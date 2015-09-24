@@ -18,7 +18,7 @@ namespace Storage
     public enum Races { MEN, ELVES, DWARFS, LIZARDMEN, GREENSKINS, CHAOS, SKAVEN, UNDEAD, OGRES };
     public enum Types { FARMER, MINER, LUMBERJACK, HERO, LIGHT, HEAVY, THROWN, CAVALRY, MACHINE, SPECIAL };
 
-    sealed class UnitInfo
+    public sealed class UnitInfo
     {
 
         public Races race = 0;
