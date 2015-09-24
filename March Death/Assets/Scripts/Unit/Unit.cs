@@ -13,12 +13,12 @@ public class Unit : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        info = Storage.InfoGather.get.getInfoOf(race, type);
+        info = Storage.InfoGather.get.getUnitInfo(race, type);
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
-	
+
 	}
 
 }

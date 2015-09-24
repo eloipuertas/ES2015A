@@ -9,14 +9,14 @@ namespace Storage
     /// <summary>
     /// Valid Races and Types for Units.
     /// Might be expanded in a future
-    /// 
+    ///
     /// <remarks>
-    /// Should something be added, append it as the last element, otherwise 
+    /// Should something be added, append it as the last element, otherwise
     /// previously assigned gameobjects might get wrong types
     /// </remarks>
     /// </summary>
     public enum Races { MEN, ELVES, DWARFS, LIZARDMEN, GREENSKINS, CHAOS, SKAVEN, UNDEAD, OGRES };
-    public enum Types { FARMER, MINER, LUMBERJACK, HERO, LIGHT, HEAVY, THROWN, CAVALRY, MACHINES, SPECIAL };
+    public enum Types { FARMER, MINER, LUMBERJACK, HERO, LIGHT, HEAVY, THROWN, CAVALRY, MACHINE, SPECIAL };
 
     sealed class UnitInfo
     {

@@ -29,11 +29,13 @@ namespace Storage
 
         /// <summary>
         /// Parses all unit files on "Assets/Units".
-        /// <exception cref="System.FileLoadException">Thrown when a unit file is not valid</exception>
+        /// <exception cref="System.FileLoadException">
+        /// Thrown when a unit file is not valid or has already been added
+        /// </exception>
         /// </summary>
         private void parseUnitFiles()
         {
-            DirectoryInfo info = new DirectoryInfo("Assets/Units");
+            DirectoryInfo info = new DirectoryInfo("Assets/Data/Units");
             var fileInfo = info.GetFiles();
             foreach (var file in fileInfo)
             {
@@ -44,9 +46,16 @@ namespace Storage
                         string json = File.ReadAllText(file.FullName);
                         UnitInfo unitInfo = JsonConvert.DeserializeObject<Storage.UnitInfo>(json);
 
-                        infoStore.Add(new Tuple<Races, Types>(unitInfo.race, unitInfo.type), unitInfo);
+                        Tuple<Races, Types> key = new Tuple<Races, Types>(unitInfo.race, unitInfo.type);
+
+                        if (infoStore.ContainsKey(key))
+                        {
+                            throw new FileLoadException("Unit info '" + file.Name + "' (" + file.FullName + ") already exists");
+                        }
+
+                        infoStore.Add(key, unitInfo);
                     }
-                    catch (Exception e)
+                    catch (JsonException e)
                     {
                         throw new FileLoadException("Unit info '" + file.Name + "' (" + file.FullName + ") is invalid\n\t" + e.Message);
                     }
@@ -61,7 +70,7 @@ namespace Storage
         /// <param name="type">Type to look for</param>
         /// <exception cref="System.NotImplementedException">Thrown when a race/type combination is not found</exception>
         /// <returns>The UnitInfo object of that race/type combination</returns>
-        public UnitInfo getInfoOf(Races race, Types type)
+        public UnitInfo getUnitInfo(Races race, Types type)
         {
             Tuple<Races, Types> key = new Tuple<Races, Types>(race, type);
 
@@ -80,10 +89,10 @@ namespace Storage
         /// <param name="race">Race of the Unit</param>
         /// <param name="type">Type of the Unit</param>
         /// <returns>The created GameObject</returns>
-        public GameObject createFromPrefab(String prefab, Races race, Types type)
+        public GameObject createUnit(String prefab, Races race, Types type)
         {
             GameObject gob = UnityEngine.Object.Instantiate((GameObject)Resources.Load(prefab, typeof(GameObject)));
-            return postCreate(gob, race, type);
+            return postCreateUnit(gob, race, type);
         }
 
         /// <summary>
@@ -95,10 +104,10 @@ namespace Storage
         /// <param name="position">Unit position</param>
         /// <param name="rotation">Unit rotation</param>
         /// <returns>The created GameObject</returns>
-        public GameObject createFromPrefab(String prefab, Races race, Types type, Vector3 position, Quaternion rotation)
+        public GameObject createUnit(String prefab, Races race, Types type, Vector3 position, Quaternion rotation)
         {
             UnityEngine.Object gob = UnityEngine.Object.Instantiate((GameObject)Resources.Load(prefab, typeof(GameObject)), position, rotation);
-            return postCreate((GameObject)gob, race, type);
+            return postCreateUnit((GameObject)gob, race, type);
         }
 
         /// <summary>
@@ -109,7 +118,7 @@ namespace Storage
         /// <param name="race">Race of the Unit</param>
         /// <param name="type">Type of the Unit</param>
         /// <returns>The set GameObject</returns>
-        private GameObject postCreate(GameObject gob, Races race, Types type)
+        private GameObject postCreateUnit(GameObject gob, Races race, Types type)
         {
             gob.GetComponent<Unit>().race = race;
             gob.GetComponent<Unit>().type = type;
