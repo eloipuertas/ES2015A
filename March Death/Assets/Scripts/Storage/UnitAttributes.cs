@@ -7,9 +7,13 @@ namespace Storage
 {
     public sealed class UnitAttributes
     {
-        public float health;
-        public float attack;
-        public float defense;
+        public int weaponAbility;
+        public int projectileAbility;
+        public int strength;
+        public int resistance;
+        public int wounds;
+
+        public float attack_rate;
         public float moving_rate;
     }
 }

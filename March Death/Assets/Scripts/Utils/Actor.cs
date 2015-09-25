@@ -26,6 +26,11 @@ namespace Utils
             callbacks[action].Add(func);
         }
 
+        public void unregister(T action, Action<GameObject> func)
+        {
+            callbacks[action].Remove(func);
+        }
+
         public void fire(T action)
         {
             foreach (Action<GameObject> func in callbacks[action])
