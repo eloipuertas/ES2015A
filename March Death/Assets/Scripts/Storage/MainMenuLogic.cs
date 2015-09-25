@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MenuLogic : MonoBehaviour {
+public class MainMenuLogic : MonoBehaviour {
 
 	/* Each one of these bool variables corresponds to the 
 	 * options of the main menu. */
@@ -9,8 +9,8 @@ public class MenuLogic : MonoBehaviour {
 	//public bool bTutorial = false;
 	//public bool bQuit = false;  // these variables wont be needed if we use tags
 
-	const Color UP_CLICK = new Color(1.0, 1.0, 0.0, 0.6);
-	const Color DOWN_CLICK = new Color(0.0, 0.0, 0.0, 0.6);
+	static readonly Color UP_CLICK = new Color(1.0f, 1.0f, 0.0f, 0.6f);
+	static readonly Color DOWN_CLICK = new Color(0.0f, 0.0f, 0.0f, 0.6f);
 
 	// Use this for initialization
 	void Start () {
