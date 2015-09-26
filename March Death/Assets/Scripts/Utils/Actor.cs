@@ -31,7 +31,7 @@ namespace Utils
             callbacks[action].Remove(func);
         }
 
-        public void fire(T action)
+        protected void fire(T action)
         {
             foreach (Action<GameObject> func in callbacks[action])
             {

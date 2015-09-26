@@ -14,6 +14,6 @@ namespace Storage
         public int wounds;
 
         public float attack_rate;
-        public float moving_rate;
+        public float movement_rate;
     }
 }

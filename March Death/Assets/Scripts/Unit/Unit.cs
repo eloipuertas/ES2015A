@@ -1,6 +1,8 @@
 ﻿using System;
 using UnityEngine;
 
+using Storage;
+
 /// <summary>
 /// Unit base class. Extends actor (which in turn extends MonoBehaviour) to
 /// handle basic API operations
@@ -81,7 +83,7 @@ public class Unit : Utils.Actor<Unit.Actions>
             return dice > 1 && (info.attributes.projectileAbility + dice >= 7);
         }
 
-        return Storage.HitTables.meleeHit[from.info.attributes.weaponAbility, info.attributes.weaponAbility] <= dice;
+        return HitTables.meleeHit[from.info.attributes.weaponAbility, info.attributes.weaponAbility] <= dice;
     }
 
     /// <summary>
@@ -92,7 +94,7 @@ public class Unit : Utils.Actor<Unit.Actions>
     private bool willAttackCauseWounds(Unit from)
     {
         int dice = Utils.D6.get.rollOnce();
-        return Storage.HitTables.wounds[from.info.attributes.strength, info.attributes.resistance] <= dice;
+        return HitTables.wounds[from.info.attributes.strength, info.attributes.resistance] <= dice;
     }
 
     /// <summary>
@@ -129,7 +131,7 @@ public class Unit : Utils.Actor<Unit.Actions>
     /// Called once our target dies. It may be used to update unit IA
     /// </summary>
     /// <param name="gob"></param>
-    public void onTargetDied(GameObject gob)
+    private void onTargetDied(GameObject gob)
     {
         // TODO: Our target died, select next? Do nothing?
         _status = Status.IDLE;
@@ -158,19 +160,19 @@ public class Unit : Utils.Actor<Unit.Actions>
         _status = Status.IDLE;
     }
 
-	// Use this for initialization
+    // Use this for initialization
     void Start ()
     {
-        info = Storage.InfoGather.get.getUnitInfo(race, type);
+        info = Info.get.unit(race, type);
         _status = Status.IDLE;
     }
 
-	// Update is called once per frame
+    // Update is called once per frame
     void Update ()
     {
         if (_status == Status.ATTACKING && _target != null)
         {
-            if (Time.time - _lastAttack >= info.attributes.attack_rate)
+            if (Time.time - _lastAttack >= (1f / (float)info.attributes.attack_rate))
             {
                 // TODO: Ranged attacks!
                 _target.receiveAttack(this, false);

@@ -10,19 +10,19 @@ using Newtonsoft.Json;
 namespace Storage
 {
     /// <summary>
-    /// InfoGather singleton class might be used to query information of a given
+    /// Info singleton class might be used to query information of a given
     /// unit race and type.
     /// It automatically parses all units on Assets/Units and stores it.
     /// </summary>
-    sealed class InfoGather : Singleton<InfoGather>
+    sealed class Info : Singleton<Info>
     {
         private Dictionary<Tuple<Races, Types>, UnitInfo> infoStore = new Dictionary<Tuple<Races, Types>, UnitInfo>();
 
         /// <summary>
         /// Private constructor, singleton access only
-        /// <remarks>Use InfoGather.get instead</remarks>
+        /// <remarks>Use Info.get instead</remarks>
         /// </summary>
-        private InfoGather()
+        private Info()
         {
             parseUnitFiles();
         }
@@ -44,7 +44,7 @@ namespace Storage
                     try
                     {
                         string json = File.ReadAllText(file.FullName);
-                        UnitInfo unitInfo = JsonConvert.DeserializeObject<Storage.UnitInfo>(json);
+                        UnitInfo unitInfo = JsonConvert.DeserializeObject<UnitInfo>(json);
 
                         Tuple<Races, Types> key = new Tuple<Races, Types>(unitInfo.race, unitInfo.type);
 
@@ -70,7 +70,7 @@ namespace Storage
         /// <param name="type">Type to look for</param>
         /// <exception cref="System.NotImplementedException">Thrown when a race/type combination is not found</exception>
         /// <returns>The UnitInfo object of that race/type combination</returns>
-        public UnitInfo getUnitInfo(Races race, Types type)
+        public UnitInfo unit(Races race, Types type)
         {
             Tuple<Races, Types> key = new Tuple<Races, Types>(race, type);
 
