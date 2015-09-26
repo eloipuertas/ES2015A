@@ -5,11 +5,15 @@ using System.Text;
 
 namespace Storage
 {
-    sealed class UnitAttributes
+    public sealed class UnitAttributes
     {
-        float health;
-        float attack;
-        float defense;
-        float moving_rate;
+        public int weaponAbility;
+        public int projectileAbility;
+        public int strength;
+        public int resistance;
+        public int wounds;
+
+        public float attack_rate;
+        public float movement_rate;
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Storage
 {
-    class UnitResources
+    public class UnitResources
     {
         public int wood = 0;
         public int metal = 0;
