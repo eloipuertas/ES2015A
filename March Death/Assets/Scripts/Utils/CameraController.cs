@@ -7,16 +7,18 @@
 public class CameraController : MonoBehaviour {
 
     private Vector3 cameraOffset;
-    private  GameObject followingGameObject;
+    private GameObject followingGameObject;
     private GameObject cameraContainer;
     private bool isManualControlEnabled;
     private float speed;
+    private float mouseWeelZoomSensitivity;
 
     void Start()
     {
         setupCamera();
         this.isManualControlEnabled = true;
         this.speed = 5f;
+        this.mouseWeelZoomSensitivity = 5f;
     }
 
     void Update()
@@ -140,11 +142,17 @@ public class CameraController : MonoBehaviour {
         {
             this.cameraContainer.transform.Translate(Vector3.right * Time.deltaTime * this.speed);
         }
+
+        handleZoom();
+
     }
 
+    /// <summary>
+    /// Setup the camera and look the pont 0, 0, 0
+    /// </summary>
     private void setupCamera()
     {
-        this.cameraOffset = new Vector3(-10f, 13.4f, -10f);
+        this.cameraOffset = new Vector3(-20f, 26.8f, -20f);
         Vector3 desiredCameraPosition = new Vector3(this.transform.position.x, this.cameraOffset.y, this.transform.position.z);
         this.cameraContainer = new GameObject("Camera");
         this.transform.localEulerAngles = new Vector3(45f, 0f, 0f);
@@ -152,7 +160,17 @@ public class CameraController : MonoBehaviour {
         this.transform.localPosition = Vector3.zero;
         this.transform.localEulerAngles = new Vector3(this.transform.localEulerAngles.x, 0, this.transform.localEulerAngles.z);
         this.cameraContainer.transform.position = desiredCameraPosition;
+        Camera.main.fieldOfView = 30;
         this.cameraContainer.transform.Rotate(Vector3.up, 45f);
+        this.lookAtPoint(Vector3.zero);
+    }
+
+    private void handleZoom()
+    {
+        float fov = Camera.main.fieldOfView;
+        fov -= Input.GetAxis("Mouse ScrollWheel") * this.mouseWeelZoomSensitivity;
+        fov = Mathf.Clamp(fov, 10, 100);
+        Camera.main.fieldOfView = fov;
     }
 
 }
