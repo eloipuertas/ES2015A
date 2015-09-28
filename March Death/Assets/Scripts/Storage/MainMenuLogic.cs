@@ -45,9 +45,10 @@ public class MainMenuLogic : MonoBehaviour {
 
 		GetComponent<Renderer>().material.color = col;
 
-
-		if(this.CompareTag("bStart")) { Debug.Log("START"); }
-		else if(this.CompareTag("bTutorial")) { Debug.Log("TUTORIAL"); }
-		else { Debug.Log("QUIT"); }
+		if(bStillInside){
+			if(this.CompareTag("bStart")) { Application.LoadLevel(2); }
+			else if(this.CompareTag("bTutorial")) { Application.LoadLevel(1); }
+			else { Application.Quit (); }
+		}
 	}
 }
