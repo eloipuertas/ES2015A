@@ -2,38 +2,52 @@
 using System.Collections;
 
 public class MainMenuLogic : MonoBehaviour {
+	
+	static readonly Color UP_CLICK = new Color(1.0f, 1.0f, 1.0f, 0.6f); // WHITE
+	static readonly Color DOWN_CLICK = new Color(0.0f, 0.0f, 0.0f, 0.6f); // GREY
+	static readonly Color ENTER_OVER = new Color(0.8f, 1.0f, 0.0f, 0.6f); // YELLOW - GREEN
+	static readonly Color EXIT_OVER = new Color(1.0f, 1.0f, 1.0f, 0.6f); // WHITE
 
-	/* Each one of these bool variables corresponds to the 
-	 * options of the main menu. */
-	//public bool bStart = false;
-	//public bool bTutorial = false;
-	//public bool bQuit = false;  // these variables wont be needed if we use tags
-
-	static readonly Color UP_CLICK = new Color(1.0f, 1.0f, 0.0f, 0.6f);
-	static readonly Color DOWN_CLICK = new Color(0.0f, 0.0f, 0.0f, 0.6f);
+	bool bStillInside = false;
 
 	// Use this for initialization
 	void Start () {
 		Cursor.visible = true;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+
+	/* MOUSE OVER */
+
+	/* This method changes the color of the object we are over on entering */
+	void OnMouseEnter(){
+		GetComponent<Renderer>().material.color = ENTER_OVER;
+		bStillInside = true;
 	}
+
+	/* This method changes the color of the object we are over on exiting */
+	void OnMouseExit(){
+		GetComponent<Renderer>().material.color = EXIT_OVER;
+		bStillInside = false;
+	}
+
+	/* MOUSE CLICK */
 
 	/* This method changes the color of the object we are clicking */
 	void OnMouseDown() {
-		GetComponent<Renderer>().material.color = UP_CLICK;
+		GetComponent<Renderer>().material.color = DOWN_CLICK;
 	}
 
 	/* This method moves to another scene or quit */
 	void OnMouseUp() {
 
-		GetComponent<Renderer>().material.color = DOWN_CLICK;
+		Color col;
 
-		if(this.CompareTag("bStart")) { Application.LoadLevel(1); }
-		else if(this.CompareTag("bTutorial")) { Application.LoadLevel(2); }
-		else { Application.Quit(); }
+		col = bStillInside ? ENTER_OVER : UP_CLICK;
+
+		GetComponent<Renderer>().material.color = col;
+
+
+		if(this.CompareTag("bStart")) { Debug.Log("START"); }
+		else if(this.CompareTag("bTutorial")) { Debug.Log("TUTORIAL"); }
+		else { Debug.Log("QUIT"); }
 	}
 }
