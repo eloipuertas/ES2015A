@@ -6,31 +6,64 @@
 [RequireComponent(typeof(Camera))]
 public class CameraController : MonoBehaviour {
 
+    private const float CAMERA_MAX_ZOOM = 10;
+    private const float CAMERA_MIN_ZOOM = 100;
+
     private Vector3 cameraOffset;
     private GameObject followingGameObject;
     private GameObject cameraContainer;
     private bool isManualControlEnabled;
-    private float speed;
-    private float mouseWeelZoomSensitivity;
+
+    //Camera smooth translation atributes
+    private Vector3 lerpStart, lerpEnd;
+    private float lerpPosition, lerpTime;
+    private bool isLerping;
+
+    private float _cameraSpeed;
+    private float _mouseWeelZoomSensitivity;
+    private float _defaultLerpTime;
+
+    public float defaultLerpTime
+    {
+        get { return _defaultLerpTime; }
+    }
+
+    public float mouseWeelZoomSensitivity
+    {
+        get { return _mouseWeelZoomSensitivity; }
+    }
+
+    public float cameraSpeed
+    {
+        get { return _cameraSpeed; }
+    }
 
     void Start()
     {
         setupCamera();
-        this.isManualControlEnabled = true;
-        this.speed = 5f;
-        this.mouseWeelZoomSensitivity = 5f;
+        _cameraSpeed = 5f;
+        _mouseWeelZoomSensitivity = 5f;
+        _defaultLerpTime = 2f;
+        lerpTime = 2f;
+        isManualControlEnabled = true;
+        isLerping = false;
     }
 
     void Update()
     {
-        if (this.followingGameObject != null)
+        if (followingGameObject != null)
         {
-            this.lookGameObject(followingGameObject);
+            lookGameObject(followingGameObject);
         }
 
-        if (this.isManualControlEnabled)
+        if (isManualControlEnabled)
         {
             handlePlayerInput();
+        }
+
+        if (isLerping)
+        {
+            handleSmoothTravel();
         }
     }
 
@@ -40,9 +73,9 @@ public class CameraController : MonoBehaviour {
     /// <param name="target"></param>
     public void lookAtPoint(Vector3 target)
     {
-        this.followingGameObject = null;
+        stopAllAutomaticTasks();
         Vector3 newCameraPos = target + cameraOffset;
-        this.cameraContainer.transform.position = newCameraPos;
+        cameraContainer.transform.position = newCameraPos;
     }
 
     /// <summary>
@@ -51,8 +84,9 @@ public class CameraController : MonoBehaviour {
     /// <param name="target"></param>
     public void lookGameObject(GameObject target)
     {
+        stopAllAutomaticTasks();
         Vector3 newCameraPos = target.transform.position + cameraOffset;
-        this.cameraContainer.transform.position = newCameraPos;
+        cameraContainer.transform.position = newCameraPos;
     }
 
     /// <summary>
@@ -61,7 +95,8 @@ public class CameraController : MonoBehaviour {
     /// <param name="target"></param>
     public void followGameObject(GameObject target)
     {
-        this.followingGameObject = target;
+        stopAllAutomaticTasks();
+        followingGameObject = target;
     }
     
     /// <summary>
@@ -69,7 +104,7 @@ public class CameraController : MonoBehaviour {
     /// </summary>
     public void stopFollowing()
     {
-        this.followingGameObject = null;
+        followingGameObject = null;
     }
 
     /// <summary>
@@ -77,8 +112,8 @@ public class CameraController : MonoBehaviour {
     /// </summary>
     public void enableManualControl()
     {
-        this.followingGameObject = null;
-        this.isManualControlEnabled = true;
+        stopAllAutomaticTasks();
+        isManualControlEnabled = true;
     }
 
 
@@ -87,7 +122,7 @@ public class CameraController : MonoBehaviour {
     /// </summary>
     public void disableManualControl()
     {
-        this.isManualControlEnabled = false;
+        isManualControlEnabled = false;
     }
 
     /// <summary>
@@ -96,20 +131,43 @@ public class CameraController : MonoBehaviour {
     /// <param name="newSpeed"></param>
     public void setCameraSpeed(float newSpeed)
     {
-        this.speed = newSpeed;
+        if(newSpeed > 0)
+        {
+            _cameraSpeed = newSpeed;
+        }
     }
 
-    
+
     /// <summary>
-    /// Make the camera smoootly travel and look at certain game object at certain speed.
+    /// Sets the sensitivity of the mouse to make zoom
+    /// </summary>
+    /// <param name="newWeelSensitivity">New sensitivity</param>
+    public void setZoomSpeed(float newWeelSensitivity)
+    {
+        if(newWeelSensitivity > 0)
+        {
+            _mouseWeelZoomSensitivity = newWeelSensitivity;
+        }
+    }
+
+
+    /// <summary>
+    /// Make the camera smoootly travel and look at certain game object at certain time controled in seconds.
     /// Usefull to make some kind of camera animations 
     /// </summary>
     /// <param name="target">The desired target that you want to reach</param>
-    /// <param name="speed">Optional if not provided the speed will be default camera speed</param>
-    public void smoothTravelToTarget(GameObject target, float speed = -1)
+    /// <param name="time">Optional if not provided the time will be default camera time</param>
+    public void smoothTravelToTarget(GameObject target, float time = -1)
     {
+        stopAllAutomaticTasks();
+        lerpStart = transform.position;
+        lerpEnd = target.transform.position + cameraOffset;
+        if(time == -1)
+        {
+            lerpTime = defaultLerpTime;
+        }
+        isLerping = true;
     }
-
 
     /// <summary>
     /// Make the camera smoootly travel and look at certain position at certain speed.
@@ -117,60 +175,142 @@ public class CameraController : MonoBehaviour {
     /// </summary>
     /// <param name="target">The desired position that you want to look at.</param>
     /// <param name="speed">Optional if not provided the speed will be default camera speed</param>
-    public void smoothTravelToPosition(Vector3 position, float speed = -1)
+    public void smoothTravelToPosition(Vector3 position, float time = -1)
     {
+        stopAllAutomaticTasks();
+        lerpStart = transform.position;
+        lerpEnd = position + cameraOffset;
+
+        if (time == -1)
+        {
+            lerpTime = defaultLerpTime;
+        }
+
+        isLerping = true;
     }
 
-    private void handlePlayerInput()
+
+    /// <summary>
+    /// Sets the new smooth travel duration
+    /// </summary>
+    /// <param name="newSmoothTravelDuration"> new smooth travel duration in seconds </param>
+    public void setDefaultSmoothTravelTime(float newSmoothTravelDuration)
     {
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+        if(newSmoothTravelDuration > 0)
         {
-            this.cameraContainer.transform.Translate(Vector3.forward * Time.deltaTime * this.speed);
+            _defaultLerpTime = newSmoothTravelDuration;
         }
-
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-        {
-            this.cameraContainer.transform.Translate(Vector3.left * Time.deltaTime * this.speed);
-        }
-
-        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
-        {
-            this.cameraContainer.transform.Translate(Vector3.back * Time.deltaTime * this.speed);
-        }
-
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-        {
-            this.cameraContainer.transform.Translate(Vector3.right * Time.deltaTime * this.speed);
-        }
-
-        handleZoom();
-
     }
+
+
+    /// <summary>
+    /// Stops the smooth travel 
+    /// </summary>
+    public void stopSmoothTravel()
+    {
+        isLerping = false;
+    }
+
 
     /// <summary>
     /// Setup the camera and look the pont 0, 0, 0
     /// </summary>
     private void setupCamera()
     {
-        this.cameraOffset = new Vector3(-20f, 26.8f, -20f);
-        Vector3 desiredCameraPosition = new Vector3(this.transform.position.x, this.cameraOffset.y, this.transform.position.z);
-        this.cameraContainer = new GameObject("Camera");
-        this.transform.localEulerAngles = new Vector3(45f, 0f, 0f);
-        this.gameObject.transform.parent = this.cameraContainer.transform;
-        this.transform.localPosition = Vector3.zero;
-        this.transform.localEulerAngles = new Vector3(this.transform.localEulerAngles.x, 0, this.transform.localEulerAngles.z);
-        this.cameraContainer.transform.position = desiredCameraPosition;
+        cameraOffset = new Vector3(-20f, 26.8f, -20f);
+        Vector3 desiredCameraPosition = new Vector3(transform.position.x, cameraOffset.y, transform.position.z);
+        cameraContainer = new GameObject("Camera");
+        transform.localEulerAngles = new Vector3(45f, 0f, 0f);
+        gameObject.transform.parent = cameraContainer.transform;
+        transform.localPosition = Vector3.zero;
+        transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 0, transform.localEulerAngles.z);
+        cameraContainer.transform.position = desiredCameraPosition;
         Camera.main.fieldOfView = 30;
-        this.cameraContainer.transform.Rotate(Vector3.up, 45f);
-        this.lookAtPoint(Vector3.zero);
+        cameraContainer.transform.Rotate(Vector3.up, 45f);
+        lookAtPoint(Vector3.zero);
     }
 
+
+    /// <summary>
+    /// Sets the new zoom of the camera
+    /// </summary>
+    /// <param name="newZoom"> A number between 10 (max zoom) and 100 (min zoom) </param>
+    public void setCameraZoom(float newZoom)
+    {
+        float fov = Mathf.Clamp(newZoom, CAMERA_MAX_ZOOM, CAMERA_MIN_ZOOM);
+        if(newZoom > 0)
+        {
+            Camera.main.fieldOfView = fov;
+        }
+    }
+
+
+    /// <summary>
+    /// Internal Camera method used to perform an smooth travel in certain time between to points
+    /// </summary>
+    private void handleSmoothTravel()
+    {
+        lerpPosition += Time.deltaTime / lerpTime;
+        transform.position = Vector3.Lerp(lerpStart, lerpEnd, lerpPosition);
+
+        if (transform.position.Equals(lerpEnd))
+        {
+            isLerping = false;
+        }
+    }
+
+
+    /// <summary>
+    /// Internal Camera method used to handle player input.
+    /// </summary>
+    private void handlePlayerInput()
+    {
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+        {
+            cameraContainer.transform.Translate(Vector3.forward * Time.deltaTime * _cameraSpeed);
+        }
+
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+        {
+            cameraContainer.transform.Translate(Vector3.left * Time.deltaTime * _cameraSpeed);
+        }
+
+        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+        {
+            cameraContainer.transform.Translate(Vector3.back * Time.deltaTime * _cameraSpeed);
+        }
+
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+        {
+            cameraContainer.transform.Translate(Vector3.right * Time.deltaTime * _cameraSpeed);
+        }
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            stopSmoothTravel();
+        }
+
+        handleZoom();
+    }
+
+
+    /// <summary>
+    /// Internal Camera method used to handle player Zoom
+    /// </summary>
     private void handleZoom()
     {
         float fov = Camera.main.fieldOfView;
-        fov -= Input.GetAxis("Mouse ScrollWheel") * this.mouseWeelZoomSensitivity;
-        fov = Mathf.Clamp(fov, 10, 100);
-        Camera.main.fieldOfView = fov;
+        fov -= Input.GetAxis("Mouse ScrollWheel") * _mouseWeelZoomSensitivity;
+        setCameraZoom(fov);
     }
 
+
+    /// <summary>
+    /// Stops all the actual automatic functions
+    /// </summary>
+    private void stopAllAutomaticTasks()
+    {
+        stopFollowing();
+        stopSmoothTravel();
+    }
 }
