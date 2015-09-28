@@ -44,7 +44,7 @@ public class CameraController : MonoBehaviour {
         _cameraSpeed = 5f;
         _mouseWeelZoomSensitivity = 5f;
         _defaultLerpTime = 2f;
-        lerpTime = 20f;
+        lerpTime = 2f;
         isManualControlEnabled = true;
         isLerping = false;
     }
