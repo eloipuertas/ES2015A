@@ -44,7 +44,7 @@ public class CameraController : MonoBehaviour {
         _cameraSpeed = 5f;
         _mouseWeelZoomSensitivity = 5f;
         _defaultLerpTime = 2f;
-        lerpTime = 2f;
+        lerpTime = 20f;
         isManualControlEnabled = true;
         isLerping = false;
     }
@@ -166,6 +166,10 @@ public class CameraController : MonoBehaviour {
         {
             lerpTime = defaultLerpTime;
         }
+        else
+        {
+            lerpTime = time;
+        }
         isLerping = true;
     }
 
@@ -185,10 +189,39 @@ public class CameraController : MonoBehaviour {
         {
             lerpTime = defaultLerpTime;
         }
+        else
+        {
+            lerpTime = time;
+        }
 
         isLerping = true;
     }
 
+
+
+    /// <summary>
+    /// Make the camera travel between to points of the map in a certain time
+    /// </summary>
+    /// <param name="origin"> The origin of the travel</param>
+    /// <param name="end"> The end of the travel</param>
+    /// <param name="time">Duration of the travel</param>
+    public void smoothTravelBetweenTwoPoints(Vector3 origin, Vector3 end, float time = -1)
+    {
+        stopAllAutomaticTasks();
+        lerpStart = origin + cameraOffset;
+        lerpEnd = end + cameraOffset;
+
+        if (time == -1)
+        {
+            lerpTime = defaultLerpTime;
+        }
+        else
+        {
+            lerpTime = time;
+        }
+
+        isLerping = true;
+    }
 
     /// <summary>
     /// Sets the new smooth travel duration
