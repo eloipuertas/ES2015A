@@ -15,17 +15,14 @@ namespace Storage
     /// previously assigned gameobjects might get wrong types
     /// </remarks>
     /// </summary>
-    public enum Races { MEN, ELVES, DWARFS, LIZARDMEN, GREENSKINS, CHAOS, SKAVEN, UNDEAD, OGRES };
-    public enum Types { FARMER, MINER, LUMBERJACK, HERO, LIGHT, HEAVY, THROWN, CAVALRY, MACHINE, SPECIAL };
+    public enum UnitTypes { FARMER, MINER, LUMBERJACK, HERO, LIGHT, HEAVY, THROWN, CAVALRY, MACHINE, SPECIAL };
 
-    public sealed class UnitInfo
+    public sealed class UnitInfo : EntityInfo
     {
-
-        public Races race = 0;
-        public Types type = 0;
+        public UnitTypes type = 0;
 
         public UnitAttributes attributes = null;
-        public UnitResources resources = null;
+        public List<UnitAbility> abilities = new List<UnitAbility>();
 
 
         /// <summary>
@@ -35,7 +32,7 @@ namespace Storage
         {
             get
             {
-                return type == Types.FARMER || type == Types.MINER || type == Types.LUMBERJACK;
+                return type == UnitTypes.FARMER || type == UnitTypes.MINER || type == UnitTypes.LUMBERJACK;
             }
         }
 

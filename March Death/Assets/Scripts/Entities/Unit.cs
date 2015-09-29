@@ -1,42 +1,55 @@
 ﻿using System;
+using System.Reflection;
+using System.Collections.Generic;
 using UnityEngine;
-
 using Storage;
+
 
 /// <summary>
 /// Unit base class. Extends actor (which in turn extends MonoBehaviour) to
 /// handle basic API operations
 /// </summary>
-public class Unit : Utils.Actor<Unit.Actions>
+public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
 {
     public enum Actions { DIED };
-    public enum Status { IDLE, ATTACKING, DEAD };
 
     public Unit() { }
 
     /// <summary>
     /// Edit this on the Prefab to set Units of certain races/types
     /// </summary>
-    public Storage.Races race = Storage.Races.MEN;
-    public Storage.Types type = Storage.Types.HERO;
+    public Races race = Races.MEN;
+    public UnitTypes type = UnitTypes.HERO;
 
     /// <summary>
-    /// Contains all static information of the Unit.
-    /// That means: max health, damage, defense, etc.
-    /// </summary>
-    public Storage.UnitInfo info { get; set; }
-
-    /// <summary>
-    /// If in battle, this is the target
+    /// If in battle, this is the target and last attack time
     /// </summary>
     private Unit _target = null;
     private double _lastAttack = 0;
 
     /// <summary>
+    /// List of ability objects of this unit
+    /// </summary>
+    private List<IAbility> _abilities;
+
+    /// <summary>
+    /// Contains all static information of the Unit.
+    /// That means: max health, damage, defense, etc.
+    /// </summary>
+    private UnitInfo _info;
+    public EntityInfo info
+    {
+        get
+        {
+            return _info;
+        }
+    }
+
+    /// <summary>
     /// Returns current status of the Unit
     /// </summary>
-    private Status _status;
-    private Status status
+    private EntityStatus _status;
+    public EntityStatus status
     {
         get
         {
@@ -55,15 +68,26 @@ public class Unit : Utils.Actor<Unit.Actions>
             return _woundsReceived;
         }
     }
-    
+
     /// <summary>
-    /// Contains percentual value of health (100-0%)
+    /// Returns percentual value of health (100% meaning all life)
     /// </summary>
-    public float woundsPct
+    public float healthPercentage
     {
         get
         {
-            return (info.attributes.wounds - _woundsReceived) * 100f / info.attributes.wounds;
+            return (_info.attributes.wounds - _woundsReceived) * 100f / _info.attributes.wounds;
+        }
+    }
+
+    /// <summary>
+    /// Returns percentual value of damage (100% meaning 0% life)
+    /// </summary>
+    public float damagePercentage
+    {
+        get
+        {
+            return 100f - healthPercentage;
         }
     }
 
@@ -80,10 +104,10 @@ public class Unit : Utils.Actor<Unit.Actions>
         if (isRanged)
         {
             // TODO: Specil units (ie gigants) and distance!
-            return dice > 1 && (info.attributes.projectileAbility + dice >= 7);
+            return dice > 1 && (_info.attributes.projectileAbility + dice >= 7);
         }
 
-        return HitTables.meleeHit[from.info.attributes.weaponAbility, info.attributes.weaponAbility] <= dice;
+        return HitTables.meleeHit[from._info.attributes.weaponAbility, _info.attributes.weaponAbility] <= dice;
     }
 
     /// <summary>
@@ -94,7 +118,7 @@ public class Unit : Utils.Actor<Unit.Actions>
     private bool willAttackCauseWounds(Unit from)
     {
         int dice = Utils.D6.get.rollOnce();
-        return HitTables.wounds[from.info.attributes.strength, info.attributes.resistance] <= dice;
+        return HitTables.wounds[from._info.attributes.strength, _info.attributes.resistance] <= dice;
     }
 
     /// <summary>
@@ -106,7 +130,7 @@ public class Unit : Utils.Actor<Unit.Actions>
     public void receiveAttack(Unit from, bool isRanged)
     {
         // Do not attack dead targets
-        if (_status == Status.DEAD)
+        if (_status == EntityStatus.DEAD)
         {
             throw new InvalidOperationException("Can not receive damage while not alive");
         }
@@ -118,9 +142,9 @@ public class Unit : Utils.Actor<Unit.Actions>
         }
 
         // Check if we are dead
-        if (_woundsReceived == info.attributes.wounds)
+        if (_woundsReceived == _info.attributes.wounds)
         {
-            _status = Status.DEAD;
+            _status = EntityStatus.DEAD;
             _target = null;
 
             fire(Actions.DIED);
@@ -134,7 +158,7 @@ public class Unit : Utils.Actor<Unit.Actions>
     private void onTargetDied(GameObject gob)
     {
         // TODO: Our target died, select next? Do nothing?
-        _status = Status.IDLE;
+        _status = EntityStatus.IDLE;
     }
 
     /// <summary>
@@ -146,7 +170,7 @@ public class Unit : Utils.Actor<Unit.Actions>
     {
         _target = unit;
         _target.register(Actions.DIED, onTargetDied);
-        _status = Status.ATTACKING;
+        _status = EntityStatus.ATTACKING;
     }
 
     /// <summary>
@@ -157,27 +181,61 @@ public class Unit : Utils.Actor<Unit.Actions>
         _target.unregister(Actions.DIED, onTargetDied);
         // TODO: Maybe we should not set it to null? In case we want to attack it again
         _target = null; 
-        _status = Status.IDLE;
+        _status = EntityStatus.IDLE;
+    }
+
+    /// <summary>
+    /// Iterates all abilities on the 
+    /// </summary>
+    private void setupAbilities()
+    {
+        _abilities = new List<IAbility>();
+
+        foreach (UnitAbility ability in _info.abilities)
+        {
+            // Try to get class with this name
+            string abilityName = ability.name.Replace(" ", "");
+
+            var constructor = Type.GetType(abilityName).
+                GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(UnitAbility), typeof(GameObject) }, null);
+            if (constructor == null)
+            {
+                // No such class, use the GenericAbility class
+                _abilities.Add(new GenericAbility(ability));
+            }
+            else
+            {
+                // Class found, use that!
+                _abilities.Add((IAbility)constructor.Invoke(new object[2] { ability, gameObject }));
+            }
+        }
     }
 
     // Use this for initialization
     void Start ()
     {
-        info = Info.get.unit(race, type);
-        _status = Status.IDLE;
+        _status = EntityStatus.IDLE;
+        _info = Info.get.of(race, type);
+        setupAbilities();
+
+        Debug.Log(_info.attributes.weaponAbility);
+        Debug.Log(_info.name);
     }
 
     // Update is called once per frame
     void Update ()
     {
-        if (_status == Status.ATTACKING && _target != null)
+        if (_status == EntityStatus.ATTACKING && _target != null)
         {
-            if (Time.time - _lastAttack >= (1f / (float)info.attributes.attack_rate))
+            if (Time.time - _lastAttack >= (1f / _info.attributes.attackRate))
             {
                 // TODO: Ranged attacks!
                 _target.receiveAttack(this, false);
             }
         }
     }
+
+    public Unit toUnit() { return this;  }
+    public Building toBuilding() { return null; }
 
 }
