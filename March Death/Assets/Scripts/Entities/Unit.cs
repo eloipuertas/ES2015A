@@ -58,6 +58,11 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     }
 
     /// <summary>
+    /// Civil units might need this to acount how many *items* they are carrying.
+    /// </summary>
+    public int usedCapacity { get; set; }
+
+    /// <summary>
     /// Returns the number of wounds a unit received
     /// </summary>
     private float _woundsReceived;
