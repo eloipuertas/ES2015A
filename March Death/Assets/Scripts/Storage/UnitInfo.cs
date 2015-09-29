@@ -23,29 +23,5 @@ namespace Storage
 
         public UnitAttributes attributes = null;
         public List<UnitAbility> abilities = new List<UnitAbility>();
-
-
-        /// <summary>
-        /// Returns true if the unit is civil, false otherwise
-        /// </summary>
-        public bool isCivil
-        {
-            get
-            {
-                return type == UnitTypes.FARMER || type == UnitTypes.MINER || type == UnitTypes.LUMBERJACK;
-            }
-        }
-
-        /// <summary>
-        /// Returns true if the unit is of the army, false otherwise
-        /// </summary>
-        public bool isArmy
-        {
-            get
-            {
-                return !isCivil;
-            }
-        }
-
     }
 }

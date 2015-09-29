@@ -217,9 +217,6 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
         _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
         setupAbilities();
-
-        Debug.Log(_info.attributes.weaponAbility);
-        Debug.Log(_info.name);
     }
 
     // Update is called once per frame
