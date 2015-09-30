@@ -11,7 +11,7 @@ using Storage;
 /// </summary>
 public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
 {
-    public enum Actions { MOVEMENT_START, MOVEMENT_END, DIED };
+    public enum Actions { MOVEMENT_START, MOVEMENT_END, DAMAGED, DIED };
 
     public Unit() { }
 
@@ -149,6 +149,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
         if (willAttackLand(from, isRanged) && willAttackCauseWounds(from))
         {
             _woundsReceived += 1;
+            fire(Actions.DAMAGED);
         }
 
         // Check if we are dead
@@ -190,7 +191,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     {
         _target.unregister(Actions.DIED, onTargetDied);
         // TODO: Maybe we should not set it to null? In case we want to attack it again
-        _target = null; 
+        _target = null;
         _status = EntityStatus.IDLE;
     }
 
@@ -216,7 +217,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     }
 
     /// <summary>
-    /// Iterates all abilities on the 
+    /// Iterates all abilities on the
     /// </summary>
     private void setupAbilities()
     {
@@ -251,7 +252,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
         _info = Info.get.of(race, type);
         setupAbilities();
     }
-    
+
     /// <summary>
     /// Called once a frame to update the object
     /// </summary>
@@ -299,9 +300,9 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
         {
             case EntityStatus.MOVING:
                 // TODO: Steps on the last sector are smoothened due to distance being small
-                // Althought it's an unintended behaviour, it may be interesating to leave it as is 
+                // Althought it's an unintended behaviour, it may be interesating to leave it as is
                 transform.position = Vector3.MoveTowards(transform.position, _movePoint, Time.fixedDeltaTime * _info.attributes.movementRate);
-                
+
                 // If distance is lower than 0.5, stop movement
                 if (Vector3.Distance(transform.position, _movePoint) <= 0.5f)
                 {
