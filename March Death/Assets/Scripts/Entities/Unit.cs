@@ -286,7 +286,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
 
             // We need to actually hit an object
             RaycastHit hit;
-            if (!Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out hit, 100))
+            if (!Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out hit, 1000))
                 return;
 
             // We need to hit something (with a collider on it)
