@@ -244,6 +244,27 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     }
 
     /// <summary>
+    /// Returns an action given a name
+    /// </summary>
+    /// <param name="name">Name of the action</param>
+    /// <exception cref="System.ArgumentException">
+    /// Thrown when no action with the given name is found
+    /// </exception>
+    /// <returns>Always returns a valid IUnitAbility (IAction)</returns>
+    public IAction getAction(string name)
+    {
+        foreach (IUnitAbility ability in _abilities)
+        {
+            if (ability.info.name.Equals(name))
+            {
+                return ability;
+            }
+        }
+
+        throw new ArgumentException("Invalid action " + name + "requested");
+    }
+
+    /// <summary>
     /// Object initialization
     /// </summary>
     void Start()

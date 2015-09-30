@@ -10,6 +10,8 @@ public interface IGameEntity
     float damagePercentage { get; }
     float healthPercentage { get; }
 
+    IAction getAction(string name);
+
     Unit toUnit();
     Building toBuilding();
 }

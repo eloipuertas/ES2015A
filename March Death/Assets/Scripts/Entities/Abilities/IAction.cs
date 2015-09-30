@@ -5,6 +5,8 @@ using System.Text;
 
 public interface IAction
 {
+    Storage.EntityAction info { get; }
+
     bool isActive { get; }
     bool isUsable { get; }
 

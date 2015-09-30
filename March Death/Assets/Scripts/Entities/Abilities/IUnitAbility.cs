@@ -7,7 +7,5 @@ public enum Modifier { WEAPON, PROJECTILE, STRENGTH, RESISTANCE, WOUNDS, ATTACKR
 
 public interface IUnitAbility : IAction
 {
-    Storage.UnitAbility info { get; }
-
     T getModifier<T>(Modifier modifier);
 }

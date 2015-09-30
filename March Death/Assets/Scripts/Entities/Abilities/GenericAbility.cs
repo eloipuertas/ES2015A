@@ -13,7 +13,7 @@ class GenericAbility : IUnitAbility
     }
 
     private UnitAbility _info = null;
-    public UnitAbility info
+    public EntityAction info
     {
         get
         {
