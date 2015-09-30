@@ -51,7 +51,7 @@ public class CameraController : MonoBehaviour
         isLerping = false;
         lookAtPoint(Vector3.zero);
         setCameraZoom(20f);
-        setCameraSpeed(25f);
+        setCameraSpeed(20f);
     }
 
     void Update()
