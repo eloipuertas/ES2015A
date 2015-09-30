@@ -1,10 +1,4 @@
 ﻿using UnityEngine;
-// Dia 30/09/2015
-// Jacint 8/16
-// Albert Igual
-// Marti 10
-// Guillem 4
-// 
 
 /// <summary>
 /// Attach this script to the main camera and it will be able to be controlled like an Isometric Camera.
