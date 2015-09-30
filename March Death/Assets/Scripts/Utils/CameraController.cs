@@ -228,6 +228,17 @@ public class CameraController : MonoBehaviour
     }
 
     /// <summary>
+    /// Make the camera travel between to gameobjects of the map in a certain time
+    /// </summary>
+    /// <param name="origin"> The origin gameobject</param>
+    /// <param name="end"> The destination gameobject</param>
+    /// <param name="time">Duration of the travel between the game objects</param>
+    public void smoothTravelBetweenTwoGameObjects(GameObject origin, GameObject end, float time = -1)
+    {
+        smoothTravelBetweenTwoPoints(origin.transform.position, end.transform.position);
+    }
+
+    /// <summary>
     /// Sets the new smooth travel duration
     /// </summary>
     /// <param name="newSmoothTravelDuration"> new smooth travel duration in seconds </param>
