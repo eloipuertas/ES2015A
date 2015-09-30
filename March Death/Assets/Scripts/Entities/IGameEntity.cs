@@ -1,6 +1,6 @@
 ﻿using Storage;
 
-public enum EntityStatus { IDLE, ATTACKING, DEAD };
+public enum EntityStatus { IDLE, MOVING, ATTACKING, DEAD };
 
 public interface IGameEntity
 {
