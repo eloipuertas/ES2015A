@@ -35,7 +35,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     /// <summary>
     /// List of ability objects of this unit
     /// </summary>
-    private List<IAbility> _abilities;
+    private List<IUnitAbility> _abilities;
 
     /// <summary>
     /// Contains all static information of the Unit.
@@ -221,9 +221,9 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     /// </summary>
     private void setupAbilities()
     {
-        _abilities = new List<IAbility>();
+        _abilities = new List<IUnitAbility>();
 
-        foreach (UnitAbility ability in _info.abilities)
+        foreach (UnitAbility ability in _info.actions)
         {
             // Try to get class with this name
             string abilityName = ability.name.Replace(" ", "");
@@ -238,7 +238,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
             else
             {
                 // Class found, use that!
-                _abilities.Add((IAbility)constructor.Invoke(new object[2] { ability, gameObject }));
+                _abilities.Add((IUnitAbility)constructor.Invoke(new object[2] { ability, gameObject }));
             }
         }
     }

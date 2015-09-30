@@ -5,10 +5,8 @@ using System.Text;
 
 namespace Storage
 {
-    public sealed class UnitAbility
+    public sealed class UnitAbility : EntityAction
     {
-        public string name;
-
         public int weaponAbilityModifier;
         public int projectileAbilityModifier;
         public int strengthModifier;

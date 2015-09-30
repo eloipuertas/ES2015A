@@ -22,6 +22,5 @@ namespace Storage
         public UnitTypes type = 0;
 
         public UnitAttributes attributes = null;
-        public List<UnitAbility> abilities = new List<UnitAbility>();
     }
 }

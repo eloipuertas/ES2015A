@@ -1,15 +1,49 @@
 ﻿using System;
 using Storage;
 
-class GenericAbility : IAbility
+class GenericAbility : IUnitAbility
 {
+    private bool _enabled = false;
+    public bool isActive
+    {
+        get
+        {
+            return _enabled;
+        }
+    }
+
     private UnitAbility _info = null;
-    private Boolean _enabled = false;
+    public UnitAbility info
+    {
+        get
+        {
+            return _info;
+        }
+    }
+
+    public bool isUsable
+    {
+        get
+        {
+            return true;
+        }
+    }
 
     public GenericAbility(UnitAbility info) { _info = info; }
 
     public void disable() { _enabled = false; }
     public void enable() { _enabled = true; }
+    public void toggle()
+    {
+        if (_enabled)
+        {
+            disable();
+        }
+        else
+        {
+            enable();
+        }
+    }
 
     public T getModifier<T>(Modifier modifier)
     {
