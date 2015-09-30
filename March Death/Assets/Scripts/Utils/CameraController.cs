@@ -1,12 +1,19 @@
 ﻿using UnityEngine;
+// Dia 30/09/2015
+// Jacint 8/16
+// Albert Igual
+// Marti 10
+// Guillem 4
+// 
 
 /// <summary>
 /// Attach this script to the main camera and it will be able to be controlled like an Isometric Camera.
 /// </summary>
 [RequireComponent(typeof(Camera))]
-public class CameraController : MonoBehaviour {
+public class CameraController : MonoBehaviour
+{
 
-    private const float CAMERA_MAX_ZOOM = 10;
+    private const float CAMERA_MAX_ZOOM = 5;
     private const float CAMERA_MIN_ZOOM = 100;
 
     private Vector3 cameraOffset;
@@ -22,6 +29,7 @@ public class CameraController : MonoBehaviour {
     private float _cameraSpeed;
     private float _mouseWeelZoomSensitivity;
     private float _defaultLerpTime;
+
 
     public float defaultLerpTime
     {
@@ -47,15 +55,13 @@ public class CameraController : MonoBehaviour {
         lerpTime = 2f;
         isManualControlEnabled = true;
         isLerping = false;
+        lookAtPoint(Vector3.zero);
+        setCameraZoom(20f);
+        setCameraSpeed(25f);
     }
 
     void Update()
     {
-        if (followingGameObject != null)
-        {
-            lookGameObject(followingGameObject);
-        }
-
         if (isManualControlEnabled)
         {
             handlePlayerInput();
@@ -64,6 +70,11 @@ public class CameraController : MonoBehaviour {
         if (isLerping)
         {
             handleSmoothTravel();
+        }
+
+        if (followingGameObject != null)
+        {
+            lookGameObject(followingGameObject);
         }
     }
 
@@ -84,7 +95,6 @@ public class CameraController : MonoBehaviour {
     /// <param name="target"></param>
     public void lookGameObject(GameObject target)
     {
-        stopAllAutomaticTasks();
         Vector3 newCameraPos = target.transform.position + cameraOffset;
         cameraContainer.transform.position = newCameraPos;
     }
@@ -98,7 +108,7 @@ public class CameraController : MonoBehaviour {
         stopAllAutomaticTasks();
         followingGameObject = target;
     }
-    
+
     /// <summary>
     /// Stops the camera follow
     /// </summary>
@@ -131,7 +141,7 @@ public class CameraController : MonoBehaviour {
     /// <param name="newSpeed"></param>
     public void setCameraSpeed(float newSpeed)
     {
-        if(newSpeed > 0)
+        if (newSpeed > 0)
         {
             _cameraSpeed = newSpeed;
         }
@@ -144,7 +154,7 @@ public class CameraController : MonoBehaviour {
     /// <param name="newWeelSensitivity">New sensitivity</param>
     public void setZoomSpeed(float newWeelSensitivity)
     {
-        if(newWeelSensitivity > 0)
+        if (newWeelSensitivity > 0)
         {
             _mouseWeelZoomSensitivity = newWeelSensitivity;
         }
@@ -162,7 +172,7 @@ public class CameraController : MonoBehaviour {
         stopAllAutomaticTasks();
         lerpStart = transform.position;
         lerpEnd = target.transform.position + cameraOffset;
-        if(time == -1)
+        if (time == -1)
         {
             lerpTime = defaultLerpTime;
         }
@@ -229,7 +239,7 @@ public class CameraController : MonoBehaviour {
     /// <param name="newSmoothTravelDuration"> new smooth travel duration in seconds </param>
     public void setDefaultSmoothTravelTime(float newSmoothTravelDuration)
     {
-        if(newSmoothTravelDuration > 0)
+        if (newSmoothTravelDuration > 0)
         {
             _defaultLerpTime = newSmoothTravelDuration;
         }
@@ -250,30 +260,29 @@ public class CameraController : MonoBehaviour {
     /// </summary>
     private void setupCamera()
     {
-        cameraOffset = new Vector3(-20f, 26.8f, -20f);
+        cameraOffset = new Vector3(-252.8f, 250.34f, -252.8f);
         Vector3 desiredCameraPosition = new Vector3(transform.position.x, cameraOffset.y, transform.position.z);
         cameraContainer = new GameObject("Camera");
-        transform.localEulerAngles = new Vector3(45f, 0f, 0f);
+        transform.localEulerAngles = new Vector3(35f, 0f, 0f);
         gameObject.transform.parent = cameraContainer.transform;
         transform.localPosition = Vector3.zero;
         transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 0, transform.localEulerAngles.z);
         cameraContainer.transform.position = desiredCameraPosition;
-        Camera.main.fieldOfView = 30;
         cameraContainer.transform.Rotate(Vector3.up, 45f);
-        lookAtPoint(Vector3.zero);
+        Camera.main.orthographic = true;
     }
 
 
     /// <summary>
     /// Sets the new zoom of the camera
     /// </summary>
-    /// <param name="newZoom"> A number between 10 (max zoom) and 100 (min zoom) </param>
+    /// <param name="newZoom"> A number between 5 (max zoom) and 100 (min zoom) </param>
     public void setCameraZoom(float newZoom)
     {
         float fov = Mathf.Clamp(newZoom, CAMERA_MAX_ZOOM, CAMERA_MIN_ZOOM);
-        if(newZoom > 0)
+        if (newZoom > 0)
         {
-            Camera.main.fieldOfView = fov;
+            Camera.main.orthographicSize = fov;
         }
     }
 
@@ -332,7 +341,7 @@ public class CameraController : MonoBehaviour {
     /// </summary>
     private void handleZoom()
     {
-        float fov = Camera.main.fieldOfView;
+        float fov = Camera.main.orthographicSize;
         fov -= Input.GetAxis("Mouse ScrollWheel") * _mouseWeelZoomSensitivity;
         setCameraZoom(fov);
     }
