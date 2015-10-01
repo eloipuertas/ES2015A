@@ -52,7 +52,7 @@ public class CameraController : MonoBehaviour
         isManualControlEnabled = true;
         isLerping = false;
         lookAtPoint(Vector3.zero);
-        setCameraZoom(200f);
+        setCameraZoom(20f);
         setCameraSpeed(20f);
         lookAtPoint(new Vector3(1782.54f, 91.48f, 1166f));
     }
@@ -170,7 +170,7 @@ public class CameraController : MonoBehaviour
     /// <param name="time">Optional if not provided the time will be default camera time</param>
     public void smoothTravelToTarget(GameObject target, float time = -1)
     {
-        smoothTravelBetweenTwoPoints(this.transform.position, target.transform.position, time);
+        smoothTravelBetweenTwoPoints(transform.position, target.transform.position, time);
     }
 
     /// <summary>
