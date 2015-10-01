@@ -11,11 +11,13 @@ public class Selectable : MonoBehaviour
     private bool updateHealthRatio = true;
     private bool entityMoving = true;
 
-    IGameEntity gameEntity;
+    //Pendiente
+    //IGameEntity gameEntity;
 
     protected virtual void Start()
     {
-        gameEntity = this.GetComponent<IGameEntity>();
+        //Pendiente
+        //gameEntity = this.GetComponent<IGameEntity>();
         selectedBox = SelectionOverlay.CreateTexture();
         currentlySelected = false;
 
@@ -37,9 +39,8 @@ public class Selectable : MonoBehaviour
 
         if (updateHealthRatio)
         {
-            //TODO
-            healthRatio = gameEntity.healthPercentage() / 100f;
-            //healthRatio = this.GetComponent<IGameEntity>().FakeHealthRatio;
+            //Pendiente
+            //healthRatio = gameEntity.healthPercentage() / 100f;
             updateSomething = true;
             // doesn't update until gets the callback
             updateHealthRatio = false;
@@ -71,7 +72,8 @@ public class Selectable : MonoBehaviour
             player.SelectedObject = this;
             this.currentlySelected = true;
             //Debug pursposes
-            Debug.Log(gameEntity.info.name);
+            //Pendiente
+            //Debug.Log(gameEntity.info.name);
             registerEntityCallbacks();
         }
     }
