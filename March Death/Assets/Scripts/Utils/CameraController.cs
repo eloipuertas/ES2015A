@@ -7,8 +7,9 @@
 public class CameraController : MonoBehaviour
 {
 
-    private const float CAMERA_MAX_ZOOM = 5;
-    private const float CAMERA_MIN_ZOOM = 100;
+    private const float CAMERA_MAX_ZOOM = 5f;
+    private const float CAMERA_MIN_ZOOM = 100f;
+    private const float MOUSE_BOUNDS = 20f;
 
     private Vector3 cameraOffset;
     private GameObject followingGameObject;
@@ -313,31 +314,27 @@ public class CameraController : MonoBehaviour
     /// </summary>
     private void handlePlayerInput()
     {
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) ||  Input.mousePosition.y >= Screen.height - MOUSE_BOUNDS)
         {
             cameraContainer.transform.Translate(Vector3.forward * Time.deltaTime * _cameraSpeed);
         }
 
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) || Input.mousePosition.x <= MOUSE_BOUNDS)
         {
             cameraContainer.transform.Translate(Vector3.left * Time.deltaTime * _cameraSpeed);
         }
 
-        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) || Input.mousePosition.y <= MOUSE_BOUNDS)
         {
             cameraContainer.transform.Translate(Vector3.back * Time.deltaTime * _cameraSpeed);
         }
 
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || Input.mousePosition.x >= Screen.width - MOUSE_BOUNDS)
         {
             cameraContainer.transform.Translate(Vector3.right * Time.deltaTime * _cameraSpeed);
         }
 
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            stopSmoothTravel();
-        }
-
+  
         handleZoom();
     }
 
