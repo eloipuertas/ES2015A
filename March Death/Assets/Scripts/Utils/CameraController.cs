@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 
 /// <summary>
 /// Attach this script to the main camera and it will be able to be controlled like an Isometric Camera.
@@ -51,7 +52,7 @@ public class CameraController : MonoBehaviour
         isManualControlEnabled = true;
         isLerping = false;
         lookAtPoint(Vector3.zero);
-        setCameraZoom(20f);
+        setCameraZoom(200f);
         setCameraSpeed(20f);
         lookAtPoint(new Vector3(1782.54f, 91.48f, 1166f));
     }
@@ -154,6 +155,10 @@ public class CameraController : MonoBehaviour
         {
             _mouseWeelZoomSensitivity = newWeelSensitivity;
         }
+        else
+        {
+           throw new InvalidOperationException("New camera zoom speed must be a positive float!");   
+        }
     }
 
 
@@ -165,18 +170,7 @@ public class CameraController : MonoBehaviour
     /// <param name="time">Optional if not provided the time will be default camera time</param>
     public void smoothTravelToTarget(GameObject target, float time = -1)
     {
-        stopAllAutomaticTasks();
-        lerpStart = transform.position;
-        lerpEnd = target.transform.position + cameraOffset;
-        if (time == -1)
-        {
-            lerpTime = defaultLerpTime;
-        }
-        else
-        {
-            lerpTime = time;
-        }
-        isLerping = true;
+        smoothTravelBetweenTwoPoints(this.transform.position, target.transform.position, time);
     }
 
     /// <summary>
@@ -187,23 +181,20 @@ public class CameraController : MonoBehaviour
     /// <param name="speed">Optional if not provided the speed will be default camera speed</param>
     public void smoothTravelToPosition(Vector3 position, float time = -1)
     {
-        stopAllAutomaticTasks();
-        lerpStart = transform.position;
-        lerpEnd = position + cameraOffset;
-
-        if (time == -1)
-        {
-            lerpTime = defaultLerpTime;
-        }
-        else
-        {
-            lerpTime = time;
-        }
-
-        isLerping = true;
+        smoothTravelBetweenTwoPoints(transform.position, position, time);
     }
 
 
+    /// <summary>
+    /// Make the camera travel between to gameobjects of the map in a certain time
+    /// </summary>
+    /// <param name="origin"> The origin gameobject</param>
+    /// <param name="end"> The destination gameobject</param>
+    /// <param name="time">Duration of the travel between the game objects</param>
+    public void smoothTravelBetweenTwoGameObjects(GameObject origin, GameObject end, float time = -1)
+    {
+        smoothTravelBetweenTwoPoints(origin.transform.position, end.transform.position);
+    }
 
     /// <summary>
     /// Make the camera travel between to points of the map in a certain time
@@ -221,23 +212,15 @@ public class CameraController : MonoBehaviour
         {
             lerpTime = defaultLerpTime;
         }
-        else
+        else if (time > 0)
         {
             lerpTime = time;
         }
-
+        else
+        {
+            throw new InvalidOperationException("Smooth time must be a positive floating point number");
+        }
         isLerping = true;
-    }
-
-    /// <summary>
-    /// Make the camera travel between to gameobjects of the map in a certain time
-    /// </summary>
-    /// <param name="origin"> The origin gameobject</param>
-    /// <param name="end"> The destination gameobject</param>
-    /// <param name="time">Duration of the travel between the game objects</param>
-    public void smoothTravelBetweenTwoGameObjects(GameObject origin, GameObject end, float time = -1)
-    {
-        smoothTravelBetweenTwoPoints(origin.transform.position, end.transform.position);
     }
 
     /// <summary>
@@ -249,6 +232,10 @@ public class CameraController : MonoBehaviour
         if (newSmoothTravelDuration > 0)
         {
             _defaultLerpTime = newSmoothTravelDuration;
+        }
+        else
+        {
+            throw new InvalidOperationException("New smooth travel duration must be a positive float!");
         }
     }
 
@@ -286,11 +273,13 @@ public class CameraController : MonoBehaviour
     /// <param name="newZoom"> A number between 5 (max zoom) and 100 (min zoom) </param>
     public void setCameraZoom(float newZoom)
     {
-        float fov = Mathf.Clamp(newZoom, CAMERA_MAX_ZOOM, CAMERA_MIN_ZOOM);
-        if (newZoom > 0)
+        if(newZoom > 100 || newZoom < 5)
         {
-            Camera.main.orthographicSize = fov;
+            throw new InvalidOperationException("New camera zoom must be a positive float between 5 (max zoom) and 100 (min zoom)!");
         }
+
+        float fov = Mathf.Clamp(newZoom, CAMERA_MAX_ZOOM, CAMERA_MIN_ZOOM);
+        Camera.main.orthographicSize = fov;     
     }
 
 
