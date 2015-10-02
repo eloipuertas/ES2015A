@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Storage
 {
@@ -17,10 +15,19 @@ namespace Storage
     /// </summary>
     public enum UnitTypes { FARMER, MINER, LUMBERJACK, HERO, LIGHT, HEAVY, THROWN, CAVALRY, MACHINE, SPECIAL };
 
-    public sealed class UnitInfo : EntityInfo
+    public class UnitInfo : EntityInfo
     {
         public UnitTypes type = 0;
 
-        public UnitAttributes attributes = null;
+        [JsonConverter(typeof(UnitAttributesDataConverter))]
+        public override EntityAttributes attributes { get; set; }
+
+        [JsonConverter(typeof(UnitActionsDataConverter))]
+        public override List<EntityAction> actions { get; set; }
+
+        public UnitInfo()
+        {
+            actions = new List<EntityAction>();
+        }
     }
 }
