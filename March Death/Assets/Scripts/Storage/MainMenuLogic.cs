@@ -2,16 +2,18 @@
 using System.Collections;
 
 public class MainMenuLogic : MonoBehaviour {
-	
+
 	static readonly Color UP_CLICK = new Color(1.0f, 1.0f, 1.0f, 0.6f); // WHITE
 	static readonly Color DOWN_CLICK = new Color(0.0f, 0.0f, 0.0f, 0.6f); // GREY
 	static readonly Color ENTER_OVER = new Color(0.8f, 1.0f, 0.0f, 0.6f); // YELLOW - GREEN
 	static readonly Color EXIT_OVER = new Color(1.0f, 1.0f, 1.0f, 0.6f); // WHITE
+	static readonly Color YELLOW = new Color(1.0f, 0.92f, 0.016f, 1f); //YELLOW 
 
 	bool bStillInside = false;
 
 	// Use this for initialization
 	void Start () {
+
 		Cursor.visible = true;
 	}
 
@@ -19,7 +21,7 @@ public class MainMenuLogic : MonoBehaviour {
 
 	/* This method changes the color of the object we are over on entering */
 	void OnMouseEnter(){
-		GetComponent<Renderer>().material.color = ENTER_OVER;
+		GetComponent<Renderer> ().material.color = YELLOW;
 		bStillInside = true;
 	}
 
