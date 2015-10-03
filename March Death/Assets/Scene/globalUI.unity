@@ -398,6 +398,7 @@ GameObject:
   - 222: {fileID: 289275215}
   - 114: {fileID: 289275214}
   - 114: {fileID: 289275213}
+  - 114: {fileID: 289275217}
   m_Layer: 5
   m_Name: Button_Menu
   m_TagString: Untagged
@@ -508,6 +509,17 @@ RectTransform:
   m_AnchoredPosition: {x: -46, y: -10}
   m_SizeDelta: {x: 92, y: 21}
   m_Pivot: {x: .5, y: .5}
+--- !u!114 &289275217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 289275212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ade1486da893844191baedce3afff92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &301562413
 GameObject:
   m_ObjectHideFlags: 0
