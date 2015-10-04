@@ -115,7 +115,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
         if (isRanged)
         {
             // TODO: Specil units (ie gigants) and distance!
-            return dice > 1 && (_attributes.projectileAbility + dice >= 7);
+            return dice > 1 && (from._attributes.projectileAbility + dice >= 7);
         }
 
         return HitTables.meleeHit[((UnitAttributes)from.info.attributes).weaponAbility, _attributes.weaponAbility] <= dice;
@@ -355,5 +355,10 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     /// </summary>
     /// <returns>Always null</returns>
     public Building toBuilding() { return null; }
+    /// <summary>
+    /// Returns NULL as this cannot be converted to Resource
+    /// </summary>
+    /// <returns>Always null</returns>
+    public Resource toResource() { return null; }
 
 }
