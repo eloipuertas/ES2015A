@@ -20,6 +20,7 @@ public class MiniMapController : MonoBehaviour
         if (Terrain.activeTerrain)
         {
             _camera.transform.position = new Vector3(Terrain.activeTerrain.terrainData.size.x * 0.5f, Terrain.activeTerrain.terrainData.size.x, Terrain.activeTerrain.terrainData.size.z * 0.5f);
+			_camera.transform.rotation = Quaternion.Euler(90f,0,0); 
             _camera.orthographicSize = Terrain.activeTerrain.terrainData.size.x * 0.5f;
         }
 
