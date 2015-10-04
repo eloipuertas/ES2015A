@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-public enum Modifier { RESISTANCE, WOUNDS };
+public enum BuildingModifier { RESISTANCE, WOUNDS };
 
 public interface IBuildingAbility : IAction
 {
-    T getModifier<T>(Modifier modifier);
+    T getModifier<T>(BuildingModifier modifier);
 }

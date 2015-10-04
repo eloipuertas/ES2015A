@@ -10,7 +10,7 @@ namespace Storage
         public EntityResources sellValue;
         
         public int timeToBuild;
-		public int repairSpeed; // Auto repair speed
+		public float repairSpeed; // Auto repair speed
 
     }
 }

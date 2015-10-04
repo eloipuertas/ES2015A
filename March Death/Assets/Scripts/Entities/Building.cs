@@ -94,6 +94,36 @@ public class Building : Utils.Actor<Building.Actions>, IGameEntity
 
 
     /// <summary>
+    /// Returns true in case an attack will land on this unit
+    /// </summary>
+    /// <param name="from">Unit which attacked</param>
+    /// <param name="isRanged">Set to true in case the attack is range, false if melee</param>
+    /// <returns>True if it hits, false otherwise</returns>
+    private bool willAttackLand(Unit from, bool isRanged = false)
+    {
+        int dice = Utils.D6.get.rollSpecial();
+
+        if (isRanged)
+        {
+            // TODO: Specil units (ie gigants) and distance!
+            return dice > 1 && (((UnitAttributes)from.info.attributes).projectileAbility + dice >= 7);
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Retuns true if an attack will cause wounds to this unit
+    /// </summary>
+    /// <param name="from">Attacker</param>
+    /// <returns>True if causes wounds, false otherwise</returns>
+    private bool willAttackCauseWounds(Unit from)
+    {
+        int dice = Utils.D6.get.rollOnce();
+        return HitTables.wounds[((UnitAttributes)from.info.attributes).strength, _attributes.resistance] <= dice;
+    }
+
+    /// <summary>
     /// Automatically calculates if an attack will hit, and in case it
     /// does it updates the current state.
     /// </summary>
@@ -118,7 +148,6 @@ public class Building : Utils.Actor<Building.Actions>, IGameEntity
         if (_woundsReceived == _attributes.wounds)
         {
             _status = EntityStatus.DESTROYED;
-            _target = null;
 
             fire(Actions.DESTROYED);
         }
@@ -136,17 +165,25 @@ public class Building : Utils.Actor<Building.Actions>, IGameEntity
             // Try to get class with this name
             string abilityName = ability.name.Replace(" ", "");
 
-            var constructor = Type.GetType(abilityName).
-                GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(BuildingAbility), typeof(GameObject) }, null);
-            if (constructor == null)
+            try
+            {
+                var constructor = Type.GetType(abilityName).
+                    GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(BuildingAbility), typeof(GameObject) }, null);
+                if (constructor == null)
+                {
+                    // No such constructor, construct default
+                    _abilities.Add(new GenericBuildingAbility(ability));
+                }
+                else
+                {
+                    // Class found, use that!
+                    _abilities.Add((IBuildingAbility)constructor.Invoke(new object[2] { ability, gameObject }));
+                }
+            }
+            catch (Exception)
             {
                 // No such class, use the GenericAbility class
-                _abilities.Add(new GenericAbility(ability));
-            }
-            else
-            {
-                // Class found, use that!
-                _abilities.Add((IBuildingAbility)constructor.Invoke(new object[2] { ability, gameObject }));
+                _abilities.Add(new GenericBuildingAbility(ability));
             }
         }
     }
@@ -182,17 +219,6 @@ public class Building : Utils.Actor<Building.Actions>, IGameEntity
         _info = Info.get.of(race, type);
         _attributes = (BuildingAttributes)_info.attributes;
         setupAbilities();
-
-        Debug.Log(_info);
-        Debug.Log(_info.attributes);
-
-        Debug.Log(info);
-        Debug.Log(info.attributes);
-        Debug.Log(_attributes);
-
-        Debug.Log(_info.attributes.wounds);
-        Debug.Log(((BuildingAttributes)info.attributes).wounds);
-        Debug.Log(_attributes.weaponAbility);
     }
 
     /// <summary>
@@ -220,5 +246,7 @@ public class Building : Utils.Actor<Building.Actions>, IGameEntity
     /// </summary>
     /// <returns>Always null</returns>
     public Building toBuilding() { return this; }
+
+    public Resource toResource() { return null; }
 
 }
