@@ -267,7 +267,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Terrain: {fileID: 112888544}
   Quality: .5
-  NotFullyOpaque: 1
+  NotFullyOpaque: 0
   FadeRate: 200
   Enabled: 1
 --- !u!1 &397576490
@@ -282,6 +282,7 @@ GameObject:
   - 65: {fileID: 397576493}
   - 23: {fileID: 397576492}
   - 114: {fileID: 397576491}
+  - 114: {fileID: 397576496}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -357,6 +358,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 6
+--- !u!114 &397576496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 397576490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: caa19c7f960625f4b83094529589a1c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsRevealer: 0
+  Range: 0
 --- !u!1 &884767879
 GameObject:
   m_ObjectHideFlags: 0
