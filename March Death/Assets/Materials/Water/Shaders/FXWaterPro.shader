@@ -21,6 +21,7 @@ Properties {
 Subshader {
 	Tags { "WaterMode"="Refractive" "RenderType"="Opaque" }
 	Pass {
+Name "WaterPass"
 CGPROGRAM
 #pragma vertex vert
 #pragma fragment frag
