@@ -303,22 +303,22 @@ public class CameraController : MonoBehaviour
     /// </summary>
     private void handlePlayerInput()
     {
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) ||  Input.mousePosition.y >= Screen.height - MOUSE_BOUNDS)
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) ||  (Input.mousePosition.y >= Screen.height - MOUSE_BOUNDS && Input.mousePosition.y <= Screen.height))
         {
             cameraContainer.transform.Translate(Vector3.forward * Time.deltaTime * _cameraSpeed);
         }
 
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) || Input.mousePosition.x <= MOUSE_BOUNDS)
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) || (Input.mousePosition.x <= MOUSE_BOUNDS && Input.mousePosition.x >= 0f))
         {
             cameraContainer.transform.Translate(Vector3.left * Time.deltaTime * _cameraSpeed);
         }
 
-        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) || Input.mousePosition.y <= MOUSE_BOUNDS)
+        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) || (Input.mousePosition.y <= MOUSE_BOUNDS && Input.mousePosition.y >= 0f))
         {
             cameraContainer.transform.Translate(Vector3.back * Time.deltaTime * _cameraSpeed);
         }
 
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || Input.mousePosition.x >= Screen.width - MOUSE_BOUNDS)
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || (Input.mousePosition.x >= Screen.width - MOUSE_BOUNDS && Input.mousePosition.x <= Screen.width))
         {
             cameraContainer.transform.Translate(Vector3.right * Time.deltaTime * _cameraSpeed);
         }
@@ -335,6 +335,17 @@ public class CameraController : MonoBehaviour
     {
         float fov = Camera.main.orthographicSize;
         fov -= Input.GetAxis("Mouse ScrollWheel") * _mouseWeelZoomSensitivity;
+
+        if (fov < 5f)
+        {
+            fov = 5f;
+        }
+
+        if (fov > 100f)
+        {
+            fov = 100f;
+        }
+
         setCameraZoom(fov);
     }
 
