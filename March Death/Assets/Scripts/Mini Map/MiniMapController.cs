@@ -19,9 +19,12 @@ public class MiniMapController : MonoBehaviour
         // moves camera to show the whole map
         if (Terrain.activeTerrain)
         {
+            float diagonal = Mathf.Sqrt(Mathf.Pow(Terrain.activeTerrain.terrainData.size.x, 2) + Mathf.Pow(Terrain.activeTerrain.terrainData.size.y, 2));
             _camera.transform.position = new Vector3(Terrain.activeTerrain.terrainData.size.x * 0.5f, Terrain.activeTerrain.terrainData.size.x, Terrain.activeTerrain.terrainData.size.z * 0.5f);
-			_camera.transform.rotation = Quaternion.Euler(90f,0,0); 
-            _camera.orthographicSize = Terrain.activeTerrain.terrainData.size.x * 0.5f;
+            _camera.transform.rotation = Quaternion.Euler(90f, 45f,0); 
+            _camera.orthographicSize = diagonal * 0.75f; // a hack
+            _camera.farClipPlane = Terrain.activeTerrain.terrainData.size.x * 1.5f;
+
         }
 
     }
