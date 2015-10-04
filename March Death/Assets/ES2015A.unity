@@ -193,6 +193,7 @@ GameObject:
   - 4: {fileID: 112888545}
   - 218: {fileID: 112888544}
   - 154: {fileID: 112888543}
+  - 114: {fileID: 112888546}
   m_Layer: 0
   m_Name: Terrain
   m_TagString: Untagged
@@ -226,18 +227,18 @@ Terrain:
   m_DetailObjectDistance: 80
   m_DetailObjectDensity: 1
   m_HeightmapPixelError: 5
-  m_SplatMapDistance: 0
+  m_SplatMapDistance: 864
   m_HeightmapMaximumLOD: 0
   m_CastShadows: 1
   m_DrawHeightmap: 1
   m_DrawTreesAndFoliage: 1
   m_ReflectionProbeUsage: 1
-  m_MaterialType: 0
+  m_MaterialType: 3
   m_LegacySpecular:
     serializedVersion: 2
     rgba: 4286545791
   m_LegacyShininess: .078125
-  m_MaterialTemplate: {fileID: 0}
+  m_MaterialTemplate: {fileID: 2100000, guid: af1946b7b073fc248a4a278d45874f9b, type: 2}
   m_BakeLightProbesForTrees: 1
   m_ScaleInLightmap: .0511999987
   m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
@@ -253,6 +254,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
+--- !u!114 &112888546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 112888542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e83c52e64f9b4844955addfbefbcb31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Terrain: {fileID: 112888544}
+  Quality: .5
+  NotFullyOpaque: 0
+  FadeRate: 200
+  Enabled: 1
 --- !u!1 &884767879
 GameObject:
   m_ObjectHideFlags: 0
@@ -364,6 +381,10 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 599.755005
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: 780611a67e8e941a2b3aa96e5915a793, type: 2}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 0a6680bd13e6bc94c92f6fe84180d22a, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 780611a67e8e941a2b3aa96e5915a793, type: 2}
   m_IsPrefabParent: 0
@@ -379,6 +400,7 @@ GameObject:
   - 65: {fileID: 1434825897}
   - 23: {fileID: 1434825896}
   - 54: {fileID: 1434825900}
+  - 114: {fileID: 1434825901}
   m_Layer: 0
   m_Name: Cube_unity_10x10x2
   m_TagString: Untagged
@@ -456,6 +478,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1434825901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1434825895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: caa19c7f960625f4b83094529589a1c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsRevealer: 0
+  Range: 0
 --- !u!1 &1504844444
 GameObject:
   m_ObjectHideFlags: 0
@@ -469,6 +504,7 @@ GameObject:
   - 23: {fileID: 1504844445}
   - 114: {fileID: 1504844449}
   - 54: {fileID: 1504844451}
+  - 114: {fileID: 1504844450}
   m_Layer: 0
   m_Name: Cube_unity_1x1x2
   m_TagString: Untagged
@@ -544,6 +580,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   race: 0
   type: 3
+--- !u!114 &1504844450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1504844444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: caa19c7f960625f4b83094529589a1c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsRevealer: 1
+  Range: 10
 --- !u!54 &1504844451
 Rigidbody:
   m_ObjectHideFlags: 0
