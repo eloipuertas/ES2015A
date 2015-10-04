@@ -355,5 +355,10 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     /// </summary>
     /// <returns>Always null</returns>
     public Building toBuilding() { return null; }
+    /// <summary>
+    /// Returns NULL as this cannot be converted to Resource
+    /// </summary>
+    /// <returns>Always null</returns>
+    public Resource toResource() { return null; }
 
 }
