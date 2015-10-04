@@ -228,18 +228,25 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
         {
             // Try to get class with this name
             string abilityName = ability.name.Replace(" ", "");
-
-            var constructor = Type.GetType(abilityName).
-                GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(UnitAbility), typeof(GameObject) }, null);
-            if (constructor == null)
+            try
+            {
+                var constructor = Type.GetType(abilityName).
+                    GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(UnitAbility), typeof(GameObject) }, null);
+                if (constructor == null)
+                {
+                    // Invalid constructor, use GenericAbility
+                    _abilities.Add(new GenericAbility(ability));
+                }
+                else
+                {
+                    // Class found, use that!
+                    _abilities.Add((IUnitAbility)constructor.Invoke(new object[2] { ability, gameObject }));
+                }
+            }
+            catch (Exception /*e*/)
             {
                 // No such class, use the GenericAbility class
                 _abilities.Add(new GenericAbility(ability));
-            }
-            else
-            {
-                // Class found, use that!
-                _abilities.Add((IUnitAbility)constructor.Invoke(new object[2] { ability, gameObject }));
             }
         }
     }
@@ -358,5 +365,10 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     /// </summary>
     /// <returns>Always null</returns>
     public Building toBuilding() { return null; }
+    /// <summary>
+    /// Returns NULL as this cannot be converted to Resource
+    /// </summary>
+    /// <returns>Always null</returns>
+    public Resource toResource() { return null; }
 
 }
