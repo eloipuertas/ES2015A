@@ -15,6 +15,8 @@ namespace Storage
         public string name = "";
 
         public EntityResources resources;
+        public abstract EntityAttributes attributes { get; set; }
+        public abstract List<EntityAction> actions { get; set; }
 
         /// <summary>
         /// Returns true if the entity is a unit, false otherwise
@@ -38,7 +40,7 @@ namespace Storage
                 {
                     return false;
                 }
-                
+
                 return toUnitInfo.type == UnitTypes.FARMER || toUnitInfo.type == UnitTypes.MINER || toUnitInfo.type == UnitTypes.LUMBERJACK;
             }
         }

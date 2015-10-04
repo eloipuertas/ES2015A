@@ -1,6 +1,6 @@
 ﻿using Storage;
 
-public enum EntityStatus { IDLE, ATTACKING, DEAD };
+public enum EntityStatus { IDLE, MOVING, ATTACKING, DEAD, DESTROYED };
 
 public interface IGameEntity
 {
@@ -10,6 +10,9 @@ public interface IGameEntity
     float damagePercentage { get; }
     float healthPercentage { get; }
 
+    IAction getAction(string name);
+
     Unit toUnit();
     Building toBuilding();
+    Resource toResource();
 }

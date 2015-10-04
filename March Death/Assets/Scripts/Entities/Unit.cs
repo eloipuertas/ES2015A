@@ -11,7 +11,7 @@ using Storage;
 /// </summary>
 public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
 {
-    public enum Actions { DIED };
+    public enum Actions { MOVEMENT_START, MOVEMENT_END, DAMAGED, DIED };
 
     public Unit() { }
 
@@ -28,15 +28,21 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     private double _lastAttack = 0;
 
     /// <summary>
+    /// Point to move to
+    /// </summary>
+    private Vector3 _movePoint;
+
+    /// <summary>
     /// List of ability objects of this unit
     /// </summary>
-    private List<IAbility> _abilities;
+    private List<IUnitAbility> _abilities;
 
     /// <summary>
     /// Contains all static information of the Unit.
     /// That means: max health, damage, defense, etc.
     /// </summary>
     private UnitInfo _info;
+    private UnitAttributes _attributes;
     public EntityInfo info
     {
         get
@@ -81,7 +87,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     {
         get
         {
-            return (_info.attributes.wounds - _woundsReceived) * 100f / _info.attributes.wounds;
+            return (_attributes.wounds - _woundsReceived) * 100f / _attributes.wounds;
         }
     }
 
@@ -109,10 +115,10 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
         if (isRanged)
         {
             // TODO: Specil units (ie gigants) and distance!
-            return dice > 1 && (_info.attributes.projectileAbility + dice >= 7);
+            return dice > 1 && (from._attributes.projectileAbility + dice >= 7);
         }
 
-        return HitTables.meleeHit[from._info.attributes.weaponAbility, _info.attributes.weaponAbility] <= dice;
+        return HitTables.meleeHit[((UnitAttributes)from.info.attributes).weaponAbility, _attributes.weaponAbility] <= dice;
     }
 
     /// <summary>
@@ -123,7 +129,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     private bool willAttackCauseWounds(Unit from)
     {
         int dice = Utils.D6.get.rollOnce();
-        return HitTables.wounds[from._info.attributes.strength, _info.attributes.resistance] <= dice;
+        return HitTables.wounds[from._attributes.strength, _attributes.resistance] <= dice;
     }
 
     /// <summary>
@@ -144,10 +150,11 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
         if (willAttackLand(from, isRanged) && willAttackCauseWounds(from))
         {
             _woundsReceived += 1;
+            fire(Actions.DAMAGED);
         }
 
         // Check if we are dead
-        if (_woundsReceived == _info.attributes.wounds)
+        if (_woundsReceived == _attributes.wounds)
         {
             _status = EntityStatus.DEAD;
             _target = null;
@@ -185,59 +192,173 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     {
         _target.unregister(Actions.DIED, onTargetDied);
         // TODO: Maybe we should not set it to null? In case we want to attack it again
-        _target = null; 
+        _target = null;
         _status = EntityStatus.IDLE;
     }
 
     /// <summary>
-    /// Iterates all abilities on the 
+    /// Starts moving the unit towards a point on a terrain
+    /// </summary>
+    /// <param name="movePoint">Point to move to</param>
+    public void moveTo(Vector3 movePoint)
+    {
+        _movePoint = movePoint;
+
+        float distance = Vector3.Distance(movePoint, transform.position);
+        if (distance > 1.50f)
+        {
+            // TODO: SMOOTH TURNING
+            Quaternion targetRotation = Quaternion.LookRotation(movePoint - transform.position);
+            targetRotation.x = 0;   // lock rotation on x-axis
+            transform.rotation = targetRotation;
+        }
+
+        _status = EntityStatus.MOVING;
+        fire(Actions.MOVEMENT_START);
+    }
+
+    /// <summary>
+    /// Iterates all abilities on the
     /// </summary>
     private void setupAbilities()
     {
-        _abilities = new List<IAbility>();
+        _abilities = new List<IUnitAbility>();
 
-        foreach (UnitAbility ability in _info.abilities)
+        foreach (UnitAbility ability in _info.actions)
         {
             // Try to get class with this name
             string abilityName = ability.name.Replace(" ", "");
 
-            var constructor = Type.GetType(abilityName).
-                GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(UnitAbility), typeof(GameObject) }, null);
-            if (constructor == null)
+            try
+            {
+                var constructor = Type.GetType(abilityName).
+                    GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(UnitAbility), typeof(GameObject) }, null);
+                if (constructor == null)
+                {
+                    // Invalid constructor, use GenericAbility
+                    _abilities.Add(new GenericAbility(ability));
+                }
+                else
+                {
+                    // Class found, use that!
+                    _abilities.Add((IUnitAbility)constructor.Invoke(new object[2] { ability, gameObject }));
+                }
+            }
+            catch (Exception /*e*/)
             {
                 // No such class, use the GenericAbility class
                 _abilities.Add(new GenericAbility(ability));
             }
-            else
-            {
-                // Class found, use that!
-                _abilities.Add((IAbility)constructor.Invoke(new object[2] { ability, gameObject }));
-            }
         }
     }
 
-    // Use this for initialization
-    void Start ()
+    /// <summary>
+    /// Returns an action given a name
+    /// </summary>
+    /// <param name="name">Name of the action</param>
+    /// <exception cref="System.ArgumentException">
+    /// Thrown when no action with the given name is found
+    /// </exception>
+    /// <returns>Always returns a valid IUnitAbility (IAction)</returns>
+    public IAction getAction(string name)
+    {
+        foreach (IUnitAbility ability in _abilities)
+        {
+            if (ability.info.name.Equals(name))
+            {
+                return ability;
+            }
+        }
+
+        throw new ArgumentException("Invalid action " + name + "requested");
+    }
+
+    /// <summary>
+    /// Object initialization
+    /// </summary>
+    void Start()
     {
         _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
+        _attributes = (UnitAttributes)_info.attributes;
         setupAbilities();
     }
 
-    // Update is called once per frame
-    void Update ()
+    /// <summary>
+    /// Called once a frame to update the object
+    /// </summary>
+    void Update()
     {
-        if (_status == EntityStatus.ATTACKING && _target != null)
+#if TEST_INPUT
+        if (Input.GetMouseButtonDown(0))
         {
-            if (Time.time - _lastAttack >= (1f / _info.attributes.attackRate))
-            {
-                // TODO: Ranged attacks!
-                _target.receiveAttack(this, false);
-            }
+            Camera mainCamera = Camera.main;
+
+            // We need to actually hit an object
+            RaycastHit hit;
+            if (!Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out hit, 1000))
+                return;
+
+            // We need to hit something (with a collider on it)
+            if (!hit.transform)
+                return;
+
+            // Get input vector from kayboard or analog stick and make it length 1 at most
+            moveTo(hit.point);
+        }
+#endif
+        switch (_status)
+        {
+            case EntityStatus.ATTACKING:
+                if (_target != null)
+                {
+                    if (Time.time - _lastAttack >= (1f / _attributes.attackRate))
+                    {
+                        // TODO: Ranged attacks!
+                        _target.receiveAttack(this, false);
+                    }
+                }
+                break;
         }
     }
 
+    /// <summary>
+    /// Called every fixed physics frame
+    /// </summary>
+    void FixedUpdate()
+    {
+        switch (_status)
+        {
+            case EntityStatus.MOVING:
+                // TODO: Steps on the last sector are smoothened due to distance being small
+                // Althought it's an unintended behaviour, it may be interesating to leave it as is
+                transform.position = Vector3.MoveTowards(transform.position, _movePoint, Time.fixedDeltaTime * _attributes.movementRate);
+
+                // If distance is lower than 0.5, stop movement
+                if (Vector3.Distance(transform.position, _movePoint) <= 0.5f)
+                {
+                    _status = EntityStatus.IDLE;
+                    fire(Actions.MOVEMENT_END);
+                }
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Casts this IGameEntity to Unity (pointless if already unit)
+    /// </summary>
+    /// <returns>Object casted to Unit</returns>
     public Unit toUnit() { return this;  }
+
+    /// <summary>
+    /// Returns NULL as this cannot be converted to Building
+    /// </summary>
+    /// <returns>Always null</returns>
     public Building toBuilding() { return null; }
+    /// <summary>
+    /// Returns NULL as this cannot be converted to Resource
+    /// </summary>
+    /// <returns>Always null</returns>
+    public Resource toResource() { return null; }
 
 }
