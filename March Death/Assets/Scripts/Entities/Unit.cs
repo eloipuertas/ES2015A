@@ -118,7 +118,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
             return dice > 1 && (_attributes.projectileAbility + dice >= 7);
         }
 
-        return HitTables.meleeHit[from._attributes.weaponAbility, _attributes.weaponAbility] <= dice;
+        return HitTables.meleeHit[((UnitAttributes)from.info.attributes).weaponAbility, _attributes.weaponAbility] <= dice;
     }
 
     /// <summary>
@@ -292,7 +292,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     /// </summary>
     void Update()
     {
-#if !TEST_INPUT
+#if TEST_INPUT
         if (Input.GetMouseButtonDown(0))
         {
             Camera mainCamera = Camera.main;

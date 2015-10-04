@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
+
 
 namespace Storage
 {
@@ -30,7 +32,8 @@ namespace Storage
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            return serializer.Deserialize<UnitAbility>(reader);
+            List<UnitAbility> list = serializer.Deserialize<List<UnitAbility>>(reader);
+            return list.ConvertAll(x => (EntityAction)x);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

@@ -7,13 +7,13 @@ namespace Storage
 {
     public sealed class UnitAbility : EntityAction
     {
-        public int weaponAbilityModifier;
-        public int projectileAbilityModifier;
-        public int strengthModifier;
-        public int resistanceModifier;
-        public int woundsModifier;
+        public int weaponAbilityModifier = 0;
+        public int projectileAbilityModifier = 0;
+        public int strengthModifier = 0;
+        public int resistanceModifier = 0;
+        public int woundsModifier = 0;
 
-        public float attackRateModifier;
-        public float movementRateModifier;
+        public float attackRateModifier = 0;
+        public float movementRateModifier = 0;
     }
 }
