@@ -400,8 +400,10 @@ public class Resource : Utils.Actor<Resource.Actions>, IGameEntity
     /// <summary>
     /// Object initialization
     /// </summary>
-    void Start()
+    override public void Start()
     {
+        // Call actor start
+        base.Start();
 
         type = ResourceTypes.FARM;
         race = Races.MEN;

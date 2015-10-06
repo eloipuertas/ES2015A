@@ -276,8 +276,11 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     /// <summary>
     /// Object initialization
     /// </summary>
-    void Start()
+    override public void Start()
     {
+        // Call actor start
+        base.Start();
+
         _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
         _attributes = (UnitAttributes)_info.attributes;

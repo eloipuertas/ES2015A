@@ -213,8 +213,10 @@ public class Building : Utils.Actor<Building.Actions>, IGameEntity
     /// <summary>
     /// Object initialization
     /// </summary>
-    void Start()
+    override public void Start()
     {
+        base.Start();
+
         _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
         _attributes = (BuildingAttributes)_info.attributes;
