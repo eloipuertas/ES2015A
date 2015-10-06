@@ -289,7 +289,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     /// </summary>
     void Update()
     {
-#if !TEST_INPUT
+#if TEST_INPUT
         if (Input.GetMouseButtonDown(0))
         {
             Camera mainCamera = Camera.main;
