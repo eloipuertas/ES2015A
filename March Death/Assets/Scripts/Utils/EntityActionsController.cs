@@ -5,38 +5,30 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using System;
 
-public class EntityActionsController : MonoBehaviour {
+public class EntityActionsController : MonoBehaviour
+{
+
+    private static int Button_Rows = 3;
+    private static int Button_Columns = 3;
+    private Boolean button = false;
 
     // Use this for initialization
     void Start()
     {
-        CreateUI();
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            var renderer = this.gameObject.GetComponent<Renderer>();
-            var localMousePosition = Input.mousePosition;
-            localMousePosition.z = renderer.bounds.center.z - Camera.main.gameObject.transform.position.z;
-            var position = Camera.main.ScreenToWorldPoint(localMousePosition);
-
-            var minPoint = renderer.bounds.min;
-            var maxPoint = renderer.bounds.max;
-            if (position.x < minPoint.x || position.y < minPoint.y || position.x > maxPoint.x || position.y > maxPoint.y)
-            {
-                Debug.Log("Has pulsado el raton en area prohibido");
-                GameObject[] objetos = GameObject.FindGameObjectsWithTag("Button");
-                foreach (GameObject objeto in objetos)
-                {
-                    Destroy(objeto);
-                }
-            }
-        }
 
 
+    }
+
+    void OnMouseDown()
+    {
+        CheckActionButtons();
+        CreateUI();
     }
 
 
@@ -45,28 +37,70 @@ public class EntityActionsController : MonoBehaviour {
     /// </summary>
     void CreateUI()
     {
-        GameObject panel = GameObject.FindGameObjectWithTag("Player");
+        GameObject actionPanel = GameObject.Find("actions");
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-
-        //Debug.Log("Estas accediendo a un objeto vacio: "+ panel.GetComponent<IGameEntity>().info.ToString());
-        //Debug.Log("NActions : "+panel.GetComponent<IGameEntity>().info.actions.Count);
-        var actions = entity.info.actions;
-        var nactions = actions.Count;
-        var renderer = panel.GetComponent<Renderer>();
-        var minPoint = renderer.bounds.min;
-        var maxPoint = renderer.bounds.max;
-        var point = new Vector3(minPoint.x, maxPoint.y, 0);
-        var size = renderer.bounds.extents / nactions;
-
-        for (int i = 0; i < nactions; i++)
+        if (Input.GetMouseButtonDown(0))
         {
-            UnityAction actionMethod = new UnityAction(() => SayHello());
-            String action = actions[i].name;
-            var centerPoint = point + size * (2 * i + 1);
-            centerPoint.y = minPoint.y - (renderer.bounds.extents.y / 2.0f);
-            centerPoint.z = minPoint.z;
-            CreateButton(panel, centerPoint, size, action, actionMethod);
+            if (!button)
+            {
 
+                //actionPanel.GetComponent = null;
+                var rectTransform = actionPanel.GetComponent<RectTransform>();
+                var extents = 0.9f * rectTransform.sizeDelta / 2.0f;
+                var buttonExtents = new Vector2(extents.x / Button_Columns, extents.y / Button_Rows);
+                var position = rectTransform.position;
+                var point = new Vector2(position.x - extents.x, position.y + extents.y);
+                var actions = entity.info.actions;
+                var nactions = actions.Count;
+
+                for (int i = 0; i < nactions; i++)
+                {
+                    String action = actions[i].name;
+                    IAction actionObj = entity.getAction(action);
+                    if (actionObj.isUsable && !actionObj.isActive)
+                    {
+                        actionObj.enable();
+                        UnityAction actionMethod = new UnityAction(() => SayHello());
+                        var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
+                        buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Rows) + 1));
+                        CreateButton(actionPanel, buttonCenter, buttonExtents, action, actionMethod);
+                    }
+
+                }
+                button = true;
+            }
+            else
+            {
+                var actions = entity.info.actions;
+                var nactions = actions.Count;
+                Debug.Log("Numero de acciones :" + nactions);
+                for (int i = 0; i < nactions; i++)
+                {
+                    String action = actions[i].name;
+                    IAction actionObj = entity.getAction(action);
+                    actionObj.disable();
+                    Debug.Log("Desactivando el objeto");
+                    var objeto = GameObject.Find(actions[i].name);
+                    if (objeto != null)
+                    {
+                        Destroy(objeto);
+                    }
+                }
+                button = false;
+            }
+
+        }
+    }
+
+    void CheckActionButtons()
+    {
+        GameObject[] actionButtons = GameObject.FindGameObjectsWithTag("ActionButton");
+        if (actionButtons != null)
+        {
+            foreach (GameObject button in actionButtons)
+            {
+                Destroy(button);
+            }
         }
     }
 
@@ -78,17 +112,18 @@ public class EntityActionsController : MonoBehaviour {
     /// <param name="extends">The extents of the button</param>
     /// <param name="action">Actin name</param>
     /// <param name="actionMethod">Method that will be called when we click the button</param>
-    void CreateButton(GameObject panel, Vector3 center, Vector3 extends, String action, UnityAction actionMethod)
+    void CreateButton(GameObject panel, Vector2 center, Vector2 extends, String action, UnityAction actionMethod)
     {
-        var canvasObject = new GameObject("Canvas");
+        var canvasObject = new GameObject(action);
         var canvas = canvasObject.AddComponent<Canvas>();
+        canvas.tag = "ActionButton";
         canvasObject.AddComponent<GraphicRaycaster>();
-        canvas.renderMode = RenderMode.WorldSpace;
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
         var buttonObject = new GameObject("Button");
         var image = buttonObject.AddComponent<Image>();
         image.transform.parent = canvas.transform;
-        image.rectTransform.sizeDelta = extends * 1.8f;
+        image.rectTransform.sizeDelta = extends * 1.5f;
         image.rectTransform.position = center;
         image.color = new Color(1f, .3f, .3f, .5f);
         Debug.Log("Image position: " + image.transform.position);
@@ -97,11 +132,11 @@ public class EntityActionsController : MonoBehaviour {
         var button = buttonObject.AddComponent<Button>();
         button.targetGraphic = image;
         button.onClick.AddListener(() => actionMethod());
-        var textObject = new GameObject("Text");
+        var textObject = new GameObject("ActionText");
         textObject.transform.parent = buttonObject.transform;
         var text = textObject.AddComponent<Text>();
-        text.rectTransform.sizeDelta = extends * 1.8f;
-        text.rectTransform.anchoredPosition = center;
+        text.rectTransform.sizeDelta = extends * 1.5f;
+        text.rectTransform.position = center;
         text.text = action;
         text.font = Resources.FindObjectsOfTypeAll<Font>()[0];
         text.fontSize = 10;
