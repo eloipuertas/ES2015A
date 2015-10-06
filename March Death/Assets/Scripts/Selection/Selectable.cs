@@ -86,77 +86,8 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 
 			fire (Actions.SELECTED);
 
-			updateActorInformation();
-
         }
     }
-
-	private void updateActorInformation() 
-	{
-		Transform information = getHUDInformationComponent ();
-		if (information != null) {
-			Transform txtActorName = information.transform.FindChild ("ActorName");
-			Transform txtActorRace = information.transform.FindChild ("ActorRace");
-			Transform txtActorHealth = information.transform.FindChild ("ActorHealth");
-			Transform txtActorImage = information.transform.FindChild ("ActorImage");
-			Transform sliderActorHealth = information.transform.FindChild ("ActorHealthSlider");
-					
-			IGameEntity entity = gameObject.GetComponent<IGameEntity> ();
-			txtActorName.gameObject.GetComponent<Text> ().text = entity.info.name;
-			txtActorName.gameObject.GetComponent<Text> ().enabled = true;
-
-			txtActorRace.gameObject.GetComponent<Text> ().text = entity.info.race.ToString ();
-			txtActorRace.gameObject.GetComponent<Text> ().enabled = true;
-
-			txtActorHealth.gameObject.GetComponent<Text> ().text = entity.healthPercentage.ToString () + "/100";
-			txtActorHealth.gameObject.GetComponent<Text> ().enabled = true;
-
-			txtActorImage.gameObject.GetComponent<Image> ().color = new Color (0, 0, 1, 1);
-			txtActorImage.gameObject.GetComponent<Image> ().enabled = true;
-
-			sliderActorHealth.gameObject.GetComponent<Slider> ().value = entity.healthPercentage;
-			sliderActorHealth.gameObject.GetComponent<Slider> ().enabled = true;
-
-			Transform sliderBackground = sliderActorHealth.transform.FindChild ("Background");
-			sliderBackground.GetComponent<Image>().enabled = true;
-		}
-	}
-
-	private void hideActorInformation() 
-	{
-		Transform information = getHUDInformationComponent ();
-		if (information != null) 
-		{
-			Transform txtActorName = information.transform.FindChild("ActorName");
-			Transform txtActorRace = information.transform.FindChild ("ActorRace");
-			Transform txtActorHealth = information.transform.FindChild("ActorHealth");
-			Transform txtActorImage = information.transform.FindChild ("ActorImage");
-			Transform sliderActorHealth = information.transform.FindChild ("ActorHealthSlider");
-
-			txtActorName.gameObject.GetComponent<Text>().enabled = false;
-			txtActorRace.gameObject.GetComponent<Text>().enabled = false;
-			txtActorHealth.gameObject.GetComponent<Text>().enabled = false;
-			txtActorImage.gameObject.GetComponent<Image>().enabled = false;
-			sliderActorHealth.gameObject.GetComponent<Slider>().enabled = false;
-			sliderActorHealth.gameObject.GetComponent<Slider>().value = 0;
-
-			Transform sliderBackground = sliderActorHealth.transform.FindChild ("Background");
-			sliderBackground.GetComponent<Image>().enabled = false;
-		}
-	}
-
-	private Transform getHUDInformationComponent() 
-	{
-		GameObject hud = GameObject.Find ("HUD");	
-		if (hud != null) {
-			Transform information = hud.transform.FindChild ("Information");
-			if (information != null) {
-				return information;
-			}
-		}
-
-		return null;
-	}
 
     private void registerEntityCallbacks()
     {
@@ -169,7 +100,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public virtual void Deselect()
     {
         currentlySelected = false;
-		hideActorInformation ();
+		fire (Actions.DESELECTED);
     }
 
     private void DrawSelection()

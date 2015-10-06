@@ -13,9 +13,12 @@ public class InformationController : MonoBehaviour {
 	private Slider sliderActorHealth;
 	
 	// Use this for initialization
-	void Start () {
+	void Start () 
+	{
 
+		//Register to selectable actions
 		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.SELECTED, onUnitSelected);
+		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.DESELECTED, onUnitDeselected);
 
 		//Init menu components
 		Transform information = GameObject.Find ("HUD").transform.FindChild ("Information");
@@ -35,12 +38,22 @@ public class InformationController : MonoBehaviour {
 	
 	}
 
-	private void dosomething() 
+	private void showInformation(GameObject gameObject) 
 	{
-		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-		Unit unit = entity.toUnit ();
-		unit.register(Unit.Actions.DAMAGED, onUnitDamaged);
-		unit.register(Unit.Actions.DAMAGED, onUnitDied);
+		IGameEntity entity = gameObject.GetComponent<IGameEntity> ();
+
+		txtActorName.text = entity.info.name;
+		txtActorName.enabled = true;
+		txtActorRace.text = entity.info.race.ToString ();
+		txtActorRace.enabled = true;
+		txtActorHealth.text = entity.healthPercentage.ToString () + "/100";
+		txtActorHealth.enabled = true;	
+		imgActorDetail.color = new Color (0, 0, 1, 1);
+		imgActorDetail.enabled = true;
+		sliderActorHealth.value = entity.healthPercentage;
+		sliderActorHealth.enabled = true;
+		Transform sliderBackground = sliderActorHealth.transform.FindChild ("Background");
+		sliderBackground.GetComponent<Image>().enabled = true;
 	}
 
 	private void hideInformation() 
@@ -51,7 +64,6 @@ public class InformationController : MonoBehaviour {
 		imgActorDetail.enabled = false;
 		sliderActorHealth.enabled = false;
 		sliderActorHealth.value = 0;
-		
 		Transform sliderBackground = sliderActorHealth.transform.FindChild ("Background");
 		sliderBackground.GetComponent<Image>().enabled = false;
 
@@ -59,8 +71,25 @@ public class InformationController : MonoBehaviour {
 
 	public void onUnitSelected(GameObject gameObject)
 	{
-		//TODO
-		Debug.Log ("SELECTED");
+		//TODO: parse actor type (building / unit)
+		showInformation(gameObject);
+
+		//Register for unit events
+		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+		Unit unit = entity.toUnit ();
+		unit.register(Unit.Actions.DAMAGED, onUnitDamaged);
+		unit.register(Unit.Actions.DAMAGED, onUnitDied);
+	}
+
+	public void onUnitDeselected(GameObject gameObject)
+	{
+		hideInformation ();
+
+		//Unregister unit events
+		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+		Unit unit = entity.toUnit ();
+		unit.unregister(Unit.Actions.DAMAGED, onUnitDamaged);
+		unit.unregister(Unit.Actions.DAMAGED, onUnitDied);
 	}
 
 	public void onUnitDamaged(GameObject gameObject)
