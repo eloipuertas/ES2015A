@@ -15,5 +15,10 @@ namespace Storage
 
         public float attackRate;
         public float movementRate;
+
+        public int storeSize;
+        public int maxUnits;
+        public int productionRate;
+        public float updateInterval;
     }
 }

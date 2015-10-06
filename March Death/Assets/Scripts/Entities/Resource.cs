@@ -271,7 +271,7 @@ public class Resource : Utils.Actor<Resource.Actions>, IGameEntity
     {
 
         // space enough to hold new collectingUnit
-        if (harvestUnits < maxUnits)
+        if (harvestUnits < _attributes.maxUnits)
         {
             IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
 
@@ -302,7 +302,7 @@ public class Resource : Utils.Actor<Resource.Actions>, IGameEntity
         // get entity
         IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
 
-        if (harvestUnits < maxUnits)
+        if (harvestUnits < _attributes.maxUnits)
         {
             if (entity.info.isCivil)
             {
@@ -315,9 +315,6 @@ public class Resource : Utils.Actor<Resource.Actions>, IGameEntity
                 }
             }
         }
-
-        // TODO: aclarir el Destroy
-        //Destroy(other.gameObject);
     }
 
     /// <summary>
@@ -366,14 +363,14 @@ public class Resource : Utils.Actor<Resource.Actions>, IGameEntity
 
     void produce()
     {
-        int remainingSpace = storeSize - stored;
-        if (productionRate > remainingSpace)
+        int remainingSpace = _attributes.storeSize - stored;
+        if (_attributes.productionRate > remainingSpace)
         {
-            stored = storeSize;
+            stored = _attributes.storeSize;
         }
         else
         {
-            stored += productionRate;
+            stored += _attributes.productionRate;
         }
         return;
     }
@@ -410,17 +407,9 @@ public class Resource : Utils.Actor<Resource.Actions>, IGameEntity
         race = Races.MEN;
         nextUpdate = 0;
         stored = 0;
-
-        // TODO: Establir maxUnits en JSON?
-        maxUnits = 10;
-
-        harvestUnits = 0;
-        updateInterval = 1;
-        productionRate = 20;
-
         collectionRate = 0;
-
-
+        harvestUnits = 0;
+        
         _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
 
@@ -435,7 +424,7 @@ public class Resource : Utils.Actor<Resource.Actions>, IGameEntity
 
         if (Time.time > nextUpdate)
         {
-            nextUpdate = Time.time + updateInterval;
+            nextUpdate = Time.time + _attributes.updateInterval;
             // when updated, collector units load materials from store.
             // after they finish loading materials production cycle succes.
             // new produced materials can be stored but not collected until
