@@ -79,11 +79,17 @@ namespace Utils
         public void registerForAll(T action, Action<GameObject> func)
         {
             callbacks[action].Add(func);
+
+            // Find all already existing gameobjects of this type
+            UnityEngine.Object[] alreadyExistingActors = UnityEngine.Object.FindObjectsOfType(typeof(SubscribableActor<T,S>));
+            foreach (UnityEngine.Object obj in alreadyExistingActors)
+            {
+                ((SubscribableActor<T, S>)obj).register(action, func);
+            }
         }
 
         public void onActorStart(SubscribableActor<T, S> actor)
         {
-            Debug.Log(actor);
             foreach (KeyValuePair<T, List < Action < GameObject >>> entry in callbacks)
             {
                 foreach (Action<GameObject> action in entry.Value)
