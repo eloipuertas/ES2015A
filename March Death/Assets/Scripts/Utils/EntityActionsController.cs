@@ -142,7 +142,6 @@ public class EntityActionsController : MonoBehaviour
         text.fontSize = 10;
         text.color = Color.yellow;
         text.alignment = TextAnchor.MiddleCenter;
-        Debug.Log("Button position: " + button.transform.position);
     }
 
     /// <summary>
