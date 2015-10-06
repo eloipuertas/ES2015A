@@ -60,6 +60,10 @@ namespace Utils
 
     public sealed class Subscriber<T, S> : Singleton<Subscriber<T, S>> where T : struct, IConvertible where S : class
     {
+
+		private Subscriber() { }
+
+
         private Dictionary<T, List<Action<GameObject>>> callbacks = new Dictionary<T, List<Action<GameObject>>>();
 
         public void registerForAll(T action, Action<GameObject> func)

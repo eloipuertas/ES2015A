@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using Storage;
+using Utils;
 
 public class InformationController : MonoBehaviour {
 
@@ -13,6 +14,8 @@ public class InformationController : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
+
+		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.SELECTED, onUnitSelected);
 
 		//Init menu components
 		Transform information = GameObject.Find ("HUD").transform.FindChild ("Information");
@@ -52,6 +55,12 @@ public class InformationController : MonoBehaviour {
 		Transform sliderBackground = sliderActorHealth.transform.FindChild ("Background");
 		sliderBackground.GetComponent<Image>().enabled = false;
 
+	}
+
+	public void onUnitSelected(GameObject gameObject)
+	{
+		//TODO
+		Debug.Log ("SELECTED");
 	}
 
 	public void onUnitDamaged(GameObject gameObject)

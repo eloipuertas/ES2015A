@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using Storage;
+using Utils;
 
-public class Selectable : MonoBehaviour
+public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 {
+	
+	public enum Actions { SELECTED, DESELECTED };
 
     private Rect selectedRect = new Rect();
     private Texture2D selectedBox;
@@ -11,6 +15,8 @@ public class Selectable : MonoBehaviour
     private float healthRatio = 1f;
     private bool updateHealthRatio = true;
     private bool entityMoving = true;
+
+	public Selectable() { }
 
     //Pendiente
     //IGameEntity gameEntity;
@@ -75,6 +81,8 @@ public class Selectable : MonoBehaviour
             //Pendiente
             //Debug.Log(gameEntity.info.name);
             registerEntityCallbacks();
+
+			fire (Actions.SELECTED);
 
 			updateActorInformation();
 
