@@ -1202,6 +1202,7 @@ GameObject:
   - 114: {fileID: 11498514}
   - 54: {fileID: 5477106}
   - 65: {fileID: 6598066}
+  - 114: {fileID: 11468738}
   m_Layer: 0
   m_Name: Human-Stronghold
   m_TagString: Untagged
@@ -1814,7 +1815,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 180004}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1234.66211, y: 78.0172958, z: 1048.64941}
+  m_LocalPosition: {x: 1985.5, y: 80.9000015, z: 1003.09998}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 402056}
@@ -5138,6 +5139,19 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11468738
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 180004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: caa19c7f960625f4b83094529589a1c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsRevealer: 0
+  Range: 0
 --- !u!114 &11498514
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -14,6 +14,7 @@ GameObject:
   - 114: {fileID: 11455256}
   - 54: {fileID: 5435530}
   - 65: {fileID: 6536680}
+  - 114: {fileID: 11490308}
   m_Layer: 0
   m_Name: Human-Mine
   m_TagString: Untagged
@@ -28,7 +29,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 150300}
   m_LocalRotation: {x: -.707106829, y: 0, z: -0, w: .707106829}
-  m_LocalPosition: {x: 1978.32886, y: 79.0144882, z: 1097.93982}
+  m_LocalPosition: {x: 1941.09998, y: 80.8000031, z: 1000.59998}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -121,6 +122,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   race: 0
   type: 1
+--- !u!114 &11490308
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 150300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: caa19c7f960625f4b83094529589a1c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsRevealer: 0
+  Range: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

@@ -613,6 +613,8 @@ GameObject:
   - 114: {fileID: 11431178}
   - 65: {fileID: 6563030}
   - 54: {fileID: 5494296}
+  - 114: {fileID: 11475940}
+  - 114: {fileID: 11490494}
   m_Layer: 0
   m_Name: human_hero
   m_TagString: Untagged
@@ -1688,8 +1690,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 168590}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: -1.62920685e-07}
+  m_LocalPosition: {x: 1977.90002, y: 80.3099976, z: 987.900024}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 456072}
@@ -1890,9 +1892,9 @@ MeshRenderer:
   m_Materials:
   - {fileID: 2100000, guid: f2b61098ceda1504db67d4987c649cd0, type: 2}
   - {fileID: 2100000, guid: a2b4bac32fd142f478502afe5a85af22, type: 2}
-  - {fileID: 2100000, guid: 4001c2066482c4c2eafd870a89328dc9, type: 2}
+  - {fileID: 0}
   - {fileID: 2100000, guid: eea24df8506b08d40b72f0b80f233635, type: 2}
-  - {fileID: 2100000, guid: d8ef48407b9f44080b8c67474658d770, type: 2}
+  - {fileID: 0}
   - {fileID: 2100000, guid: eb5645b1ba320df449e96249c68bb803, type: 2}
   - {fileID: 2100000, guid: 20877ddba0968c6478229a2d7db0f152, type: 2}
   - {fileID: 2100000, guid: 20877ddba0968c6478229a2d7db0f152, type: 2}
@@ -1987,6 +1989,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   race: 0
   type: 3
+--- !u!114 &11475940
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 168590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43c34b4ae45e2c94f90ae970db2ad9f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &11490494
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 168590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: caa19c7f960625f4b83094529589a1c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsRevealer: 1
+  Range: 10
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
