@@ -61,8 +61,18 @@ namespace Utils
     public sealed class Subscriber<T, S> : Singleton<Subscriber<T, S>> where T : struct, IConvertible where S : class
     {
 
-		private Subscriber() { }
+		private Subscriber()
+        {
+            if (!typeof(T).IsEnum)
+            {
+                throw new ArgumentException("T must be an enumerated type");
+            }
 
+            foreach (T action in Enum.GetValues(typeof(T)))
+            {
+                callbacks.Add(action, new List<Action<GameObject>>());
+            }
+        }
 
         private Dictionary<T, List<Action<GameObject>>> callbacks = new Dictionary<T, List<Action<GameObject>>>();
 
@@ -73,6 +83,7 @@ namespace Utils
 
         public void onActorStart(SubscribableActor<T, S> actor)
         {
+            Debug.Log(actor);
             foreach (KeyValuePair<T, List < Action < GameObject >>> entry in callbacks)
             {
                 foreach (Action<GameObject> action in entry.Value)

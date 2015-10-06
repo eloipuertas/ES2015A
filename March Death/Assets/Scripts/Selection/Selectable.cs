@@ -21,8 +21,10 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     //Pendiente
     //IGameEntity gameEntity;
 
-    protected virtual void Start()
+    public override void Start()
     {
+        base.Start();
+
         //Pendiente
         //gameEntity = this.GetComponent<IGameEntity>();
         selectedBox = SelectionOverlay.CreateTexture();
