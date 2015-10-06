@@ -21,7 +21,6 @@ public class Selectable : MonoBehaviour
         //gameEntity = this.GetComponent<IGameEntity>();
         selectedBox = SelectionOverlay.CreateTexture();
         currentlySelected = false;
-
     }
 
     protected virtual void Update() { }
@@ -85,20 +84,31 @@ public class Selectable : MonoBehaviour
 	private void updateActorInformation() 
 	{
 		Transform information = getHUDInformationComponent ();
-		if (information != null) 
-		{
+		if (information != null) {
 			Transform txtActorName = information.transform.FindChild ("ActorName");
+			Transform txtActorRace = information.transform.FindChild ("ActorRace");
 			Transform txtActorHealth = information.transform.FindChild ("ActorHealth");
 			Transform txtActorImage = information.transform.FindChild ("ActorImage");
+			Transform sliderActorHealth = information.transform.FindChild ("ActorHealthSlider");
 					
 			IGameEntity entity = gameObject.GetComponent<IGameEntity> ();
 			txtActorName.gameObject.GetComponent<Text> ().text = entity.info.name;
-			txtActorName.gameObject.GetComponent<Text>().enabled = true;
-			txtActorHealth.gameObject.GetComponent<Text> ().text = entity.healthPercentage.ToString ();
-			txtActorHealth.gameObject.GetComponent<Text>().enabled = true;
+			txtActorName.gameObject.GetComponent<Text> ().enabled = true;
 
-			txtActorImage.gameObject.GetComponent<Image> ().color = new Color(0, 0, 1, 1);
-			txtActorImage.gameObject.GetComponent<Image>().enabled = true;
+			txtActorRace.gameObject.GetComponent<Text> ().text = entity.info.race.ToString ();
+			txtActorRace.gameObject.GetComponent<Text> ().enabled = true;
+
+			txtActorHealth.gameObject.GetComponent<Text> ().text = entity.healthPercentage.ToString () + "/100";
+			txtActorHealth.gameObject.GetComponent<Text> ().enabled = true;
+
+			txtActorImage.gameObject.GetComponent<Image> ().color = new Color (0, 0, 1, 1);
+			txtActorImage.gameObject.GetComponent<Image> ().enabled = true;
+
+			sliderActorHealth.gameObject.GetComponent<Slider> ().value = entity.healthPercentage;
+			sliderActorHealth.gameObject.GetComponent<Slider> ().enabled = true;
+
+			Transform sliderBackground = sliderActorHealth.transform.FindChild ("Background");
+			sliderBackground.GetComponent<Image>().enabled = true;
 		}
 	}
 
@@ -108,13 +118,20 @@ public class Selectable : MonoBehaviour
 		if (information != null) 
 		{
 			Transform txtActorName = information.transform.FindChild("ActorName");
+			Transform txtActorRace = information.transform.FindChild ("ActorRace");
 			Transform txtActorHealth = information.transform.FindChild("ActorHealth");
 			Transform txtActorImage = information.transform.FindChild ("ActorImage");
+			Transform sliderActorHealth = information.transform.FindChild ("ActorHealthSlider");
 
 			txtActorName.gameObject.GetComponent<Text>().enabled = false;
+			txtActorRace.gameObject.GetComponent<Text>().enabled = false;
 			txtActorHealth.gameObject.GetComponent<Text>().enabled = false;
 			txtActorImage.gameObject.GetComponent<Image>().enabled = false;
+			sliderActorHealth.gameObject.GetComponent<Slider>().enabled = false;
+			sliderActorHealth.gameObject.GetComponent<Slider>().value = 0;
 
+			Transform sliderBackground = sliderActorHealth.transform.FindChild ("Background");
+			sliderBackground.GetComponent<Image>().enabled = false;
 		}
 	}
 
