@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class Selectable : MonoBehaviour
 {
@@ -75,8 +76,60 @@ public class Selectable : MonoBehaviour
             //Pendiente
             //Debug.Log(gameEntity.info.name);
             registerEntityCallbacks();
+
+			updateActorInformation();
+
         }
     }
+
+	private void updateActorInformation() 
+	{
+		Transform information = getHUDInformationComponent ();
+		if (information != null) 
+		{
+			Transform txtActorName = information.transform.FindChild ("ActorName");
+			Transform txtActorHealth = information.transform.FindChild ("ActorHealth");
+			Transform txtActorImage = information.transform.FindChild ("ActorImage");
+					
+			IGameEntity entity = gameObject.GetComponent<IGameEntity> ();
+			txtActorName.gameObject.GetComponent<Text> ().text = entity.info.name;
+			txtActorName.gameObject.GetComponent<Text>().enabled = true;
+			txtActorHealth.gameObject.GetComponent<Text> ().text = entity.healthPercentage.ToString ();
+			txtActorHealth.gameObject.GetComponent<Text>().enabled = true;
+
+			txtActorImage.gameObject.GetComponent<Image> ().color = new Color(0, 0, 1, 1);
+			txtActorImage.gameObject.GetComponent<Image>().enabled = true;
+		}
+	}
+
+	private void hideActorInformation() 
+	{
+		Transform information = getHUDInformationComponent ();
+		if (information != null) 
+		{
+			Transform txtActorName = information.transform.FindChild("ActorName");
+			Transform txtActorHealth = information.transform.FindChild("ActorHealth");
+			Transform txtActorImage = information.transform.FindChild ("ActorImage");
+
+			txtActorName.gameObject.GetComponent<Text>().enabled = false;
+			txtActorHealth.gameObject.GetComponent<Text>().enabled = false;
+			txtActorImage.gameObject.GetComponent<Image>().enabled = false;
+
+		}
+	}
+
+	private Transform getHUDInformationComponent() 
+	{
+		GameObject hud = GameObject.Find ("HUD");	
+		if (hud != null) {
+			Transform information = hud.transform.FindChild ("Information");
+			if (information != null) {
+				return information;
+			}
+		}
+
+		return null;
+	}
 
     private void registerEntityCallbacks()
     {
@@ -89,6 +142,7 @@ public class Selectable : MonoBehaviour
     public virtual void Deselect()
     {
         currentlySelected = false;
+		hideActorInformation ();
     }
 
     private void DrawSelection()
