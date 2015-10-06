@@ -81,6 +81,7 @@ public class FOWManager : MonoBehaviour
     
     void Update()
     {
+#if UNITY_EDITOR
         //Don't show fog on the editor or if not enabled.
         if (!Application.isPlaying || !Enabled)
         {
@@ -89,6 +90,7 @@ public class FOWManager : MonoBehaviour
                 DestroyImmediate(fowTex);
             fowTex = null;
         }
+#endif
         if (fowTex)
         {
             int fade = Mathf.RoundToInt(Time.deltaTime * FadeRate);
