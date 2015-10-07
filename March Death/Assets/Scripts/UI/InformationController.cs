@@ -15,7 +15,6 @@ public class InformationController : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
-
 		//Register to selectable actions
 		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.SELECTED, onUnitSelected);
 		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.DESELECTED, onUnitDeselected);
