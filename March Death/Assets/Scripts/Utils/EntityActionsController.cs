@@ -4,17 +4,20 @@ using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using System;
+using Utils;
 
 public class EntityActionsController : MonoBehaviour
 {
 
     private static int Button_Rows = 3;
     private static int Button_Columns = 3;
-    private Boolean button = false;
 
     // Use this for initialization
     void Start()
     {
+		//Register to selectable actions
+		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.SELECTED, onActorSelected);
+		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.DESELECTED, onActorDeselected);
 
     }
 
@@ -22,77 +25,46 @@ public class EntityActionsController : MonoBehaviour
     void Update()
     {
 
-
     }
 
-    void OnMouseDown()
-    {
-        CheckActionButtons();
-        CreateUI();
-    }
+	public void onActorSelected(GameObject gameObject)
+	{
+		destroyButtons ();
+		showActions (gameObject);
+	}
+	
+	public void onActorDeselected(GameObject gameObject)
+	{
+		destroyButtons ();
+	}
 
+	void showActions(GameObject gameObject)
+	{
+		GameObject actionPanel = GameObject.Find("actions");
+		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+		var rectTransform = actionPanel.GetComponent<RectTransform>();
+		var extents = 0.9f * rectTransform.sizeDelta / 2.0f;
+		var buttonExtents = new Vector2(extents.x / Button_Columns, extents.y / Button_Rows);
+		var position = rectTransform.position;
+		var point = new Vector2(position.x - extents.x, position.y + extents.y);
+		var actions = entity.info.actions;
+		var nactions = actions.Count;
+	
+		for (int i = 0; i < nactions; i++)
+		{
+			String action = actions[i].name;
+			IAction actionObj = entity.getAction(action);
+			if (actionObj.isUsable)
+			{
+				UnityAction actionMethod = new UnityAction(() => SayHello());
+				var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
+				buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Rows) + 1));
+				CreateButton(actionPanel, buttonCenter, buttonExtents, action, actionMethod, !actionObj.isActive);
+			}	
+		}
+	}
 
-    /// <summary>
-    /// Method to create a new UI Element.In our case only buttons.
-    /// </summary>
-    void CreateUI()
-    {
-        GameObject actionPanel = GameObject.Find("actions");
-        IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (!button)
-            {
-
-                //actionPanel.GetComponent = null;
-                var rectTransform = actionPanel.GetComponent<RectTransform>();
-                var extents = 0.9f * rectTransform.sizeDelta / 2.0f;
-                var buttonExtents = new Vector2(extents.x / Button_Columns, extents.y / Button_Rows);
-                var position = rectTransform.position;
-                var point = new Vector2(position.x - extents.x, position.y + extents.y);
-                var actions = entity.info.actions;
-                var nactions = actions.Count;
-
-                for (int i = 0; i < nactions; i++)
-                {
-                    String action = actions[i].name;
-                    IAction actionObj = entity.getAction(action);
-                    if (actionObj.isUsable && !actionObj.isActive)
-                    {
-                        actionObj.enable();
-                        UnityAction actionMethod = new UnityAction(() => SayHello());
-                        var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
-                        buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Rows) + 1));
-                        CreateButton(actionPanel, buttonCenter, buttonExtents, action, actionMethod);
-                    }
-
-                }
-                button = true;
-            }
-            else
-            {
-                var actions = entity.info.actions;
-                var nactions = actions.Count;
-                Debug.Log("Numero de acciones :" + nactions);
-                for (int i = 0; i < nactions; i++)
-                {
-                    String action = actions[i].name;
-                    IAction actionObj = entity.getAction(action);
-                    actionObj.disable();
-                    Debug.Log("Desactivando el objeto");
-                    var objeto = GameObject.Find(actions[i].name);
-                    if (objeto != null)
-                    {
-                        Destroy(objeto);
-                    }
-                }
-                button = false;
-            }
-
-        }
-    }
-
-    void CheckActionButtons()
+    void destroyButtons()
     {
         GameObject[] actionButtons = GameObject.FindGameObjectsWithTag("ActionButton");
         if (actionButtons != null)
@@ -112,7 +84,7 @@ public class EntityActionsController : MonoBehaviour
     /// <param name="extends">The extents of the button</param>
     /// <param name="action">Actin name</param>
     /// <param name="actionMethod">Method that will be called when we click the button</param>
-    void CreateButton(GameObject panel, Vector2 center, Vector2 extends, String action, UnityAction actionMethod)
+    void CreateButton(GameObject panel, Vector2 center, Vector2 extends, String action, UnityAction actionMethod, Boolean enabled)
     {
         var canvasObject = new GameObject(action);
         var canvas = canvasObject.AddComponent<Canvas>();
@@ -128,10 +100,11 @@ public class EntityActionsController : MonoBehaviour
         image.color = new Color(1f, .3f, .3f, .5f);
         Debug.Log("Image position: " + image.transform.position);
 
-
         var button = buttonObject.AddComponent<Button>();
         button.targetGraphic = image;
-        button.onClick.AddListener(() => actionMethod());
+		button.onClick.AddListener(() => actionMethod());
+		button.enabled = enabled;
+
         var textObject = new GameObject("ActionText");
         textObject.transform.parent = buttonObject.transform;
         var text = textObject.AddComponent<Text>();
@@ -147,7 +120,7 @@ public class EntityActionsController : MonoBehaviour
     /// <summary>
     /// Exemple method of action
     /// </summary>
-    void SayHello()
+	void SayHello()
     {
         Debug.Log("Hello everybody!");
     }

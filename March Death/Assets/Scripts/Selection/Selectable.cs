@@ -69,7 +69,6 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public virtual void Select(Player player)
     {
         //only handle input if currently selected
-
         Selectable oldObject = player.SelectedObject;
 
         if ( !this.Equals(oldObject))
