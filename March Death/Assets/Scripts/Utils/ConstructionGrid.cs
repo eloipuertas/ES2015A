@@ -18,7 +18,7 @@ public class ConstructionGrid : MonoBehaviour {
     /// <returns></returns>
 	public Vector3 discretizeMapCoords(Vector3 position)
     {
-        return Vector3.zero;
+        return position;
     }
 
     /// <summary>
