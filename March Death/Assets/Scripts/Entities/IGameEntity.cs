@@ -7,6 +7,7 @@ public interface IGameEntity
     EntityInfo info { get; }
     EntityStatus status { get; }
 
+    int wounds { get; }
     float damagePercentage { get; }
     float healthPercentage { get; }
 
