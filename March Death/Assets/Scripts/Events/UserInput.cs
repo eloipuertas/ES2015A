@@ -28,31 +28,38 @@ public class UserInput : MonoBehaviour
 
     private void LeftMouseClick()
     {
-        GameObject hitObject = FindHitObject();
-        Vector3 hitPoint = FindHitPoint();
-
-        if (hitObject)
+        if (GetComponent<BuildingsFactory>().Locating) // we are locating a building
         {
+            GetComponent<BuildingsFactory>().placeBuilding();
+        }
+        else // we are doing something else
+        {
+            GameObject hitObject = FindHitObject();
+            Vector3 hitPoint = FindHitPoint();
 
-            Selectable selectedObject = hitObject.GetComponent<Selectable>();
-            // We just be sure that is a selectable object
-            if (selectedObject)
+            if (hitObject)
             {
-                selectedObject.Select(player);
-            }
-        }
-        else if (hitPoint != this.invalidPosition)
-        {
-            /* TODO check if click is not out of bounds ( perhaps the click is in the HUD ) */
 
-        }
-        else
-        {
-            //TODO where is the hit???
+                Selectable selectedObject = hitObject.GetComponent<Selectable>();
+                // We just be sure that is a selectable object
+                if (selectedObject)
+                {
+                    selectedObject.Select(player);
+                }
+            }
+            else if (hitPoint != this.invalidPosition)
+            {
+                /* TODO check if click is not out of bounds ( perhaps the click is in the HUD ) */
+
+            }
+            else
+            {
+                //TODO where is the hit???
+            }
         }
     }
 
-    private GameObject FindHitObject()
+    public GameObject FindHitObject()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -60,7 +67,7 @@ public class UserInput : MonoBehaviour
         return null;
     }
 
-    private Vector3 FindHitPoint()
+    public  Vector3 FindHitPoint()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
