@@ -16,6 +16,7 @@ public class FOWManager : MonoBehaviour
     public float Quality=1;
     /// <summary>
     /// If enabled zones that should be completly black will just be a little darker. Used mainly for debugging purposes.
+    /// Also you will be able to see fowEntities in semifog
     /// </summary>
     public bool NotFullyOpaque = false;
     /// <summary>
@@ -97,14 +98,8 @@ public class FOWManager : MonoBehaviour
 
             //Fade all the map
             for (int i = 0; i < pixels.Length; i++)
-            {
                 if (pixels[i].b > 0)
-                {
-                    if (!NotFullyOpaque)
-                        pixels[i].g = (byte)Mathf.Max(pixels[i].g - fade, 0);
                     pixels[i].b = (byte)Mathf.Max(pixels[i].b - fade, 0);
-                }
-            }
             //Reveal the area around the revealer entities
             foreach (FOWEntity e in entities)
             {
@@ -169,7 +164,7 @@ public class FOWManager : MonoBehaviour
             for (int y = yMin; y <= yMax; ++y)
             { 
                 int p = x + y * fowTex.width;
-                if (pixels[p].g > 0 || pixels[p].b>0)
+                if (pixels[p].b>0 || (NotFullyOpaque && pixels[p].g>0))
                     return true;
             }
         return false;
