@@ -15,8 +15,10 @@ namespace Storage
     {
         private Dictionary<Tuple<Races, UnitTypes>, UnitInfo> unitStore = new Dictionary<Tuple<Races, UnitTypes>, UnitInfo>();
         private Dictionary<Tuple<Races, UnitTypes>, string> unitPrefabs = new Dictionary<Tuple<Races, UnitTypes>, string>();
+
         private Dictionary<Tuple<Races, BuildingTypes>, BuildingInfo> buildingStore = new Dictionary<Tuple<Races, BuildingTypes>, BuildingInfo>();
         private Dictionary<Tuple<Races, BuildingTypes>, string> buildingPrefabs = new Dictionary<Tuple<Races, BuildingTypes>, string>();
+
         private Dictionary<Tuple<Races, ResourceTypes>, ResourceInfo> resourceStore = new Dictionary<Tuple<Races, ResourceTypes>, ResourceInfo>();
         private Dictionary<Tuple<Races, ResourceTypes>, string> resourcePrefabs = new Dictionary<Tuple<Races, ResourceTypes>, string>();
 
@@ -86,7 +88,7 @@ namespace Storage
                 try
                 {
                     BuildingInfo buildingInfo = JsonConvert.DeserializeObject<BuildingInfo>(json.text);
-                    buildingInfo.entityType = EntityType.UNIT;
+                    buildingInfo.entityType = EntityType.BUILDING;
 
                     Tuple<Races, BuildingTypes> key = new Tuple<Races, BuildingTypes>(buildingInfo.race, buildingInfo.type);
 

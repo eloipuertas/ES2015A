@@ -42,7 +42,6 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     /// That means: max health, damage, defense, etc.
     /// </summary>
     private UnitInfo _info;
-    private UnitAttributes _attributes;
     public EntityInfo info
     {
         get
@@ -87,7 +86,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     {
         get
         {
-            return (_attributes.wounds - _woundsReceived) * 100f / _attributes.wounds;
+            return (info.unitAttributes.wounds - _woundsReceived) * 100f / info.unitAttributes.wounds;
         }
     }
 
@@ -115,10 +114,10 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
         if (isRanged)
         {
             // TODO: Specil units (ie gigants) and distance!
-            return dice > 1 && (from._attributes.projectileAbility + dice >= 7);
+            return dice > 1 && (from.info.unitAttributes.projectileAbility + dice >= 7);
         }
 
-        return HitTables.meleeHit[((UnitAttributes)from.info.attributes).weaponAbility, _attributes.weaponAbility] <= dice;
+        return HitTables.meleeHit[from.info.unitAttributes.weaponAbility, info.unitAttributes.weaponAbility] <= dice;
     }
 
     /// <summary>
@@ -129,7 +128,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     private bool willAttackCauseWounds(Unit from)
     {
         int dice = Utils.D6.get.rollOnce();
-        return HitTables.wounds[from._attributes.strength, _attributes.resistance] <= dice;
+        return HitTables.wounds[from.info.unitAttributes.strength, info.unitAttributes.resistance] <= dice;
     }
 
     /// <summary>
@@ -154,7 +153,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
         }
 
         // Check if we are dead
-        if (_woundsReceived == _attributes.wounds)
+        if (_woundsReceived == info.unitAttributes.wounds)
         {
             _status = EntityStatus.DEAD;
             _target = null;
@@ -224,7 +223,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     {
         _abilities = new List<IUnitAbility>();
 
-        foreach (UnitAbility ability in _info.actions)
+        foreach (UnitAbility ability in info.actions)
         {
             // Try to get class with this name
             string abilityName = ability.name.Replace(" ", "");
@@ -283,7 +282,6 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
 
         _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
-        _attributes = (UnitAttributes)_info.attributes;
         setupAbilities();
     }
 
@@ -315,7 +313,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
             case EntityStatus.ATTACKING:
                 if (_target != null)
                 {
-                    if (Time.time - _lastAttack >= (1f / _attributes.attackRate))
+                    if (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate))
                     {
                         // TODO: Ranged attacks!
                         _target.receiveAttack(this, false);
@@ -335,7 +333,7 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
             case EntityStatus.MOVING:
                 // TODO: Steps on the last sector are smoothened due to distance being small
                 // Althought it's an unintended behaviour, it may be interesating to leave it as is
-                transform.position = Vector3.MoveTowards(transform.position, _movePoint, Time.fixedDeltaTime * _attributes.movementRate);
+                transform.position = Vector3.MoveTowards(transform.position, _movePoint, Time.fixedDeltaTime * info.unitAttributes.movementRate);
 
                 // If distance is lower than 0.5, stop movement
                 if (Vector3.Distance(transform.position, _movePoint) <= 0.5f)

@@ -279,7 +279,8 @@ public class Resource : Utils.Actor<Resource.Actions>, IGameEntity
             if (entity.info.isCivil)
             {
                 Unit unit = (Unit)entity;
-                UnitInfo info = entity.info.toUnitInfo;
+                UnitInfo info = (UnitInfo)entity.info;
+
                 //Increase units collecting resource, calculate max capacity.
                 if (match(info.type, type))
                 {
@@ -306,7 +307,8 @@ public class Resource : Utils.Actor<Resource.Actions>, IGameEntity
         {
             if (entity.info.isCivil)
             {
-                UnitInfo info = entity.info.toUnitInfo;
+                UnitInfo info = (UnitInfo)entity.info;
+
                 //Decrease units collecting resource, calculate max capacity.
                 if (match(info.type, type))
                 {
