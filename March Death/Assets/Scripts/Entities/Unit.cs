@@ -9,7 +9,7 @@ using Storage;
 /// Unit base class. Extends actor (which in turn extends MonoBehaviour) to
 /// handle basic API operations
 /// </summary>
-public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
+public class Unit : GameEntity<Unit.Actions>
 {
     public enum Actions { MOVEMENT_START, MOVEMENT_END, DAMAGED, DIED };
 
@@ -31,137 +31,12 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     /// Point to move to
     /// </summary>
     private Vector3 _movePoint;
-
-    /// <summary>
-    /// List of ability objects of this unit
-    /// </summary>
-    private List<IUnitAbility> _abilities;
-
-    /// <summary>
-    /// Contains all static information of the Unit.
-    /// That means: max health, damage, defense, etc.
-    /// </summary>
-    private UnitInfo _info;
-    public EntityInfo info
-    {
-        get
-        {
-            return _info;
-        }
-    }
-
-    /// <summary>
-    /// Returns current status of the Unit
-    /// </summary>
-    private EntityStatus _status;
-    public EntityStatus status
-    {
-        get
-        {
-            return _status;
-        }
-    }
-
+    
     /// <summary>
     /// Civil units might need this to acount how many *items* they are carrying.
     /// </summary>
     public int usedCapacity { get; set; }
-
-    /// <summary>
-    /// Returns the number of wounds a unit received
-    /// </summary>
-    private float _woundsReceived;
-    public float wounds
-    {
-        get
-        {
-            return _woundsReceived;
-        }
-    }
-
-    /// <summary>
-    /// Returns percentual value of health (100% meaning all life)
-    /// </summary>
-    public float healthPercentage
-    {
-        get
-        {
-            return (info.unitAttributes.wounds - _woundsReceived) * 100f / info.unitAttributes.wounds;
-        }
-    }
-
-    /// <summary>
-    /// Returns percentual value of damage (100% meaning 0% life)
-    /// </summary>
-    public float damagePercentage
-    {
-        get
-        {
-            return 100f - healthPercentage;
-        }
-    }
-
-    /// <summary>
-    /// Returns true in case an attack will land on this unit
-    /// </summary>
-    /// <param name="from">Unit which attacked</param>
-    /// <param name="isRanged">Set to true in case the attack is range, false if melee</param>
-    /// <returns>True if it hits, false otherwise</returns>
-    private bool willAttackLand(Unit from, bool isRanged = false)
-    {
-        int dice = Utils.D6.get.rollSpecial();
-
-        if (isRanged)
-        {
-            // TODO: Specil units (ie gigants) and distance!
-            return dice > 1 && (from.info.unitAttributes.projectileAbility + dice >= 7);
-        }
-
-        return HitTables.meleeHit[from.info.unitAttributes.weaponAbility, info.unitAttributes.weaponAbility] <= dice;
-    }
-
-    /// <summary>
-    /// Retuns true if an attack will cause wounds to this unit
-    /// </summary>
-    /// <param name="from">Attacker</param>
-    /// <returns>True if causes wounds, false otherwise</returns>
-    private bool willAttackCauseWounds(Unit from)
-    {
-        int dice = Utils.D6.get.rollOnce();
-        return HitTables.wounds[from.info.unitAttributes.strength, info.unitAttributes.resistance] <= dice;
-    }
-
-    /// <summary>
-    /// Automatically calculates if an attack will hit, and in case it
-    /// does it updates the current state.
-    /// </summary>
-    /// <param name="from">Attacker</param>
-    /// <param name="isRanged">True if the attack is ranged, false if melee</param>
-    public void receiveAttack(Unit from, bool isRanged)
-    {
-        // Do not attack dead targets
-        if (_status == EntityStatus.DEAD)
-        {
-            throw new InvalidOperationException("Can not receive damage while not alive");
-        }
-
-        // If it hits and produces damage, update wounds
-        if (willAttackLand(from, isRanged) && willAttackCauseWounds(from))
-        {
-            _woundsReceived += 1;
-            fire(Actions.DAMAGED);
-        }
-
-        // Check if we are dead
-        if (_woundsReceived == info.unitAttributes.wounds)
-        {
-            _status = EntityStatus.DEAD;
-            _target = null;
-
-            fire(Actions.DIED);
-        }
-    }
-
+    
     /// <summary>
     /// Called once our target dies. It may be used to update unit IA
     /// </summary>
@@ -170,6 +45,22 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     {
         // TODO: Our target died, select next? Do nothing?
         _status = EntityStatus.IDLE;
+    }
+
+    /// <summary>
+    /// When a wound is received, this is called
+    /// </summary>
+    protected override void onReceiveDamage()
+    {
+        fire(Actions.DAMAGED);
+    }
+
+    /// <summary>
+    /// When wounds reach its maximum, thus unit dies, this is called
+    /// </summary>
+    protected override void onFatalWounds()
+    {
+        fire(Actions.DIED);
     }
 
     /// <summary>
@@ -219,10 +110,8 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
     /// <summary>
     /// Iterates all abilities on the
     /// </summary>
-    private void setupAbilities()
+    protected override void setupActions()
     {
-        _abilities = new List<IUnitAbility>();
-
         foreach (UnitAbility ability in info.actions)
         {
             // Try to get class with this name
@@ -235,54 +124,32 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
                 if (constructor == null)
                 {
                     // Invalid constructor, use GenericAbility
-                    _abilities.Add(new GenericAbility(ability));
+                    _actions.Add(new GenericAbility(ability));
                 }
                 else
                 {
                     // Class found, use that!
-                    _abilities.Add((IUnitAbility)constructor.Invoke(new object[2] { ability, gameObject }));
+                    _actions.Add((IUnitAbility)constructor.Invoke(new object[2] { ability, gameObject }));
                 }
             }
             catch (Exception /*e*/)
             {
                 // No such class, use the GenericAbility class
-                _abilities.Add(new GenericAbility(ability));
+                _actions.Add(new GenericAbility(ability));
             }
         }
     }
-
-    /// <summary>
-    /// Returns an action given a name
-    /// </summary>
-    /// <param name="name">Name of the action</param>
-    /// <exception cref="System.ArgumentException">
-    /// Thrown when no action with the given name is found
-    /// </exception>
-    /// <returns>Always returns a valid IUnitAbility (IAction)</returns>
-    public IAction getAction(string name)
-    {
-        foreach (IUnitAbility ability in _abilities)
-        {
-            if (ability.info.name.Equals(name))
-            {
-                return ability;
-            }
-        }
-
-        throw new ArgumentException("Invalid action " + name + "requested");
-    }
-
+    
     /// <summary>
     /// Object initialization
     /// </summary>
     override public void Start()
     {
-        // Call actor start
-        base.Start();
-
         _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
-        setupAbilities();
+
+        // Call GameEntity start
+        base.Start();
     }
 
     /// <summary>
@@ -344,22 +211,5 @@ public class Unit : Utils.Actor<Unit.Actions>, IGameEntity
                 break;
         }
     }
-
-    /// <summary>
-    /// Casts this IGameEntity to Unity (pointless if already unit)
-    /// </summary>
-    /// <returns>Object casted to Unit</returns>
-    public Unit toUnit() { return this;  }
-
-    /// <summary>
-    /// Returns NULL as this cannot be converted to Building
-    /// </summary>
-    /// <returns>Always null</returns>
-    public Building toBuilding() { return null; }
-    /// <summary>
-    /// Returns NULL as this cannot be converted to Resource
-    /// </summary>
-    /// <returns>Always null</returns>
-    public Resource toResource() { return null; }
 
 }
