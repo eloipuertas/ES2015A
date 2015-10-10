@@ -612,8 +612,8 @@ GameObject:
   - 4: {fileID: 483526}
   - 111: {fileID: 11190890}
   - 54: {fileID: 5451264}
-  - 65: {fileID: 6527574}
   - 114: {fileID: 11496304}
+  - 65: {fileID: 6522280}
   m_Layer: 0
   m_Name: humanSawmill
   m_TagString: Untagged
@@ -1019,7 +1019,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 104552}
   m_LocalRotation: {x: .707106888, y: -.70710665, z: -5.33850724e-08, w: 5.33850795e-08}
-  m_LocalPosition: {x: -1.93565702, y: .283462554, z: .644846201}
+  m_LocalPosition: {x: -1.93565702, y: .283462554, z: .109999999}
   m_LocalScale: {x: 20.3710041, y: 20.3710041, z: 118.586983}
   m_Children: []
   m_Father: {fileID: 483526}
@@ -1151,7 +1151,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 194914}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1957.47998, y: 79.9430008, z: 1000.70416}
+  m_LocalPosition: {x: 1957.14685, y: 84.6999969, z: 1002.17737}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 462280}
@@ -2291,7 +2291,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 122
   m_CollisionDetection: 0
---- !u!65 &6527574
+--- !u!65 &6522280
 BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -2301,8 +2301,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 17, y: .5, z: 15}
+  m_Center: {x: .809204102, y: .225212097, z: -.0167236328}
 --- !u!111 &11190890
 Animation:
   m_ObjectHideFlags: 1
@@ -2339,6 +2339,10 @@ Prefab:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 0}
+      propertyPath: m_Animations.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
       propertyPath: m_ApplyRootMotion
       value: 1
       objectReference: {fileID: 0}
@@ -2346,6 +2350,18 @@ Prefab:
       propertyPath: m_Constraints
       value: 122
       objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Animations.Array.data[0]
+      value: 
+      objectReference: {fileID: 7400000, guid: c6a34e6fda888a7468241cf25d78f19e, type: 2}
+    - target: {fileID: 0}
+      propertyPath: m_Animations.Array.data[1]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Animations.Array.data[2]
+      value: 
+      objectReference: {fileID: 7400000, guid: c6a34e6fda888a7468241cf25d78f19e, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 194914}
