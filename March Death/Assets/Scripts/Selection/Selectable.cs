@@ -9,6 +9,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 	
 	public enum Actions { SELECTED, DESELECTED };
 
+	private Player player;
     private Rect selectedRect = new Rect();
     private Texture2D selectedBox;
     bool currentlySelected { get; set; }
@@ -26,8 +27,8 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         base.Start();
 
 		GameObject gameObject = GameObject.Find("GameObject");
-		Player player = gameObject.GetComponent ("Player") as Player;
-		player.fillPlayerUnits (this.gameObject);
+		player = gameObject.GetComponent ("Player") as Player;
+		player.FillPlayerUnits (this.gameObject);
 
         //Pendiente
         //gameEntity = this.GetComponent<IGameEntity>();
@@ -69,7 +70,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         }
     }
 
-    public virtual void SelectUnique(Player player)
+    public virtual void SelectUnique()
     {
 		//Deselect other selected objects
 		foreach (Selectable selectedObject in player.SelectedObjects) {
@@ -85,20 +86,25 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 
     }
 
-	public virtual void Select(Player player)
+	public virtual void Select()
 	{
 		if (!player.SelectedObjects.Contains(this)) {
 			player.SelectedObjects.Add (this);
 		}
 
 		this.currentlySelected = true;
-		//fire (Actions.SELECTED);
+		fire (Actions.SELECTED);
 	}
 
-    public virtual void Deselect()
+	public virtual void Deselect()
     {
+
+		if (player.SelectedObjects.Contains(this)) {
+			player.SelectedObjects.Remove(this);
+		}
+
         currentlySelected = false;
-		//fire (Actions.DESELECTED);
+		fire (Actions.DESELECTED);
     }
 
     private void DrawSelection()

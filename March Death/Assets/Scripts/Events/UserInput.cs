@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class UserInput : MonoBehaviour
 {
@@ -65,7 +66,7 @@ public class UserInput : MonoBehaviour
 			leftButtonIsDown = false;
 
 			//Check if is a simple click or dragging if the range is not big enough
-			if (isSimpleClick (mouseButtonDownPoint, mouseButtonUpPoint)) LeftMouseClick ();
+			if (IsSimpleClick (mouseButtonDownPoint, mouseButtonUpPoint)) LeftMouseClick ();
 
 		} else if (Input.GetMouseButtonDown (1)) {
 			leftButtonIsDown = false;
@@ -84,11 +85,10 @@ public class UserInput : MonoBehaviour
 			topRight    = GetScreenRaycastPoint(new Vector2( mouseButtonDownPoint.x, mouseButtonDownPoint.y-height()));
 
 			selectUnitsInArea();
-
 		}
     }
 
-	private Vector3 GetScreenRaycastPoint ( Vector2 screenPosition )
+	private Vector3 GetScreenRaycastPoint (Vector2 screenPosition)
 	{
 		Physics.Raycast(Camera.main.ScreenPointToRay(screenPosition), out hit, Mathf.Infinity);  
 		return hit.point;
@@ -107,7 +107,7 @@ public class UserInput : MonoBehaviour
 			Vector3 unitPosition = unit.transform.position;
 			Selectable selectedObject = unit.GetComponent<Selectable>();
 			if (AreaContainsObject(selectedArea, unitPosition)) {
-				selectedObject.Select(player);
+				selectedObject.Select();
 			} else {
 				selectedObject.Deselect();
 			}
@@ -140,7 +140,7 @@ public class UserInput : MonoBehaviour
             // We just be sure that is a selectable object
             if (selectedObject)
             {
-                selectedObject.SelectUnique(player);
+                selectedObject.SelectUnique();
             }
         }
         else if (hitPoint != this.invalidPosition)
@@ -156,12 +156,14 @@ public class UserInput : MonoBehaviour
 
 	private void RightMouseClick()
 	{
-		foreach (Selectable selectedObject in player.SelectedObjects) {
+		for (int i = player.SelectedObjects.Count-1; i >= 0; i--)
+		{
+			Selectable selectedObject = (Selectable) player.SelectedObjects[i];
 			selectedObject.Deselect();
 		}
 	}
 		
-	private bool isSimpleClick(Vector2 v1, Vector2 v2) 
+	private bool IsSimpleClick(Vector2 v1, Vector2 v2) 
 	{
 		if (Vector2.Distance (v1, v2) < mouseButtonReleaseRange) return true;
 		return false;
