@@ -20,12 +20,20 @@ public class UserInput : MonoBehaviour
         MouseActivity();
 
     }
+
+    /// <summary>
+    /// Checks if there has been activity with the mouse buttons
+    /// </summary>
     private void MouseActivity()
     {
         if (Input.GetMouseButtonDown(0)) LeftMouseClick();
         else if (Input.GetMouseButtonDown(1)) RightMouseClick();
     }
 
+
+    /// <summary>
+    /// Controls the left mouse click events
+    /// </summary>
     private void LeftMouseClick()
     {
         if (player.isCurrently(Player.status.PLACING_BUILDING)) // we are locating a building
@@ -59,6 +67,10 @@ public class UserInput : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Returns the object where the mouse hits
+    /// </summary>
+    /// <returns></returns>
     public GameObject FindHitObject()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -67,6 +79,10 @@ public class UserInput : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// Returns the point where the mouse hits
+    /// </summary>
+    /// <returns></returns>
     public  Vector3 FindHitPoint()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -75,6 +91,10 @@ public class UserInput : MonoBehaviour
         return this.invalidPosition;
     }
 
+
+    /// <summary>
+    /// Controls the right mouse click events
+    /// </summary>
     private void RightMouseClick()
     {
         if (player.SelectedObject)
