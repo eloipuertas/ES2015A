@@ -31,9 +31,20 @@ public class EntityActionsController : MonoBehaviour
 	{
 		destroyButtons ();
 		showActions (gameObject);
+		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+		Unit unit = entity.toUnit ();
+		unit.register(Unit.Actions.DIED, onActorDied);
 	}
 	
 	public void onActorDeselected(GameObject gameObject)
+	{
+		destroyButtons ();
+		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+		Unit unit = entity.toUnit ();
+		unit.unregister(Unit.Actions.DIED, onActorDied);
+	}
+
+	public void onActorDied(GameObject gameObject)
 	{
 		destroyButtons ();
 	}

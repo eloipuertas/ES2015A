@@ -77,7 +77,7 @@ public class InformationController : MonoBehaviour {
 		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 		Unit unit = entity.toUnit ();
 		unit.register(Unit.Actions.DAMAGED, onUnitDamaged);
-		unit.register(Unit.Actions.DAMAGED, onUnitDied);
+		unit.register(Unit.Actions.DIED, onUnitDied);
 	}
 
 	public void onUnitDeselected(GameObject gameObject)
@@ -88,7 +88,7 @@ public class InformationController : MonoBehaviour {
 		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 		Unit unit = entity.toUnit ();
 		unit.unregister(Unit.Actions.DAMAGED, onUnitDamaged);
-		unit.unregister(Unit.Actions.DAMAGED, onUnitDied);
+		unit.unregister(Unit.Actions.DIED, onUnitDied);
 	}
 
 	public void onUnitDamaged(GameObject gameObject)
