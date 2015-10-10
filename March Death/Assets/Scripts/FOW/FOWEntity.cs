@@ -55,7 +55,7 @@ public class FOWEntity : MonoBehaviour
         }
         size2 = size / 2;
     }
-    public void OndDisable()
+    public void OnDisable()
     {
         FOWManager.removeEntity(this);
     }
