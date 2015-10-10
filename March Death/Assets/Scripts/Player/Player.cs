@@ -5,9 +5,16 @@ using System.Collections.Generic;
 
 public class Player : MonoBehaviour
 {
+    /// <summary>
+    /// Information regarding the current status of the player
+    /// </summary>
+    private status _currently;
+    public enum status {IDLE, PLACING_BUILDING, SELECTING_UNITS /*...*/}
 
+    /// <summary>
+    /// Information regarding the entities of the player
+    /// </summary>
     private List<IGameEntity> _activeEntities = new List<IGameEntity>();
-    public bool locatingBuilding { get; set; }
     public Selectable SelectedObject { get; set; }
     
     // Use this for initialization
@@ -33,5 +40,25 @@ public class Player : MonoBehaviour
     public int currentEntitiesCount()
     {
         return _activeEntities.Count;
+    }
+
+    /// <summary>
+    /// Returns whether is in the current status or not
+    /// </summary>
+    /// <param name="check"></param>
+    /// <returns></returns>
+    public bool isCurrently(status check)
+    {
+        return _currently == check;
+
+    }
+
+    /// <summary>
+    /// Establishes the new status of the player
+    /// </summary>
+    /// <param name="newStatus"></param>
+    public void setCurrently(status newStatus)
+    {
+        _currently = newStatus;
     }
 }

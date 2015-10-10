@@ -28,9 +28,9 @@ public class UserInput : MonoBehaviour
 
     private void LeftMouseClick()
     {
-        if (GetComponent<BuildingsFactory>().Locating) // we are locating a building
+        if (player.isCurrently(Player.status.PLACING_BUILDING)) // we are locating a building
         {
-            GetComponent<BuildingsFactory>().placeBuilding();
+            GetComponent<BuildingsManager>().placeBuilding();
         }
         else // we are doing something else
         {
@@ -81,6 +81,10 @@ public class UserInput : MonoBehaviour
         {
             player.SelectedObject.Deselect();
             player.SelectedObject = null;
+        }
+        else if(player.isCurrently(Player.status.PLACING_BUILDING))
+        {
+            GetComponent<BuildingsManager>().cancelPlacing();
         }
     }
 
