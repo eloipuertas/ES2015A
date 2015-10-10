@@ -38,19 +38,31 @@ public class BuildingsManager : MonoBehaviour
     {
         if (!_placing)
         {
-
+            GameObject newBuilding;
             newBuilding = (GameObject)Resources.Load("Prefabs/Buildings/" + name, typeof(GameObject));
             newBuilding = (GameObject)Instantiate(newBuilding, new Vector3(0, 0, 0), Quaternion.identity);
 
+            this.createBuilding(newBuilding);
 
-            _placing = true;
-            Cursor.visible = false;
-            player.setCurrently(Player.status.PLACING_BUILDING);
         }
-
 
     }
 
+    /// <summary>
+    /// Starts creating a building. The param newBuilding must be instantiated previously
+    /// </summary>
+    /// <param name="newBuilding"></param>
+    public void createBuilding(GameObject newBuilding)
+    {
+        if (!_placing)
+        {
+            this.newBuilding = newBuilding;
+            _placing = true;
+            Cursor.visible = false;
+            player.setCurrently(Player.status.PLACING_BUILDING);
+
+        }
+    }
 
     /// <summary>
     /// Discretizes the location through ConstructioGrid
