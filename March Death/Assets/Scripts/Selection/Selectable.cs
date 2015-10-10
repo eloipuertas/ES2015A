@@ -25,6 +25,10 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
         base.Start();
 
+		GameObject gameObject = GameObject.Find("GameObject");
+		Player player = gameObject.GetComponent ("Player") as Player;
+		player.fillPlayerUnits (this.gameObject);
+
         //Pendiente
         //gameEntity = this.GetComponent<IGameEntity>();
         selectedBox = SelectionOverlay.CreateTexture();
@@ -54,7 +58,6 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
             updateHealthRatio = false;
         }
 
-
         if(updateSomething) SelectionOverlay.UpdateTexture(selectedBox, healthRatio);
     }
 
@@ -66,40 +69,36 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         }
     }
 
-    public virtual void Select(Player player)
+    public virtual void SelectUnique(Player player)
     {
-        //only handle input if currently selected
-        Selectable oldObject = player.SelectedObject;
+		//Deselect other selected objects
+		foreach (Selectable selectedObject in player.SelectedObjects) {
+			if (selectedObject == this) continue;
+			selectedObject.Deselect();
+		}
 
-        if ( !this.Equals(oldObject))
-        {
-            // old object selection is now false (if exists)
-            if (oldObject) oldObject.currentlySelected = false;
-            // player selected object is now this current selectable object
-            player.SelectedObject = this;
-            this.currentlySelected = true;
-            //Debug pursposes
-            //Pendiente
-            //Debug.Log(gameEntity.info.name);
-            registerEntityCallbacks();
+		if (!player.SelectedObjects.Contains(this)) {
+			player.SelectedObjects.Add (this);
+		}
+        this.currentlySelected = true;
+		fire (Actions.SELECTED);
 
-			fire (Actions.SELECTED);
-
-        }
     }
 
-    private void registerEntityCallbacks()
-    {
-        //TODO
-    }
-    private void unregisterEntityCallbacks()
-    {
-        //TODO
-    }
+	public virtual void Select(Player player)
+	{
+		if (!player.SelectedObjects.Contains(this)) {
+			player.SelectedObjects.Add (this);
+		}
+
+		this.currentlySelected = true;
+		//fire (Actions.SELECTED);
+	}
+
     public virtual void Deselect()
     {
         currentlySelected = false;
-		fire (Actions.DESELECTED);
+		//fire (Actions.DESELECTED);
     }
 
     private void DrawSelection()
