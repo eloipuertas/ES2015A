@@ -20,16 +20,16 @@ public class Building : GameEntity<Building.Actions>
     /// </summary>
     public Races race = Races.MEN;
     public BuildingTypes type = BuildingTypes.FORTRESS;
-    
+
     /// <summary>
     /// Resource building might need this to acount how many workers can pull resources from it.
     /// </summary>
     public int usedCapacity { get; set; }
-    
+
     /// <summary>
     /// Iterates all abilities on the
     /// </summary>
-    protected override void setupActions()
+    protected override void setupAbilities()
     {
         foreach (BuildingAbility ability in _info.actions)
         {
@@ -43,18 +43,18 @@ public class Building : GameEntity<Building.Actions>
                 if (constructor == null)
                 {
                     // No such constructor, construct default
-                    _actions.Add(new GenericBuildingAbility(ability));
+                    _abilities.Add(new GenericBuildingAbility(ability));
                 }
                 else
                 {
                     // Class found, use that!
-                    _actions.Add((IBuildingAbility)constructor.Invoke(new object[2] { ability, gameObject }));
+                    _abilities.Add((Ability)constructor.Invoke(new object[2] { ability, gameObject }));
                 }
             }
             catch (Exception)
             {
                 // No such class, use the GenericAbility class
-                _actions.Add(new GenericBuildingAbility(ability));
+                _abilities.Add(new GenericBuildingAbility(ability));
             }
         }
     }

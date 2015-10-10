@@ -27,14 +27,14 @@ public class Resource : GameEntity<Resource.Actions>
     /// <summary>
     ///  Next update time
     /// </summary>
-    // 
+    //
     private float nextUpdate;
 
     /// <summary>
     // Resource could store limited amount of material when not in use
     // or when production is higher than collection
     /// </summary>
-    // 
+    //
     private int storeSize;
     /// <summary>
     /// amount of materials produced and not collected yet.
@@ -50,7 +50,7 @@ public class Resource : GameEntity<Resource.Actions>
     /// <summary>
     /// sum of capacity of units collecting this resource
     /// the more units the more maxCollectionRate.
-    /// real collectionRate could be lower due to 
+    /// real collectionRate could be lower due to
     /// store limit.
     /// </summary>
     public int collectionRate { get; set; }
@@ -93,7 +93,7 @@ public class Resource : GameEntity<Resource.Actions>
     /// <summary>
     /// Iterates all abilities on the resource
     /// </summary>
-    protected override void setupActions()
+    protected override void setupAbilities()
     {
         foreach (ResourceAbility ability in _info.actions)
         {
@@ -107,24 +107,24 @@ public class Resource : GameEntity<Resource.Actions>
                 if (constructor == null)
                 {
                     // Invalid constructor, use GenericAbility
-                    _actions.Add(new GenericResourceAbility(ability));
+                    _abilities.Add(new GenericResourceAbility(ability));
                 }
                 else
                 {
                     // Class found, use that!
-                    _actions.Add((IResourceAbility)constructor.Invoke(new object[2] { ability, gameObject }));
+                    _abilities.Add((Ability)constructor.Invoke(new object[2] { ability, gameObject }));
                 }
             }
             catch (Exception /*e*/)
             {
                 // No such class, use the GenericAbility class
-                _actions.Add(new GenericResourceAbility(ability));
+                _abilities.Add(new GenericResourceAbility(ability));
             }
         }
     }
-    
+
     /// <summary>
-    /// when collider interact with other gameobject method checks if 
+    /// when collider interact with other gameobject method checks if
     /// it is collecting unit and if unit has the rigth type for collecting
     ///  resource.Then update number of collectors attached and production.
     /// </summary>
@@ -272,10 +272,10 @@ public class Resource : GameEntity<Resource.Actions>
         stored = 0;
         collectionRate = 0;
         harvestUnits = 0;
-        
+
         _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
-        
+
         // Call GameEntity start
         base.Start();
     }

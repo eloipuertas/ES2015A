@@ -1,41 +1,23 @@
 ﻿using System;
-using Storage;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-class GenericResourceAbility : IResourceAbility
+public enum Modifier { WEAPON, PROJECTILE, STRENGTH, RESISTANCE, WOUNDS, ATTACKRATE, MOVEMENTRATE };
+
+public abstract class Ability
 {
-    private bool _enabled = false;
-    public bool isActive
-    {
-        get
-        {
-            return _enabled;
-        }
-    }
+    public abstract Storage.EntityAction info { get; }
 
-    private ResourceAbility _info = null;
-    public EntityAction info
-    {
-        get
-        {
-            return _info;
-        }
-    }
+    public abstract bool isActive { get; }
+    public abstract bool isUsable { get; }
 
-    public bool isUsable
-    {
-        get
-        {
-            return true;
-        }
-    }
+    public abstract void enable();
+    public abstract void disable();
 
-    public GenericResourceAbility(ResourceAbility info) { _info = info; }
-
-    public void disable() { _enabled = false; }
-    public void enable() { _enabled = true; }
     public void toggle()
     {
-        if (_enabled)
+        if (isActive)
         {
             disable();
         }

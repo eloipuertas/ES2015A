@@ -31,12 +31,12 @@ public class Unit : GameEntity<Unit.Actions>
     /// Point to move to
     /// </summary>
     private Vector3 _movePoint;
-    
+
     /// <summary>
     /// Civil units might need this to acount how many *items* they are carrying.
     /// </summary>
     public int usedCapacity { get; set; }
-    
+
     /// <summary>
     /// Called once our target dies. It may be used to update unit IA
     /// </summary>
@@ -110,7 +110,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// <summary>
     /// Iterates all abilities on the
     /// </summary>
-    protected override void setupActions()
+    protected override void setupAbilities()
     {
         foreach (UnitAbility ability in info.actions)
         {
@@ -124,22 +124,22 @@ public class Unit : GameEntity<Unit.Actions>
                 if (constructor == null)
                 {
                     // Invalid constructor, use GenericAbility
-                    _actions.Add(new GenericAbility(ability));
+                    _abilities.Add(new GenericAbility(ability));
                 }
                 else
                 {
                     // Class found, use that!
-                    _actions.Add((IUnitAbility)constructor.Invoke(new object[2] { ability, gameObject }));
+                    _abilities.Add((Ability)constructor.Invoke(new object[2] { ability, gameObject }));
                 }
             }
             catch (Exception /*e*/)
             {
                 // No such class, use the GenericAbility class
-                _actions.Add(new GenericAbility(ability));
+                _abilities.Add(new GenericAbility(ability));
             }
         }
     }
-    
+
     /// <summary>
     /// Object initialization
     /// </summary>

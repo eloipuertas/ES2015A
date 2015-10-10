@@ -13,7 +13,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
             return _info;
         }
     }
-    
+
     /// <summary>
     /// Returns the number of wounds received
     /// </summary>
@@ -60,10 +60,10 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         }
     }
 
-    protected List<IAction> _actions = new List<IAction>();
-    public IAction getAction(string name)
+    protected List<Ability> _abilities = new List<Ability>();
+    public Ability getAbility(string name)
     {
-        foreach (IAction ability in _actions)
+        foreach (Ability ability in _abilities)
         {
             if (ability.info.name.Equals(name))
             {
@@ -74,12 +74,12 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         throw new ArgumentException("Invalid action " + name + "requested");
     }
 
-    protected abstract void setupActions();
+    protected abstract void setupAbilities();
 
     public override void Start()
     {
         base.Start();
-        setupActions();
+        setupAbilities();
     }
 
 
