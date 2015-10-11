@@ -53,7 +53,8 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         if (updateHealthRatio)
         {
             //Pendiente
-            //healthRatio = gameEntity.healthPercentage() / 100f;
+			IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+			healthRatio = entity.healthPercentage / 100f;
             updateSomething = true;
             // doesn't update until gets the callback
             updateHealthRatio = false;
