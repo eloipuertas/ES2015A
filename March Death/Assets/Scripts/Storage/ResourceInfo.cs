@@ -22,11 +22,11 @@ namespace Storage
         public override EntityAttributes attributes { get; set; }
 
         [JsonConverter(typeof(ResourceActionsDataConverter))]
-        public override List<EntityAbility> actions { get; set; }
+        public override List<EntityAbility> abilities { get; set; }
 
         public ResourceInfo()
         {
-            actions = new List<EntityAbility>();
+            abilities = new List<EntityAbility>();
         }
 
     }
