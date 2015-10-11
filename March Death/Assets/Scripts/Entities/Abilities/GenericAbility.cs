@@ -22,7 +22,7 @@ class GenericAbility : Ability
         }
     }
 
-    public GenericAbility(UnitAbility info, GameObject gameObject) :
+    public GenericAbility(EntityAbility info, GameObject gameObject) :
         base(info, gameObject)
     {
     }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reflection;
+using System.Linq;
 using System.Collections.Generic;
 using Storage;
 using Utils;
@@ -66,7 +68,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     protected EntityAbility _accumulatedModifier;
     public R accumulatedModifier<R>() where R : EntityAbility
     {
-        return (R)EntityAbility;
+        return (R)_accumulatedModifier;
     }
 
     public void onAbilityToggled(GameObject gameObject)
@@ -74,33 +76,33 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         if (info.isUnit)
         {
             ((UnitAbility)_accumulatedModifier).weaponAbilityModifier =
-                activeAbilities().Select(ability => ((UnitAbility)ability.info).weaponAbilityModifier).Sum();
+                activeAbilities().Select(ability => ability.info<UnitAbility>().weaponAbilityModifier).Sum();
 
             ((UnitAbility)_accumulatedModifier).projectileAbilityModifier =
-                activeAbilities().Select(ability => ((UnitAbility)ability.info).projectileAbilityModifier).Sum();
+                activeAbilities().Select(ability => ability.info<UnitAbility>().projectileAbilityModifier).Sum();
 
             ((UnitAbility)_accumulatedModifier).resistanceModifier =
-                activeAbilities().Select(ability => ((UnitAbility)ability.info).resistanceModifier).Sum();
+                activeAbilities().Select(ability => ability.info<UnitAbility>().resistanceModifier).Sum();
 
             ((UnitAbility)_accumulatedModifier).strengthModifier =
-                activeAbilities().Select(ability => ((UnitAbility)ability.info).strengthModifier).Sum();
+                activeAbilities().Select(ability => ability.info<UnitAbility>().strengthModifier).Sum();
 
             ((UnitAbility)_accumulatedModifier).woundsModifier =
-                activeAbilities().Select(ability => ((UnitAbility)ability.info).woundsModifier).Sum();
+                activeAbilities().Select(ability => ability.info<UnitAbility>().woundsModifier).Sum();
 
             ((UnitAbility)_accumulatedModifier).attackRateModifier =
-                activeAbilities().Select(ability => ((UnitAbility)ability.info).attackRateModifier).Sum();
+                activeAbilities().Select(ability => ability.info<UnitAbility>().attackRateModifier).Sum();
 
             ((UnitAbility)_accumulatedModifier).movementRateModifier =
-                activeAbilities().Select(ability => ((UnitAbility)ability.info).movementRateModifier).Sum();
+                activeAbilities().Select(ability => ability.info<UnitAbility>().movementRateModifier).Sum();
         }
         else if (info.isBuilding)
         {
-            ((BuildingAbility)_accumulatedModifier).strengthModifier =
-                activeAbilities().Select(ability => ((UnitAbility)ability.info).strengthModifier).Sum();
+            ((BuildingAbility)_accumulatedModifier).resistanceModifier =
+                activeAbilities().Select(ability => ability.info<BuildingAbility>().resistanceModifier).Sum();
 
             ((BuildingAbility)_accumulatedModifier).woundsModifier =
-                activeAbilities().Select(ability => ((UnitAbility)ability.info).woundsModifier).Sum();
+                activeAbilities().Select(ability => ability.info<BuildingAbility>().woundsModifier).Sum();
         }
         else if (info.isResource)
         {
@@ -113,7 +115,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     {
         foreach (Ability ability in _abilities)
         {
-            if (ability.info.name.Equals(name))
+            if (ability.info<EntityAbility>().name.Equals(name))
             {
                 return ability;
             }
@@ -124,12 +126,12 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 
     public bool hasAbility(string name)
     {
-        return _abilities.Where(ability => ability.info.name.Equals(name)).Count > 0;
+        return _abilities.Where(ability => ability.info<EntityAbility>().name.Equals(name)).Count() > 0;
     }
 
     public List<Ability> activeAbilities()
     {
-        return _abilities.Where(ability => ability.isActive);
+        return _abilities.Where(ability => ability.isActive).ToList();
     }
 
     /// <summary>
@@ -150,7 +152,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
             _accumulatedModifier = new ResourceAbility();
         }
 
-        foreach (UnitAbility ability in info.actions)
+        foreach (EntityAbility ability in info.abilities)
         {
             // Try to get class with this name
             string abilityName = ability.name.Replace(" ", "");
@@ -212,7 +214,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         {
             // TODO: Specil units (ie gigants) and distance!
             int projectileAbility = from.info.unitAttributes.projectileAbility +
-                from.accumulatedModifier<UnitAbility>().projectileAbility;
+                from.accumulatedModifier<UnitAbility>().projectileAbilityModifier;
 
             return dice > 1 && (projectileAbility + dice >= 7);
         }
@@ -223,10 +225,10 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
             return true;
         }
 
-        int attackerAbility = Max(10, from.info.unitAttributes.weaponAbility +
+        int attackerAbility = Math.Max(10, from.info.unitAttributes.weaponAbility +
             from.accumulatedModifier<UnitAbility>().weaponAbilityModifier);
 
-        int defenderAbility = Max(10, info.unitAttributes.weaponAbility +
+        int defenderAbility = Math.Max(10, info.unitAttributes.weaponAbility +
             accumulatedModifier<UnitAbility>().weaponAbilityModifier);
 
         return HitTables.meleeHit[attackerAbility, defenderAbility] <= dice;
@@ -245,10 +247,10 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
             return true;
         }
 
-        int attackerStrength = Max(10, from.info.unitAttributes.strength +
+        int attackerStrength = Math.Max(10, from.info.unitAttributes.strength +
             from.accumulatedModifier<UnitAbility>().weaponAbilityModifier);
 
-        int defenderResistance = Max(10, info.unitAttributes.resistance +
+        int defenderResistance = Math.Max(10, info.unitAttributes.resistance +
             accumulatedModifier<UnitAbility>().resistanceModifier);
 
         int dice = Utils.D6.get.rollOnce();

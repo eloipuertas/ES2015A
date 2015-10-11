@@ -18,7 +18,6 @@ public class EntityAbilitysController : MonoBehaviour
 		//Register to selectable actions
 		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.SELECTED, onActorSelected);
 		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.DESELECTED, onActorDeselected);
-
     }
 
     // Update is called once per frame
@@ -32,7 +31,7 @@ public class EntityAbilitysController : MonoBehaviour
 		destroyButtons ();
 		showActions (gameObject);
 	}
-	
+
 	public void onActorDeselected(GameObject gameObject)
 	{
 		destroyButtons ();
@@ -47,20 +46,21 @@ public class EntityAbilitysController : MonoBehaviour
 		var buttonExtents = new Vector2(extents.x / Button_Columns, extents.y / Button_Rows);
 		var position = rectTransform.position;
 		var point = new Vector2(position.x - extents.x, position.y + extents.y);
-		var actions = entity.info.actions;
-		var nactions = actions.Count;
-	
-		for (int i = 0; i < nactions; i++)
+		var abilities = entity.info.abilities;
+		var nabilities = abilities.Count;
+
+		for (int i = 0; i < nabilities; i++)
 		{
-			String action = actions[i].name;
-			IAction actionObj = entity.getAction(action);
-			if (actionObj.isUsable)
+			String ability = abilities[i].name;
+			Ability abilityObj = entity.getAbility(ability);
+			if (abilityObj.isUsable)
 			{
 				UnityAction actionMethod = new UnityAction(() => SayHello());
+
 				var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
 				buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Rows) + 1));
-				CreateButton(actionPanel, buttonCenter, buttonExtents, action, actionMethod, !actionObj.isActive);
-			}	
+				CreateButton(actionPanel, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
+			}
 		}
 	}
 

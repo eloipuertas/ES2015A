@@ -13,14 +13,14 @@ public abstract class Ability : Actor<Ability.Actions>
     public enum Actions { ENABLED, DISABLED };
 
     protected GameObject _gameObject = null;
-    protected Storage.EntityAbility _info = null;
+    protected EntityAbility _info = null;
 
     public T info<T>() where T: EntityAbility
     {
         return (T)_info;
     }
 
-    protected Ability(UnitAbility info, GameObject gameObject)
+    protected Ability(EntityAbility info, GameObject gameObject)
     {
         _info = info;
         _gameObject = gameObject;
