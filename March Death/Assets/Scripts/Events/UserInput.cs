@@ -34,11 +34,14 @@ public class UserInput : MonoBehaviour
 
 	private RaycastHit hit = new RaycastHit();
 
+	CameraController camera;
+
     // Use this for initialization
     void Start()
     {
         player = GetComponent<Player>();
-		selectionTexture = (Texture2D)Resources.Load("SelectionTexture");
+		selectionTexture = (Texture2D)Resources.Load("SelectionTexture");	
+		camera = GameObject.Find("Main Camera").GetComponent ("CameraController") as CameraController;
     }
 
 	void OnGUI() {
@@ -59,10 +62,13 @@ public class UserInput : MonoBehaviour
     {
 
         if (Input.GetMouseButtonDown (0)) {
+			camera.disableManualControl();
 			leftButtonIsDown = true;
 			mouseButtonUpPoint = Input.mousePosition;    
 			topLeft = GetScreenRaycastPoint(mouseButtonUpPoint);
+
 		} else if (Input.GetMouseButtonUp (0)) {
+			camera.enableManualControl();
 			leftButtonIsDown = false;
 
 			//Check if is a simple click or dragging if the range is not big enough
@@ -77,14 +83,13 @@ public class UserInput : MonoBehaviour
 		//if the left button is down and the mouse is moving, start dragging
 		if(leftButtonIsDown)
 		{
-			//actual position of the mouse
 			mouseButtonDownPoint = Input.mousePosition;
 
 			bottomRight = GetScreenRaycastPoint(mouseButtonDownPoint);
 			bottomLeft  = GetScreenRaycastPoint(new Vector2( mouseButtonDownPoint.x+width(), mouseButtonDownPoint.y));
 			topRight    = GetScreenRaycastPoint(new Vector2( mouseButtonDownPoint.x, mouseButtonDownPoint.y-height()));
 
-			selectUnitsInArea();
+			SelectUnitsInArea();
 		}
     }
 
@@ -94,7 +99,7 @@ public class UserInput : MonoBehaviour
 		return hit.point;
 	}
 
-	private void selectUnitsInArea() {
+	private void SelectUnitsInArea() {
 		Vector3[] selectedArea = new Vector3[4];
 
 		//set the array with the 4 points of the polygon
@@ -107,9 +112,9 @@ public class UserInput : MonoBehaviour
 			Vector3 unitPosition = unit.transform.position;
 			Selectable selectedObject = unit.GetComponent<Selectable>();
 			if (AreaContainsObject(selectedArea, unitPosition)) {
-				selectedObject.Select();
+				if (!player.SelectedObjects.Contains(selectedObject)) selectedObject.Select();	
 			} else {
-				selectedObject.Deselect();
+				if (player.SelectedObjects.Contains(selectedObject)) selectedObject.Deselect();
 			}
 		}
 	}
@@ -135,7 +140,6 @@ public class UserInput : MonoBehaviour
 
         if (hitObject)
         {
-
             Selectable selectedObject = hitObject.GetComponent<Selectable>();
             // We just be sure that is a selectable object
             if (selectedObject)
@@ -167,7 +171,6 @@ public class UserInput : MonoBehaviour
 	{
 		if (Vector2.Distance (v1, v2) < mouseButtonReleaseRange) return true;
 		return false;
-
 	}
 
     private GameObject FindHitObject()
