@@ -6,7 +6,7 @@ using UnityEngine.Events;
 using System;
 using Utils;
 
-public class EntityActionsController : MonoBehaviour
+public class EntityAbilitysController : MonoBehaviour
 {
 
     private static int Button_Rows = 3;

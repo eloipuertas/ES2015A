@@ -32,7 +32,7 @@ namespace Storage
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             List<ResourceAbility> list = serializer.Deserialize<List<ResourceAbility>>(reader);
-            return list.ConvertAll(x => (EntityAction)x);
+            return list.ConvertAll(x => (EntityAbility)x);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

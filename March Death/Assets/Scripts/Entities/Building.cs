@@ -27,39 +27,6 @@ public class Building : GameEntity<Building.Actions>
     public int usedCapacity { get; set; }
 
     /// <summary>
-    /// Iterates all abilities on the
-    /// </summary>
-    protected override void setupAbilities()
-    {
-        foreach (BuildingAbility ability in _info.actions)
-        {
-            // Try to get class with this name
-            string abilityName = ability.name.Replace(" ", "");
-
-            try
-            {
-                var constructor = Type.GetType(abilityName).
-                    GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(BuildingAbility), typeof(GameObject) }, null);
-                if (constructor == null)
-                {
-                    // No such constructor, construct default
-                    _abilities.Add(new GenericBuildingAbility(ability));
-                }
-                else
-                {
-                    // Class found, use that!
-                    _abilities.Add((Ability)constructor.Invoke(new object[2] { ability, gameObject }));
-                }
-            }
-            catch (Exception)
-            {
-                // No such class, use the GenericAbility class
-                _abilities.Add(new GenericBuildingAbility(ability));
-            }
-        }
-    }
-
-    /// <summary>
     /// When a wound is received, this is called
     /// </summary>
     protected override void onReceiveDamage()
@@ -90,8 +57,9 @@ public class Building : GameEntity<Building.Actions>
     /// <summary>
     /// Called once a frame to update the object
     /// </summary>
-    void Update()
+    public override void Update()
     {
+        base.Update();
     }
 
     /// <summary>

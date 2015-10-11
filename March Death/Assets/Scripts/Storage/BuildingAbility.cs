@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Storage
 {
-    public sealed class BuildingAbility : EntityAction
+    public sealed class BuildingAbility : EntityAbility
     {
         public int resistanceModifier;
         public int woundsModifier;

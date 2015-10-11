@@ -1,10 +1,12 @@
 ﻿using System;
 using Storage;
 
+using UnityEngine;
+
 class GenericAbility : Ability
 {
     private bool _enabled = false;
-    public bool isActive
+    public override bool isActive
     {
         get
         {
@@ -12,16 +14,7 @@ class GenericAbility : Ability
         }
     }
 
-    private UnitAbility _info = null;
-    public EntityAction info
-    {
-        get
-        {
-            return _info;
-        }
-    }
-
-    public bool isUsable
+    public override bool isUsable
     {
         get
         {
@@ -29,8 +22,20 @@ class GenericAbility : Ability
         }
     }
 
-    public GenericAbility(UnitAbility info) { _info = info; }
+    public GenericAbility(UnitAbility info, GameObject gameObject) :
+        base(info, gameObject)
+    {
+    }
 
-    public void disable() { _enabled = false; }
-    public void enable() { _enabled = true; }
+    public override void disable()
+    {
+        _enabled = false;
+        base.disable();
+    }
+
+    public override void enable()
+    {
+        _enabled = true;
+        base.enable();
+    }
 }

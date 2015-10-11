@@ -91,39 +91,6 @@ public class Resource : GameEntity<Resource.Actions>
     }
 
     /// <summary>
-    /// Iterates all abilities on the resource
-    /// </summary>
-    protected override void setupAbilities()
-    {
-        foreach (ResourceAbility ability in _info.actions)
-        {
-            // Try to get class with this name
-            string abilityName = ability.name.Replace(" ", "");
-
-            try
-            {
-                var constructor = Type.GetType(abilityName).
-                    GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(UnitAbility), typeof(GameObject) }, null);
-                if (constructor == null)
-                {
-                    // Invalid constructor, use GenericAbility
-                    _abilities.Add(new GenericResourceAbility(ability));
-                }
-                else
-                {
-                    // Class found, use that!
-                    _abilities.Add((Ability)constructor.Invoke(new object[2] { ability, gameObject }));
-                }
-            }
-            catch (Exception /*e*/)
-            {
-                // No such class, use the GenericAbility class
-                _abilities.Add(new GenericResourceAbility(ability));
-            }
-        }
-    }
-
-    /// <summary>
     /// when collider interact with other gameobject method checks if
     /// it is collecting unit and if unit has the rigth type for collecting
     ///  resource.Then update number of collectors attached and production.
@@ -282,8 +249,9 @@ public class Resource : GameEntity<Resource.Actions>
 
 
     // Update is called once per frame
-    void Update()
+    public override void Update()
     {
+        base.Update();
 
         if (Time.time > nextUpdate)
         {
