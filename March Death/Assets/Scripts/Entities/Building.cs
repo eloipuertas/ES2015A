@@ -25,14 +25,14 @@ public class Building : Utils.Actor<Building.Actions>, IGameEntity
     /// <summary>
     /// List of ability objects of this building
     /// </summary>
-    private List<IBuildingAbility> _abilities;
+    protected List<IBuildingAbility> _abilities;
 
     /// <summary>
     /// Contains all static information of the Building.
     /// That means: max health, damage, defense, etc.
     /// </summary>
-    private BuildingInfo _info;
-    private BuildingAttributes _attributes;
+    protected BuildingInfo _info;
+    protected BuildingAttributes _attributes;
     public EntityInfo info
     {
         get
@@ -40,7 +40,6 @@ public class Building : Utils.Actor<Building.Actions>, IGameEntity
             return _info;
         }
     }
-
     /// <summary>
     /// Returns current status of the Building
     /// </summary>
@@ -51,12 +50,11 @@ public class Building : Utils.Actor<Building.Actions>, IGameEntity
         {
             return _status;
         }
+        protected set
+        {
+            _status = value;
+        }
     }
-
-    /// <summary>
-    /// Resource building might need this to acount how many workers can pull resources from it.
-    /// </summary>
-    public int usedCapacity { get; set; }
 
     /// <summary>
     /// Returns the number of wounds a building received
@@ -99,7 +97,7 @@ public class Building : Utils.Actor<Building.Actions>, IGameEntity
     /// <param name="from">Unit which attacked</param>
     /// <param name="isRanged">Set to true in case the attack is range, false if melee</param>
     /// <returns>True if it hits, false otherwise</returns>
-    private bool willAttackLand(Unit from, bool isRanged = false)
+    protected bool willAttackLand(Unit from, bool isRanged = false)
     {
         int dice = Utils.D6.get.rollSpecial();
 
@@ -117,7 +115,7 @@ public class Building : Utils.Actor<Building.Actions>, IGameEntity
     /// </summary>
     /// <param name="from">Attacker</param>
     /// <returns>True if causes wounds, false otherwise</returns>
-    private bool willAttackCauseWounds(Unit from)
+    protected bool willAttackCauseWounds(Unit from)
     {
         int dice = Utils.D6.get.rollOnce();
         return HitTables.wounds[((UnitAttributes)from.info.attributes).strength, _attributes.resistance] <= dice;
@@ -129,7 +127,7 @@ public class Building : Utils.Actor<Building.Actions>, IGameEntity
     /// </summary>
     /// <param name="from">Attacker</param>
     /// <param name="isRanged">True if the attack is ranged, false if melee</param>
-    public void receiveAttack(Unit from, bool isRanged)
+    protected void receiveAttack(Unit from, bool isRanged)
     {
         // Do not attack dead targets
         if (_status == EntityStatus.DESTROYED)
@@ -156,7 +154,7 @@ public class Building : Utils.Actor<Building.Actions>, IGameEntity
     /// <summary>
     /// Iterates all abilities on the
     /// </summary>
-    private void setupAbilities()
+    protected void setupAbilities()
     {
         _abilities = new List<IBuildingAbility>();
 
@@ -248,7 +246,5 @@ public class Building : Utils.Actor<Building.Actions>, IGameEntity
     /// </summary>
     /// <returns>Always null</returns>
     public Building toBuilding() { return this; }
-
-    public Resource toResource() { return null; }
 
 }
