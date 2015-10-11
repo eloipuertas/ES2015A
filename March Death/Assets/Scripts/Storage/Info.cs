@@ -306,6 +306,25 @@ namespace Storage
         /// <sumary>
         /// Given a race and type it will return its prefab route
         /// </sumary>
+        /// <param name="race">Race of the Building</param>
+        /// <param name="type">Type of the Building</param>
+        /// <exception cref="System.ArgumentException">Thrown when a race/type combination is not found</exception>
+        /// <returns>The prefab path</returns>
+        private string getPrefab(Races race, BuildingTypes type)
+        {
+            Tuple<Races, BuildingTypes> key = new Tuple<Races, BuildingTypes>(race, type);
+
+            if (!buildingPrefabs.ContainsKey(key))
+            {
+                throw new System.ArgumentException("Resource prefab for ('" + race + "', '" + type + "') not found");
+            }
+
+            return buildingPrefabs[key];
+        }
+
+        /// <sumary>
+        /// Given a race and type it will return its prefab route
+        /// </sumary>
         /// <param name="race">Race of the Unit</param>
         /// <param name="type">Type of the Unit</param>
         /// <exception cref="System.ArgumentException">Thrown when a race/type combination is not found</exception>
@@ -335,6 +354,18 @@ namespace Storage
         }
 
         /// <summary>
+        /// Creates a Building of a given race and type from a prefab
+        /// </summary>
+        /// <param name="race">Race of the Building</param>
+        /// <param name="type">Type of the Building</param>
+        /// <returns>The created GameObject</returns>
+        public GameObject createBuilding(Races race, BuildingTypes type)
+        {
+            string prefab = getPrefab(race, type);
+            return UnityEngine.Object.Instantiate((GameObject)Resources.Load(prefab, typeof(GameObject)));
+        }
+
+        /// <summary>
         /// Creates a Resource of a given race and type from a prefab
         /// </summary>
         /// <param name="race">Race of the Resource</param>
@@ -355,6 +386,20 @@ namespace Storage
         /// <param name="rotation">Unit rotation</param>
         /// <returns>The created GameObject</returns>
         public GameObject createUnit(Races race, UnitTypes type, Vector3 position, Quaternion rotation)
+        {
+            string prefab = getPrefab(race, type);
+            return UnityEngine.Object.Instantiate((GameObject)Resources.Load(prefab, typeof(GameObject)), position, rotation) as GameObject;
+        }
+
+        /// <summary>
+        /// Creates a Building of a given race and type from a prefab in a certain position and rotation
+        /// </summary>
+        /// <param name="race">Race of the Building</param>
+        /// <param name="type">Type of the Building</param>
+        /// <param name="position">Building position</param>
+        /// <param name="rotation">Building rotation</param>
+        /// <returns>The created GameObject</returns>
+        public GameObject createBuilding(Races race, BuildingTypes type, Vector3 position, Quaternion rotation)
         {
             string prefab = getPrefab(race, type);
             return UnityEngine.Object.Instantiate((GameObject)Resources.Load(prefab, typeof(GameObject)), position, rotation) as GameObject;

@@ -13,7 +13,7 @@ namespace Storage
     /// previously assigned gameobjects might get wrong types
     /// </remarks>
     /// </summary>
-    public enum BuildingTypes { FORTRESS };
+    public enum BuildingTypes { STRONGHOLD };
 
     public class BuildingInfo : EntityInfo
     {
