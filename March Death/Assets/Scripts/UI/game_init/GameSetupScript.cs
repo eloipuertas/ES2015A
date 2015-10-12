@@ -12,13 +12,13 @@ public class GameSetupScript : MonoBehaviour {
 
     private int playerRace;
 
-    //private Dropdown playerComboBox;
+    private Dropdown playerComboBox;
 
     // Use this for initialization
     void Start () {
         GameObject myComboBox = GameObject.Find("cboCivilizations");
         playerRace = 0;
-        //playerComboBox = myComboBox.GetComponent<Dropdown>();
+        playerComboBox = myComboBox.GetComponent<Dropdown>();
     }
 
     // Update is called once per frame
@@ -33,7 +33,7 @@ public class GameSetupScript : MonoBehaviour {
         switch (combo)
         {
         case PLAYER_RACE:
-            ///playerRace = playerComboBox.value;
+            playerRace = playerComboBox.value;
             break;
         }
     }
