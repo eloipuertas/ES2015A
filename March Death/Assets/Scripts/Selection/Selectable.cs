@@ -26,7 +26,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
         base.Start();
 
-		GameObject gameObject = GameObject.Find("GameObject");
+		GameObject gameObject = GameObject.Find("GameController");
 		player = gameObject.GetComponent ("Player") as Player;
 		player.FillPlayerUnits (this.gameObject);
 

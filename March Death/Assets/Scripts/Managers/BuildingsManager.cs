@@ -7,7 +7,7 @@ public class BuildingsManager : MonoBehaviour
     Player player;
     UserInput inputs;
 
-    private bool _placing;
+    private bool _placing = false;
     private GameObject newBuilding;
 
     // Use this for initialization
@@ -15,7 +15,6 @@ public class BuildingsManager : MonoBehaviour
     {
         player = GetComponent<Player>();
         inputs = GetComponent<UserInput>();
-        _placing = false;
 
     }
 

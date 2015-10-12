@@ -29,7 +29,7 @@ public class InformationController : MonoBehaviour {
 		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.SELECTED, onUnitSelected);
 		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.DESELECTED, onUnitDeselected);
 
-		GameObject gameObject = GameObject.Find("GameObject");
+		GameObject gameObject = GameObject.Find("GameController");
 		player = gameObject.GetComponent ("Player") as Player;
 
 		//Init menu components used for show info for one unit
