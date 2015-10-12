@@ -9,6 +9,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 	
 	public enum Actions { SELECTED, DESELECTED };
 
+	private Player player;
     private Rect selectedRect = new Rect();
     private Texture2D selectedBox;
     bool currentlySelected { get; set; }
@@ -24,6 +25,10 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public override void Start()
     {
         base.Start();
+
+		GameObject gameObject = GameObject.Find("GameObject");
+		player = gameObject.GetComponent ("Player") as Player;
+		player.FillPlayerUnits (this.gameObject);
 
         //Pendiente
         //gameEntity = this.GetComponent<IGameEntity>();
@@ -48,12 +53,12 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         if (updateHealthRatio)
         {
             //Pendiente
-            //healthRatio = gameEntity.healthPercentage() / 100f;
+			IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+			healthRatio = entity.healthPercentage / 100f;
             updateSomething = true;
             // doesn't update until gets the callback
             updateHealthRatio = false;
         }
-
 
         if(updateSomething) SelectionOverlay.UpdateTexture(selectedBox, healthRatio);
     }
@@ -66,38 +71,39 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         }
     }
 
-    public virtual void Select(Player player)
+    public virtual void SelectUnique()
     {
-        //only handle input if currently selected
-        Selectable oldObject = player.SelectedObject;
+		//Deselect other selected objects
+		foreach (Selectable selectedObject in player.SelectedObjects) {
+			if (selectedObject == this) continue;
+			selectedObject.Deselect();
+		}
 
-        if ( !this.Equals(oldObject))
-        {
-            // old object selection is now false (if exists)
-            if (oldObject) oldObject.currentlySelected = false;
-            // player selected object is now this current selectable object
-            player.SelectedObject = this;
-            this.currentlySelected = true;
-            //Debug pursposes
-            //Pendiente
-            //Debug.Log(gameEntity.info.name);
-            registerEntityCallbacks();
+		if (!player.SelectedObjects.Contains(this)) {
+			player.SelectedObjects.Add (this);
+		}
+        this.currentlySelected = true;
+		fire (Actions.SELECTED);
 
-			fire (Actions.SELECTED);
-
-        }
     }
 
-    private void registerEntityCallbacks()
+	public virtual void Select()
+	{
+		if (!player.SelectedObjects.Contains(this)) {
+			player.SelectedObjects.Add (this);
+		}
+
+		this.currentlySelected = true;
+		fire (Actions.SELECTED);
+	}
+
+	public virtual void Deselect()
     {
-        //TODO
-    }
-    private void unregisterEntityCallbacks()
-    {
-        //TODO
-    }
-    public virtual void Deselect()
-    {
+
+		if (player.SelectedObjects.Contains(this)) {
+			player.SelectedObjects.Remove(this);
+		}
+
         currentlySelected = false;
 		fire (Actions.DESELECTED);
     }

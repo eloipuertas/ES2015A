@@ -31,9 +31,20 @@ public class EntityActionsController : MonoBehaviour
 	{
 		destroyButtons ();
 		showActions (gameObject);
+		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+		Unit unit = entity.toUnit ();
+		unit.register(Unit.Actions.DIED, onActorDied);
 	}
 	
 	public void onActorDeselected(GameObject gameObject)
+	{
+		destroyButtons ();
+		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+		Unit unit = entity.toUnit ();
+		unit.unregister(Unit.Actions.DIED, onActorDied);
+	}
+
+	public void onActorDied(GameObject gameObject)
 	{
 		destroyButtons ();
 	}
@@ -98,7 +109,6 @@ public class EntityActionsController : MonoBehaviour
         image.rectTransform.sizeDelta = extends * 1.5f;
         image.rectTransform.position = center;
         image.color = new Color(1f, .3f, .3f, .5f);
-        Debug.Log("Image position: " + image.transform.position);
 
         var button = buttonObject.AddComponent<Button>();
         button.targetGraphic = image;

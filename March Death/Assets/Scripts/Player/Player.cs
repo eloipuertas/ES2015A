@@ -15,8 +15,12 @@ public class Player : MonoBehaviour
     /// Information regarding the entities of the player
     /// </summary>
     private List<IGameEntity> _activeEntities = new List<IGameEntity>();
-    public Selectable SelectedObject { get; set; }
+
     
+	//the list of player units in the scene
+	public ArrayList currentUnits = new ArrayList ();
+
+	public ArrayList SelectedObjects = new ArrayList();
     // Use this for initialization
     void Start(){}
 
@@ -33,6 +37,10 @@ public class Player : MonoBehaviour
         Debug.Log(_activeEntities.Count + " entities");
     }
 
+	public void FillPlayerUnits(GameObject unit) 
+	{
+		currentUnits.Add (unit);
+	}
     /// <summary>
     /// Returns the count of the current associated entities
     /// </summary>
