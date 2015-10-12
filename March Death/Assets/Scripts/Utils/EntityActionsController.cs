@@ -26,15 +26,15 @@ public class EntityAbilitysController : MonoBehaviour
 
     }
 
-	public void onActorSelected(GameObject gameObject)
+	public void onActorSelected(System.Object obj)
 	{
 		destroyButtons ();
-		showActions (gameObject);
+		showActions((GameObject)obj);
 	}
 
-	public void onActorDeselected(GameObject gameObject)
+	public void onActorDeselected(System.Object obj)
 	{
-		destroyButtons ();
+		destroyButtons();
 	}
 
 	void showActions(GameObject gameObject)
