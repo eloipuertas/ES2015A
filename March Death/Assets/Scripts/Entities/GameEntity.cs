@@ -192,7 +192,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         setupAbilities();
     }
 
-    public virtual void Update()
+    public override void Update()
     {
         foreach (Ability ability in _abilities)
         {

@@ -8,7 +8,7 @@ using Storage;
 
 using UnityEngine;
 
-public abstract class Ability : Actor<Ability.Actions>
+public abstract class Ability : BareActor<Ability.Actions>
 {
     public enum Actions { ENABLED, DISABLED };
 
