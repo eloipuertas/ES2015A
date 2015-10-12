@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Utils
@@ -50,7 +51,7 @@ namespace Utils
 
         protected void fire(T action)
         {
-            foreach (Action<Object> func in callbacks[action])
+            foreach (Action<Object> func in callbacks[action].ToList())
             {
                 func.Invoke(gameObject);
             }
@@ -58,7 +59,7 @@ namespace Utils
 
         protected void fire(T action, Object obj)
         {
-            foreach (Action<Object> func in callbacks[action])
+            foreach (Action<Object> func in callbacks[action].ToList())
             {
                 func.Invoke(obj);
             }
@@ -95,11 +96,23 @@ namespace Utils
             }
         }
 
+        public void unregisterFromAll(T action, Action<Object> func)
+        {
+            callbacks[action].Remove(func);
+
+            // Find all already existing gameobjects of this type
+            UnityEngine.Object[] alreadyExistingActors = UnityEngine.Object.FindObjectsOfType(typeof(SubscribableActor<T,S>));
+            foreach (UnityEngine.Object obj in alreadyExistingActors)
+            {
+                ((SubscribableActor<T, S>)obj).unregister(action, func);
+            }
+        }
+
         public void onActorStart(SubscribableActor<T, S> actor)
         {
             foreach (KeyValuePair<T, List < Action < Object >>> entry in callbacks)
             {
-                foreach (Action<Object> action in entry.Value)
+                foreach (Action<Object> action in entry.Value.ToList())
                 {
                     actor.register(entry.Key, action);
                 }
