@@ -14,7 +14,7 @@ namespace Storage
     sealed class Info : Singleton<Info>
     {
         private Dictionary<Tuple<Races, UnitTypes>, UnitInfo> unitStore = new Dictionary<Tuple<Races, UnitTypes>, UnitInfo>();
-        private Dictionary<Tuple<Races, UnitTypes>, string> unitPrefabs = new Dictionary<Tuple<Races, UnitTypes>, string>();
+        private Dictionary<Tuple<Races, PrefabUnitTypes>, string> unitPrefabs = new Dictionary<Tuple<Races, PrefabUnitTypes>, string>();
 
         private Dictionary<Tuple<Races, BuildingTypes>, BuildingInfo> buildingStore = new Dictionary<Tuple<Races, BuildingTypes>, BuildingInfo>();
         private Dictionary<Tuple<Races, BuildingTypes>, string> buildingPrefabs = new Dictionary<Tuple<Races, BuildingTypes>, string>();
@@ -30,14 +30,13 @@ namespace Storage
         {
             parseUnitFiles();
             parseResourceFiles();
-
             parseBuildingFiles();
-            parseBuildingPrefabs();
 
-            parsePrefabs();
+            parseUnitPrefabs();
+            parseBuildingPrefabs();
             parseResourcePrefabs();
         }
-    
+
         /// <summary>
         /// Parses all unit files on "Resources/Data/Units".
         /// <exception cref="System.FileLoadException">
@@ -140,13 +139,40 @@ namespace Storage
             }
         }
 
+        private PrefabUnitTypes UnitType2Prefab(UnitTypes type)
+        {
+            switch (type)
+            {
+                case UnitTypes.FARMER:
+                    return PrefabUnitTypes.CIVIL_1;
+
+                case UnitTypes.MINER:
+                    return PrefabUnitTypes.CIVIL_2;
+
+                case UnitTypes.LUMBERJACK:
+                    return (Utils.D6.get.rollOnce() <= 3 ? PrefabUnitTypes.CIVIL_1 :
+                        PrefabUnitTypes.CIVIL_2);
+
+                case UnitTypes.HERO: return PrefabUnitTypes.HERO;
+                case UnitTypes.LIGHT: return PrefabUnitTypes.LIGHT;
+                case UnitTypes.HEAVY: return PrefabUnitTypes.HEAVY;
+                case UnitTypes.THROWN: return PrefabUnitTypes.THROWN;
+                case UnitTypes.CAVALRY: return PrefabUnitTypes.CAVALRY;
+                case UnitTypes.MACHINE: return PrefabUnitTypes.MACHINE;
+                case UnitTypes.SPECIAL: return PrefabUnitTypes.SPECIAL;
+            }
+
+            Debug.Log(type);
+            return PrefabUnitTypes.CIVIL_1;
+        }
+
         /// <summary>
         /// Parses all prefabs on "Resources/Prefabs/Units".
         /// <exception cref="System.FileLoadException">
         /// Thrown when two prefabs define the same Race and UnitType
         /// </exception>
         /// </summary>
-        private void parsePrefabs()
+        private void parseUnitPrefabs()
         {
             Object[] assets = Resources.LoadAll("Prefabs/Units", typeof(GameObject));
             foreach (Object asset in assets)
@@ -156,11 +182,17 @@ namespace Storage
 
                 if (unit != null)
                 {
-                    Tuple<Races, UnitTypes> key = new Tuple<Races, UnitTypes>(unit.race, unit.type);
+                    // LUMBERJACK is used as the random male/female, while miner = male, farmer = female
+                    if (unit.type == UnitTypes.LUMBERJACK)
+                    {
+                        throw new System.IO.FileLoadException("Prefab '" + asset.name + "' should not use LUMBERJACK: ('" + unit.race+ "', '" + UnitType2Prefab(unit.type) + "')");
+                    }
+
+                    Tuple<Races, PrefabUnitTypes> key = new Tuple<Races, PrefabUnitTypes>(unit.race, UnitType2Prefab(unit.type));
 
                     if (unitPrefabs.ContainsKey(key))
                     {
-                        throw new System.IO.FileLoadException("Duplicated unit prefab ('" + unit.race+ "', '" + unit.type + "')");
+                        throw new System.IO.FileLoadException("Duplicated unit prefab ('" + unit.race+ "', '" + UnitType2Prefab(unit.type) + "')");
                     }
 
                     unitPrefabs.Add(key, "Prefabs/Units/" + gameObject.name);
@@ -293,11 +325,17 @@ namespace Storage
         /// <returns>The prefab path</returns>
         private string getPrefab(Races race, UnitTypes type)
         {
-            Tuple<Races, UnitTypes> key = new Tuple<Races, UnitTypes>(race, type);
+            // LUMBERJACK is used as the random male/female, while miner = male, farmer = female
+            if (type == UnitTypes.MINER || type == UnitTypes.FARMER)
+            {
+                type = UnitTypes.LUMBERJACK;
+            }
+
+            Tuple<Races, PrefabUnitTypes> key = new Tuple<Races, PrefabUnitTypes>(race, UnitType2Prefab(type));
 
             if (!unitPrefabs.ContainsKey(key))
             {
-                throw new System.ArgumentException("Unit prefab for ('" + race+ "', '" + type + "') not found");
+                throw new System.ArgumentException("Unit prefab for ('" + race+ "', '" + UnitType2Prefab(type) + "') not found");
             }
 
             return unitPrefabs[key];

@@ -31,12 +31,12 @@ public abstract class Ability : BareActor<Ability.Actions>
 
     public virtual void enable()
     {
-        fire(Actions.ENABLED);
+        fire(Actions.ENABLED, this);
     }
 
     public virtual void disable()
     {
-        fire(Actions.DISABLED);
+        fire(Actions.DISABLED, this);
     }
 
     public void Update() {}
