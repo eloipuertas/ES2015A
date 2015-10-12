@@ -25,11 +25,12 @@ public class animatedConstructionHuman : MonoBehaviour
         llista_3aFase = new List<Renderer>();
         
         llista_1aFase.Add(GameObject.Find("Suelo").GetComponent<MeshRenderer>());
-        llista_1aFase.Add(GameObject.Find("Casa Part1").GetComponent<MeshRenderer>());
+        llista_1aFase.Add(GameObject.Find("Casa Part0").GetComponent<MeshRenderer>());
 
-        llista_2aFase.Add(GameObject.Find("Casa Part0").GetComponent<MeshRenderer>());
+        llista_2aFase.Add(GameObject.Find("Casa Part1").GetComponent<MeshRenderer>());
         llista_2aFase.Add(GameObject.Find("ListonSuelo").GetComponent<MeshRenderer>());
         llista_2aFase.Add(GameObject.Find("Troncos").GetComponent<MeshRenderer>());
+        llista_2aFase.Add(GameObject.Find("EscaleraP").GetComponent<MeshRenderer>());
 
 
         llista_3aFase.Add(GameObject.Find("TroncosPeq").GetComponent<MeshRenderer>());
