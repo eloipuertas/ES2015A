@@ -71,7 +71,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         return (R)_accumulatedModifier;
     }
 
-    public void onAbilityToggled(GameObject gameObject)
+    public void onAbilityToggled(System.Object obj)
     {
         if (info.isUnit)
         {
