@@ -7,6 +7,7 @@ namespace Utils
     public abstract class Actor<T> : UnityEngine.MonoBehaviour, IActor<T> where T : struct, IConvertible
     {
         private Dictionary<T, List<Action<Object>>> callbacks = new Dictionary<T, List<Action<Object>>>();
+        private List<AutoUnregister<T>> autoUnregisters = new List<AutoUnregister<T>>();
 
         public Actor()
         {
@@ -24,14 +25,45 @@ namespace Utils
         public virtual void Start() { }
         public virtual void Update() { }
 
-        public void register(T action, Action<Object> func)
+        public virtual void OnDestroy()
         {
-            callbacks[action].Add(func);
+            foreach (AutoUnregister<T> auto in autoUnregisters.ToList())
+            {
+                auto.unregisterAll();
+            }
+
+            // This should always be true, as AutoUnregister.unregisterAll
+            // automatically unregisters itself from the actor
+            UnityEngine.Debug.Assert(autoUnregisters.Count == 0);
         }
 
-        public void unregister(T action, Action<Object> func)
+        public void register(AutoUnregister<T> auto)
+        {
+            autoUnregisters.Add(auto);
+        }
+
+        public RegisterResult<T> register(T action, Action<Object> func)
+        {
+            callbacks[action].Add(func);
+            return new RegisterResult<T>(action, func);
+        }
+
+        public void unregister(AutoUnregister<T> auto)
+        {
+            autoUnregisters.Remove(auto);
+        }
+
+        public void unregister(T action, Action<Object> func, bool skipAutoUnregister = false)
         {
             callbacks[action].Remove(func);
+
+            if (!skipAutoUnregister)
+            {
+                foreach (AutoUnregister<T> auto in autoUnregisters.ToList())
+                {
+                    auto.unregister(action, func);
+                }
+            }
         }
 
         protected void fire(T action)

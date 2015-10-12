@@ -21,12 +21,13 @@ namespace Utils
             }
         }
 
-        public void register(T action, Action<Object> func)
+        public RegisterResult<T> register(T action, Action<Object> func)
         {
             callbacks[action].Add(func);
+            return new RegisterResult<T>(action, func);
         }
 
-        public void unregister(T action, Action<Object> func)
+        public void unregister(T action, Action<Object> func, bool skipAutoUnregister = false)
         {
             callbacks[action].Remove(func);
         }
