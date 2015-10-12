@@ -20,16 +20,24 @@ public class Building : GameEntity<Building.Actions>
     /// </summary>
     public Races race = Races.MEN;
     public BuildingTypes type = BuildingTypes.STRONGHOLD;
-    
+
     /// <summary>
-    /// Resource building might need this to acount how many workers can pull resources from it.
+    /// List of ability objects of this building
     /// </summary>
-    public int usedCapacity { get; set; }
+    protected List<IBuildingAbility> _abilities;
+
+    /// <summary>
+    /// Contains all static information of the Building.
+    /// That means: max health, damage, defense, etc.
+    /// </summary>
+    protected BuildingInfo _info;
+    protected BuildingAttributes _attributes;
     
+
     /// <summary>
     /// Iterates all abilities on the
     /// </summary>
-    protected override void setupActions()
+    protected void setupAbilities()
     {
         foreach (BuildingAbility ability in _info.actions)
         {

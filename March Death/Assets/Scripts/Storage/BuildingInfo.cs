@@ -5,7 +5,7 @@ namespace Storage
 {
 
     /// <summary>
-    /// Valid Races and Types for Units.
+    /// Valid Races and Types for Buildings.
     /// Might be expanded in a future
     ///
     /// <remarks>
@@ -13,7 +13,11 @@ namespace Storage
     /// previously assigned gameobjects might get wrong types
     /// </remarks>
     /// </summary>
+<<<<<<< HEAD
     public enum BuildingTypes { STRONGHOLD };
+=======
+    public enum BuildingTypes { FORTRESS, FARM, MINE, SAWMILL };
+>>>>>>> origin/devel_d-resource_api
 
     public class BuildingInfo : EntityInfo
     {

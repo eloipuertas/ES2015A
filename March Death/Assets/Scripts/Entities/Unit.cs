@@ -12,7 +12,7 @@ using Storage;
 public class Unit : GameEntity<Unit.Actions>
 {
     public enum Actions { MOVEMENT_START, MOVEMENT_END, DAMAGED, DIED };
-
+    
     public Unit() { }
 
     /// <summary>

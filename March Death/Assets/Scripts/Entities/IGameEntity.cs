@@ -15,5 +15,4 @@ public interface IGameEntity
 
     Unit toUnit();
     Building toBuilding();
-    Resource toResource();
 }

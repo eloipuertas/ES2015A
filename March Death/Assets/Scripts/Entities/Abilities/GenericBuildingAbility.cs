@@ -56,6 +56,12 @@ class GenericBuildingAbility : IBuildingAbility
         {
             case BuildingModifier.RESISTANCE: return (T)Convert.ChangeType(_info.resistanceModifier, typeof(T));
             case BuildingModifier.WOUNDS: return (T)Convert.ChangeType(_info.woundsModifier, typeof(T));
+
+
+            // Resource modifiers
+            case BuildingModifier.MAXUNITS: return (T)Convert.ChangeType(_info.resistanceModifier, typeof(T));
+            case BuildingModifier.PRODUCTIONRATE: return (T)Convert.ChangeType(_info.resistanceModifier, typeof(T));
+            case BuildingModifier.STORESIZE: return (T)Convert.ChangeType(_info.resistanceModifier, typeof(T));
             default: throw new ArgumentException("Modifier " + modifier + " not found");
         }
     }

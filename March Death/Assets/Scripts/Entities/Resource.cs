@@ -4,20 +4,11 @@ using UnityEngine;
 using Storage;
 
 
-
-public class Resource : GameEntity<Resource.Actions>
+public class Resource : Building
 {
-    public enum Actions { DAMAGED, DESTROYED };
-
+    public new enum Actions { DAMAGED, DESTROYED, COLLECTION_START, COLLECTION_STOP, CREATE_UNIT };
     // Constructor
     public Resource() { }
-
-    /// <summary>
-    /// Edit this on the Prefab to set Resources of certain races/types
-    /// </summary>
-    public Races race = Races.MEN;
-    public ResourceTypes type = ResourceTypes.FARM;
-
 
     /// <summary>
     /// Time elapsed to next update
@@ -55,14 +46,11 @@ public class Resource : GameEntity<Resource.Actions>
     /// </summary>
     public int collectionRate { get; set; }
 
-
     /// <summary>
     ///  units collecting this resource
     /// </summary>
     public int harvestUnits;
     //public int harvestUnits { get; set; }
-
-
 
     /// <summary>
     /// max harvesting units allowed
@@ -75,113 +63,6 @@ public class Resource : GameEntity<Resource.Actions>
     private int collectedAmount;
 
     /// <summary>
-    /// When a wound is received, this is called
-    /// </summary>
-    protected override void onReceiveDamage()
-    {
-        fire(Actions.DAMAGED);
-    }
-
-    /// <summary>
-    /// When wounds reach its maximum, thus unit dies, this is called
-    /// </summary>
-    protected override void onFatalWounds()
-    {
-        fire(Actions.DESTROYED);
-    }
-
-    /// <summary>
-    /// Iterates all abilities on the resource
-    /// </summary>
-    protected override void setupActions()
-    {
-        foreach (ResourceAbility ability in _info.actions)
-        {
-            // Try to get class with this name
-            string abilityName = ability.name.Replace(" ", "");
-
-            try
-            {
-                var constructor = Type.GetType(abilityName).
-                    GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(UnitAbility), typeof(GameObject) }, null);
-                if (constructor == null)
-                {
-                    // Invalid constructor, use GenericAbility
-                    _actions.Add(new GenericResourceAbility(ability));
-                }
-                else
-                {
-                    // Class found, use that!
-                    _actions.Add((IResourceAbility)constructor.Invoke(new object[2] { ability, gameObject }));
-                }
-            }
-            catch (Exception /*e*/)
-            {
-                // No such class, use the GenericAbility class
-                _actions.Add(new GenericResourceAbility(ability));
-            }
-        }
-    }
-    
-    /// <summary>
-    /// when collider interact with other gameobject method checks if 
-    /// it is collecting unit and if unit has the rigth type for collecting
-    ///  resource.Then update number of collectors attached and production.
-    /// </summary>
-    /// <param name="other"></param>
-    void OnTriggerEnter(Collider other)
-    {
-
-        // space enough to hold new collectingUnit
-        if (harvestUnits < _info.resourceAttributes.maxUnits)
-        {
-            IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
-
-            // check collection unit and right type
-            if (entity.info.isCivil)
-            {
-                Unit unit = (Unit)entity;
-                UnitInfo info = (UnitInfo)entity.info;
-
-                //Increase units collecting resource, calculate max capacity.
-                if (match(info.type, type))
-                {
-                    harvestUnits++;
-                    collectionRate += info.attributes.capacity;
-                }
-            }
-        }
-
-
-    }
-    void OnTriggerStay(Collider other)
-    {
-        ;
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-
-        // get entity
-        IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
-
-        if (harvestUnits < _info.resourceAttributes.maxUnits)
-        {
-            if (entity.info.isCivil)
-            {
-                UnitInfo info = (UnitInfo)entity.info;
-
-                //Decrease units collecting resource, calculate max capacity.
-                if (match(info.type, type))
-                {
-                    harvestUnits--;
-                    collectionRate -= info.attributes.capacity;
-                }
-            }
-        }
-    }
-
-    /// <summary>
     /// check if collecting unit type matchs rigth resource type
     /// </summary>
     /// <param name="unitType"></param>
@@ -190,23 +71,23 @@ public class Resource : GameEntity<Resource.Actions>
     /// true if resource and unit type match,
     /// false otherwise
     /// </returns>
-    bool match(UnitTypes unitType, ResourceTypes type)
+    bool match(UnitTypes unitType, BuildingTypes type)
     {
-        if (type.Equals(ResourceTypes.FARM))
+        if (type.Equals(BuildingTypes.FARM))
         {
             return unitType.Equals(UnitTypes.FARMER);
         }
-        if (type.Equals(ResourceTypes.MINE))
+        if (type.Equals(BuildingTypes.MINE))
         {
             return unitType.Equals(UnitTypes.MINER);
         }
-        if (type.Equals(ResourceTypes.SAWMILL))
+        if (type.Equals(BuildingTypes.SAWMILL))
         {
             return unitType.Equals(UnitTypes.LUMBERJACK);
         }
         return false;
-
     }
+
     void collect()
     {
         if (collectionRate > stored)
@@ -241,17 +122,17 @@ public class Resource : GameEntity<Resource.Actions>
 
     void addResource(int amount)
     {
-        if (type.Equals(ResourceTypes.FARM))
+        if (type.Equals(BuildingTypes.FARM))
         {
             //TODO
             //add amount to player food
         }
-        if (type.Equals(ResourceTypes.MINE))
+        if (type.Equals(BuildingTypes.MINE))
         {
             //TODO
             //add amount to player metal
         }
-        if (type.Equals(ResourceTypes.SAWMILL))
+        if (type.Equals(BuildingTypes.SAWMILL))
         {
             //TODO
             //add amount to player wood
@@ -266,18 +147,21 @@ public class Resource : GameEntity<Resource.Actions>
     /// </summary>
     override public void Start()
     {
-        type = ResourceTypes.FARM;
+        // Call actor start
+        base.Start();
+
+        type = BuildingTypes.FARM;
         race = Races.MEN;
         nextUpdate = 0;
         stored = 0;
         collectionRate = 0;
         harvestUnits = 0;
-        
-        _status = EntityStatus.IDLE;
+
+        this.status = EntityStatus.IDLE;
+
         _info = Info.get.of(race, type);
-        
-        // Call GameEntity start
-        base.Start();
+        _attributes = (Storage.BuildingAttributes)info.attributes;
+        setupAbilities();
     }
 
 

@@ -10,7 +10,14 @@ namespace Storage
         public EntityResources sellValue;
         
         public int timeToBuild;
-		public float repairSpeed; // Auto repair speed
+        public float repairSpeed; // Auto repair speed
+
+// resources only attributes
+
+        public int storeSize;
+        public int maxUnits;
+        public int productionRate;
+        public float updateInterval;
 
     }
 }
