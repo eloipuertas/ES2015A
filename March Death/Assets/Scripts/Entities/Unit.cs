@@ -15,6 +15,11 @@ public class Unit : GameEntity<Unit.Actions>
 
     public Unit() { }
 
+    /// <sumary>
+    /// Autounregisters on death
+    /// </sumary>
+    private AutoUnregister _auto;
+
     /// <summary>
     /// Edit this on the Prefab to set Units of certain races/types
     /// </summary>
@@ -71,7 +76,7 @@ public class Unit : GameEntity<Unit.Actions>
     public void attackTarget(Unit unit)
     {
         _target = unit;
-        _target.register(Actions.DIED, onTargetDied);
+        _auto += _target.register(Actions.DIED, onTargetDied);
         _status = EntityStatus.ATTACKING;
     }
 
@@ -114,6 +119,7 @@ public class Unit : GameEntity<Unit.Actions>
     {
         _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
+        _auto = this;
 
         // Call GameEntity start
         base.Start();
