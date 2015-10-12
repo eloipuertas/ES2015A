@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Utils
 {
-    public abstract class Actor<T> : UnityEngine.MonoBehaviour, IActor<T> where T : struct, IConvertible
+    public abstract class Actor<T> : UnityEngine.MonoBehaviour, IObserver<T>, IActor<T> where T : struct, IConvertible
     {
         private Dictionary<T, List<Action<Object>>> callbacks = new Dictionary<T, List<Action<Object>>>();
         private List<AutoUnregister<T>> autoUnregisters = new List<AutoUnregister<T>>();
@@ -45,7 +45,7 @@ namespace Utils
         public RegisterResult<T> register(T action, Action<Object> func)
         {
             callbacks[action].Add(func);
-            return new RegisterResult<T>(action, func);
+            return new RegisterResult<T>(this, action, func);
         }
 
         public void unregister(AutoUnregister<T> auto)
@@ -61,7 +61,7 @@ namespace Utils
             {
                 foreach (AutoUnregister<T> auto in autoUnregisters.ToList())
                 {
-                    auto.unregister(action, func);
+                    auto.unregister(this, action, func);
                 }
             }
         }

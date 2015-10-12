@@ -6,49 +6,43 @@ namespace Utils
 {
     public sealed class AutoUnregister<T> where T : struct, IConvertible
     {
-        private Actor<T> actor;
-        private List<Tuple<T, Action<Object>>> results = new List<Tuple<T, Action<Object>>>();
+        private IObserver<T> observer;
+        private List<RegisterResult<T>> results = new List<RegisterResult<T>>();
 
-        private AutoUnregister(Actor<T> actor)
+        private AutoUnregister(IObserver<T> observer)
         {
-            this.actor = actor;
-            actor.register(this);
+            this.observer = observer;
+            this.observer.register(this);
         }
 
-        public static implicit operator AutoUnregister<T>(Actor<T> actor)
+        public static implicit operator AutoUnregister<T>(Actor<T> observer)
         {
-            return new AutoUnregister<T>(actor);
+            return new AutoUnregister<T>(observer);
         }
 
-        public static AutoUnregister<T> operator+ (AutoUnregister<T> self, Tuple<T, Action<Object>> result)
+        public static AutoUnregister<T> operator+ (AutoUnregister<T> self, RegisterResult<T> result)
         {
             self.results.Add(result);
             return self;
         }
 
-        public void unregister(T action, Action<Object> func)
+        public void unregister(IActor<T> actor, T action, Action<Object> func)
         {
-            var key = new RegisterResult<T>(action, func);
+            var key = new RegisterResult<T>(actor, action, func);
             if (results.Contains(key))
             {
                 results.Remove(key);
-                actor.unregister(action, func, true);
-            }
-
-            if (results.Count == 0)
-            {
-                actor.unregister(this);
             }
         }
 
         public void unregisterAll()
         {
-            foreach (RegisterResult<T> pair in results)
+            foreach (RegisterResult<T> triplet in results)
             {
-                actor.unregister(pair.Key0, pair.Key1);
+                triplet.Key0.unregister(triplet.Key1, triplet.Key2, true);
             }
 
-            actor.unregister(this);
+            observer.unregister(this);
         }
     }
 }

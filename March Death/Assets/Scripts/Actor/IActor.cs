@@ -4,9 +4,12 @@ using System.Collections.Generic;
 
 namespace Utils
 {
-    public class RegisterResult<T> : Tuple<T, Action<Object>> where T : struct, IConvertible
+    public class RegisterResult<T> : Triplet<IActor<T>, T, Action<Object>> where T : struct, IConvertible
     {
-        public RegisterResult(T action, Action<Object> func) : base(action, func) { }
+        public RegisterResult(IActor<T> actor, T action, Action<Object> func) :
+            base(actor, action, func)
+        {
+        }
     }
 
     public interface IActor<T> where T : struct, IConvertible

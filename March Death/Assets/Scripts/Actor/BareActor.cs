@@ -24,7 +24,7 @@ namespace Utils
         public RegisterResult<T> register(T action, Action<Object> func)
         {
             callbacks[action].Add(func);
-            return new RegisterResult<T>(action, func);
+            return new RegisterResult<T>(this, action, func);
         }
 
         public void unregister(T action, Action<Object> func, bool skipAutoUnregister = false)
