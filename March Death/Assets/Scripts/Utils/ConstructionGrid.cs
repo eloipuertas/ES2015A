@@ -8,8 +8,8 @@ public class ConstructionGrid : MonoBehaviour {
 
 	void Start () {
         dimensions = new Vector2(100f, 100f);
-        reservedPositions = new ArrayList();    	
-	}
+        reservedPositions = new ArrayList();
+    }
 	
     /// <summary>
     /// Returns the center of a row of the grid where the building will be placed
@@ -36,7 +36,22 @@ public class ConstructionGrid : MonoBehaviour {
     /// <param name="discretizedPosition"></param>
     public void reservePosition(Vector3 buildingDiscretizedPosition)
     {
-        reservedPositions.Add(buildingDiscretizedPosition);
+        if (isNewPositionAbleForConstrucction(buildingDiscretizedPosition))
+        {
+            reservedPositions.Add(buildingDiscretizedPosition);
+
+            Debug.Log("---------------------------------------------------------------------------\nPosition reserved: ");
+
+            for (int i = 0; i < reservedPositions.Count; i++)
+            {
+                Debug.Log(reservedPositions[i].ToString());
+            }
+        }
+        else
+        {
+            Debug.Log("This position couldn't be reserved");
+        }
+        
     }
 
     /// <summary>
@@ -45,7 +60,14 @@ public class ConstructionGrid : MonoBehaviour {
     /// <param name="discretizedPosition"></param>
     public void liberatePosition(Vector3 discretizedPosition)
     {
-        //liberate free this position
+        reservedPositions.Remove(discretizedPosition);
+
+        Debug.Log("---------------------------------------------------------------------------\nPosition erased: ");
+
+        for (int i = 0; i < reservedPositions.Count; i++)
+        {
+            Debug.Log(reservedPositions[i].ToString());
+        }
     }
 
     /// <summary>
@@ -65,6 +87,13 @@ public class ConstructionGrid : MonoBehaviour {
     /// <returns></returns>
     private bool isNewPositionAbleForConstrucction(Vector3 discretizedPosition)
     {
-        return true;
+        //If this position is contained on the array return false
+        if (reservedPositions.Contains(discretizedPosition))
+        {
+            return false;
+        }
+
+        //next check if the zone is flat enought for construction
+        return isFlatEnoughtForConstruction(discretizedPosition);
     }
 }
