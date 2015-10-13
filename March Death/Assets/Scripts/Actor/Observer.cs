@@ -4,15 +4,15 @@ using System.Collections.Generic;
 
 namespace Utils
 {
-    public abstract class Observer<T> : UnityEngine.MonoBehaviour, IObserver<T> where T : struct, IConvertible
+    public abstract class Observer : UnityEngine.MonoBehaviour, IObserver
     {
-        private List<AutoUnregister<T>> autoUnregisters = new List<AutoUnregister<T>>();
+        private List<AutoUnregister> autoUnregisters = new List<AutoUnregister>();
 
         public virtual void OnDestroy()
         {
-            foreach (AutoUnregister<T> auto in autoUnregisters.ToList())
+            foreach (AutoUnregister auto in autoUnregisters.ToList())
             {
-                auto.unregisterAll<T>();
+                auto.unregisterAll();
             }
 
             // This should always be true, as AutoUnregister.unregisterAll
@@ -20,12 +20,12 @@ namespace Utils
             UnityEngine.Debug.Assert(autoUnregisters.Count == 0);
         }
 
-        public void register(AutoUnregister<T> auto)
+        public void register(AutoUnregister auto)
         {
             autoUnregisters.Add(auto);
         }
 
-        public void unregister(AutoUnregister<T> auto)
+        public void unregister(AutoUnregister auto)
         {
             autoUnregisters.Remove(auto);
         }

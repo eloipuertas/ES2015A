@@ -19,7 +19,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// <sumary>
     /// Autounregisters on death
     /// </sumary>
-    private AutoUnregister<Unit.Actions> _auto;
+    private AutoUnregister _auto;
 
     /// <summary>
     /// Edit this on the Prefab to set Units of certain races/types
@@ -86,7 +86,8 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     public void stopAttack()
     {
-        _target.unregister(Actions.DIED, onTargetDied);
+        _auto -= _target.unregister(Actions.DIED, onTargetDied);
+
         // TODO: Maybe we should not set it to null? In case we want to attack it again
         _target = null;
         _status = EntityStatus.IDLE;

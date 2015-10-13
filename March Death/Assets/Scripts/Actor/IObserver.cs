@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 namespace Utils
 {
-    public interface IObserver<T> where T : struct, IConvertible
+    public interface IObserver
     {
         void OnDestroy();
-        void register(AutoUnregister<T> auto);
-        void unregister(AutoUnregister<T> auto);
+        void register(AutoUnregister auto);
+        void unregister(AutoUnregister auto);
     }
 }

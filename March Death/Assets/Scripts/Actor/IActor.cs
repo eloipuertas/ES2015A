@@ -12,9 +12,13 @@ namespace Utils
         }
     }
 
-    public interface IActor<T> where T : struct, IConvertible
+    public interface IActor<T> : IBaseActor where T : struct, IConvertible
     {
         RegisterResult<T> register(T action, Action<Object> func);
-        void unregister(T action, Action<Object> func, bool skipAutoUnregister = false);
+    }
+
+    public interface IBaseActor
+    {
+        IKeyGetter unregister<A>(A action, Action<Object> func);
     }
 }

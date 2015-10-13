@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 namespace Utils
 {
-    public abstract class Actor<T> : UnityEngine.MonoBehaviour, IObserver<T>, IActor<T> where T : struct, IConvertible
+    public abstract class Actor<T> : UnityEngine.MonoBehaviour, IObserver, IActor<T>, IBaseActor where T : struct, IConvertible
     {
         private Dictionary<T, List<Action<Object>>> callbacks = new Dictionary<T, List<Action<Object>>>();
-        private List<AutoUnregister<T>> autoUnregisters = new List<AutoUnregister<T>>();
+        private List<AutoUnregister> autoUnregisters = new List<AutoUnregister>();
 
         public Actor()
         {
@@ -27,9 +27,9 @@ namespace Utils
 
         public virtual void OnDestroy()
         {
-            foreach (AutoUnregister<T> auto in autoUnregisters.ToList())
+            foreach (AutoUnregister auto in autoUnregisters.ToList())
             {
-                auto.unregisterAll<T>();
+                auto.unregisterAll();
             }
 
             // This should always be true, as AutoUnregister.unregisterAll
@@ -37,7 +37,7 @@ namespace Utils
             UnityEngine.Debug.Assert(autoUnregisters.Count == 0);
         }
 
-        public void register(AutoUnregister<T> auto)
+        public void register(AutoUnregister auto)
         {
             autoUnregisters.Add(auto);
         }
@@ -48,20 +48,29 @@ namespace Utils
             return new RegisterResult<T>(this, action, func);
         }
 
-        public void unregister(AutoUnregister<T> auto)
+        public void unregister(AutoUnregister auto)
         {
             autoUnregisters.Remove(auto);
         }
 
-        public void unregister(T action, Action<Object> func, bool skipAutoUnregister = false)
+        public IKeyGetter unregister<A>(A action, Action<Object> func)
         {
-            callbacks[action].Remove(func);
+            T realAction = (T)Convert.ChangeType(action, typeof(T));
+            callbacks[realAction].Remove(func);
 
-            if (!skipAutoUnregister)
+            return new RegisterResult<T>(this, realAction, func);
+        }
+
+        public void unregisterAll(Action<Object> func)
+        {
+            foreach (var pair in callbacks)
             {
-                foreach (AutoUnregister<T> auto in autoUnregisters.ToList())
+                foreach (var action in pair.Value.ToList())
                 {
-                    auto.unregister(this, action, func);
+                    if (action == func)
+                    {
+                        callbacks[pair.Key].Remove(action);
+                    }
                 }
             }
         }

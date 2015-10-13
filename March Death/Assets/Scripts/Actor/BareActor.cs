@@ -27,9 +27,12 @@ namespace Utils
             return new RegisterResult<T>(this, action, func);
         }
 
-        public void unregister(T action, Action<Object> func, bool skipAutoUnregister = false)
+        public IKeyGetter unregister<A>(A action, Action<Object> func)
         {
-            callbacks[action].Remove(func);
+            T realAction = (T)Convert.ChangeType(action, typeof(T));
+            callbacks[realAction].Remove(func);
+
+            return new RegisterResult<T>(this, realAction, func);
         }
 
         protected void fire(T action)
