@@ -2,6 +2,9 @@
 using System.Collections;
 using UnityEngine.UI;
 
+/// <summary>
+/// Script to handle UI events for the game setup screen.
+/// </summary>
 public class GameSetupScript : MonoBehaviour {
 
     /// <summary>
@@ -10,15 +13,15 @@ public class GameSetupScript : MonoBehaviour {
     const int PLAYER_RACE = 0;
     /*const int ENEMY_1_RACE = 1;*/
 
-    private int playerRace;
-
     private Dropdown playerComboBox;
+
+	GameInformation info;
 
     // Use this for initialization
     void Start () {
         GameObject myComboBox = GameObject.Find("cboCivilizations");
-        playerRace = 0;
         playerComboBox = myComboBox.GetComponent<Dropdown>();
+		info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
     }
 
     // Update is called once per frame
@@ -33,18 +36,19 @@ public class GameSetupScript : MonoBehaviour {
         switch (combo)
         {
         case PLAYER_RACE:
-            playerRace = playerComboBox.value;
+			info.SetPlayerRace(playerComboBox.value);
             break;
         }
     }
 
     public void StartGame()
     {
-        // TODO Add logic to open hud with current setup (race, etc.)
+		Application.LoadLevel(3);
     }
 
     public void Cancel()
     {
-        // TODO Add logic to return to main menu
+		Destroy(info);
+		Application.LoadLevel(0);
     }
 }
