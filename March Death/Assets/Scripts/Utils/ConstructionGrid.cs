@@ -6,11 +6,33 @@ public class ConstructionGrid : MonoBehaviour {
 
     private Vector2 dimensions;
     private ArrayList reservedPositions;
+    private GameObject flatnessChecker;
 
 	void Start () {
         dimensions = new Vector2(5f, 5f);
         reservedPositions = new ArrayList();
         Debug.Log(discretizeMapCoords(new Vector3(-11.2f, 10f,12f)).ToString());
+        flatnessChecker = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        flatnessChecker.transform.position = Camera.main.transform.position;
+        flatnessChecker.name = "FlatnessChecker";
+        flatnessChecker.transform.localScale.Set(dimensions.x, 1, dimensions.y);
+    }
+
+    void Update()
+    {
+        
+        if (Input.GetMouseButtonDown(1))
+        {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity))
+            {
+                Vector3 flatnescheckerPosition = hit.point;
+                flatnescheckerPosition.y += 0.01f;
+                flatnessChecker.transform.position = this.discretizeMapCoords(flatnescheckerPosition);
+            }
+        }
+        
     }
 	
     /// <summary>
