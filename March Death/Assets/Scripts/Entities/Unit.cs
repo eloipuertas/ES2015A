@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 using Storage;
+using Utils;
 
 
 /// <summary>
@@ -18,7 +19,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// <sumary>
     /// Autounregisters on death
     /// </sumary>
-    private AutoUnregister _auto;
+    private AutoUnregister<Unit.Actions> _auto;
 
     /// <summary>
     /// Edit this on the Prefab to set Units of certain races/types

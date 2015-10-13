@@ -29,7 +29,7 @@ namespace Utils
         {
             foreach (AutoUnregister<T> auto in autoUnregisters.ToList())
             {
-                auto.unregisterAll();
+                auto.unregisterAll<T>();
             }
 
             // This should always be true, as AutoUnregister.unregisterAll
