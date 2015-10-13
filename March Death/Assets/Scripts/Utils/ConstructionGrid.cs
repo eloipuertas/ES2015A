@@ -33,6 +33,11 @@ public class ConstructionGrid : MonoBehaviour {
     /// <param name="newDimensions"></param>
     public void setNewGridDimensions(Vector2 newDimensions)
     {
+        if (newDimensions.x <= 0 || newDimensions.y <= 0)
+        {
+            throw new InvalidOperationException("New dimensions must be bigger than zero");
+        }
+
         dimensions = newDimensions;
     }
 
