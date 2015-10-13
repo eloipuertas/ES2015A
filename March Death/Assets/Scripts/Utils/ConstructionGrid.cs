@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class ConstructionGrid : MonoBehaviour {
 
@@ -7,8 +8,9 @@ public class ConstructionGrid : MonoBehaviour {
     private ArrayList reservedPositions;
 
 	void Start () {
-        dimensions = new Vector2(100f, 100f);
+        dimensions = new Vector2(5f, 5f);
         reservedPositions = new ArrayList();
+        Debug.Log(discretizeMapCoords(new Vector3(-11.2f, 10f,12f)).ToString());
     }
 	
     /// <summary>
@@ -18,7 +20,11 @@ public class ConstructionGrid : MonoBehaviour {
     /// <returns></returns>
 	public Vector3 discretizeMapCoords(Vector3 position)
     {
-        return position;
+        Vector3 discretizedCoords = new Vector3();
+        discretizedCoords.x = (float) Math.Floor(position.x / dimensions.x) * dimensions.x + dimensions.x / 2;
+        discretizedCoords.z = (float)Math.Floor(position.z / dimensions.y) * dimensions.y + dimensions.y / 2;
+        discretizedCoords.y = position.y;
+        return discretizedCoords;
     }
 
     /// <summary>
