@@ -83,7 +83,7 @@ public class BuildingsManager : MonoBehaviour
     {
         bool check;
 
-
+		//TODO: (hermetico) call check location from construction grid
         /* Utils.ConstructionGrid.isValidLocation(toLocation)*/
         check = location.y < 89 ? true : false;
 
@@ -96,8 +96,10 @@ public class BuildingsManager : MonoBehaviour
     /// </summary>
     public void placeBuilding()
     {
+		//TODO: (hermetico) The system is firing mouseUp() just inmediately after the click button, so the building
+		// is placed nowhere
         Vector3 toLocation = inputs.FindHitPoint();
-        locationTrick(toLocation); // revisar
+        locationTrick(toLocation); // HACK : (hermetico) It won't be necessary when using construction grid methods
         toLocation = adaptLocation(toLocation);
 
         // alter the color if is not a valid location
@@ -152,7 +154,7 @@ public class BuildingsManager : MonoBehaviour
         // move the object to match toLocation with the min corner
 
 
-        toLocation = locationTrick(toLocation);// revisar
+		toLocation = locationTrick(toLocation);// HACK : (hermetico) It won't be necessary when using construction grid methods
         toLocation = adaptLocation(toLocation);
 
         // alter the color if is not a valid location

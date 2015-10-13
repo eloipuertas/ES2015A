@@ -66,18 +66,23 @@ public class UserInput : MonoBehaviour
     private void MouseActivity()
     {
 
+		// TODO : (Devel_c) Check positions with the HUD
         if (Input.GetMouseButtonDown (0)) {
-			camera.disableManualControl();
+			//camera.disableManualControl();
 			leftButtonIsDown = true;
 			mouseButtonUpPoint = Input.mousePosition;    
 			topLeft = GetScreenRaycastPoint(mouseButtonUpPoint);
 
 		} else if (Input.GetMouseButtonUp (0)) {
-			camera.enableManualControl();
+			//camera.enableManualControl();
 			leftButtonIsDown = false;
 
 			//Check if is a simple click or dragging if the range is not big enough
-			if (IsSimpleClick (mouseButtonDownPoint, mouseButtonUpPoint)) LeftMouseClick ();
+			if (IsSimpleClick (mouseButtonDownPoint, mouseButtonUpPoint))
+			{
+				LeftMouseClick ();
+			}
+
 
 		} else if (Input.GetMouseButtonDown (1)) {
 			leftButtonIsDown = false;
@@ -205,18 +210,18 @@ public class UserInput : MonoBehaviour
     /// </summary>
     private void RightMouseClick()
     {
-	if(player.isCurrently(Player.status.PLACING_BUILDING))
-        {
-            GetComponent<BuildingsManager>().cancelPlacing();
-        }
-	else
-	{
-		for (int i = player.SelectedObjects.Count-1; i >= 0; i--)
+		if(player.isCurrently(Player.status.PLACING_BUILDING))
+	        {
+	            GetComponent<BuildingsManager>().cancelPlacing();
+	        }
+		else
 		{
-			Selectable selectedObject = (Selectable) player.SelectedObjects[i];
-			selectedObject.Deselect();
+			for (int i = player.SelectedObjects.Count-1; i >= 0; i--)
+			{
+				Selectable selectedObject = (Selectable) player.SelectedObjects[i];
+				selectedObject.Deselect();
+			}
 		}
-	}
     }
 	private bool IsSimpleClick(Vector2 v1, Vector2 v2) 
 	{
