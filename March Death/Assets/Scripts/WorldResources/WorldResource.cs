@@ -55,7 +55,7 @@ namespace WorldResources
 		/// <param name="amount">Amount.</param>
 		public void substract(int amount)
 		{
-			_amount = amount > 0 ? amount : 0;
+			_amount = amount > 0 ? _amount - amount : 0;
 		}
 
 

@@ -3,8 +3,6 @@ public interface IPlayerResource
 	
 	WorldResources.Type getType();
 
-	int substractAll();
-
 	/// <summary>
 	/// compares the specified amount.
 	/// </summary>
@@ -18,17 +16,30 @@ public interface IPlayerResource
 	
 
 	/// <summary>
-	/// Checks the amount and substract.
+	/// Checks the amount and substracts.
 	/// </summary>
 	/// <returns><c>true</c>, if is enough amount, <c>false</c> otherwise.</returns>
 	bool checkAmountAndSubstract( int amount );
 
-	/// <summary>
-	/// Merge the resources with the other. This means, adds the amount of the other resource to the current
-	/// resource and returns the new resource instance
-	/// </summary>
-	/// <param name="other">Other.</param>
-	IPlayerResource mergeResources( IPlayerResource other);
+    /// <summary>
+    /// Substract the amount specified and returns the remaining amount
+    /// </summary>
+    /// <param name="amount"></param>
+    /// <returns></returns>
+    int substractAndGet(int amount);
+
+    /// <summary>
+    /// Returns all the amount and substracts it
+    /// </summary>
+    /// <returns>The amount substracted</returns>
+    int getAndSubstractAll();
+
+    /// <summary>
+    /// Merge the resources with the other. This means, adds the amount of the other resource to the current
+    /// resource and returns the new resource instance
+    /// </summary>
+    /// <param name="other">Other.</param>
+    void addResources( IPlayerResource other);
 }
 
 

@@ -46,33 +46,42 @@ public class PlayerResource : WorldResources.WorldResource, IPlayerResource
 	}
 
 	/// <summary>
-	/// Substracts all.
+	/// Returns all the amount and substracts it
 	/// </summary>
 	/// <returns>The amount substracted</returns>
-	public int substractAll()
+	public int getAndSubstractAll()
 	{
 		int temp = getAmount();
-
 		substract(temp);
 
 		return temp;
 	}
+
+    /// <summary>
+    /// Substract the amount specified and returns the remaining amount
+    /// </summary>
+    /// <param name="amount"></param>
+    /// <returns></returns>
+    public int substractAndGet(int amount)
+    {
+        substract(amount);
+        return getAmount();
+    }
 
 	/// <summary>
 	/// Merge the resources with the other. This means, adds the amount of the other resource to the current
 	/// resource and returns the new resource instance
 	/// </summary>
 	/// <param name="other">Other.</param>
-	public IPlayerResource mergeResources( IPlayerResource other)
+	public void addResources( IPlayerResource other)
 	{
 		if (!_type.Equals(other.getType()))
 		{
 			throw new Exception ("Merging different type of resources");
 		}
 
-		add (other.substractAll());
+		add (other.getAndSubstractAll());
 
-		return this;
 	}
 }
 
