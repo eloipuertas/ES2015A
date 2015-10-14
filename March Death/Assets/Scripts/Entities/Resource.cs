@@ -4,20 +4,11 @@ using UnityEngine;
 using Storage;
 
 
-
-public class Resource : GameEntity<Resource.Actions>
+public class Resource : Building<Resource.Actions>
 {
-    public enum Actions { DAMAGED, DESTROYED };
-
+    public new enum Actions { DAMAGED, DESTROYED, COLLECTION_START, COLLECTION_STOP, CREATE_UNIT };
     // Constructor
     public Resource() { }
-
-    /// <summary>
-    /// Edit this on the Prefab to set Resources of certain races/types
-    /// </summary>
-    public Races race = Races.MEN;
-    public ResourceTypes type = ResourceTypes.FARM;
-
 
     /// <summary>
     /// Time elapsed to next update
@@ -27,14 +18,14 @@ public class Resource : GameEntity<Resource.Actions>
     /// <summary>
     ///  Next update time
     /// </summary>
-    // 
+    //
     private float nextUpdate;
 
     /// <summary>
     // Resource could store limited amount of material when not in use
     // or when production is higher than collection
     /// </summary>
-    // 
+    //
     private int storeSize;
     /// <summary>
     /// amount of materials produced and not collected yet.
@@ -50,19 +41,16 @@ public class Resource : GameEntity<Resource.Actions>
     /// <summary>
     /// sum of capacity of units collecting this resource
     /// the more units the more maxCollectionRate.
-    /// real collectionRate could be lower due to 
+    /// real collectionRate could be lower due to
     /// store limit.
     /// </summary>
     public int collectionRate { get; set; }
-
 
     /// <summary>
     ///  units collecting this resource
     /// </summary>
     public int harvestUnits;
     //public int harvestUnits { get; set; }
-
-
 
     /// <summary>
     /// max harvesting units allowed
@@ -75,56 +63,7 @@ public class Resource : GameEntity<Resource.Actions>
     private int collectedAmount;
 
     /// <summary>
-    /// When a wound is received, this is called
-    /// </summary>
-    protected override void onReceiveDamage()
-    {
-        fire(Actions.DAMAGED);
-    }
-
-    /// <summary>
-    /// When wounds reach its maximum, thus unit dies, this is called
-    /// </summary>
-    protected override void onFatalWounds()
-    {
-        fire(Actions.DESTROYED);
-    }
-
-    /// <summary>
-    /// Iterates all abilities on the resource
-    /// </summary>
-    protected override void setupActions()
-    {
-        foreach (ResourceAbility ability in _info.actions)
-        {
-            // Try to get class with this name
-            string abilityName = ability.name.Replace(" ", "");
-
-            try
-            {
-                var constructor = Type.GetType(abilityName).
-                    GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(UnitAbility), typeof(GameObject) }, null);
-                if (constructor == null)
-                {
-                    // Invalid constructor, use GenericAbility
-                    _actions.Add(new GenericResourceAbility(ability));
-                }
-                else
-                {
-                    // Class found, use that!
-                    _actions.Add((IResourceAbility)constructor.Invoke(new object[2] { ability, gameObject }));
-                }
-            }
-            catch (Exception /*e*/)
-            {
-                // No such class, use the GenericAbility class
-                _actions.Add(new GenericResourceAbility(ability));
-            }
-        }
-    }
-    
-    /// <summary>
-    /// when collider interact with other gameobject method checks if 
+    /// when collider interact with other gameobject method checks if
     /// it is collecting unit and if unit has the rigth type for collecting
     ///  resource.Then update number of collectors attached and production.
     /// </summary>
@@ -190,23 +129,23 @@ public class Resource : GameEntity<Resource.Actions>
     /// true if resource and unit type match,
     /// false otherwise
     /// </returns>
-    bool match(UnitTypes unitType, ResourceTypes type)
+    bool match(UnitTypes unitType, BuildingTypes type)
     {
-        if (type.Equals(ResourceTypes.FARM))
+        if (type.Equals(BuildingTypes.FARM))
         {
             return unitType.Equals(UnitTypes.FARMER);
         }
-        if (type.Equals(ResourceTypes.MINE))
+        if (type.Equals(BuildingTypes.MINE))
         {
             return unitType.Equals(UnitTypes.MINER);
         }
-        if (type.Equals(ResourceTypes.SAWMILL))
+        if (type.Equals(BuildingTypes.SAWMILL))
         {
             return unitType.Equals(UnitTypes.LUMBERJACK);
         }
         return false;
-
     }
+
     void collect()
     {
         if (collectionRate > stored)
@@ -241,17 +180,17 @@ public class Resource : GameEntity<Resource.Actions>
 
     void addResource(int amount)
     {
-        if (type.Equals(ResourceTypes.FARM))
+        if (type.Equals(BuildingTypes.FARM))
         {
             //TODO
             //add amount to player food
         }
-        if (type.Equals(ResourceTypes.MINE))
+        if (type.Equals(BuildingTypes.MINE))
         {
             //TODO
             //add amount to player metal
         }
-        if (type.Equals(ResourceTypes.SAWMILL))
+        if (type.Equals(BuildingTypes.SAWMILL))
         {
             //TODO
             //add amount to player wood
@@ -266,24 +205,25 @@ public class Resource : GameEntity<Resource.Actions>
     /// </summary>
     override public void Start()
     {
-        type = ResourceTypes.FARM;
+        type = BuildingTypes.FARM;
         race = Races.MEN;
         nextUpdate = 0;
         stored = 0;
         collectionRate = 0;
         harvestUnits = 0;
-        
+
         _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
-        
+
         // Call GameEntity start
         base.Start();
     }
 
 
     // Update is called once per frame
-    void Update()
+    public override void Update()
     {
+        base.Update();
 
         if (Time.time > nextUpdate)
         {

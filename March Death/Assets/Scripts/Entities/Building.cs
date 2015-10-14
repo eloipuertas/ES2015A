@@ -9,62 +9,22 @@ using Storage;
 /// Building base class. Extends actor (which in turn extends MonoBehaviour) to
 /// handle basic API operations
 /// </summary>
-public class Building : GameEntity<Building.Actions>
+public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 {
-    public enum Actions { DAMAGED, DESTROYED };
-
     public Building() { }
 
     /// <summary>
     /// Edit this on the Prefab to set Units of certain races/types
     /// </summary>
-    public Races race = Races.MEN;
-    public BuildingTypes type = BuildingTypes.FORTRESS;
-    
-    /// <summary>
-    /// Resource building might need this to acount how many workers can pull resources from it.
-    /// </summary>
-    public int usedCapacity { get; set; }
-    
-    /// <summary>
-    /// Iterates all abilities on the
-    /// </summary>
-    protected override void setupActions()
-    {
-        foreach (BuildingAbility ability in _info.actions)
-        {
-            // Try to get class with this name
-            string abilityName = ability.name.Replace(" ", "");
-
-            try
-            {
-                var constructor = Type.GetType(abilityName).
-                    GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(BuildingAbility), typeof(GameObject) }, null);
-                if (constructor == null)
-                {
-                    // No such constructor, construct default
-                    _actions.Add(new GenericBuildingAbility(ability));
-                }
-                else
-                {
-                    // Class found, use that!
-                    _actions.Add((IBuildingAbility)constructor.Invoke(new object[2] { ability, gameObject }));
-                }
-            }
-            catch (Exception)
-            {
-                // No such class, use the GenericAbility class
-                _actions.Add(new GenericBuildingAbility(ability));
-            }
-        }
-    }
+    public BuildingTypes type = BuildingTypes.STRONGHOLD;
+    public override E getType<E>() { return (E)Convert.ChangeType(type, typeof(E)); }
 
     /// <summary>
     /// When a wound is received, this is called
     /// </summary>
     protected override void onReceiveDamage()
     {
-        fire(Actions.DAMAGED);
+        fire((T) Enum.Parse(typeof(T), "DAMAGED", true));
     }
 
     /// <summary>
@@ -72,7 +32,7 @@ public class Building : GameEntity<Building.Actions>
     /// </summary>
     protected override void onFatalWounds()
     {
-        fire(Actions.DESTROYED);
+        fire((T) Enum.Parse(typeof(T), "DESTROYED", true));
     }
 
     /// <summary>
@@ -80,9 +40,6 @@ public class Building : GameEntity<Building.Actions>
     /// </summary>
     public override void Start()
     {
-        _status = EntityStatus.IDLE;
-        _info = Info.get.of(race, type);
-
         // Call GameEntity start
         base.Start();
     }
@@ -90,8 +47,9 @@ public class Building : GameEntity<Building.Actions>
     /// <summary>
     /// Called once a frame to update the object
     /// </summary>
-    void Update()
+    public override void Update()
     {
+        base.Update();
     }
 
     /// <summary>

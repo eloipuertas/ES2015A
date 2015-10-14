@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Utils
 {
@@ -17,9 +16,9 @@ namespace Utils
 
     // T, enum actions
     // S, base class
-    public abstract class SubscribableActor<T, S> : MonoBehaviour where T : struct, IConvertible where S : class
+    public abstract class SubscribableActor<T, S> : UnityEngine.MonoBehaviour where T : struct, IConvertible where S : class
     {
-        private Dictionary<T, List<Action<GameObject>>> callbacks = new Dictionary<T, List<Action<GameObject>>>();
+        private Dictionary<T, List<Action<Object>>> callbacks = new Dictionary<T, List<Action<Object>>>();
 
         public SubscribableActor()
         {
@@ -30,7 +29,7 @@ namespace Utils
 
             foreach (T action in Enum.GetValues(typeof(T)))
             {
-                callbacks.Add(action, new List<Action<GameObject>>());
+                callbacks.Add(action, new List<Action<Object>>());
             }
         }
 
@@ -39,21 +38,29 @@ namespace Utils
             Subscriber<T, S>.get.onActorStart(this);
         }
 
-        public void register(T action, Action<GameObject> func)
+        public void register(T action, Action<Object> func)
         {
             callbacks[action].Add(func);
         }
 
-        public void unregister(T action, Action<GameObject> func)
+        public void unregister(T action, Action<Object> func)
         {
             callbacks[action].Remove(func);
         }
 
         protected void fire(T action)
         {
-            foreach (Action<GameObject> func in callbacks[action])
+            foreach (Action<Object> func in callbacks[action])
             {
                 func.Invoke(gameObject);
+            }
+        }
+
+        protected void fire(T action, Object obj)
+        {
+            foreach (Action<Object> func in callbacks[action])
+            {
+                func.Invoke(obj);
             }
         }
     }
@@ -70,13 +77,13 @@ namespace Utils
 
             foreach (T action in Enum.GetValues(typeof(T)))
             {
-                callbacks.Add(action, new List<Action<GameObject>>());
+                callbacks.Add(action, new List<Action<Object>>());
             }
         }
 
-        private Dictionary<T, List<Action<GameObject>>> callbacks = new Dictionary<T, List<Action<GameObject>>>();
+        private Dictionary<T, List<Action<Object>>> callbacks = new Dictionary<T, List<Action<Object>>>();
 
-        public void registerForAll(T action, Action<GameObject> func)
+        public void registerForAll(T action, Action<Object> func)
         {
             callbacks[action].Add(func);
 
@@ -90,9 +97,9 @@ namespace Utils
 
         public void onActorStart(SubscribableActor<T, S> actor)
         {
-            foreach (KeyValuePair<T, List < Action < GameObject >>> entry in callbacks)
+            foreach (KeyValuePair<T, List < Action < Object >>> entry in callbacks)
             {
-                foreach (Action<GameObject> action in entry.Value)
+                foreach (Action<Object> action in entry.Value)
                 {
                     actor.register(entry.Key, action);
                 }
