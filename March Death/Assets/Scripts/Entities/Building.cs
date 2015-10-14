@@ -63,20 +63,4 @@ public class Building : GameEntity<Building.Actions>
     void FixedUpdate()
     {
     }
-    
-    /// <summary>
-    /// When a wound is received, this is called
-    /// </summary>
-    protected override void onReceiveDamage()
-    {
-        fire(Actions.DAMAGED);
-    }
-
-    /// <summary>
-    /// When wounds reach its maximum, thus unit dies, this is called
-    /// </summary>
-    protected override void onFatalWounds()
-    {
-        fire(Actions.DESTROYED);
-    }
 }

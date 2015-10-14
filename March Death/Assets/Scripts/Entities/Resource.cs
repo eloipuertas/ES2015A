@@ -72,7 +72,7 @@ public class Resource : Building
     {
 
         // space enough to hold new collectingUnit
-        if (harvestUnits < _info.resourceAttributes.maxUnits)
+        if (harvestUnits < _info.buildingAttributes.maxUnits)
         {
             IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
 
@@ -104,7 +104,7 @@ public class Resource : Building
         // get entity
         IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
 
-        if (harvestUnits < _info.resourceAttributes.maxUnits)
+        if (harvestUnits < _info.buildingAttributes.maxUnits)
         {
             if (entity.info.isCivil)
             {
@@ -166,14 +166,14 @@ public class Resource : Building
 
     void produce()
     {
-        int remainingSpace = _info.resourceAttributes.storeSize - stored;
-        if (_info.resourceAttributes.productionRate > remainingSpace)
+        int remainingSpace = _info.buildingAttributes.storeSize - stored;
+        if (_info.buildingAttributes.productionRate > remainingSpace)
         {
-            stored = _info.resourceAttributes.storeSize;
+            stored = _info.buildingAttributes.storeSize;
         }
         else
         {
-            stored += _info.resourceAttributes.productionRate;
+            stored += _info.buildingAttributes.productionRate;
         }
         return;
     }
@@ -205,9 +205,6 @@ public class Resource : Building
     /// </summary>
     override public void Start()
     {
-        // Call actor start
-        base.Start();
-
         type = BuildingTypes.FARM;
         race = Races.MEN;
         nextUpdate = 0;
@@ -215,19 +212,11 @@ public class Resource : Building
         collectionRate = 0;
         harvestUnits = 0;
 
-<<<<<<< HEAD
-        this.status = EntityStatus.IDLE;
-
-        _info = Info.get.of(race, type);
-        _attributes = (Storage.BuildingAttributes)info.attributes;
-        setupAbilities();
-=======
         _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
 
         // Call GameEntity start
         base.Start();
->>>>>>> origin/devel_d-abilities_api
     }
 
 
@@ -238,7 +227,7 @@ public class Resource : Building
 
         if (Time.time > nextUpdate)
         {
-            nextUpdate = Time.time + _info.resourceAttributes.updateInterval;
+            nextUpdate = Time.time + _info.buildingAttributes.updateInterval;
             // when updated, collector units load materials from store.
             // after they finish loading materials production cycle succes.
             // new produced materials can be stored but not collected until

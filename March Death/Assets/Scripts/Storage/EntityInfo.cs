@@ -112,22 +112,5 @@ namespace Storage
                 return (BuildingAttributes)this.attributes;
             }
         }
-
-        /// <summary>
-        /// If this info describes a resource, returns the ResourceAttributes class, otherwise it returns null
-        /// It should always be used either by first checking isBuilding, or checking if returned value is not null
-        /// </summary>
-        public ResourceAttributes resourceAttributes
-        {
-            get
-            {
-                if (!isResource)
-                {
-                    return null;
-                }
-
-                return (ResourceAttributes)this.attributes;
-            }
-        }
     }
 }

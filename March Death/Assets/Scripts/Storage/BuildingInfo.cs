@@ -13,11 +13,7 @@ namespace Storage
     /// previously assigned gameobjects might get wrong types
     /// </remarks>
     /// </summary>
-<<<<<<< HEAD
-    public enum BuildingTypes { STRONGHOLD };
-=======
-    public enum BuildingTypes { FORTRESS, FARM, MINE, SAWMILL };
->>>>>>> origin/devel_d-resource_api
+    public enum BuildingTypes { STRONGHOLD, FARM, MINE, SAWMILL };
 
     public class BuildingInfo : EntityInfo
     {
