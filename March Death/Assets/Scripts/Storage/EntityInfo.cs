@@ -16,7 +16,7 @@ namespace Storage
 
         public EntityResources resources;
         public abstract EntityAttributes attributes { get; set; }
-        public abstract List<EntityAction> actions { get; set; }
+        public abstract List<EntityAbility> abilities { get; set; }
 
         /// <summary>
         /// Returns true if the entity is a unit, false otherwise

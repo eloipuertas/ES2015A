@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-
 namespace Storage
 {
-    class UnitAttributesDataConverter : JsonConverter
+
+    class ResourceAttributesDataConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
@@ -14,7 +14,7 @@ namespace Storage
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            return serializer.Deserialize<UnitAttributes>(reader);
+            return serializer.Deserialize<ResourceAttributes>(reader);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -22,8 +22,7 @@ namespace Storage
             serializer.Serialize(writer, value);
         }
     }
-
-    class UnitActionsDataConverter : JsonConverter
+    class ResourceActionsDataConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
@@ -32,7 +31,7 @@ namespace Storage
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            List<UnitAbility> list = serializer.Deserialize<List<UnitAbility>>(reader);
+            List<ResourceAbility> list = serializer.Deserialize<List<ResourceAbility>>(reader);
             return list.ConvertAll(x => (EntityAbility)x);
         }
 

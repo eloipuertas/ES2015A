@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Storage
 {
-    public class EntityAction
+    public class EntityAbility
     {
         public string name;
     }

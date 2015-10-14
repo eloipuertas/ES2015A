@@ -18,14 +18,14 @@ public class Resource : Building
     /// <summary>
     ///  Next update time
     /// </summary>
-    // 
+    //
     private float nextUpdate;
 
     /// <summary>
     // Resource could store limited amount of material when not in use
     // or when production is higher than collection
     /// </summary>
-    // 
+    //
     private int storeSize;
     /// <summary>
     /// amount of materials produced and not collected yet.
@@ -41,7 +41,7 @@ public class Resource : Building
     /// <summary>
     /// sum of capacity of units collecting this resource
     /// the more units the more maxCollectionRate.
-    /// real collectionRate could be lower due to 
+    /// real collectionRate could be lower due to
     /// store limit.
     /// </summary>
     public int collectionRate { get; set; }
@@ -61,6 +61,64 @@ public class Resource : Building
     /// material amount collected when update succes.
     /// </summary>
     private int collectedAmount;
+
+    /// <summary>
+    /// when collider interact with other gameobject method checks if
+    /// it is collecting unit and if unit has the rigth type for collecting
+    ///  resource.Then update number of collectors attached and production.
+    /// </summary>
+    /// <param name="other"></param>
+    void OnTriggerEnter(Collider other)
+    {
+
+        // space enough to hold new collectingUnit
+        if (harvestUnits < _info.resourceAttributes.maxUnits)
+        {
+            IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
+
+            // check collection unit and right type
+            if (entity.info.isCivil)
+            {
+                Unit unit = (Unit)entity;
+                UnitInfo info = (UnitInfo)entity.info;
+
+                //Increase units collecting resource, calculate max capacity.
+                if (match(info.type, type))
+                {
+                    harvestUnits++;
+                    collectionRate += info.attributes.capacity;
+                }
+            }
+        }
+
+
+    }
+    void OnTriggerStay(Collider other)
+    {
+        ;
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+
+        // get entity
+        IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
+
+        if (harvestUnits < _info.resourceAttributes.maxUnits)
+        {
+            if (entity.info.isCivil)
+            {
+                UnitInfo info = (UnitInfo)entity.info;
+
+                //Decrease units collecting resource, calculate max capacity.
+                if (match(info.type, type))
+                {
+                    harvestUnits--;
+                    collectionRate -= info.attributes.capacity;
+                }
+            }
+        }
+    }
 
     /// <summary>
     /// check if collecting unit type matchs rigth resource type
@@ -157,17 +215,26 @@ public class Resource : Building
         collectionRate = 0;
         harvestUnits = 0;
 
+<<<<<<< HEAD
         this.status = EntityStatus.IDLE;
 
         _info = Info.get.of(race, type);
         _attributes = (Storage.BuildingAttributes)info.attributes;
         setupAbilities();
+=======
+        _status = EntityStatus.IDLE;
+        _info = Info.get.of(race, type);
+
+        // Call GameEntity start
+        base.Start();
+>>>>>>> origin/devel_d-abilities_api
     }
 
 
     // Update is called once per frame
-    void Update()
+    public override void Update()
     {
+        base.Update();
 
         if (Time.time > nextUpdate)
         {

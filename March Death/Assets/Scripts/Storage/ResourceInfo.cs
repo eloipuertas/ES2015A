@@ -3,9 +3,8 @@ using Newtonsoft.Json;
 
 namespace Storage
 {
-
     /// <summary>
-    /// Valid Races and Types for Units.
+    /// Valid Races and Types for Resources.
     /// Might be expanded in a future
     ///
     /// <remarks>
@@ -13,21 +12,22 @@ namespace Storage
     /// previously assigned gameobjects might get wrong types
     /// </remarks>
     /// </summary>
-    public enum UnitTypes { FARMER, MINER, LUMBERJACK, HERO, LIGHT, HEAVY, THROWN, CAVALRY, MACHINE, SPECIAL };
+    public enum ResourceTypes { FARM, MINE, SAWMILL };
 
-    public class UnitInfo : EntityInfo
+    public class ResourceInfo : EntityInfo
     {
-        public UnitTypes type = 0;
+        public ResourceTypes type = 0;
 
-        [JsonConverter(typeof(UnitAttributesDataConverter))]
+        [JsonConverter(typeof(ResourceAttributesDataConverter))]
         public override EntityAttributes attributes { get; set; }
 
-        [JsonConverter(typeof(UnitActionsDataConverter))]
+        [JsonConverter(typeof(ResourceActionsDataConverter))]
         public override List<EntityAbility> abilities { get; set; }
 
-        public UnitInfo()
+        public ResourceInfo()
         {
             abilities = new List<EntityAbility>();
         }
+
     }
 }

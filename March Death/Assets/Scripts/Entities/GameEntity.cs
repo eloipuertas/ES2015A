@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Reflection;
+using System.Linq;
 using System.Collections.Generic;
 using Storage;
 using Utils;
+
+using UnityEngine;
+
 
 public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IConvertible
 {
@@ -13,7 +18,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
             return _info;
         }
     }
-    
+
     /// <summary>
     /// Returns the number of wounds received
     /// </summary>
@@ -60,12 +65,57 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         }
     }
 
-    protected List<IAction> _actions = new List<IAction>();
-    public IAction getAction(string name)
+    protected EntityAbility _accumulatedModifier;
+    public R accumulatedModifier<R>() where R : EntityAbility
     {
-        foreach (IAction ability in _actions)
+        return (R)_accumulatedModifier;
+    }
+
+    public void onAbilityToggled(GameObject gameObject)
+    {
+        if (info.isUnit)
         {
-            if (ability.info.name.Equals(name))
+            ((UnitAbility)_accumulatedModifier).weaponAbilityModifier =
+                activeAbilities().Select(ability => ability.info<UnitAbility>().weaponAbilityModifier).Sum();
+
+            ((UnitAbility)_accumulatedModifier).projectileAbilityModifier =
+                activeAbilities().Select(ability => ability.info<UnitAbility>().projectileAbilityModifier).Sum();
+
+            ((UnitAbility)_accumulatedModifier).resistanceModifier =
+                activeAbilities().Select(ability => ability.info<UnitAbility>().resistanceModifier).Sum();
+
+            ((UnitAbility)_accumulatedModifier).strengthModifier =
+                activeAbilities().Select(ability => ability.info<UnitAbility>().strengthModifier).Sum();
+
+            ((UnitAbility)_accumulatedModifier).woundsModifier =
+                activeAbilities().Select(ability => ability.info<UnitAbility>().woundsModifier).Sum();
+
+            ((UnitAbility)_accumulatedModifier).attackRateModifier =
+                activeAbilities().Select(ability => ability.info<UnitAbility>().attackRateModifier).Sum();
+
+            ((UnitAbility)_accumulatedModifier).movementRateModifier =
+                activeAbilities().Select(ability => ability.info<UnitAbility>().movementRateModifier).Sum();
+        }
+        else if (info.isBuilding)
+        {
+            ((BuildingAbility)_accumulatedModifier).resistanceModifier =
+                activeAbilities().Select(ability => ability.info<BuildingAbility>().resistanceModifier).Sum();
+
+            ((BuildingAbility)_accumulatedModifier).woundsModifier =
+                activeAbilities().Select(ability => ability.info<BuildingAbility>().woundsModifier).Sum();
+        }
+        else if (info.isResource)
+        {
+
+        }
+    }
+
+    protected List<Ability> _abilities = new List<Ability>();
+    public Ability getAbility(string name)
+    {
+        foreach (Ability ability in _abilities)
+        {
+            if (ability.info<EntityAbility>().name.Equals(name))
             {
                 return ability;
             }
@@ -74,15 +124,81 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         throw new ArgumentException("Invalid action " + name + "requested");
     }
 
-    protected abstract void setupActions();
+    public bool hasAbility(string name)
+    {
+        return _abilities.Where(ability => ability.info<EntityAbility>().name.Equals(name)).Count() > 0;
+    }
+
+    public List<Ability> activeAbilities()
+    {
+        return _abilities.Where(ability => ability.isActive).ToList();
+    }
+
+    /// <summary>
+    /// Iterates all abilities on the
+    /// </summary>
+    protected void setupAbilities()
+    {
+        if (info.isUnit)
+        {
+            _accumulatedModifier = new UnitAbility();
+        }
+        else if (info.isBuilding)
+        {
+            _accumulatedModifier = new BuildingAbility();
+        }
+        else
+        {
+            _accumulatedModifier = new ResourceAbility();
+        }
+
+        foreach (EntityAbility ability in info.abilities)
+        {
+            // Try to get class with this name
+            string abilityName = ability.name.Replace(" ", "");
+            Ability newAbility = null;
+
+            try
+            {
+                var constructor = Type.GetType(abilityName).
+                    GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(UnitAbility), typeof(GameObject) }, null);
+                if (constructor == null)
+                {
+                    // Invalid constructor, use GenericAbility
+                    newAbility = new GenericAbility(ability, gameObject);
+                }
+                else
+                {
+                    // Class found, use that!
+                    newAbility = (Ability)constructor.Invoke(new object[2] { ability, gameObject });
+                }
+            }
+            catch (Exception /*e*/)
+            {
+                // No such class, use the GenericAbility class
+                newAbility = new GenericAbility(ability, gameObject);
+            }
+
+            newAbility.register(Ability.Actions.ENABLED, onAbilityToggled);
+            newAbility.register(Ability.Actions.DISABLED, onAbilityToggled);
+
+            _abilities.Add(newAbility);
+        }
+    }
 
     public override void Start()
     {
         base.Start();
-        setupActions();
+        setupAbilities();
     }
 
-
+    public virtual void Update()
+    {
+        foreach (Ability ability in _abilities)
+        {
+            ability.Update();
+        }
+    }
 
     /// <summary>
     /// Returns true in case an attack will land on this unit
@@ -97,7 +213,10 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         if (isRanged)
         {
             // TODO: Specil units (ie gigants) and distance!
-            return dice > 1 && (from.info.unitAttributes.projectileAbility + dice >= 7);
+            int projectileAbility = from.info.unitAttributes.projectileAbility +
+                from.accumulatedModifier<UnitAbility>().projectileAbilityModifier;
+
+            return dice > 1 && (projectileAbility + dice >= 7);
         }
 
         // Buildings always get hit
@@ -106,7 +225,13 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
             return true;
         }
 
-        return HitTables.meleeHit[from.info.unitAttributes.weaponAbility, info.unitAttributes.weaponAbility] <= dice;
+        int attackerAbility = Math.Max(10, from.info.unitAttributes.weaponAbility +
+            from.accumulatedModifier<UnitAbility>().weaponAbilityModifier);
+
+        int defenderAbility = Math.Max(10, info.unitAttributes.weaponAbility +
+            accumulatedModifier<UnitAbility>().weaponAbilityModifier);
+
+        return HitTables.meleeHit[attackerAbility, defenderAbility] <= dice;
     }
 
     /// <summary>
@@ -122,8 +247,14 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
             return true;
         }
 
+        int attackerStrength = Math.Max(10, from.info.unitAttributes.strength +
+            from.accumulatedModifier<UnitAbility>().weaponAbilityModifier);
+
+        int defenderResistance = Math.Max(10, info.unitAttributes.resistance +
+            accumulatedModifier<UnitAbility>().resistanceModifier);
+
         int dice = Utils.D6.get.rollOnce();
-        return HitTables.wounds[from.info.unitAttributes.strength, info.unitAttributes.resistance] <= dice;
+        return HitTables.wounds[attackerStrength, defenderResistance] <= dice;
     }
 
     protected abstract void onReceiveDamage();
@@ -138,7 +269,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public void receiveAttack(Unit from, bool isRanged)
     {
         // Do not attack dead targets
-        if (_status == EntityStatus.DEAD)
+        if (_status == EntityStatus.DEAD || _status == EntityStatus.DESTROYED)
         {
             throw new InvalidOperationException("Can not receive damage while not alive");
         }
@@ -153,7 +284,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         // Check if we are dead
         if (_woundsReceived == info.unitAttributes.wounds)
         {
-            _status = EntityStatus.DEAD;
+            _status = info.isUnit ? EntityStatus.DEAD : EntityStatus.DESTROYED;
             onFatalWounds();
         }
     }
