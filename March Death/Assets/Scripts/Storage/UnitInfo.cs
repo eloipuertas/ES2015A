@@ -1,3 +1,4 @@
+using System;
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
@@ -24,6 +25,11 @@ namespace Storage
 
         [JsonConverter(typeof(UnitActionsDataConverter))]
         public override List<EntityAbility> abilities { get; set; }
+
+        public override T getType<T>()
+        {
+            return (T)Convert.ChangeType(type, typeof(T));
+        }
 
         public UnitInfo()
         {

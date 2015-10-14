@@ -18,6 +18,8 @@ namespace Storage
         public abstract EntityAttributes attributes { get; set; }
         public abstract List<EntityAbility> abilities { get; set; }
 
+        public abstract T getType<T>() where T : struct, IConvertible;
+
         /// <summary>
         /// Returns true if the entity is a unit, false otherwise
         /// </summary>

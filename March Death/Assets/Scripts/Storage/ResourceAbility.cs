@@ -7,13 +7,5 @@ namespace Storage
 {
     public sealed class ResourceAbility : BuildingAbility
     {
-        public int weaponAbilityModifier;
-        public int projectileAbilityModifier;
-        public int strengthModifier;
-        public int resistanceModifier;
-        public int woundsModifier;
-
-        public float attackRateModifier;
-        public float movementRateModifier;
     }
 }

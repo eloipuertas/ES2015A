@@ -10,6 +10,13 @@ using UnityEngine;
 
 public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IConvertible
 {
+    /// <summary>
+    /// Edit this on the Prefab to set Units of certain races/types
+    /// </summary>
+    public Races race = Races.MEN;
+    public Races getRace() { return race; }
+    public abstract E getType<E>() where E : struct, IConvertible;
+
     protected EntityInfo _info;
     public EntityInfo info
     {
@@ -289,6 +296,15 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         {
             _status = info.isUnit ? EntityStatus.DEAD : EntityStatus.DESTROYED;
             onFatalWounds();
+        }
+    }
+
+    public void doIfUnit(Action<Unit> callIfTrue)
+    {
+        Unit unit = this as Unit;
+        if (unit != null)
+        {
+            callIfTrue(unit);
         }
     }
 }

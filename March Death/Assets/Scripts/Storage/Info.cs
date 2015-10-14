@@ -1,3 +1,4 @@
+using System;
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
@@ -13,10 +14,10 @@ namespace Storage
     /// </summary>
     sealed class Info : Singleton<Info>
     {
-        private Dictionary<Tuple<Races, UnitTypes>, UnitInfo> unitStore = new Dictionary<Tuple<Races, UnitTypes>, UnitInfo>();
+        private Dictionary<Tuple<Races, UnitTypes>, EntityInfo> unitStore = new Dictionary<Tuple<Races, UnitTypes>, EntityInfo>();
         private Dictionary<Tuple<Races, UnitTypes>, string> unitPrefabs = new Dictionary<Tuple<Races, UnitTypes>, string>();
 
-        private Dictionary<Tuple<Races, BuildingTypes>, BuildingInfo> buildingStore = new Dictionary<Tuple<Races, BuildingTypes>, BuildingInfo>();
+        private Dictionary<Tuple<Races, BuildingTypes>, EntityInfo> buildingStore = new Dictionary<Tuple<Races, BuildingTypes>, EntityInfo>();
         private Dictionary<Tuple<Races, BuildingTypes>, string> buildingPrefabs = new Dictionary<Tuple<Races, BuildingTypes>, string>();
 
         /// <summary>
@@ -25,9 +26,9 @@ namespace Storage
         /// </summary>
         private Info()
         {
-            parseJSONFiles<UnitInfo, UnitTypes>("Data/Units", unitStore);
-            parseJSONFiles<ResourceInfo, BuildingTypes>("Data/Buildings/Resources", buildingsStore);
-            parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Barracks", buildingsStore);
+            parseJSONFiles<UnitInfo, UnitTypes>("Data/Units", unitStore, EntityType.UNIT);
+            parseJSONFiles<ResourceInfo, BuildingTypes>("Data/Buildings/Resources", buildingStore, EntityType.BUILDING);
+            parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Barracks", buildingStore, EntityType.BUILDING);
 
             parsePrefabs<Unit, UnitTypes>("Prefabs/Units", unitPrefabs);
             parsePrefabs<Resource, BuildingTypes>("Prefabs/Buildings/Resources", buildingPrefabs);
@@ -40,19 +41,22 @@ namespace Storage
         /// Thrown when a unit file is not valid or has already been added
         /// </exception>
         /// </summary>
-        private void parseJSONFiles<JSONType, EnumType>(String folder, Dictionary<Tuple<Races, EnumType>, UnitInfo> store) where JSONType : EntityInfo
+        private void parseJSONFiles<JSONType, EnumType>(string folder, Dictionary<Tuple<Races, EnumType>, EntityInfo> store, EntityType entityType) where JSONType : EntityInfo where EnumType : struct, IConvertible
         {
-            Object[] assets = Resources.LoadAll(folder, typeof(TextAsset));
-            foreach (Object jsonObj in assets)
+            Debug.Log("Parsing " + typeof(JSONType));
+
+            UnityEngine.Object[] assets = Resources.LoadAll(folder, typeof(TextAsset));
+            foreach (UnityEngine.Object jsonObj in assets)
             {
                 TextAsset json = jsonObj as TextAsset;
+                Debug.Log("\tParsing " + json.name);
 
                 try
                 {
-                    JSONType entityInfo = JsonConvert.DeserializeObject<JSONType>(json.text);
-                    entityInfo.entityType = EntityType.UNIT;
+                    EntityInfo entityInfo = JsonConvert.DeserializeObject<JSONType>(json.text);
+                    entityInfo.entityType = entityType;
 
-                    Tuple<Races, EnumType> key = new Tuple<Races, EnumType>(entityInfo.race, entityInfo.type);
+                    Tuple<Races, EnumType> key = new Tuple<Races, EnumType>(entityInfo.race, entityInfo.getType<EnumType>());
 
                     if (store.ContainsKey(key))
                     {
@@ -62,8 +66,8 @@ namespace Storage
                     store.Add(key, entityInfo);
                 }
                 catch (JsonException e)
+                    throw new System.IO.FileLoadException(typeof(JSONType) + " '" + json.name + "' is invalid\n\t" + e.Message);
                 {
-                    throw new System.IO.FileLoadException(JSONType + " '" + json.name + "' is invalid\n\t" + e.Message);
                 }
             }
         }
@@ -74,21 +78,21 @@ namespace Storage
         /// Thrown when two prefabs define the same Race and UnitType
         /// </exception>
         /// </summary>
-        private void parsePrefabs<ComponentType, EnumType>(String folder, Dictionary<Tuple<Races, EnumType>, string> store) where ComponentType : IGameEntity
+        private void parsePrefabs<ComponentType, EnumType>(string folder, Dictionary<Tuple<Races, EnumType>, string> store) where EnumType : struct, IConvertible where ComponentType : IGameEntity
         {
-            Object[] assets = Resources.LoadAll(folder, typeof(GameObject));
-            foreach (Object asset in assets)
+            UnityEngine.Object[] assets = Resources.LoadAll(folder, typeof(GameObject));
+            foreach (UnityEngine.Object asset in assets)
             {
                 GameObject gameObject = asset as GameObject;
                 ComponentType component = gameObject.GetComponent<ComponentType>();
 
                 if (component != null)
                 {
-                    Tuple<Races, EnumType> key = new Tuple<Races, EnumType>(component.race, component.type);
+                    Tuple<Races, EnumType> key = new Tuple<Races, EnumType>(component.getRace(), component.getType<EnumType>());
 
                     if (store.ContainsKey(key))
                     {
-                        throw new System.IO.FileLoadException("Duplicated unit prefab ('" + unit.race+ "', '" + unit.type + "')");
+                        throw new System.IO.FileLoadException("Duplicated unit prefab ('" + component.getRace() + "', '" + component.getType<EnumType>() + "')");
                     }
 
                     store.Add(key, folder + "/" + gameObject.name);
@@ -112,7 +116,7 @@ namespace Storage
                 throw new System.ArgumentException("Race (" + race + ") and Type (" + type + ") does not exist");
             }
 
-            return unitStore[key];
+            return (UnitInfo)unitStore[key];
         }
 
         /// <summary>
@@ -131,7 +135,7 @@ namespace Storage
                 throw new System.ArgumentException("Race (" + race + ") and Type (" + type + ") does not exist");
             }
 
-            return buildingStore[key];
+            return (BuildingInfo)buildingStore[key];
         }
 
         /// <sumary>

@@ -6,9 +6,7 @@ using Storage;
 
 public class Barrack : Building<Barrack.Actions>
 {
-	public enum Actions{DAMAGED, DESTROYED}
-    public BuildingTypes type = BuildingTypes.STRONGHOLD;
-
+	public enum Actions {DAMAGED, DESTROYED};
 
     /// <summary>
     /// Object initialization

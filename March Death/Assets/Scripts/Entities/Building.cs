@@ -16,8 +16,8 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     /// <summary>
     /// Edit this on the Prefab to set Units of certain races/types
     /// </summary>
-    public Races race = Races.MEN;
     public BuildingTypes type = BuildingTypes.STRONGHOLD;
+    public override E getType<E>() { return (E)Convert.ChangeType(type, typeof(E)); }
 
     /// <summary>
     /// When a wound is received, this is called

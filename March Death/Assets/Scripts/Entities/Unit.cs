@@ -12,14 +12,14 @@ using Storage;
 public class Unit : GameEntity<Unit.Actions>
 {
     public enum Actions { MOVEMENT_START, MOVEMENT_END, DAMAGED, DIED };
-    
+
     public Unit() { }
 
     /// <summary>
     /// Edit this on the Prefab to set Units of certain races/types
     /// </summary>
-    public Races race = Races.MEN;
     public UnitTypes type = UnitTypes.HERO;
+    public override E getType<E>() { return (E)Convert.ChangeType(type, typeof(E)); }
 
     /// <summary>
     /// If in battle, this is the target and last attack time
