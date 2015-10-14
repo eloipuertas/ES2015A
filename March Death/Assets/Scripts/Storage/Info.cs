@@ -134,7 +134,6 @@ namespace Storage
             return buildingStore[key];
         }
 
-
         /// <sumary>
         /// Given a race and unit it will return its prefab route
         /// </sumary>
@@ -157,8 +156,8 @@ namespace Storage
         /// <sumary>
         /// Given a race and type it will return its prefab route
         /// </sumary>
-        /// <param name="race">Race of the Unit</param>
-        /// <param name="type">Type of the Unit</param>
+        /// <param name="race">Race of the Building</param>
+        /// <param name="type">Type of the Building</param>
         /// <exception cref="System.ArgumentException">Thrown when a race/type combination is not found</exception>
         /// <returns>The prefab path</returns>
         private string getPrefab(Races race, BuildingTypes type)
@@ -170,7 +169,7 @@ namespace Storage
                 throw new System.ArgumentException("Resource prefab for ('" + race + "', '" + type + "') not found");
             }
 
-            return resourcePrefabs[key];
+            return buildingPrefabs[key];
         }
 
         /// <summary>
@@ -186,10 +185,10 @@ namespace Storage
         }
 
         /// <summary>
-        /// Creates a Resource of a given race and type from a prefab
+        /// Creates a Building of a given race and type from a prefab
         /// </summary>
-        /// <param name="race">Race of the Resource</param>
-        /// <param name="type">Type of the Resource</param>
+        /// <param name="race">Race of the Building</param>
+        /// <param name="type">Type of the Building</param>
         /// <returns>The created GameObject</returns>
         public GameObject createBuilding(Races race, BuildingTypes type)
         {
@@ -212,12 +211,12 @@ namespace Storage
         }
 
         /// <summary>
-        /// Creates a Resource of a given race and type from a prefab in a certain position and rotation
+        /// Creates a Building of a given race and type from a prefab in a certain position and rotation
         /// </summary>
-        /// <param name="race">Race of the Resource</param>
-        /// <param name="type">Type of the Resource</param>
-        /// <param name="position">Resource position</param>
-        /// <param name="rotation">Resource rotation</param>
+        /// <param name="race">Race of the Building</param>
+        /// <param name="type">Type of the Building</param>
+        /// <param name="position">Building position</param>
+        /// <param name="rotation">Building rotation</param>
         /// <returns>The created GameObject</returns>
         public GameObject createBuilding(Races race, BuildingTypes type, Vector3 position, Quaternion rotation)
         {

@@ -4,20 +4,11 @@ using UnityEngine;
 using Storage;
 
 
-
-public class Resource : GameEntity<Resource.Actions>
+public class Resource : Building
 {
-    public enum Actions { DAMAGED, DESTROYED };
-
+    public new enum Actions { DAMAGED, DESTROYED, COLLECTION_START, COLLECTION_STOP, CREATE_UNIT };
     // Constructor
     public Resource() { }
-
-    /// <summary>
-    /// Edit this on the Prefab to set Resources of certain races/types
-    /// </summary>
-    public Races race = Races.MEN;
-    public ResourceTypes type = ResourceTypes.FARM;
-
 
     /// <summary>
     /// Time elapsed to next update
@@ -55,14 +46,11 @@ public class Resource : GameEntity<Resource.Actions>
     /// </summary>
     public int collectionRate { get; set; }
 
-
     /// <summary>
     ///  units collecting this resource
     /// </summary>
     public int harvestUnits;
     //public int harvestUnits { get; set; }
-
-
 
     /// <summary>
     /// max harvesting units allowed
@@ -75,22 +63,6 @@ public class Resource : GameEntity<Resource.Actions>
     private int collectedAmount;
 
     /// <summary>
-    /// When a wound is received, this is called
-    /// </summary>
-    protected override void onReceiveDamage()
-    {
-        fire(Actions.DAMAGED);
-    }
-
-    /// <summary>
-    /// When wounds reach its maximum, thus unit dies, this is called
-    /// </summary>
-    protected override void onFatalWounds()
-    {
-        fire(Actions.DESTROYED);
-    }
-
-    /// <summary>
     /// when collider interact with other gameobject method checks if
     /// it is collecting unit and if unit has the rigth type for collecting
     ///  resource.Then update number of collectors attached and production.
@@ -100,7 +72,7 @@ public class Resource : GameEntity<Resource.Actions>
     {
 
         // space enough to hold new collectingUnit
-        if (harvestUnits < _info.resourceAttributes.maxUnits)
+        if (harvestUnits < _info.buildingAttributes.maxUnits)
         {
             IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
 
@@ -132,7 +104,7 @@ public class Resource : GameEntity<Resource.Actions>
         // get entity
         IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
 
-        if (harvestUnits < _info.resourceAttributes.maxUnits)
+        if (harvestUnits < _info.buildingAttributes.maxUnits)
         {
             if (entity.info.isCivil)
             {
@@ -157,23 +129,23 @@ public class Resource : GameEntity<Resource.Actions>
     /// true if resource and unit type match,
     /// false otherwise
     /// </returns>
-    bool match(UnitTypes unitType, ResourceTypes type)
+    bool match(UnitTypes unitType, BuildingTypes type)
     {
-        if (type.Equals(ResourceTypes.FARM))
+        if (type.Equals(BuildingTypes.FARM))
         {
             return unitType.Equals(UnitTypes.FARMER);
         }
-        if (type.Equals(ResourceTypes.MINE))
+        if (type.Equals(BuildingTypes.MINE))
         {
             return unitType.Equals(UnitTypes.MINER);
         }
-        if (type.Equals(ResourceTypes.SAWMILL))
+        if (type.Equals(BuildingTypes.SAWMILL))
         {
             return unitType.Equals(UnitTypes.LUMBERJACK);
         }
         return false;
-
     }
+
     void collect()
     {
         if (collectionRate > stored)
@@ -194,31 +166,31 @@ public class Resource : GameEntity<Resource.Actions>
 
     void produce()
     {
-        int remainingSpace = _info.resourceAttributes.storeSize - stored;
-        if (_info.resourceAttributes.productionRate > remainingSpace)
+        int remainingSpace = _info.buildingAttributes.storeSize - stored;
+        if (_info.buildingAttributes.productionRate > remainingSpace)
         {
-            stored = _info.resourceAttributes.storeSize;
+            stored = _info.buildingAttributes.storeSize;
         }
         else
         {
-            stored += _info.resourceAttributes.productionRate;
+            stored += _info.buildingAttributes.productionRate;
         }
         return;
     }
 
     void addResource(int amount)
     {
-        if (type.Equals(ResourceTypes.FARM))
+        if (type.Equals(BuildingTypes.FARM))
         {
             //TODO
             //add amount to player food
         }
-        if (type.Equals(ResourceTypes.MINE))
+        if (type.Equals(BuildingTypes.MINE))
         {
             //TODO
             //add amount to player metal
         }
-        if (type.Equals(ResourceTypes.SAWMILL))
+        if (type.Equals(BuildingTypes.SAWMILL))
         {
             //TODO
             //add amount to player wood
@@ -233,7 +205,7 @@ public class Resource : GameEntity<Resource.Actions>
     /// </summary>
     override public void Start()
     {
-        type = ResourceTypes.FARM;
+        type = BuildingTypes.FARM;
         race = Races.MEN;
         nextUpdate = 0;
         stored = 0;
@@ -255,7 +227,7 @@ public class Resource : GameEntity<Resource.Actions>
 
         if (Time.time > nextUpdate)
         {
-            nextUpdate = Time.time + _info.resourceAttributes.updateInterval;
+            nextUpdate = Time.time + _info.buildingAttributes.updateInterval;
             // when updated, collector units load materials from store.
             // after they finish loading materials production cycle succes.
             // new produced materials can be stored but not collected until

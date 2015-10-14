@@ -19,12 +19,7 @@ public class Building : GameEntity<Building.Actions>
     /// Edit this on the Prefab to set Units of certain races/types
     /// </summary>
     public Races race = Races.MEN;
-    public BuildingTypes type = BuildingTypes.FORTRESS;
-
-    /// <summary>
-    /// Resource building might need this to acount how many workers can pull resources from it.
-    /// </summary>
-    public int usedCapacity { get; set; }
+    public BuildingTypes type = BuildingTypes.STRONGHOLD;
 
     /// <summary>
     /// When a wound is received, this is called
