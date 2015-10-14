@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
 using System;
 
 public class ConstructionGrid : MonoBehaviour {
@@ -7,30 +8,50 @@ public class ConstructionGrid : MonoBehaviour {
     private Vector2 dimensions;
     private ArrayList reservedPositions;
     private GameObject flatnessChecker;
+    private const float DIFERENCE_OF_HEIGHTS_TOLERANCE = 0.4f;
 
-	void Start () {
+    void Start () {
         dimensions = new Vector2(5f, 5f);
         reservedPositions = new ArrayList();
         Debug.Log(discretizeMapCoords(new Vector3(-11.2f, 10f,12f)).ToString());
-        flatnessChecker = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        flatnessChecker = GameObject.CreatePrimitive(PrimitiveType.Cube);
         flatnessChecker.transform.position = Camera.main.transform.position;
         flatnessChecker.name = "FlatnessChecker";
-        flatnessChecker.transform.localScale.Set(dimensions.x, 1, dimensions.y);
+        flatnessChecker.transform.localScale = new Vector3(dimensions.x, 1, dimensions.y);
     }
 
     void Update()
     {
-        
+
         if (Input.GetMouseButtonDown(1))
         {
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Vector3 newBuildingPosition;
+
             if (Physics.Raycast(ray, out hit, Mathf.Infinity))
             {
-                Vector3 flatnescheckerPosition = hit.point;
-                flatnescheckerPosition.y += 0.01f;
-                flatnessChecker.transform.position = this.discretizeMapCoords(flatnescheckerPosition);
+                newBuildingPosition = hit.point;
+                newBuildingPosition.y += 0.01f;
+                newBuildingPosition = this.discretizeMapCoords(newBuildingPosition);
+
+
+                if (isNewPositionAbleForConstrucction(newBuildingPosition))
+                {
+                    reservePosition(newBuildingPosition);
+                    flatnessChecker.transform.position = newBuildingPosition;
+                    Debug.Log(newBuildingPosition);
+                    Debug.Log(reservedPositions.Count);
+                }
+                else
+                {
+                    Debug.Log("We are not able to construct here");
+                }
             }
+
+
+
+
         }
         
     }
@@ -69,22 +90,10 @@ public class ConstructionGrid : MonoBehaviour {
     /// <param name="discretizedPosition"></param>
     public void reservePosition(Vector3 buildingDiscretizedPosition)
     {
-        if (isNewPositionAbleForConstrucction(buildingDiscretizedPosition))
+        if (!reservedPositions.Contains(buildingDiscretizedPosition))
         {
             reservedPositions.Add(buildingDiscretizedPosition);
-
-            Debug.Log("---------------------------------------------------------------------------\nPosition reserved: ");
-
-            for (int i = 0; i < reservedPositions.Count; i++)
-            {
-                Debug.Log(reservedPositions[i].ToString());
-            }
         }
-        else
-        {
-            Debug.Log("This position couldn't be reserved");
-        }
-        
     }
 
     /// <summary>
@@ -93,7 +102,7 @@ public class ConstructionGrid : MonoBehaviour {
     /// <param name="discretizedPosition"></param>
     public void liberatePosition(Vector3 discretizedPosition)
     {
-        reservedPositions.Remove(discretizedPosition);
+        reservedPositions.Remove(new Vector2(discretizedPosition.x, discretizedPosition.z));
 
         Debug.Log("---------------------------------------------------------------------------\nPosition erased: ");
 
@@ -103,6 +112,14 @@ public class ConstructionGrid : MonoBehaviour {
         }
     }
 
+    private float getPointHeight(Vector3 point)
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(point, Vector3.down, out hit)) return hit.point.y; 
+        if (Physics.Raycast(point, Vector3.up, out hit)) return hit.point.y;
+        return float.NegativeInfinity;
+    }
+
     /// <summary>
     /// Detects if a position is flat enougth to construct in passed row
     /// </summary>
@@ -110,7 +127,30 @@ public class ConstructionGrid : MonoBehaviour {
     /// <returns></returns>
     private bool isFlatEnoughtForConstruction(Vector3 discretizedPosition)
     {
-        return true;
+        float centerHeight = discretizedPosition.y;
+        float topLeftHeight = getPointHeight(new Vector3(discretizedPosition.x - dimensions.x / 2, discretizedPosition.y, discretizedPosition.z - dimensions.y / 2));
+        float topRightHeight = getPointHeight(new Vector3(discretizedPosition.x - dimensions.x / 2, discretizedPosition.y, discretizedPosition.z + dimensions.y / 2));
+        float BottomLeftHeight = getPointHeight(new Vector3(discretizedPosition.x + dimensions.x / 2, discretizedPosition.y, discretizedPosition.z - dimensions.y / 2));
+        float BottomRightHeight = getPointHeight(new Vector3(discretizedPosition.x + dimensions.x / 2, discretizedPosition.y, discretizedPosition.z + dimensions.y / 2));
+
+        var heights = new float[]{ centerHeight, topLeftHeight, topRightHeight, BottomLeftHeight, BottomRightHeight };
+        float max_height = heights.Max();
+        float min_height = heights.Min();
+
+        float difference = max_height - min_height;
+
+        /*
+        Debug.Log("Center Height: " + centerHeight);
+        Debug.Log("Top Left Height: " + topLeftHeight);
+        Debug.Log("Top Right Height: " + topRightHeight);
+        Debug.Log("Bottom Left Height: " + BottomLeftHeight);
+        Debug.Log("Bottom Right Height: " + BottomRightHeight);
+        Debug.Log("Max value = " + max_height);
+        Debug.Log("Min value = " + min_height);
+        Debug.Log("DIfference = " + difference);
+        */
+        
+        return difference < DIFERENCE_OF_HEIGHTS_TOLERANCE;
     }
 
     /// <summary>
@@ -121,8 +161,9 @@ public class ConstructionGrid : MonoBehaviour {
     private bool isNewPositionAbleForConstrucction(Vector3 discretizedPosition)
     {
         //If this position is contained on the array return false
-        if (reservedPositions.Contains(discretizedPosition))
+        if (reservedPositions.Contains(new Vector2(discretizedPosition.x, discretizedPosition.z)))
         {
+            Debug.Log("This position is already reserved");
             return false;
         }
 
