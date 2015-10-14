@@ -103,7 +103,7 @@ public class ConstructionGrid : MonoBehaviour {
     /// </summary>
     /// <param name="discretizedPosition"></param>
     /// <returns></returns>
-    private bool isNewPositionAbleForConstrucction(Vector3 discretizedPosition)
+    public bool isNewPositionAbleForConstrucction(Vector3 discretizedPosition)
     {
         //If this position is contained on the array return false
         if (reservedPositions.Contains(new Vector2(discretizedPosition.x, discretizedPosition.z)))
