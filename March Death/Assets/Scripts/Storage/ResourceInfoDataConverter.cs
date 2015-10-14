@@ -9,7 +9,7 @@ namespace Storage
     {
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(UnitInfo);
+            return objectType == typeof(ResourceInfo);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -26,7 +26,7 @@ namespace Storage
     {
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(UnitInfo);
+            return objectType == typeof(ResourceInfo);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

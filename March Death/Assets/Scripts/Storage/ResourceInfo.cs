@@ -12,12 +12,9 @@ namespace Storage
     /// previously assigned gameobjects might get wrong types
     /// </remarks>
     /// </summary>
-    public enum ResourceTypes { FARM, MINE, SAWMILL };
 
-    public class ResourceInfo : EntityInfo
+    public class ResourceInfo : BuildingInfo
     {
-        public ResourceTypes type = 0;
-
         [JsonConverter(typeof(ResourceAttributesDataConverter))]
         public override EntityAttributes attributes { get; set; }
 

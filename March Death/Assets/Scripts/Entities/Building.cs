@@ -9,10 +9,8 @@ using Storage;
 /// Building base class. Extends actor (which in turn extends MonoBehaviour) to
 /// handle basic API operations
 /// </summary>
-public class Building : GameEntity<Building.Actions>
+public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 {
-    public enum Actions { DAMAGED, DESTROYED };
-
     public Building() { }
 
     /// <summary>
@@ -26,7 +24,7 @@ public class Building : GameEntity<Building.Actions>
     /// </summary>
     protected override void onReceiveDamage()
     {
-        fire(Actions.DAMAGED);
+        fire((T) Enum.Parse(typeof(T), "DAMAGED", true));
     }
 
     /// <summary>
@@ -34,7 +32,7 @@ public class Building : GameEntity<Building.Actions>
     /// </summary>
     protected override void onFatalWounds()
     {
-        fire(Actions.DESTROYED);
+        fire((T) Enum.Parse(typeof(T), "DESTROYED", true));
     }
 
     /// <summary>
@@ -42,9 +40,6 @@ public class Building : GameEntity<Building.Actions>
     /// </summary>
     public override void Start()
     {
-        _status = EntityStatus.IDLE;
-        _info = Info.get.of(race, type);
-
         // Call GameEntity start
         base.Start();
     }

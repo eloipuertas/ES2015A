@@ -12,7 +12,4 @@ public interface IGameEntity
     float healthPercentage { get; }
 
     Ability getAbility(string name);
-
-    Unit toUnit();
-    Building toBuilding();
 }

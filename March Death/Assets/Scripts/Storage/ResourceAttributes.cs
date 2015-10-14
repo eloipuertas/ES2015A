@@ -6,16 +6,8 @@ using System.Text;
 namespace Storage
 {
 
-
-    public sealed class ResourceAttributes : EntityAttributes
+    public sealed class ResourceAttributes : BuildingAttributes
     {
-        public int weaponAbility;
-        public int projectileAbility;
-        public int strength;
-
-        public float attackRate;
-        public float movementRate;
-
         public int storeSize;
         public int maxUnits;
         public int productionRate;

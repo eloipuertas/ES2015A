@@ -4,7 +4,7 @@ using UnityEngine;
 using Storage;
 
 
-public class Resource : Building
+public class Resource : Building<Resource.Actions>
 {
     public new enum Actions { DAMAGED, DESTROYED, COLLECTION_START, COLLECTION_STOP, CREATE_UNIT };
     // Constructor
@@ -72,7 +72,7 @@ public class Resource : Building
     {
 
         // space enough to hold new collectingUnit
-        if (harvestUnits < _info.buildingAttributes.maxUnits)
+        if (harvestUnits < _info.resourceAttributes.maxUnits)
         {
             IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
 
@@ -104,7 +104,7 @@ public class Resource : Building
         // get entity
         IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
 
-        if (harvestUnits < _info.buildingAttributes.maxUnits)
+        if (harvestUnits < _info.resourceAttributes.maxUnits)
         {
             if (entity.info.isCivil)
             {
@@ -166,14 +166,14 @@ public class Resource : Building
 
     void produce()
     {
-        int remainingSpace = _info.buildingAttributes.storeSize - stored;
-        if (_info.buildingAttributes.productionRate > remainingSpace)
+        int remainingSpace = _info.resourceAttributes.storeSize - stored;
+        if (_info.resourceAttributes.productionRate > remainingSpace)
         {
-            stored = _info.buildingAttributes.storeSize;
+            stored = _info.resourceAttributes.storeSize;
         }
         else
         {
-            stored += _info.buildingAttributes.productionRate;
+            stored += _info.resourceAttributes.productionRate;
         }
         return;
     }
@@ -227,7 +227,7 @@ public class Resource : Building
 
         if (Time.time > nextUpdate)
         {
-            nextUpdate = Time.time + _info.buildingAttributes.updateInterval;
+            nextUpdate = Time.time + _info.resourceAttributes.updateInterval;
             // when updated, collector units load materials from store.
             // after they finish loading materials production cycle succes.
             // new produced materials can be stored but not collected until

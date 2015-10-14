@@ -75,7 +75,18 @@ namespace Storage
         {
             get
             {
-                return entityType == EntityType.RESOURCE;
+                return isBuilding && ((((BuildingInfo) this).type == BuildingTypes.FARM) || (((BuildingInfo) this).type == BuildingTypes.SAWMILL) || (((BuildingInfo) this).type == BuildingTypes.MINE));
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the entity is a resource, false otherwise
+        /// </summary>
+        public bool isBarrack
+        {
+            get
+            {
+                return isBuilding && !isResource;
             }
         }
 
@@ -97,6 +108,23 @@ namespace Storage
         }
 
         /// <summary>
+        /// If this info describes a resource, returns the ResourceAttributes class, otherwise it returns null
+        /// It should always be used either by first checking isResource, or checking if returned value is not null
+        /// </summary>
+        public ResourceAttributes resourceAttributes
+        {
+            get
+            {
+                if (!isResource)
+                {
+                    return null;
+                }
+
+                return (ResourceAttributes)this.attributes;
+            }
+        }
+
+        /// <summary>
         /// If this info describes a building, returns the BuildingAttributes class, otherwise it returns null
         /// It should always be used either by first checking isBuilding, or checking if returned value is not null
         /// </summary>
@@ -110,6 +138,24 @@ namespace Storage
                 }
 
                 return (BuildingAttributes)this.attributes;
+            }
+        }
+
+
+        /// <summary>
+        /// If this info describes a barrack, returns the BarrackAttributes class, otherwise it returns null
+        /// It should always be used either by first checking isBarrack, or checking if returned value is not null
+        /// </summary>
+        public BarrackAttributes barrackAttributes
+        {
+            get
+            {
+                if (!isBarrack)
+                {
+                    return null;
+                }
+
+                return (BarrackAttributes)this.attributes;
             }
         }
     }

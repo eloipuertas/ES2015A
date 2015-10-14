@@ -288,19 +288,4 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
             onFatalWounds();
         }
     }
-
-    public Building toBuilding()
-    {
-        return this as Building;
-    }
-
-    public Resource toResource()
-    {
-        return this as Resource;
-    }
-
-    public Unit toUnit()
-    {
-        return this as Unit;
-    }
 }
