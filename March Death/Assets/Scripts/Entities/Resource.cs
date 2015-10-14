@@ -131,19 +131,7 @@ public class Resource : Building<Resource.Actions>
     /// </returns>
     bool match(UnitTypes unitType, BuildingTypes type)
     {
-        if (type.Equals(BuildingTypes.FARM))
-        {
-            return unitType.Equals(UnitTypes.FARMER);
-        }
-        if (type.Equals(BuildingTypes.MINE))
-        {
-            return unitType.Equals(UnitTypes.MINER);
-        }
-        if (type.Equals(BuildingTypes.SAWMILL))
-        {
-            return unitType.Equals(UnitTypes.LUMBERJACK);
-        }
-        return false;
+        return unitType == UnitTypes.CIVIL;
     }
 
     void collect()

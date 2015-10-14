@@ -38,13 +38,7 @@ namespace Storage
         {
             get
             {
-                if (!isUnit)
-                {
-                    return false;
-                }
-
-                UnitInfo info = (UnitInfo)this;
-                return info.type == UnitTypes.FARMER || info.type == UnitTypes.MINER || info.type == UnitTypes.LUMBERJACK;
+                return isUnit && ((UnitInfo)this).type == UnitTypes.CIVIL;
             }
         }
 

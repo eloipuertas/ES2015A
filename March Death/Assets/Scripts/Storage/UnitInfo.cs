@@ -14,8 +14,7 @@ namespace Storage
     /// previously assigned gameobjects might get wrong types
     /// </remarks>
     /// </summary>
-    public enum UnitTypes { FARMER, MINER, LUMBERJACK, HERO, LIGHT, HEAVY, THROWN, CAVALRY, MACHINE, SPECIAL };
-    public enum PrefabUnitTypes { CIVIL_1, CIVIL_2, HERO, LIGHT, HEAVY, THROWN, CAVALRY, MACHINE, SPECIAL };
+    public enum UnitTypes { CIVIL, HERO, LIGHT, HEAVY, THROWN, CAVALRY, MACHINE, SPECIAL };
 
     public class UnitInfo : EntityInfo
     {
