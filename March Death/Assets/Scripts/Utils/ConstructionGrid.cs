@@ -40,18 +40,12 @@ public class ConstructionGrid : MonoBehaviour {
                 {
                     reservePosition(newBuildingPosition);
                     flatnessChecker.transform.position = newBuildingPosition;
-                    Debug.Log(newBuildingPosition);
-                    Debug.Log(reservedPositions.Count);
                 }
                 else
                 {
                     Debug.Log("We are not able to construct here");
                 }
             }
-
-
-
-
         }
         
     }
@@ -65,7 +59,7 @@ public class ConstructionGrid : MonoBehaviour {
     {
         Vector3 discretizedCoords = new Vector3();
         discretizedCoords.x = (float) Math.Floor(position.x / dimensions.x) * dimensions.x + dimensions.x / 2;
-        discretizedCoords.z = (float)Math.Floor(position.z / dimensions.y) * dimensions.y + dimensions.y / 2;
+        discretizedCoords.z = (float) Math.Floor(position.z / dimensions.y) * dimensions.y + dimensions.y / 2;
         discretizedCoords.y = position.y;
         return discretizedCoords;
     }
@@ -90,9 +84,10 @@ public class ConstructionGrid : MonoBehaviour {
     /// <param name="discretizedPosition"></param>
     public void reservePosition(Vector3 buildingDiscretizedPosition)
     {
-        if (!reservedPositions.Contains(buildingDiscretizedPosition))
+        Vector2 PositionToVector2 = new Vector2(buildingDiscretizedPosition.x, buildingDiscretizedPosition.z);
+        if (!reservedPositions.Contains(PositionToVector2))
         {
-            reservedPositions.Add(buildingDiscretizedPosition);
+            reservedPositions.Add(PositionToVector2);
         }
     }
 
@@ -103,13 +98,6 @@ public class ConstructionGrid : MonoBehaviour {
     public void liberatePosition(Vector3 discretizedPosition)
     {
         reservedPositions.Remove(new Vector2(discretizedPosition.x, discretizedPosition.z));
-
-        Debug.Log("---------------------------------------------------------------------------\nPosition erased: ");
-
-        for (int i = 0; i < reservedPositions.Count; i++)
-        {
-            Debug.Log(reservedPositions[i].ToString());
-        }
     }
 
     private float getPointHeight(Vector3 point)
@@ -136,19 +124,7 @@ public class ConstructionGrid : MonoBehaviour {
         var heights = new float[]{ centerHeight, topLeftHeight, topRightHeight, BottomLeftHeight, BottomRightHeight };
         float max_height = heights.Max();
         float min_height = heights.Min();
-
         float difference = max_height - min_height;
-
-        /*
-        Debug.Log("Center Height: " + centerHeight);
-        Debug.Log("Top Left Height: " + topLeftHeight);
-        Debug.Log("Top Right Height: " + topRightHeight);
-        Debug.Log("Bottom Left Height: " + BottomLeftHeight);
-        Debug.Log("Bottom Right Height: " + BottomRightHeight);
-        Debug.Log("Max value = " + max_height);
-        Debug.Log("Min value = " + min_height);
-        Debug.Log("DIfference = " + difference);
-        */
         
         return difference < DIFERENCE_OF_HEIGHTS_TOLERANCE;
     }
