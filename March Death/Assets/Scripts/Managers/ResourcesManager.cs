@@ -1,52 +1,80 @@
-
+using WorldResources;
 using System.Collections.Generic;
 
-public class ResourcesManager : IResourcesManager
+
+namespace Managers
 {
 
-
-	private Dictionary<WorldResources.Type, PlayerResource> _resources; 
-
-	public ResourcesManager ()
-	{
-		_resources = new Dictionary<WorldResources.Type, PlayerResource> ();
-
-	}
-
-	/// <summary>
-	/// Inits the specified resource and ads it to the collection
-	/// </summary>
-	/// <param name="type">Type.</param>
-	/// <param name="initAmount">Init amount.</param>
-	public void initResource(WorldResources.Type type, int initAmount = 0 )
-	{
-		if( !_resources.ContainsKey(type) )
-		   {
-			PlayerResource newResource = new PlayerResource(type, initAmount);
-			_resources.Add (type, newResource);
-		}
-		else
-		{
-			_resources[type] = new PlayerResource(type, initAmount);
-		}
+    public class ResourcesManager : IResourcesManager
+    {
 
 
-	}
+        private Dictionary<Type, Deposit> _deposits;
 
-	public void restartResources(){
+        public ResourcesManager()
+        {
+            _deposits = new Dictionary<Type, Deposit>();
 
-		foreach(var item in _resources.Values)
-		{
-			item.restartResource();
-		}
+        }
 
-	}
 
-	public IPlayerResource getResource(WorldResources.Type type)
-	{
-		return _resources.ContainsKey(type) ? (IPlayerResource) _resources[type] : null;
-	}
+        public void InitDeposit(WorldResources.Resource resource, int capacity = 0)
+        {
+            WorldResources.Type type = resource.GetResourceType();
+            if (!_deposits.ContainsKey(type))
+            {
+                Deposit diposit = new Deposit(resource, capacity);
+                _deposits.Add(type, diposit);
+            }
+            else
+            {
+                _deposits[type].AddAmount(capacity);
+            }
+        }
 
+        public void EmptyDeposits()
+        {
+            foreach (var deposit in _deposits.Values)
+            {
+                deposit.Empty();
+            }
+        }
+
+        public bool IsEnough(Resource other)
+        {
+            //TODO
+            return true;
+        }
+
+        public bool IsEnough(Type type, int amount)
+        {
+            //TODO
+            return true;
+        }
+
+
+
+        public int SubstractAmount(Resource other)
+        {
+            //TODO
+            return 1;
+        }
+
+        public int SubstractAmount(Type type, int amount)
+        {
+            //TODO
+            return 1;
+        }
+
+        public void AddAmount(Resource other)
+        {
+            //TODO
+        }
+        public void AddAmount(Type type, int amount)
+        {
+            //TODO
+        }
+
+    }
 
 }
-

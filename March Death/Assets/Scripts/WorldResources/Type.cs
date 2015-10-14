@@ -1,8 +1,7 @@
-namespace WorldResources
+﻿namespace WorldResources
 {
-	public enum Type
-	{
-		WOOD, FOOD, METAL
-	}
+    public enum Type
+    {
+        WOOD, FOOD, METAL, GOLD
+    }
 }
-
