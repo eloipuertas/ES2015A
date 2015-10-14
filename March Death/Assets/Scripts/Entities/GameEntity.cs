@@ -71,38 +71,41 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         return (R)_accumulatedModifier;
     }
 
-    public void onAbilityToggled(GameObject gameObject)
+    public void onAbilityToggled(System.Object obj)
     {
+        Ability ability = (Ability)obj;
+        int addOrSubs = ability.isActive ? 1 : -1;
+
         if (info.isUnit)
         {
             ((UnitAbility)_accumulatedModifier).weaponAbilityModifier =
-                activeAbilities().Select(ability => ability.info<UnitAbility>().weaponAbilityModifier).Sum();
+                 addOrSubs * ability.info<UnitAbility>().weaponAbilityModifier;
 
             ((UnitAbility)_accumulatedModifier).projectileAbilityModifier =
-                activeAbilities().Select(ability => ability.info<UnitAbility>().projectileAbilityModifier).Sum();
+                 addOrSubs * ability.info<UnitAbility>().projectileAbilityModifier;
 
-            ((UnitAbility)_accumulatedModifier).resistanceModifier =
-                activeAbilities().Select(ability => ability.info<UnitAbility>().resistanceModifier).Sum();
+            ((UnitAbility)_accumulatedModifier).resistanceModifier = addOrSubs *
+                addOrSubs * ability.info<UnitAbility>().resistanceModifier;
 
-            ((UnitAbility)_accumulatedModifier).strengthModifier =
-                activeAbilities().Select(ability => ability.info<UnitAbility>().strengthModifier).Sum();
+            ((UnitAbility)_accumulatedModifier).strengthModifier = addOrSubs *
+                addOrSubs * ability.info<UnitAbility>().strengthModifier;
 
             ((UnitAbility)_accumulatedModifier).woundsModifier =
-                activeAbilities().Select(ability => ability.info<UnitAbility>().woundsModifier).Sum();
+                addOrSubs * ability.info<UnitAbility>().woundsModifier;
 
             ((UnitAbility)_accumulatedModifier).attackRateModifier =
-                activeAbilities().Select(ability => ability.info<UnitAbility>().attackRateModifier).Sum();
+                addOrSubs * ability.info<UnitAbility>().attackRateModifier;
 
             ((UnitAbility)_accumulatedModifier).movementRateModifier =
-                activeAbilities().Select(ability => ability.info<UnitAbility>().movementRateModifier).Sum();
+                addOrSubs * ability.info<UnitAbility>().movementRateModifier;
         }
         else if (info.isBuilding)
         {
             ((BuildingAbility)_accumulatedModifier).resistanceModifier =
-                activeAbilities().Select(ability => ability.info<BuildingAbility>().resistanceModifier).Sum();
+                addOrSubs * ability.info<BuildingAbility>().resistanceModifier;
 
             ((BuildingAbility)_accumulatedModifier).woundsModifier =
-                activeAbilities().Select(ability => ability.info<BuildingAbility>().woundsModifier).Sum();
+                addOrSubs * ability.info<BuildingAbility>().woundsModifier;
         }
         else if (info.isResource)
         {

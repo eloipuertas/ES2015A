@@ -19,83 +19,51 @@ namespace Storage
         private Dictionary<Tuple<Races, BuildingTypes>, BuildingInfo> buildingStore = new Dictionary<Tuple<Races, BuildingTypes>, BuildingInfo>();
         private Dictionary<Tuple<Races, BuildingTypes>, string> buildingPrefabs = new Dictionary<Tuple<Races, BuildingTypes>, string>();
 
-
-
         /// <summary>
         /// Private constructor, singleton access only
         /// <remarks>Use Info.get instead</remarks>
         /// </summary>
         private Info()
         {
-            parseUnitFiles();
-            parseBuildingFiles();
-            parseBuildingPrefabs();
-            parsePrefabs();
+            parseJSONFiles<UnitInfo, UnitTypes>("Data/Units", unitStore);
+            parseJSONFiles<ResourceInfo, BuildingTypes>("Data/Buildings/Resources", buildingsStore);
+            parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Barracks", buildingsStore);
 
+            parsePrefabs<Unit, UnitTypes>("Prefabs/Units", unitPrefabs);
+            parsePrefabs<Resource, BuildingTypes>("Prefabs/Buildings/Resources", buildingPrefabs);
+            parsePrefabs<Barrack, BuildingTypes>("Prefabs/Buildings/Barracks", buildingPrefabs);
         }
+
         /// <summary>
         /// Parses all unit files on "Resources/Data/Units".
         /// <exception cref="System.FileLoadException">
         /// Thrown when a unit file is not valid or has already been added
         /// </exception>
         /// </summary>
-        private void parseUnitFiles()
+        private void parseJSONFiles<JSONType, EnumType>(String folder, Dictionary<Tuple<Races, EnumType>, UnitInfo> store) where JSONType : EntityInfo
         {
-            Object[] assets = Resources.LoadAll("Data/Units", typeof(TextAsset));
+            Object[] assets = Resources.LoadAll(folder, typeof(TextAsset));
             foreach (Object jsonObj in assets)
             {
                 TextAsset json = jsonObj as TextAsset;
 
                 try
                 {
-                    UnitInfo unitInfo = JsonConvert.DeserializeObject<UnitInfo>(json.text);
-                    unitInfo.entityType = EntityType.UNIT;
+                    JSONType entityInfo = JsonConvert.DeserializeObject<JSONType>(json.text);
+                    entityInfo.entityType = EntityType.UNIT;
 
-                    Tuple<Races, UnitTypes> key = new Tuple<Races, UnitTypes>(unitInfo.race, unitInfo.type);
+                    Tuple<Races, EnumType> key = new Tuple<Races, EnumType>(entityInfo.race, entityInfo.type);
 
-                    if (unitStore.ContainsKey(key))
+                    if (store.ContainsKey(key))
                     {
                         throw new System.IO.FileLoadException("Unit info '" + json.name + "' already exists");
                     }
 
-                    unitStore.Add(key, unitInfo);
+                    store.Add(key, entityInfo);
                 }
                 catch (JsonException e)
                 {
-                    throw new System.IO.FileLoadException("Unit info '" + json.name + "' is invalid\n\t" + e.Message);
-                }
-            }
-        }
-        /// <summary>
-        /// Parses all unit files on "Resources/Data/Units".
-        /// <exception cref="System.FileLoadException">
-        /// Thrown when a unit file is not valid or has already been added
-        /// </exception>
-        /// </summary>
-        private void parseBuildingFiles()
-        {
-            Object[] assets = Resources.LoadAll("Data/Buildings", typeof(TextAsset));
-            foreach (Object jsonObj in assets)
-            {
-                TextAsset json = jsonObj as TextAsset;
-
-                try
-                {
-                    BuildingInfo buildingInfo = JsonConvert.DeserializeObject<BuildingInfo>(json.text);
-                    buildingInfo.entityType = EntityType.BUILDING;
-
-                    Tuple<Races, BuildingTypes> key = new Tuple<Races, BuildingTypes>(buildingInfo.race, buildingInfo.type);
-
-                    if (buildingStore.ContainsKey(key))
-                    {
-                        throw new System.IO.FileLoadException("Unit info '" + json.name + "' already exists");
-                    }
-
-                    buildingStore.Add(key, buildingInfo);
-                }
-                catch (JsonException e)
-                {
-                    throw new System.IO.FileLoadException("Unit info '" + json.name + "' is invalid\n\t" + e.Message);
+                    throw new System.IO.FileLoadException(JSONType + " '" + json.name + "' is invalid\n\t" + e.Message);
                 }
             }
         }
@@ -106,52 +74,24 @@ namespace Storage
         /// Thrown when two prefabs define the same Race and UnitType
         /// </exception>
         /// </summary>
-        private void parsePrefabs()
+        private void parsePrefabs<ComponentType, EnumType>(String folder, Dictionary<Tuple<Races, EnumType>, string> store) where ComponentType : IGameEntity
         {
-            Object[] assets = Resources.LoadAll("Prefabs/Units", typeof(GameObject));
+            Object[] assets = Resources.LoadAll(folder, typeof(GameObject));
             foreach (Object asset in assets)
             {
                 GameObject gameObject = asset as GameObject;
-                Unit unit = gameObject.GetComponent<Unit>();
+                ComponentType component = gameObject.GetComponent<ComponentType>();
 
-                if (unit != null)
+                if (component != null)
                 {
-                    Tuple<Races, UnitTypes> key = new Tuple<Races, UnitTypes>(unit.race, unit.type);
+                    Tuple<Races, EnumType> key = new Tuple<Races, EnumType>(component.race, component.type);
 
-                    if (unitPrefabs.ContainsKey(key))
+                    if (store.ContainsKey(key))
                     {
                         throw new System.IO.FileLoadException("Duplicated unit prefab ('" + unit.race+ "', '" + unit.type + "')");
                     }
 
-                    unitPrefabs.Add(key, "Prefabs/Units/" + gameObject.name);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parses all prefabs on "Resources/Prefabs/Units".
-        /// <exception cref="System.FileLoadException">
-        /// Thrown when two prefabs define the same Race and UnitType
-        /// </exception>
-        /// </summary>
-        private void parseBuildingPrefabs()
-        {
-            Object[] assets = Resources.LoadAll("Prefabs/Buildings", typeof(GameObject));
-            foreach (Object asset in assets)
-            {
-                GameObject gameObject = asset as GameObject;
-                Building building = gameObject.GetComponent<Building>();
-
-                if (building != null)
-                {
-                    Tuple<Races, BuildingTypes> key = new Tuple<Races, BuildingTypes>(building.race, building.type);
-
-                    if (buildingPrefabs.ContainsKey(key))
-                    {
-                        throw new System.IO.FileLoadException("Duplicated unit prefab ('" + building.race + "', '" + building.type + "')");
-                    }
-
-                    buildingPrefabs.Add(key, "Prefabs/Units/" + gameObject.name);
+                    store.Add(key, folder + "/" + gameObject.name);
                 }
             }
         }

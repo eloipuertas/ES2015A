@@ -41,7 +41,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// Called once our target dies. It may be used to update unit IA
     /// </summary>
     /// <param name="gob"></param>
-    private void onTargetDied(GameObject gob)
+    private void onTargetDied(System.Object obj)
     {
         // TODO: Our target died, select next? Do nothing?
         _status = EntityStatus.IDLE;
@@ -106,7 +106,7 @@ public class Unit : GameEntity<Unit.Actions>
         _status = EntityStatus.MOVING;
         fire(Actions.MOVEMENT_START);
     }
-    
+
     /// <summary>
     /// Object initialization
     /// </summary>
