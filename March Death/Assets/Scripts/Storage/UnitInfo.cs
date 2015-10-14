@@ -15,6 +15,7 @@ namespace Storage
     /// </remarks>
     /// </summary>
     public enum UnitTypes { FARMER, MINER, LUMBERJACK, HERO, LIGHT, HEAVY, THROWN, CAVALRY, MACHINE, SPECIAL };
+    public enum PrefabUnitTypes { CIVIL_1, CIVIL_2, HERO, LIGHT, HEAVY, THROWN, CAVALRY, MACHINE, SPECIAL };
 
     public class UnitInfo : EntityInfo
     {

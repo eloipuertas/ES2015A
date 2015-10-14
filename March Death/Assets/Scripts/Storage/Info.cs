@@ -66,8 +66,8 @@ namespace Storage
                     store.Add(key, entityInfo);
                 }
                 catch (JsonException e)
-                    throw new System.IO.FileLoadException(typeof(JSONType) + " '" + json.name + "' is invalid\n\t" + e.Message);
                 {
+                    throw new System.IO.FileLoadException(typeof(JSONType) + " '" + json.name + "' is invalid\n\t" + e.Message);
                 }
             }
         }
@@ -92,7 +92,7 @@ namespace Storage
 
                     if (store.ContainsKey(key))
                     {
-                        throw new System.IO.FileLoadException("Duplicated unit prefab ('" + component.getRace() + "', '" + component.getType<EnumType>() + "')");
+                        throw new System.IO.FileLoadException("Duplicated " + typeof(ComponentType) + " prefab ('" + component.getRace() + "', '" + component.getType<EnumType>() + "')");
                     }
 
                     store.Add(key, folder + "/" + gameObject.name);
