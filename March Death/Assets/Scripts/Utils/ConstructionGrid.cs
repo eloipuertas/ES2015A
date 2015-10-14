@@ -7,46 +7,15 @@ public class ConstructionGrid : MonoBehaviour {
 
     private Vector2 dimensions;
     private ArrayList reservedPositions;
-    private GameObject flatnessChecker;
     private const float DIFERENCE_OF_HEIGHTS_TOLERANCE = 0.4f;
 
     void Start () {
         dimensions = new Vector2(5f, 5f);
         reservedPositions = new ArrayList();
-        Debug.Log(discretizeMapCoords(new Vector3(-11.2f, 10f,12f)).ToString());
-        flatnessChecker = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        flatnessChecker.transform.position = Camera.main.transform.position;
-        flatnessChecker.name = "FlatnessChecker";
-        flatnessChecker.transform.localScale = new Vector3(dimensions.x, 1, dimensions.y);
     }
 
     void Update()
     {
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            Vector3 newBuildingPosition;
-
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity))
-            {
-                newBuildingPosition = hit.point;
-                newBuildingPosition.y += 0.01f;
-                newBuildingPosition = this.discretizeMapCoords(newBuildingPosition);
-
-
-                if (isNewPositionAbleForConstrucction(newBuildingPosition))
-                {
-                    reservePosition(newBuildingPosition);
-                    flatnessChecker.transform.position = newBuildingPosition;
-                }
-                else
-                {
-                    Debug.Log("We are not able to construct here");
-                }
-            }
-        }
         
     }
 	
