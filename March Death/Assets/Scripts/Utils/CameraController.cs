@@ -63,7 +63,7 @@ public class CameraController : MonoBehaviour
         isManualControlEnabled = true;
         isLerping = false;
         setCameraZoom(30f);
-        setCameraSpeed(30f);
+        setCameraSpeed(40f);
         lookAtPoint(new Vector3(896.4047f, 90.51f, 581.8263f));
     }
 
