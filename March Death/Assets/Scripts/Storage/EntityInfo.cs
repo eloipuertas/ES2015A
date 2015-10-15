@@ -16,7 +16,9 @@ namespace Storage
 
         public EntityResources resources;
         public abstract EntityAttributes attributes { get; set; }
-        public abstract List<EntityAction> actions { get; set; }
+        public abstract List<EntityAbility> abilities { get; set; }
+
+        public abstract T getType<T>() where T : struct, IConvertible;
 
         /// <summary>
         /// Returns true if the entity is a unit, false otherwise
@@ -36,13 +38,7 @@ namespace Storage
         {
             get
             {
-                if (!isUnit)
-                {
-                    return false;
-                }
-
-                UnitInfo info = (UnitInfo)this;
-                return info.type == UnitTypes.FARMER || info.type == UnitTypes.MINER || info.type == UnitTypes.LUMBERJACK;
+                return isUnit && ((UnitInfo)this).type == UnitTypes.CIVIL;
             }
         }
 
@@ -75,7 +71,18 @@ namespace Storage
         {
             get
             {
-                return entityType == EntityType.RESOURCE;
+                return isBuilding && ((((BuildingInfo) this).type == BuildingTypes.FARM) || (((BuildingInfo) this).type == BuildingTypes.SAWMILL) || (((BuildingInfo) this).type == BuildingTypes.MINE));
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the entity is a resource, false otherwise
+        /// </summary>
+        public bool isBarrack
+        {
+            get
+            {
+                return isBuilding && !isResource;
             }
         }
 
@@ -97,6 +104,23 @@ namespace Storage
         }
 
         /// <summary>
+        /// If this info describes a resource, returns the ResourceAttributes class, otherwise it returns null
+        /// It should always be used either by first checking isResource, or checking if returned value is not null
+        /// </summary>
+        public ResourceAttributes resourceAttributes
+        {
+            get
+            {
+                if (!isResource)
+                {
+                    return null;
+                }
+
+                return (ResourceAttributes)this.attributes;
+            }
+        }
+
+        /// <summary>
         /// If this info describes a building, returns the BuildingAttributes class, otherwise it returns null
         /// It should always be used either by first checking isBuilding, or checking if returned value is not null
         /// </summary>
@@ -113,20 +137,21 @@ namespace Storage
             }
         }
 
+
         /// <summary>
-        /// If this info describes a resource, returns the ResourceAttributes class, otherwise it returns null
-        /// It should always be used either by first checking isBuilding, or checking if returned value is not null
+        /// If this info describes a barrack, returns the BarrackAttributes class, otherwise it returns null
+        /// It should always be used either by first checking isBarrack, or checking if returned value is not null
         /// </summary>
-        public ResourceAttributes resourceAttributes
+        public BarrackAttributes barrackAttributes
         {
             get
             {
-                if (!isResource)
+                if (!isBarrack)
                 {
                     return null;
                 }
 
-                return (ResourceAttributes)this.attributes;
+                return (BarrackAttributes)this.attributes;
             }
         }
     }

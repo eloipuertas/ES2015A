@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
+using Utils;
 using Storage;
 
 
@@ -15,11 +16,16 @@ public class Unit : GameEntity<Unit.Actions>
 
     public Unit() { }
 
+    ///<sumary>
+    /// Auto-unregister events when we are destroyed
+    ///</sumary>
+    AutoUnregister _auto;
+
     /// <summary>
     /// Edit this on the Prefab to set Units of certain races/types
     /// </summary>
-    public Races race = Races.MEN;
     public UnitTypes type = UnitTypes.HERO;
+    public override E getType<E>() { return (E)Convert.ChangeType(type, typeof(E)); }
 
     /// <summary>
     /// If in battle, this is the target and last attack time
@@ -31,17 +37,17 @@ public class Unit : GameEntity<Unit.Actions>
     /// Point to move to
     /// </summary>
     private Vector3 _movePoint;
-    
+
     /// <summary>
     /// Civil units might need this to acount how many *items* they are carrying.
     /// </summary>
     public int usedCapacity { get; set; }
-    
+
     /// <summary>
     /// Called once our target dies. It may be used to update unit IA
     /// </summary>
     /// <param name="gob"></param>
-    private void onTargetDied(GameObject gob)
+    private void onTargetDied(System.Object obj)
     {
         // TODO: Our target died, select next? Do nothing?
         _status = EntityStatus.IDLE;
@@ -71,7 +77,7 @@ public class Unit : GameEntity<Unit.Actions>
     public void attackTarget(Unit unit)
     {
         _target = unit;
-        _target.register(Actions.DIED, onTargetDied);
+        _auto += _target.register(Actions.DIED, onTargetDied);
         _status = EntityStatus.ATTACKING;
     }
 
@@ -80,7 +86,8 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     public void stopAttack()
     {
-        _target.unregister(Actions.DIED, onTargetDied);
+        _auto -= _target.unregister(Actions.DIED, onTargetDied);
+
         // TODO: Maybe we should not set it to null? In case we want to attack it again
         _target = null;
         _status = EntityStatus.IDLE;
@@ -108,45 +115,13 @@ public class Unit : GameEntity<Unit.Actions>
     }
 
     /// <summary>
-    /// Iterates all abilities on the
-    /// </summary>
-    protected override void setupActions()
-    {
-        foreach (UnitAbility ability in info.actions)
-        {
-            // Try to get class with this name
-            string abilityName = ability.name.Replace(" ", "");
-
-            try
-            {
-                var constructor = Type.GetType(abilityName).
-                    GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(UnitAbility), typeof(GameObject) }, null);
-                if (constructor == null)
-                {
-                    // Invalid constructor, use GenericAbility
-                    _actions.Add(new GenericAbility(ability));
-                }
-                else
-                {
-                    // Class found, use that!
-                    _actions.Add((IUnitAbility)constructor.Invoke(new object[2] { ability, gameObject }));
-                }
-            }
-            catch (Exception /*e*/)
-            {
-                // No such class, use the GenericAbility class
-                _actions.Add(new GenericAbility(ability));
-            }
-        }
-    }
-    
-    /// <summary>
     /// Object initialization
     /// </summary>
-    override public void Start()
+    public override void Start()
     {
         _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
+        _auto = this;
 
         // Call GameEntity start
         base.Start();
@@ -155,8 +130,10 @@ public class Unit : GameEntity<Unit.Actions>
     /// <summary>
     /// Called once a frame to update the object
     /// </summary>
-    void Update()
+    public override void Update()
     {
+        base.Update();
+
 #if TEST_INPUT
         if (Input.GetMouseButtonDown(0))
         {
