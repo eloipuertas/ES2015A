@@ -15,6 +15,7 @@ public class CameraController : MonoBehaviour
     private const float MOUSE_BOUNDS = 2f;
 
     private Vector3 cameraOffset;
+    private Vector3 lastLookedPoint;
     private GameObject followingGameObject;
     private GameObject cameraContainer;
     private bool isManualControlEnabled;
@@ -69,6 +70,26 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
+        if(Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            setCameraOrientation(CameraOrientation.NORTH_WEST);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            setCameraOrientation(CameraOrientation.SOUTH_WEST);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            setCameraOrientation(CameraOrientation.SOUTH_EST);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            setCameraOrientation(CameraOrientation.NORTH_EST);
+        }
+
         if (isManualControlEnabled)
         {
             handlePlayerInput();
@@ -94,6 +115,7 @@ public class CameraController : MonoBehaviour
         stopAllAutomaticTasks();
         Vector3 newCameraPos = target + cameraOffset;
         cameraContainer.transform.position = newCameraPos;
+        lastLookedPoint = target;
     }
 
     /// <summary>
@@ -104,6 +126,7 @@ public class CameraController : MonoBehaviour
     {
         Vector3 newCameraPos = target.transform.position + cameraOffset;
         cameraContainer.transform.position = newCameraPos;
+        lastLookedPoint = target.transform.position;
     }
 
     /// <summary>
@@ -276,48 +299,42 @@ public class CameraController : MonoBehaviour
         setCameraOrientation(CameraOrientation.NORTH_WEST);
     }
 
+    /// <summary>
+    /// Used to set a new camera orientation (Usefull if the map changes its rotation)
+    /// Orientations can be NORT_WEST (used in the first demo) , SOUTH_WEST, SOUTH_EST, NORTH_EST
+    /// </summary>
+    /// <param name="newOrientation"></param>
     public void setCameraOrientation(CameraOrientation newOrientation)
     {
         float baseVerticalRotation = 45f;
         float verticalRotationOffset = 90f;
         float numOffsets = 0;
+
         switch (newOrientation)
         {
             case CameraOrientation.NORTH_WEST:
                 cameraOffset = new Vector3(-252.8f, 250.34f, -252.8f);
-                //cameraOffset = new Vector3(-252.8f, 250.34f, +252.8f);
-                //cameraOffset = new Vector3(+252.8f, 250.34f, -252.8f);
-                //cameraOffset = new Vector3(+252.8f, 250.34f, +252.8f);
                 baseVerticalRotation = 45f;
                 numOffsets = 0;
                 break;
             case CameraOrientation.SOUTH_WEST:
-                //cameraOffset = new Vector3(-252.8f, 250.34f, -252.8f);
                 cameraOffset = new Vector3(-252.8f, 250.34f, +252.8f);
-                //cameraOffset = new Vector3(+252.8f, 250.34f, -252.8f);
-                //cameraOffset = new Vector3(+252.8f, 250.34f, +252.8f);
                 numOffsets = 1;
                 break;
             case CameraOrientation.SOUTH_EST:
-                //cameraOffset = new Vector3(-252.8f, 250.34f, -252.8f);
-                //cameraOffset = new Vector3(-252.8f, 250.34f, +252.8f);
-                //cameraOffset = new Vector3(+252.8f, 250.34f, -252.8f);
                 cameraOffset = new Vector3(+252.8f, 250.34f, +252.8f);
                 numOffsets = 2;
                 break;
             case CameraOrientation.NORTH_EST:
-                //cameraOffset = new Vector3(-252.8f, 250.34f, -252.8f);
-                //cameraOffset = new Vector3(-252.8f, 250.34f, +252.8f);
                 cameraOffset = new Vector3(+252.8f, 250.34f, -252.8f);
-                //cameraOffset = new Vector3(+252.8f, 250.34f, +252.8f);
                 numOffsets = 3;
                 break;
             default:
                 break;
         }
-        cameraContainer.transform.localRotation.eulerAngles.Set(cameraContainer.transform.localRotation.eulerAngles.x, 0f, cameraContainer.transform.localEulerAngles.z);
-        cameraContainer.transform.Rotate(Vector3.up, baseVerticalRotation + verticalRotationOffset * numOffsets);
+        cameraContainer.transform.rotation = Quaternion.Euler(cameraContainer.transform.localRotation.eulerAngles.x, baseVerticalRotation + verticalRotationOffset * numOffsets, cameraContainer.transform.localEulerAngles.z);
         _camera_orientation = newOrientation;
+        lookAtPoint(lastLookedPoint);
     }
 
     /// <summary>
