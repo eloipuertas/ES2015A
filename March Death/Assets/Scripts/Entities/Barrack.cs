@@ -13,7 +13,6 @@ public class Barrack : Building<Barrack.Actions>
     /// </summary>
     public override void Start()
     {
-        _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
 
         // Call GameEntity start
