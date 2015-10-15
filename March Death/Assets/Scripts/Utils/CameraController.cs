@@ -73,21 +73,25 @@ public class CameraController : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Alpha1))
         {
             setCameraOrientation(CameraOrientation.NORTH_WEST);
+            lookAtPoint(lastLookedPoint);
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             setCameraOrientation(CameraOrientation.SOUTH_WEST);
+            lookAtPoint(lastLookedPoint);
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             setCameraOrientation(CameraOrientation.SOUTH_EST);
+            lookAtPoint(lastLookedPoint);
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             setCameraOrientation(CameraOrientation.NORTH_EST);
+            lookAtPoint(lastLookedPoint);
         }
 
         if (isManualControlEnabled)
@@ -300,7 +304,7 @@ public class CameraController : MonoBehaviour
     }
 
     /// <summary>
-    /// Used to set a new camera orientation (Usefull if the map changes its rotation)
+    /// Used to set a new camera orientation (Usefull if the map changes its rotation) 
     /// Orientations can be NORT_WEST (used in the first demo) , SOUTH_WEST, SOUTH_EST, NORTH_EST
     /// </summary>
     /// <param name="newOrientation"></param>
@@ -334,7 +338,6 @@ public class CameraController : MonoBehaviour
         }
         cameraContainer.transform.rotation = Quaternion.Euler(cameraContainer.transform.localRotation.eulerAngles.x, baseVerticalRotation + verticalRotationOffset * numOffsets, cameraContainer.transform.localEulerAngles.z);
         _camera_orientation = newOrientation;
-        lookAtPoint(lastLookedPoint);
     }
 
     /// <summary>
