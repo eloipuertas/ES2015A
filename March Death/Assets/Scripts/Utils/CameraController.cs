@@ -25,6 +25,7 @@ public class CameraController : MonoBehaviour
     private float _cameraSpeed;
     private float _mouseWeelZoomSensitivity;
     private float _defaultLerpTime;
+    private float _camera_zoom;
 
 
     public float defaultLerpTime
@@ -40,6 +41,11 @@ public class CameraController : MonoBehaviour
     public float cameraSpeed
     {
         get { return _cameraSpeed; }
+    }
+
+    public float cameraZoom
+    {
+        get { return _camera_zoom; }
     }
 
     void Start()
@@ -279,7 +285,8 @@ public class CameraController : MonoBehaviour
         }
 
         float fov = Mathf.Clamp(newZoom, CAMERA_MAX_ZOOM, CAMERA_MIN_ZOOM);
-        Camera.main.orthographicSize = fov;     
+        Camera.main.orthographicSize = fov;
+        _camera_zoom = fov;     
     }
 
 
