@@ -8,6 +8,8 @@ using System;
 public class CameraController : MonoBehaviour
 {
 
+    public enum  CameraOrientation { NORTH_WEST, SOUTH_WEST, SOUTH_EST, NORTH_EST };
+
     private const float CAMERA_MAX_ZOOM = 5f;
     private const float CAMERA_MIN_ZOOM = 100f;
     private const float MOUSE_BOUNDS = 2f;
@@ -26,6 +28,8 @@ public class CameraController : MonoBehaviour
     private float _mouseWeelZoomSensitivity;
     private float _defaultLerpTime;
     private float _camera_zoom;
+
+    private CameraOrientation _camera_orientation;
 
 
     public float defaultLerpTime
