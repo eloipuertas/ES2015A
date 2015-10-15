@@ -8,7 +8,7 @@ namespace WorldResources
         /// <summary>
         /// The current amount.
         /// </summary>
-        private int _amount;
+        private float _amount;
 
 
 
@@ -22,7 +22,7 @@ namespace WorldResources
         /// </summary>
         /// <param name="type"></param>
         /// <param name="amount"></param>
-        public Resource(Type type, int amount = 0)
+        public Resource(Type type, float amount = 0f)
         {
             _type = type;
             _amount = amount;
@@ -31,10 +31,10 @@ namespace WorldResources
         /// <summary>
         /// Reset this instance and returns what it had.
         /// </summary>
-        public int Empty()
+        public float Empty()
         {
-            int temp = _amount;
-            _amount = 0;
+            float temp = _amount;
+            _amount = 0f;
 
             return temp;
         }
@@ -43,7 +43,7 @@ namespace WorldResources
         /// Add the specified amount.
         /// </summary>
         /// <param name="amount">Amount.</param>
-        public void Add(int amount)
+        public void Add(float amount)
         {
             _amount += amount;
         }
@@ -53,9 +53,9 @@ namespace WorldResources
         /// </summary>
         /// <param name="amount"></param>
         /// <returns></returns>
-        public int Substract(int amount)
+        public float Substract(float amount)
         {
-            _amount = amount > 0 ? _amount - amount : 0;
+            _amount = amount > 0f ? _amount - amount : 0f;
             return _amount;
         }
 
@@ -64,7 +64,7 @@ namespace WorldResources
         /// </summary>
         /// <param name="amount"></param>
         /// <returns></returns>
-        public bool IsEnough(int amount)
+        public bool IsEnough(float amount)
         {
             return _amount >= amount;
         }
@@ -73,7 +73,7 @@ namespace WorldResources
         /// Gets the current amount.
         /// </summary>
         /// <returns>The amount.</returns>
-        public int GetAmount()
+        public float GetAmount()
         {
             return _amount;
         }

@@ -10,7 +10,7 @@ namespace Managers
         /// </summary>
         /// <param name="type"></param>
         /// <param name="amount"></param>
-        void AddAmount(Type type, int amount);
+        void AddAmount(Type type, float amount);
         
         /// <summary>
         /// Adds the amount
@@ -24,14 +24,14 @@ namespace Managers
         /// <param name="type"></param>
         /// <param name="amount"></param>
         /// <returns></returns>
-        int SubstractAmount(Type type, int amount);
+        float SubstractAmount(Type type, float amount);
 
         /// <summary>
         /// Substracts the amount and returns the remaining
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        int SubstractAmount(Resource other);
+        float SubstractAmount(Resource other);
 
         /// <summary>
         /// Checks the current amount and returns true if is higher or equal to the input amount
@@ -40,7 +40,7 @@ namespace Managers
         /// <param name="type"></param>
         /// <param name="amount"></param>
         /// <returns></returns>
-        bool IsEnough(Type type, int amount);
+        bool IsEnough(Type type, float amount);
 
         /// <summary>
         /// Checks the current amount and returns true if is higher or equal to the input amount

@@ -46,7 +46,7 @@ namespace Managers
             return true;
         }
 
-        public bool IsEnough(Type type, int amount)
+        public bool IsEnough(Type type, float amount)
         {
             //TODO
             return true;
@@ -54,23 +54,23 @@ namespace Managers
 
 
 
-        public int SubstractAmount(Resource other)
+        public float SubstractAmount(Resource other)
         {
             //TODO
-            return 1;
+            return 1f;
         }
 
-        public int SubstractAmount(Type type, int amount)
+        public float SubstractAmount(Type type, float amount)
         {
             //TODO
-            return 1;
+            return 1f;
         }
 
         public void AddAmount(Resource other)
         {
             //TODO
         }
-        public void AddAmount(Type type, int amount)
+        public void AddAmount(Type type, float amount)
         {
             //TODO
         }

@@ -8,21 +8,21 @@
     class Deposit
     {
         private Resource _resource;
-        private int _capacity;
+        private float _capacity;
 
-        public Deposit(Resource resource, int capacity = 0)
+        public Deposit(Resource resource, float capacity = 0f)
         {
-            _capacity = 0;
+            _capacity = capacity;
             _resource = resource;
         }
 
 
-        public void AddAmount(int amount)
+        public void AddAmount(float amount)
         {
             _resource.Add(amount);
         }
 
-        public int GetAmount()
+        public float GetAmount()
         {
             return _resource.GetAmount();
         }
@@ -38,14 +38,14 @@
             
         }
 
-        public int GetCapacity()
+        public float GetCapacity()
         {
             return _capacity;
         }
 
         public bool IsLimited()
         {
-            return _capacity == 0 ? true : false;
+            return _capacity == 0f ? true : false;
         }
     }
 }
