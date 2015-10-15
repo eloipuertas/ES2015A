@@ -111,7 +111,7 @@ public class FOWManager : MonoBehaviour
             {
                 if (!e.IsRevealer)
                 {
-                    e.changeVisible(isRectVisible(e.Bounds));
+                    e.changeVisible(isThereinRect(e.Bounds,visible.visible));
                 }
             }
 
@@ -150,21 +150,25 @@ public class FOWManager : MonoBehaviour
         }
     }
     /// <summary>
-    /// Checks if there is some point of the rectange visible right now.
+    /// Checks if there is some point of the rectange with visiblity = vis
     /// (Might be a little wonky if the quality is too low)
     /// </summary>
-    /// <param name="rect"></param>
-    /// <returns>true if atleast a pixel of the rectangle is visible, false otherwise</returns>
-    private bool isRectVisible(Rect rect)
+    /// <param name="rect">Rectange in world coords to check</param>
+    /// <param name="vis">visible.unexplored: means that a point has been never revealed
+    ///                   visible.explored: means that a point has been explored OR is being explored
+    ///                   visible.visible: means that a point is currently being revealed </param>
+    /// <returns>true if atleast a pixel of the rectangle is in vis state, false otherwise</returns>
+    public bool isThereinRect(Rect rect,visible vis)
     {
         int xMin, xMax, yMin, yMax;
         getBounds(rect, 0, out xMin, out xMax, out yMin, out yMax);
-
         for (int x = xMin; x <= xMax; x++)
             for (int y = yMin; y <= yMax; ++y)
-            { 
+            {
                 int p = x + y * fowTex.width;
-                if (pixels[p].b>0 || (NotFullyOpaque && pixels[p].g>0))
+                if((vis==visible.explored && pixels[p].g>0) ||
+                   (vis==visible.visible && pixels[p].b > 0 || (NotFullyOpaque && pixels[p].g > 0))||
+                   (vis==visible.unexplored && pixels[p].b==0 &&pixels[p].g==0))
                     return true;
             }
         return false;
@@ -212,5 +216,10 @@ public class FOWManager : MonoBehaviour
                 _instance = GameObject.FindObjectOfType<FOWManager>();
             return _instance;
         }
+    }
+    public enum visible{
+        unexplored, //No one has been near this area
+        explored,   //Someone revelaed this area and then left
+        visible     //Someone is currently revealing this area
     }
 }
