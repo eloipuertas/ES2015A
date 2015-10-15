@@ -272,10 +272,53 @@ public class CameraController : MonoBehaviour
         transform.localPosition = Vector3.zero;
         transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 0, transform.localEulerAngles.z);
         cameraContainer.transform.position = desiredCameraPosition;
-        cameraContainer.transform.Rotate(Vector3.up, 45f);
         Camera.main.orthographic = true;
+        setCameraOrientation(CameraOrientation.NORTH_WEST);
     }
 
+    public void setCameraOrientation(CameraOrientation newOrientation)
+    {
+        float baseVerticalRotation = 45f;
+        float verticalRotationOffset = 90f;
+        float numOffsets = 0;
+        switch (newOrientation)
+        {
+            case CameraOrientation.NORTH_WEST:
+                cameraOffset = new Vector3(-252.8f, 250.34f, -252.8f);
+                //cameraOffset = new Vector3(-252.8f, 250.34f, +252.8f);
+                //cameraOffset = new Vector3(+252.8f, 250.34f, -252.8f);
+                //cameraOffset = new Vector3(+252.8f, 250.34f, +252.8f);
+                baseVerticalRotation = 45f;
+                numOffsets = 0;
+                break;
+            case CameraOrientation.SOUTH_WEST:
+                //cameraOffset = new Vector3(-252.8f, 250.34f, -252.8f);
+                cameraOffset = new Vector3(-252.8f, 250.34f, +252.8f);
+                //cameraOffset = new Vector3(+252.8f, 250.34f, -252.8f);
+                //cameraOffset = new Vector3(+252.8f, 250.34f, +252.8f);
+                numOffsets = 1;
+                break;
+            case CameraOrientation.SOUTH_EST:
+                //cameraOffset = new Vector3(-252.8f, 250.34f, -252.8f);
+                //cameraOffset = new Vector3(-252.8f, 250.34f, +252.8f);
+                //cameraOffset = new Vector3(+252.8f, 250.34f, -252.8f);
+                cameraOffset = new Vector3(+252.8f, 250.34f, +252.8f);
+                numOffsets = 2;
+                break;
+            case CameraOrientation.NORTH_EST:
+                //cameraOffset = new Vector3(-252.8f, 250.34f, -252.8f);
+                //cameraOffset = new Vector3(-252.8f, 250.34f, +252.8f);
+                cameraOffset = new Vector3(+252.8f, 250.34f, -252.8f);
+                //cameraOffset = new Vector3(+252.8f, 250.34f, +252.8f);
+                numOffsets = 3;
+                break;
+            default:
+                break;
+        }
+        cameraContainer.transform.localRotation.eulerAngles.Set(cameraContainer.transform.localRotation.eulerAngles.x, 0f, cameraContainer.transform.localEulerAngles.z);
+        cameraContainer.transform.Rotate(Vector3.up, baseVerticalRotation + verticalRotationOffset * numOffsets);
+        _camera_orientation = newOrientation;
+    }
 
     /// <summary>
     /// Sets the new zoom of the camera
