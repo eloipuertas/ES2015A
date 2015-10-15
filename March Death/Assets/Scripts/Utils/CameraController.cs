@@ -62,7 +62,6 @@ public class CameraController : MonoBehaviour
         lerpTime = 2f;
         isManualControlEnabled = true;
         isLerping = false;
-        lookAtPoint(Vector3.zero);
         setCameraZoom(30f);
         setCameraSpeed(30f);
         lookAtPoint(new Vector3(896.4047f, 90.51f, 581.8263f));
@@ -70,29 +69,6 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            setCameraOrientation(CameraOrientation.NORTH_WEST);
-            lookAtPoint(lastLookedPoint);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            setCameraOrientation(CameraOrientation.SOUTH_WEST);
-            lookAtPoint(lastLookedPoint);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            setCameraOrientation(CameraOrientation.SOUTH_EST);
-            lookAtPoint(lastLookedPoint);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            setCameraOrientation(CameraOrientation.NORTH_EST);
-            lookAtPoint(lastLookedPoint);
-        }
 
         if (isManualControlEnabled)
         {
@@ -300,7 +276,8 @@ public class CameraController : MonoBehaviour
         transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 0, transform.localEulerAngles.z);
         cameraContainer.transform.position = desiredCameraPosition;
         Camera.main.orthographic = true;
-        setCameraOrientation(CameraOrientation.NORTH_WEST);
+        setCameraOrientation(CameraOrientation.SOUTH_WEST);
+ 
     }
 
     /// <summary>
