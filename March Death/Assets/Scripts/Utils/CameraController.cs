@@ -10,7 +10,7 @@ public class CameraController : MonoBehaviour
 
     private const float CAMERA_MAX_ZOOM = 5f;
     private const float CAMERA_MIN_ZOOM = 100f;
-    private const float MOUSE_BOUNDS = 20f;
+    private const float MOUSE_BOUNDS = 2f;
 
     private Vector3 cameraOffset;
     private GameObject followingGameObject;
@@ -52,9 +52,9 @@ public class CameraController : MonoBehaviour
         isManualControlEnabled = true;
         isLerping = false;
         lookAtPoint(Vector3.zero);
-        setCameraZoom(20f);
+        setCameraZoom(80f);
         setCameraSpeed(20f);
-        lookAtPoint(new Vector3(1782.54f, 91.48f, 1166f));
+        lookAtPoint(new Vector3(1935f, 79f, 969f));
     }
 
     void Update()
@@ -303,22 +303,22 @@ public class CameraController : MonoBehaviour
     /// </summary>
     private void handlePlayerInput()
     {
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) ||  Input.mousePosition.y >= Screen.height - MOUSE_BOUNDS)
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) || Input.mousePosition.y >= Screen.height - MOUSE_BOUNDS )
         {
             cameraContainer.transform.Translate(Vector3.forward * Time.deltaTime * _cameraSpeed);
         }
 
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) || Input.mousePosition.x <= MOUSE_BOUNDS)
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) || Input.mousePosition.x <= MOUSE_BOUNDS )
         {
             cameraContainer.transform.Translate(Vector3.left * Time.deltaTime * _cameraSpeed);
         }
 
-        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) || Input.mousePosition.y <= MOUSE_BOUNDS)
+        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) || Input.mousePosition.y <= MOUSE_BOUNDS )
         {
             cameraContainer.transform.Translate(Vector3.back * Time.deltaTime * _cameraSpeed);
         }
 
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || Input.mousePosition.x >= Screen.width - MOUSE_BOUNDS)
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || Input.mousePosition.x >= Screen.width - MOUSE_BOUNDS )
         {
             cameraContainer.transform.Translate(Vector3.right * Time.deltaTime * _cameraSpeed);
         }
@@ -335,6 +335,17 @@ public class CameraController : MonoBehaviour
     {
         float fov = Camera.main.orthographicSize;
         fov -= Input.GetAxis("Mouse ScrollWheel") * _mouseWeelZoomSensitivity;
+
+        if (fov < 5f)
+        {
+            fov = 5f;
+        }
+
+        if (fov > 100f)
+        {
+            fov = 100f;
+        }
+
         setCameraZoom(fov);
     }
 
