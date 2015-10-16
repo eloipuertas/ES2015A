@@ -6,7 +6,7 @@ namespace Utils
 {
     public class RegisterResult<T> : Triplet<IActor<T>, T, Action<Object>> where T : struct, IConvertible
     {
-        public RegisterResult(IActor<T> actor, T action, Action<Object> func) :
+        public RegisterResult (IActor<T> actor, T action, Action<Object> func) :
             base(actor, action, func)
         {
         }
@@ -14,11 +14,11 @@ namespace Utils
 
     public interface IActor<T> : IBaseActor where T : struct, IConvertible
     {
-        RegisterResult<T> register(T action, Action<Object> func);
+        RegisterResult<T> register (T action, Action<Object> func);
     }
 
     public interface IBaseActor
     {
-        IKeyGetter unregister<A>(A action, Action<Object> func);
+        IKeyGetter unregister<A> (A action, Action<Object> func);
     }
 }

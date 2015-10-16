@@ -26,10 +26,10 @@ public class GameInformation : MonoBehaviour {
         switch (playerRace)
         {
         case Races.ELVES:
-			LoadElfHUD();
+            LoadElfHUD();;
 			break;
 		case Races.MEN:
-			LoadHumanHUD();
+            LoadHumanHUD();
 			break;
         }
 	}
@@ -51,14 +51,11 @@ public class GameInformation : MonoBehaviour {
 	public void SetPlayerRace(int race)
 	{
 		playerRace = (Races) race;
-		Debug.Log ("GameInfo: Race is " + playerRace);
-		Debug.Log("GameInfo: Race as int " + race);
 	}
 
     public void SetPlayerRace(Races race)
     {
         playerRace = race;
-        Debug.Log ("GameInfo: Race is " + playerRace);
     }
 
 	public Races GetPlayerRace()

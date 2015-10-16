@@ -7,45 +7,44 @@ namespace Utils
     public sealed class AutoUnregister
     {
         private IObserver observer;
-        private List<IKeyGetter> results = new List<IKeyGetter>();
+        private List<IKeyGetter> results = new List<IKeyGetter> ();
 
-        public AutoUnregister(IObserver observer)
+        public AutoUnregister (IObserver observer)
         {
             this.observer = observer;
-            this.observer.register(this);
+            this.observer.register (this);
         }
 
-        public static AutoUnregister operator +(AutoUnregister self, IKeyGetter result)
+        public static AutoUnregister operator + (AutoUnregister self, IKeyGetter result)
         {
-            self.results.Add(result);
+            self.results.Add (result);
             return self;
         }
 
-        public static AutoUnregister operator -(AutoUnregister self, IKeyGetter result)
+        public static AutoUnregister operator - (AutoUnregister self, IKeyGetter result)
         {
-            self.results.Remove(result);
+            self.results.Remove (result);
             return self;
         }
 
-        public void unregisterAll()
+        public void unregisterAll ()
         {
-            foreach (var triplet in results)
-            {
-                IBaseActor actor = (IBaseActor)triplet.getKey(0);
-                actor.unregister(triplet.getKey(1), (Action<Object>)triplet.getKey(2));
+            foreach (var triplet in results) {
+                IBaseActor actor = (IBaseActor)triplet.getKey (0);
+                actor.unregister (triplet.getKey (1), (Action<Object>)triplet.getKey (2));
             }
 
-            observer.unregister(this);
+            observer.unregister (this);
         }
         
-        public static implicit operator AutoUnregister(Observer observer)
+        public static implicit operator AutoUnregister (Observer observer)
         {
-            return new AutoUnregister(observer);
+            return new AutoUnregister (observer);
         }
 
-        public static implicit operator AutoUnregister(UnityEngine.MonoBehaviour observer)
+        public static implicit operator AutoUnregister (UnityEngine.MonoBehaviour observer)
         {
-            return new AutoUnregister((IObserver)observer);
+            return new AutoUnregister ((IObserver)observer);
         }
     }
 }
