@@ -1,54 +1,84 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using Storage;
 
 /// <summary>
 /// Script to handle UI events for the game setup screen.
 /// </summary>
 public class GameSetupScript : MonoBehaviour {
 
-    /// <summary>
-    /// Constant value to identify the combo box for the player's race selection.
-    /// </summary>
-    const int PLAYER_RACE = 0;
-    /*const int ENEMY_1_RACE = 1;*/
-
-    private Dropdown playerComboBox;
-
 	GameInformation info;
+
+    /// <summary>
+    /// Indicates whether the player has selected their civilization or not
+    /// </summary>
+    private bool raceSelected;
+
+    /// <summary>
+    /// Indicates if the message box should be shown
+    /// </summary>
+    private bool showMsgBox;
+
+    /// <summary>
+    /// The message box rectangle.
+    /// </summary>
+    private Rect messageBox = new Rect((Screen.width - 200) / 2, (Screen.height - 300) / 2, 200, 150);
 
     // Use this for initialization
     void Start () {
-        GameObject myComboBox = GameObject.Find("cboCivilizations");
-        playerComboBox = myComboBox.GetComponent<Dropdown>();
 		info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
+        raceSelected = false;
+        showMsgBox = false;
     }
 
-    // Update is called once per frame
-    void Update () {}
+    void OnGUI()
+    {
+        if (showMsgBox)
+        {
+            messageBox = GUI.Window(0, messageBox, DrawWindow, "Select Race");
+        }
+    }
 
     /// <summary>
-    /// Sets the race of the players (both human and AI)
+    /// Draws the message box.
     /// </summary>
-    /// <param name="combo">Combo box that triggers the event</param>
-	public void setRace(int combo)
+    /// <param name="window">Window.</param>
+    void DrawWindow(int window)
     {
-        switch (combo)
+        GUI.Label(new Rect(5, 20, messageBox.width, 20), "Please, select a civilization");
+        if (GUI.Button(new Rect(5, 50, messageBox.width - 10, 20), "Ok"))
         {
-        case PLAYER_RACE:
-			info.SetPlayerRace(playerComboBox.value);
-            break;
+            showMsgBox = false;
         }
+    }
+
+    public void SetPlayerRaceToElf()
+    {
+        info.SetPlayerRace(Races.ELVES);
+        raceSelected = true;
+    }
+
+    public void SetPlayerRaceToHuman()
+    {
+        info.SetPlayerRace(Races.MEN);
+        raceSelected = true;
     }
 
     public void StartGame()
     {
-		Application.LoadLevel(3);
+        if (raceSelected)
+        {
+		    Application.LoadLevel(3);
+        }
+        else
+        {
+            showMsgBox = true;
+        }
     }
 
     public void Cancel()
     {
-		Destroy(info);
 		Application.LoadLevel(0);
     }
 }

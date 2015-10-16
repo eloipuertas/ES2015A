@@ -55,6 +55,12 @@ public class GameInformation : MonoBehaviour {
 		Debug.Log("GameInfo: Race as int " + race);
 	}
 
+    public void SetPlayerRace(Races race)
+    {
+        playerRace = race;
+        Debug.Log ("GameInfo: Race is " + playerRace);
+    }
+
 	public Races GetPlayerRace()
 	{
 		return playerRace;
