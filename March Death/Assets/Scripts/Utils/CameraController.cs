@@ -8,11 +8,14 @@ using System;
 public class CameraController : MonoBehaviour
 {
 
+    public enum  CameraOrientation { NORTH_WEST, SOUTH_WEST, SOUTH_EST, NORTH_EST };
+
     private const float CAMERA_MAX_ZOOM = 5f;
     private const float CAMERA_MIN_ZOOM = 100f;
     private const float MOUSE_BOUNDS = 2f;
 
     private Vector3 cameraOffset;
+    private Vector3 lastLookedPoint;
     private GameObject followingGameObject;
     private GameObject cameraContainer;
     private bool isManualControlEnabled;
@@ -25,6 +28,9 @@ public class CameraController : MonoBehaviour
     private float _cameraSpeed;
     private float _mouseWeelZoomSensitivity;
     private float _defaultLerpTime;
+    private float _camera_zoom;
+
+    private CameraOrientation _camera_orientation;
 
 
     public float defaultLerpTime
@@ -42,6 +48,11 @@ public class CameraController : MonoBehaviour
         get { return _cameraSpeed; }
     }
 
+    public float cameraZoom
+    {
+        get { return _camera_zoom; }
+    }
+
     void Start()
     {
         setupCamera();
@@ -51,14 +62,14 @@ public class CameraController : MonoBehaviour
         lerpTime = 2f;
         isManualControlEnabled = true;
         isLerping = false;
-        lookAtPoint(Vector3.zero);
-        setCameraZoom(80f);
-        setCameraSpeed(20f);
-        lookAtPoint(new Vector3(1935f, 79f, 969f));
+        setCameraZoom(30f);
+        setCameraSpeed(40f);
+        lookAtPoint(new Vector3(896.4047f, 90.51f, 581.8263f));
     }
 
     void Update()
     {
+
         if (isManualControlEnabled)
         {
             handlePlayerInput();
@@ -84,6 +95,7 @@ public class CameraController : MonoBehaviour
         stopAllAutomaticTasks();
         Vector3 newCameraPos = target + cameraOffset;
         cameraContainer.transform.position = newCameraPos;
+        lastLookedPoint = target;
     }
 
     /// <summary>
@@ -94,6 +106,7 @@ public class CameraController : MonoBehaviour
     {
         Vector3 newCameraPos = target.transform.position + cameraOffset;
         cameraContainer.transform.position = newCameraPos;
+        lastLookedPoint = target.transform.position;
     }
 
     /// <summary>
@@ -262,10 +275,47 @@ public class CameraController : MonoBehaviour
         transform.localPosition = Vector3.zero;
         transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 0, transform.localEulerAngles.z);
         cameraContainer.transform.position = desiredCameraPosition;
-        cameraContainer.transform.Rotate(Vector3.up, 45f);
         Camera.main.orthographic = true;
+        setCameraOrientation(CameraOrientation.SOUTH_WEST);
+ 
     }
 
+    /// <summary>
+    /// Used to set a new camera orientation (Usefull if the map changes its rotation) 
+    /// Orientations can be NORT_WEST (used in the first demo) , SOUTH_WEST, SOUTH_EST, NORTH_EST
+    /// </summary>
+    /// <param name="newOrientation"></param>
+    public void setCameraOrientation(CameraOrientation newOrientation)
+    {
+        float baseVerticalRotation = 45f;
+        float verticalRotationOffset = 90f;
+        float numOffsets = 0;
+
+        switch (newOrientation)
+        {
+            case CameraOrientation.NORTH_WEST:
+                cameraOffset = new Vector3(-252.8f, 250.34f, -252.8f);
+                baseVerticalRotation = 45f;
+                numOffsets = 0;
+                break;
+            case CameraOrientation.SOUTH_WEST:
+                cameraOffset = new Vector3(-252.8f, 250.34f, +252.8f);
+                numOffsets = 1;
+                break;
+            case CameraOrientation.SOUTH_EST:
+                cameraOffset = new Vector3(+252.8f, 250.34f, +252.8f);
+                numOffsets = 2;
+                break;
+            case CameraOrientation.NORTH_EST:
+                cameraOffset = new Vector3(+252.8f, 250.34f, -252.8f);
+                numOffsets = 3;
+                break;
+            default:
+                break;
+        }
+        cameraContainer.transform.rotation = Quaternion.Euler(cameraContainer.transform.localRotation.eulerAngles.x, baseVerticalRotation + verticalRotationOffset * numOffsets, cameraContainer.transform.localEulerAngles.z);
+        _camera_orientation = newOrientation;
+    }
 
     /// <summary>
     /// Sets the new zoom of the camera
@@ -279,7 +329,8 @@ public class CameraController : MonoBehaviour
         }
 
         float fov = Mathf.Clamp(newZoom, CAMERA_MAX_ZOOM, CAMERA_MIN_ZOOM);
-        Camera.main.orthographicSize = fov;     
+        Camera.main.orthographicSize = fov;
+        _camera_zoom = fov;     
     }
 
 
