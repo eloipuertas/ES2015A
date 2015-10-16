@@ -14,6 +14,8 @@ public class CameraController : MonoBehaviour
     private const float CAMERA_MAX_ZOOM = 5f;
     private const float CAMERA_MIN_ZOOM = 100f;
     private const float MOUSE_BOUNDS = 2f;
+    private const float BASE_ACCELERATION = 80f;
+    private const float MAX_ACCELERATION = 200f;
 
     private Vector3 cameraOffset;
     private Vector3 lastLookedPoint;
@@ -31,6 +33,7 @@ public class CameraController : MonoBehaviour
     private float _defaultLerpTime;
     private float _camera_zoom;
     private float _acceleration;
+
 
     private CameraOrientation _camera_orientation;
     private CameraInteractionState actual_state, last_state;
@@ -388,7 +391,8 @@ public class CameraController : MonoBehaviour
 
         if(actual_state == CameraInteractionState.MOVING)
         {
-            _acceleration += 40 * Time.deltaTime;
+            _acceleration += BASE_ACCELERATION * Time.deltaTime;
+            if (_acceleration > MAX_ACCELERATION) _acceleration = MAX_ACCELERATION;
         }
         else
         {
