@@ -152,7 +152,7 @@ public class UserInput : MonoBehaviour
     private void LeftMouseClick()
     {
         if (player.isCurrently(Player.status.PLACING_BUILDING) && !EventSystem.current.IsPointerOverGameObject() )       
-        {   // HACK
+        {   // HACK : (Hermetico)
             // Check if the player is placing the building but is not over game objetct. 
             // This is needed because just after clicking in a button to place the building, the onMouseUp event is triggered
             GetComponent<BuildingsManager>().placeBuilding();

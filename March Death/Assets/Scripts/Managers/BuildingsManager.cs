@@ -55,7 +55,7 @@ public class BuildingsManager : MonoBehaviour
         if (!_placing)
         {
             this.newBuilding = newBuilding;
-            newBuilding.GetComponent<Collider>().isTrigger = true;
+            newBuilding.GetComponent<Collider>().isTrigger = true; //HACK : (hermetico) controlar colision objeto con resto
             _placing = true;
             Cursor.visible = false;
             player.setCurrently(Player.status.PLACING_BUILDING);
@@ -110,7 +110,7 @@ public class BuildingsManager : MonoBehaviour
             newBuilding.transform.position = toLocation;
             IGameEntity destination = (IGameEntity)newBuilding.GetComponent<Unit>();
             player.addEntityToList(destination);
-            newBuilding.GetComponent<Collider>().isTrigger = false;
+            newBuilding.GetComponent<Collider>().isTrigger = false; //HACK : (hermetico) controlar colision objeto con resto
             // remaining operations
             _finishPlacing();
         }
