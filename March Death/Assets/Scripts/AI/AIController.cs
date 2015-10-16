@@ -16,9 +16,9 @@ namespace Assets.Scripts.AI
         public MicroManager Micro { get; set; }
 
         /// <summary>
-        /// Will be used to calc the lvl of the AI
+        /// Will be used to calculate the lvl of the AI
         /// </summary>
-        int difficultyLvl;
+        public int DifficultyLvl { get; set; }
 
         List<AIModule> modules;
         //TODO: change this when decided about what do we really need to keep about buildings 
