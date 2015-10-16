@@ -63,7 +63,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     /// <summary>
     /// Returns current status of the Unit
     /// </summary>
-    protected EntityStatus _status;
+    private EntityStatus _status;
     public EntityStatus status
     {
         get
@@ -71,6 +71,11 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
             return _status;
         }
     }
+
+    /// <sumary>
+    /// Triggers animations on the model
+    /// </sumary>
+    Animator _animator = null;
 
     protected EntityAbility _accumulatedModifier;
     public R accumulatedModifier<R>() where R : EntityAbility
@@ -200,6 +205,9 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     {
         base.Start();
         setupAbilities();
+
+        // Get the Animator
+        _animator = gameObject.GetComponent<Animator>();
     }
 
     public override void Update()
@@ -306,5 +314,11 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         {
             callIfTrue(unit);
         }
+    }
+
+    protected void setStatus(EntityStatus status)
+    {
+        _status = status;
+        _animator.SetInteger("animation_state", (int)status);
     }
 }

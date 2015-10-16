@@ -50,7 +50,7 @@ public class Unit : GameEntity<Unit.Actions>
     private void onTargetDied(System.Object obj)
     {
         // TODO: Our target died, select next? Do nothing?
-        _status = EntityStatus.IDLE;
+        setStatus(EntityStatus.IDLE);
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ public class Unit : GameEntity<Unit.Actions>
     {
         _target = unit;
         _auto += _target.register(Actions.DIED, onTargetDied);
-        _status = EntityStatus.ATTACKING;
+        setStatus(EntityStatus.ATTACKING);
     }
 
     /// <summary>
@@ -90,7 +90,7 @@ public class Unit : GameEntity<Unit.Actions>
 
         // TODO: Maybe we should not set it to null? In case we want to attack it again
         _target = null;
-        _status = EntityStatus.IDLE;
+        setStatus(EntityStatus.IDLE);
     }
 
     /// <summary>
@@ -110,7 +110,7 @@ public class Unit : GameEntity<Unit.Actions>
             transform.rotation = targetRotation;
         }
 
-        _status = EntityStatus.MOVING;
+        setStatus(EntityStatus.MOVING);
         fire(Actions.MOVEMENT_START);
     }
 
@@ -119,12 +119,14 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     public override void Start()
     {
-        _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
         _auto = this;
 
         // Call GameEntity start
         base.Start();
+
+        // Set the status
+        setStatus(EntityStatus.IDLE);
     }
 
     /// <summary>
@@ -152,7 +154,7 @@ public class Unit : GameEntity<Unit.Actions>
             moveTo(hit.point);
         }
 #endif
-        switch (_status)
+        switch (status)
         {
             case EntityStatus.ATTACKING:
                 if (_target != null)
@@ -172,7 +174,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     void FixedUpdate()
     {
-        switch (_status)
+        switch (status)
         {
             case EntityStatus.MOVING:
                 // TODO: Steps on the last sector are smoothened due to distance being small
@@ -182,7 +184,7 @@ public class Unit : GameEntity<Unit.Actions>
                 // If distance is lower than 0.5, stop movement
                 if (Vector3.Distance(transform.position, _movePoint) <= 0.5f)
                 {
-                    _status = EntityStatus.IDLE;
+                    setStatus(EntityStatus.IDLE);
                     fire(Actions.MOVEMENT_END);
                 }
                 break;
