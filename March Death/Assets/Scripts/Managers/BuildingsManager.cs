@@ -70,7 +70,8 @@ public class BuildingsManager : MonoBehaviour
     /// <returns></returns>
     private Vector3 adaptLocation(Vector3 location)
     {
-        //location = Utils.ConstructionGrid.isValidLocationc(toLocation);
+        // TODO : (hermetico) uncomment when merge with devel_c
+        //location = Utils.ConstructionGrid.discretizeMapCoords(toLocation);
         return location;
     }
 
@@ -81,10 +82,10 @@ public class BuildingsManager : MonoBehaviour
     /// <returns></returns>
     private bool checkLocation(Vector3 location)
     {
-        bool check;
+        bool check = false;
 
-		//TODO: (hermetico) call check location from construction grid
-        /* Utils.ConstructionGrid.isValidLocation(toLocation)*/
+        // TODO : (hermetico) uncomment when merge with devel_c
+        //check = Utils.isNewPositionAbleForConstrucction(location)
         check = location.y < 89 ? true : false;
 
         return check;
@@ -96,10 +97,7 @@ public class BuildingsManager : MonoBehaviour
     /// </summary>
     public void placeBuilding()
     {
-		//TODO: (hermetico) The system is firing mouseUp() just inmediately after the click button, so the building
-		// is placed nowhere
-        Vector3 toLocation = inputs.FindHitPoint();
-        locationTrick(toLocation); // HACK : (hermetico) It won't be necessary when using construction grid methods
+		Vector3 toLocation = inputs.FindHitPoint();
         toLocation = adaptLocation(toLocation);
 
         // alter the color if is not a valid location
@@ -154,8 +152,7 @@ public class BuildingsManager : MonoBehaviour
         // move the object to match toLocation with the min corner
 
 
-		toLocation = locationTrick(toLocation);// HACK : (hermetico) It won't be necessary when using construction grid methods
-        toLocation = adaptLocation(toLocation);
+		toLocation = adaptLocation(toLocation);
 
         // alter the color if is not a valid location
         if (checkLocation(toLocation))
@@ -211,6 +208,7 @@ public class BuildingsManager : MonoBehaviour
 
     }
 
+    /*
     /// <summary>
     /// Moves the location based on the collider, because if we move the object on with the center on the hitpoint
     /// the next hitPoint will be the same object that we are placing, and not the surface of the terrain
@@ -223,5 +221,5 @@ public class BuildingsManager : MonoBehaviour
         location += ((max - min) / 2f);
         return location;
     }
-
+    */
 }
