@@ -124,6 +124,9 @@ public class Unit : GameEntity<Unit.Actions>
 
         // Call GameEntity start
         base.Start();
+
+        // Set the status
+        setStatus(EntityStatus.IDLE);
     }
 
     /// <summary>

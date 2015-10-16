@@ -208,9 +208,6 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 
         // Get the Animator
         _animator = gameObject.GetComponent<Animator>();
-
-        // Set the status
-        setStatus(EntityStatus.IDLE);
     }
 
     public override void Update()
