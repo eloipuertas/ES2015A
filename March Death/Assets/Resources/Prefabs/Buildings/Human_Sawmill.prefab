@@ -246,11 +246,10 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 478790}
-  - 111: {fileID: 11194270}
-  - 114: {fileID: 11450720}
   - 54: {fileID: 5405526}
   - 65: {fileID: 6588234}
   - 114: {fileID: 11482300}
+  - 95: {fileID: 9566116}
   m_Layer: 0
   m_Name: Human_Sawmill
   m_TagString: Untagged
@@ -554,7 +553,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 199372}
   m_LocalRotation: {x: .587939382, y: -.587939382, z: .392845243, w: .392845124}
-  m_LocalPosition: {x: 2.66000009, y: 1.72000003, z: -.939999998}
+  m_LocalPosition: {x: 2.86999989, y: 1.64999998, z: 1.37}
   m_LocalScale: {x: -2.06138659, y: -1.76071072, z: -177.431793}
   m_Children: []
   m_Father: {fileID: 478790}
@@ -674,7 +673,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 107796}
   m_LocalRotation: {x: .707106888, y: -.70710665, z: -5.33850724e-08, w: 5.33850795e-08}
-  m_LocalPosition: {x: -1.93565702, y: .283462554, z: .644846201}
+  m_LocalPosition: {x: -1.93565702, y: .283462554, z: .0900000036}
   m_LocalScale: {x: 20.3710041, y: 20.3710041, z: 118.586983}
   m_Children: []
   m_Father: {fileID: 478790}
@@ -1652,33 +1651,23 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 17, y: 0, z: 15}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!111 &11194270
-Animation:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 154054}
-  m_Enabled: 1
+--- !u!95 &9566116
+Animator:
   serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: c6a34e6fda888a7468241cf25d78f19e, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: c6a34e6fda888a7468241cf25d78f19e, type: 2}
-  - {fileID: 7400000, guid: a1bbf13e28973294a93095183b128684, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
-  m_CullingType: 0
---- !u!114 &11450720
-MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 154054}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c84ea376bc4a7344b8e4131daf8925ee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 4fd6b63b7f2076c45bb1e0ad857d8004, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &11482300
 MonoBehaviour:
   m_ObjectHideFlags: 1
