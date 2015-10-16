@@ -1,12 +1,19 @@
 ﻿using UnityEngine;
 using System;
 
+
 /// <summary>
 /// Attach this script to the main camera and it will be able to be controlled like an Isometric Camera.
 /// </summary>
 [RequireComponent(typeof(Camera))]
 public class CameraController : MonoBehaviour
 {
+
+    public struct MapBounds
+    {
+        public Vector3 minxyz;
+        public Vector3 maxxyz;
+    }
 
     public enum  CameraOrientation { NORTH_WEST, SOUTH_WEST, SOUTH_EST, NORTH_EST };
     public enum CameraInteractionState { MOVING, STOPPED }
@@ -33,10 +40,12 @@ public class CameraController : MonoBehaviour
     private float _defaultLerpTime;
     private float _camera_zoom;
     private float _acceleration;
-
+    private Vector3 _internalDisplacement;
 
     private CameraOrientation _camera_orientation;
     private CameraInteractionState actual_state, last_state;
+
+    private MapBounds map1bounds;
 
 
     public float defaultLerpTime
@@ -69,6 +78,8 @@ public class CameraController : MonoBehaviour
         lerpTime = 2f;
         isManualControlEnabled = true;
         isLerping = false;
+        map1bounds.maxxyz = new Vector3(790, 250.34f, 1250);
+        map1bounds.minxyz = new Vector3(-160, 250.34f, 203);
         actual_state = CameraInteractionState.STOPPED;
         last_state = CameraInteractionState.STOPPED;
         setCameraZoom(50f);
@@ -93,6 +104,13 @@ public class CameraController : MonoBehaviour
         {
             lookGameObject(followingGameObject);
         }
+
+    }
+
+    void LateUpdate()
+    {
+        cameraContainer.transform.position = new Vector3(Mathf.Clamp(cameraContainer.transform.position.x, map1bounds.minxyz.x, map1bounds.maxxyz.x),
+                    cameraContainer.transform.position.y, Mathf.Clamp(cameraContainer.transform.position.z, map1bounds.minxyz.z, map1bounds.maxxyz.z));
     }
 
     /// <summary>
@@ -326,6 +344,7 @@ public class CameraController : MonoBehaviour
         _camera_orientation = newOrientation;
     }
 
+
     /// <summary>
     /// Sets the new zoom of the camera
     /// </summary>
@@ -365,27 +384,33 @@ public class CameraController : MonoBehaviour
     {
         last_state = actual_state;
         actual_state = CameraInteractionState.STOPPED;
+
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) || Input.mousePosition.y >= Screen.height - MOUSE_BOUNDS )
         {
-            cameraContainer.transform.Translate(Vector3.forward * Time.deltaTime * (_cameraSpeed + _acceleration));
+            _internalDisplacement = Vector3.forward * Time.deltaTime * (_cameraSpeed + _acceleration);
+            cameraContainer.transform.Translate(_internalDisplacement); 
             actual_state = CameraInteractionState.MOVING;
         }
 
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) || Input.mousePosition.x <= MOUSE_BOUNDS )
         {
-            cameraContainer.transform.Translate(Vector3.left * Time.deltaTime * (_cameraSpeed + _acceleration));
+            _internalDisplacement = Vector3.left * Time.deltaTime * (_cameraSpeed + _acceleration);
+            cameraContainer.transform.Translate(_internalDisplacement);
             actual_state = CameraInteractionState.MOVING;
         }
 
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) || Input.mousePosition.y <= MOUSE_BOUNDS )
         {
-            cameraContainer.transform.Translate(Vector3.back * Time.deltaTime * (_cameraSpeed + _acceleration));
+            _internalDisplacement = Vector3.back * Time.deltaTime * (_cameraSpeed + _acceleration);
+            Vector3 nextFramePosition = cameraContainer.transform.position + _internalDisplacement;
+            cameraContainer.transform.Translate(_internalDisplacement);          
             actual_state = CameraInteractionState.MOVING;
         }
 
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || Input.mousePosition.x >= Screen.width - MOUSE_BOUNDS )
         {
-            cameraContainer.transform.Translate(Vector3.right * Time.deltaTime * (_cameraSpeed + _acceleration));
+            _internalDisplacement = Vector3.right * Time.deltaTime * (_cameraSpeed + _acceleration);
+            cameraContainer.transform.Translate(_internalDisplacement); 
             actual_state = CameraInteractionState.MOVING;
         }
 
@@ -398,8 +423,6 @@ public class CameraController : MonoBehaviour
         {
             _acceleration = 0f;
         }
-
-        Debug.Log(_acceleration);
 
         handleZoom();
     }
