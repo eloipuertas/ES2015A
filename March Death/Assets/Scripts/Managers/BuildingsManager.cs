@@ -40,7 +40,6 @@ public class BuildingsManager : MonoBehaviour
             GameObject newBuilding;
             newBuilding = (GameObject)Resources.Load("Prefabs/Buildings/" + name, typeof(GameObject));
             newBuilding = (GameObject)Instantiate(newBuilding, new Vector3(0, 0, 0), Quaternion.identity);
-
             this.createBuilding(newBuilding);
 
         }
@@ -56,6 +55,7 @@ public class BuildingsManager : MonoBehaviour
         if (!_placing)
         {
             this.newBuilding = newBuilding;
+            newBuilding.GetComponent<Collider>().isTrigger = true;
             _placing = true;
             Cursor.visible = false;
             player.setCurrently(Player.status.PLACING_BUILDING);
@@ -105,12 +105,12 @@ public class BuildingsManager : MonoBehaviour
         // alter the color if is not a valid location
         if (checkLocation(toLocation))
         {
-
+            
             //Utils.ConstructionGrid.resevePosition(toLocation)
             newBuilding.transform.position = toLocation;
             IGameEntity destination = (IGameEntity)newBuilding.GetComponent<Unit>();
             player.addEntityToList(destination);
-            
+            newBuilding.GetComponent<Collider>().isTrigger = false;
             // remaining operations
             _finishPlacing();
         }
