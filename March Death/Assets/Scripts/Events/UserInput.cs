@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
 
 public class UserInput : MonoBehaviour
 {
@@ -65,6 +66,7 @@ public class UserInput : MonoBehaviour
     /// </summary>
     private void MouseActivity()
     {
+
 
 		// TODO : (Devel_c) Check positions with the HUD
         if (Input.GetMouseButtonDown (0)) {
@@ -149,8 +151,10 @@ public class UserInput : MonoBehaviour
 
     private void LeftMouseClick()
     {
-        if (player.isCurrently(Player.status.PLACING_BUILDING)) // we are locating a building
-        {
+        if (player.isCurrently(Player.status.PLACING_BUILDING) && !EventSystem.current.IsPointerOverGameObject() )       
+        {   // HACK
+            // Check if the player is placing the building but is not over game objetct. 
+            // This is needed because just after clicking in a button to place the building, the onMouseUp event is triggered
             GetComponent<BuildingsManager>().placeBuilding();
         }
         else // we are doing something else
