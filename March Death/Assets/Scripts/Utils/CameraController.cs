@@ -9,6 +9,7 @@ public class CameraController : MonoBehaviour
 {
 
     public enum  CameraOrientation { NORTH_WEST, SOUTH_WEST, SOUTH_EST, NORTH_EST };
+    public enum CameraInteractionState { MOVING, STOPPED }
 
     private const float CAMERA_MAX_ZOOM = 5f;
     private const float CAMERA_MIN_ZOOM = 100f;
@@ -29,8 +30,10 @@ public class CameraController : MonoBehaviour
     private float _mouseWeelZoomSensitivity;
     private float _defaultLerpTime;
     private float _camera_zoom;
+    private float _acceleration;
 
     private CameraOrientation _camera_orientation;
+    private CameraInteractionState actual_state, last_state;
 
 
     public float defaultLerpTime
@@ -57,12 +60,15 @@ public class CameraController : MonoBehaviour
     {
         setupCamera();
         _cameraSpeed = 5f;
-        _mouseWeelZoomSensitivity = 5f;
+        _mouseWeelZoomSensitivity = 20f;
+        _acceleration = 0f;
         _defaultLerpTime = 2f;
         lerpTime = 2f;
         isManualControlEnabled = true;
         isLerping = false;
-        setCameraZoom(30f);
+        actual_state = CameraInteractionState.STOPPED;
+        last_state = CameraInteractionState.STOPPED;
+        setCameraZoom(50f);
         setCameraSpeed(40f);
         lookAtPoint(new Vector3(896.4047f, 90.51f, 581.8263f));
     }
@@ -354,27 +360,43 @@ public class CameraController : MonoBehaviour
     /// </summary>
     private void handlePlayerInput()
     {
+        last_state = actual_state;
+        actual_state = CameraInteractionState.STOPPED;
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) || Input.mousePosition.y >= Screen.height - MOUSE_BOUNDS )
         {
-            cameraContainer.transform.Translate(Vector3.forward * Time.deltaTime * _cameraSpeed);
+            cameraContainer.transform.Translate(Vector3.forward * Time.deltaTime * (_cameraSpeed + _acceleration));
+            actual_state = CameraInteractionState.MOVING;
         }
 
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) || Input.mousePosition.x <= MOUSE_BOUNDS )
         {
-            cameraContainer.transform.Translate(Vector3.left * Time.deltaTime * _cameraSpeed);
+            cameraContainer.transform.Translate(Vector3.left * Time.deltaTime * (_cameraSpeed + _acceleration));
+            actual_state = CameraInteractionState.MOVING;
         }
 
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) || Input.mousePosition.y <= MOUSE_BOUNDS )
         {
-            cameraContainer.transform.Translate(Vector3.back * Time.deltaTime * _cameraSpeed);
+            cameraContainer.transform.Translate(Vector3.back * Time.deltaTime * (_cameraSpeed + _acceleration));
+            actual_state = CameraInteractionState.MOVING;
         }
 
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || Input.mousePosition.x >= Screen.width - MOUSE_BOUNDS )
         {
-            cameraContainer.transform.Translate(Vector3.right * Time.deltaTime * _cameraSpeed);
+            cameraContainer.transform.Translate(Vector3.right * Time.deltaTime * (_cameraSpeed + _acceleration));
+            actual_state = CameraInteractionState.MOVING;
         }
 
-  
+        if(actual_state == CameraInteractionState.MOVING)
+        {
+            _acceleration += 40 * Time.deltaTime;
+        }
+        else
+        {
+            _acceleration = 0f;
+        }
+
+        Debug.Log(_acceleration);
+
         handleZoom();
     }
 
