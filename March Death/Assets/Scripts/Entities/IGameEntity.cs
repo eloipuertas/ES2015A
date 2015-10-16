@@ -5,11 +5,14 @@ using System;
 // Once DEAD/DESTROYED, you can not go back to any state!
 public enum EntityStatus
 {
-    IDLE = 0,
-    MOVING = 1,
-    ATTACKING = 2,
-    DEAD = 3,
-    DESTROYED = 4
+    BUILDING_PHASE_1 = 0,
+    BUILDING_PHASE_2 = 1,
+    BUILDING_PHASE_3 = 2,
+    IDLE = 4,
+    MOVING = 5,
+    ATTACKING = 6,
+    DEAD = 7,
+    DESTROYED = 8
 };
 
 public interface IGameEntity
