@@ -2,7 +2,7 @@
 using Storage;
 using Utils;
 
-public class UnitMarker : SubscribableActor<UnitMarker.Actions, UnitMarker>
+public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker>
 {
     public enum Actions { BEING_ATTACKED, NORMAL};
 

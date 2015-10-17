@@ -183,7 +183,7 @@ namespace Storage
         public GameObject createUnit (Races race, UnitTypes type, int variant = -1)
         {
             string prefab = getPrefab (race, type, variant);
-            return UnityEngine.Object.Instantiate ((GameObject)Resources.Load (prefab, typeof(GameObject)));
+            return UnityEngine.Object.Instantiate ((GameObject)Resources.Load(prefab, typeof(GameObject)));
         }
 
         /// <summary>
@@ -195,7 +195,7 @@ namespace Storage
         public GameObject createBuilding (Races race, BuildingTypes type, int variant = -1)
         {
             string prefab = getPrefab (race, type, variant);
-            return UnityEngine.Object.Instantiate ((GameObject)Resources.Load (prefab, typeof(GameObject)));
+            return UnityEngine.Object.Instantiate ((GameObject)Resources.Load(prefab, typeof(GameObject)));
         }
 
         /// <summary>
