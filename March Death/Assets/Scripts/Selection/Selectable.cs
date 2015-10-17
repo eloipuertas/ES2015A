@@ -6,7 +6,7 @@ using Utils;
 
 public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 {
-	
+
 	public enum Actions { SELECTED, DESELECTED };
 
     private Rect selectedRect = new Rect();
@@ -31,7 +31,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         currentlySelected = false;
     }
 
-    protected virtual void Update() { }
+    public override void Update() { }
 
     protected virtual void LateUpdate()
     {

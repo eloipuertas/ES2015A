@@ -11,9 +11,9 @@ public class InformationController : MonoBehaviour {
 	private Text txtActorHealth;
 	private Image imgActorDetail;
 	private Slider sliderActorHealth;
-	
+
 	// Use this for initialization
-	void Start () 
+	void Start ()
 	{
 		//Register to selectable actions
 		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.SELECTED, onUnitSelected);
@@ -30,11 +30,11 @@ public class InformationController : MonoBehaviour {
 		//Default is hidden
 		hideInformation ();
 	}
-	
+
 	// Update is called once per frame
-	void Update () 
+	void Update ()
 	{
-	
+
 	}
 
 	private void showInformation(GameObject gameObject) 
@@ -46,7 +46,7 @@ public class InformationController : MonoBehaviour {
 		txtActorRace.text = entity.info.race.ToString ();
 		txtActorRace.enabled = true;
 		txtActorHealth.text = entity.healthPercentage.ToString () + "/100";
-		txtActorHealth.enabled = true;	
+		txtActorHealth.enabled = true;
 		imgActorDetail.color = new Color (0, 0, 1, 1);
 		imgActorDetail.enabled = true;
 		sliderActorHealth.value = entity.healthPercentage;
@@ -55,8 +55,8 @@ public class InformationController : MonoBehaviour {
 		sliderBackground.GetComponent<Image>().enabled = true;
 	}
 
-	private void hideInformation() 
-	{	
+	private void hideInformation()
+	{
 		txtActorName.enabled = false;
 		txtActorRace.enabled = false;
 		txtActorHealth.enabled = false;
@@ -68,38 +68,41 @@ public class InformationController : MonoBehaviour {
 
 	}
 
-	public void onUnitSelected(GameObject gameObject)
+	public void onUnitSelected(System.Object obj)
 	{
+        GameObject gameObject = (GameObject) obj;
 		//TODO: parse actor type (building / unit)
 		showInformation(gameObject);
 
 		//Register for unit events
 		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-		Unit unit = entity.toUnit ();
+        Unit unit = (Unit) entity;
 		unit.register(Unit.Actions.DAMAGED, onUnitDamaged);
 		unit.register(Unit.Actions.DIED, onUnitDied);
 	}
 
-	public void onUnitDeselected(GameObject gameObject)
+	public void onUnitDeselected(System.Object obj)
 	{
+        GameObject gameObject = (GameObject) obj;
 		hideInformation ();
 
 		//Unregister unit events
 		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-		Unit unit = entity.toUnit ();
+		Unit unit = (Unit) entity;
 		unit.unregister(Unit.Actions.DAMAGED, onUnitDamaged);
 		unit.unregister(Unit.Actions.DIED, onUnitDied);
 	}
 
-	public void onUnitDamaged(GameObject gameObject)
+	public void onUnitDamaged(System.Object obj)
 	{
+        GameObject gameObject = (GameObject) obj;
 		IGameEntity entity = gameObject.GetComponent<IGameEntity> ();
 		sliderActorHealth.value = entity.healthPercentage;
 	}
 
-	public void onUnitDied(GameObject gameObject)
+    public void onUnitDied(System.Object obj)
 	{
 		hideInformation ();
 	}
-		
+
 }

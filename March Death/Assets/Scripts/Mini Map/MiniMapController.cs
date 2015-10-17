@@ -8,7 +8,6 @@ public class MiniMapController : MonoBehaviour
     private Camera mainCam;
     
     // Minimap Rectangle
-    GameObject quad;
     Rect rect_marker;
     Texture2D tex;
     private float main_zoom;
@@ -29,8 +28,6 @@ public class MiniMapController : MonoBehaviour
 
         initializeCameraPars();
 
-        createMarker();
-
         // moves camera to show the whole map
         if (Terrain.activeTerrain)
         {
@@ -42,6 +39,7 @@ public class MiniMapController : MonoBehaviour
 
         }
 
+        createMarker();
     }
 
     /// <summary>
@@ -76,8 +74,8 @@ public class MiniMapController : MonoBehaviour
         if (main_zoom != mainCam.orthographicSize) // if the zoom has changed
         {
             float diff = (mainCam.orthographicSize - main_zoom) / 1.5f;
-            rect_marker.width += diff; rect_marker.height += diff / 2f;
-            rect_marker.center -= new Vector2(diff / 2, diff / (2 * 3));
+            rect_marker.width += diff; rect_marker.height += diff / 2.0f;
+            rect_marker.center -= new Vector2(diff / 2, diff / (2 * 2.0f));
             main_zoom = mainCam.orthographicSize;
         }
         if (!act_pos.Equals(mainCam.transform.position)) // if the camera has moved
@@ -119,12 +117,9 @@ public class MiniMapController : MonoBehaviour
     {
         Vector3[] corners = new Vector3[2]
         {
-            mainCam.ScreenToWorldPoint(new Vector3(0,0,mainCam.farClipPlane+70)),
-            mainCam.ScreenToWorldPoint(new Vector3(Screen.width,Screen.height,mainCam.farClipPlane+70))
+            mainCam.ScreenToWorldPoint(new Vector3(0,0,mainCam.farClipPlane)),
+            mainCam.ScreenToWorldPoint(new Vector3(Screen.width,Screen.height,mainCam.farClipPlane))
         };
-
-        Debug.Log(mainCam.farClipPlane);
-        //corners[0] += cameraOffset; corners[1] += cameraOffset; //  * 2.65f
 
         Vector3[] corners_minimap = new Vector3[2]
         {
@@ -133,10 +128,16 @@ public class MiniMapController : MonoBehaviour
         };
 
         Rect r = new Rect();
+
         r.xMax = corners_minimap[1].x + 10;
         r.xMin = corners_minimap[0].x - 10;
-        r.yMax = Screen.height - corners_minimap[1].y + 10;
-        r.yMin = Screen.height - corners_minimap[0].y - 10;
+        r.yMax = Screen.height - corners_minimap[1].y + 12;
+        r.yMin = Screen.height - corners_minimap[0].y - 12;
+
+        Vector3 v = _camera.WorldToScreenPoint(mainCam.transform.position + cameraOffset);
+        v.y = Screen.height - v.y;
+        r.center = v;
+  
         return r;
     }
 

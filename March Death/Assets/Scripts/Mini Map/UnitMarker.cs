@@ -4,7 +4,7 @@ using Utils;
 
 public class UnitMarker : SubscribableActor<UnitMarker.Actions, UnitMarker>
 {
-    public enum Actions { BEING_ATTACKED, NORMAL, ATTACKING};
+    public enum Actions { BEING_ATTACKED, NORMAL};
 
     private GameObject plane;
     private Camera minimap_cam, mainCam;
@@ -24,8 +24,8 @@ public class UnitMarker : SubscribableActor<UnitMarker.Actions, UnitMarker>
         if (mainCam == null) {
             mainCam = GameObject.FindGameObjectWithTag("minimap_cam").GetComponent<Camera>();
         }
-        marker_rect = MinimapOverlays.CalculateBoxFromCntr(this.transform.position, mainCam, 1);
-        box_text = MinimapOverlays.CreateTextureUnit(getRaceColor(this.GetComponent<Unit>().race));
+        marker_rect = MinimapOverlays.CalculateBoxFromCntr(this.transform.position, mainCam, 1); 
+        box_text = MinimapOverlays.CreateTextureUnit(getRaceColor(this.gameObject.GetComponent<IGameEntity>().info.race));
     }
 
     protected virtual void OnGUI()
