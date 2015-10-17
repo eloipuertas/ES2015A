@@ -1,4 +1,4 @@
-﻿Shader "Fog Of War/Terrain" {
+﻿Shader "Fog Of War/TerrainAddPass" {
 	Properties{
 		[HideInInspector] _Control("Control (RGBA)", 2D) = "red" {}
 		[HideInInspector] _Splat3("Layer 3 (A)", 2D) = "white" {}
@@ -13,15 +13,16 @@
 	SubShader{
 		Tags{
 			"SplatCount" = "4"
-            "Queue" = "Geometry-100"
+            "Queue" = "Geometry-99"
 			"RenderType" = "Opaque" 
+			"IgnoreProjector" = "true"
 		}
 		LOD 200
 		Blend SrcAlpha OneMinusSrcAlpha
 		CGPROGRAM
 			
 		#pragma target 4.0
-		#pragma surface surf Lambert exclude_path:prepass
+		#pragma surface surf Lambert decal:add
 
 		sampler2D _FOWTex;
 		float4 _FOWTex_ST;
@@ -69,6 +70,5 @@
 		}
 		ENDCG
 	}
-	Dependency "AddPassShader" = "Fog Of War/TerrainAddPass"
 	FallBack "Diffuse"
 }

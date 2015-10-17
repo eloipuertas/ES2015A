@@ -14,10 +14,11 @@
 	[HideInInspector] _RefractionTex("Internal Refraction", 2D) = "" {}
 	}
 		SubShader{
-		Tags{ "RenderType" = "Opaque" }
-		LOD 200
-		Blend DstColor Zero
 		UsePass "FX/Water/WATERPASS"
+		Tags{ "RenderType" = "Opaque" "WaterMode" = "Refractive" "RenderType" = "Opaque" }
+		LOD 200
+		ZWrite Off
+		Blend DstColor Zero
 		CGPROGRAM
 #pragma surface surf Lambert
 
