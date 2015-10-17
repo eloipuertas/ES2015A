@@ -35,7 +35,6 @@
         public Resource Empty()
         {
             return new Resource(_resource.GetResourceType(), _resource.Empty());
-            
         }
 
         public float Substract(Resource other)
