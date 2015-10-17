@@ -76,7 +76,7 @@ public class MiniMapController : MonoBehaviour
         if (main_zoom != mainCam.orthographicSize) // if the zoom has changed
         {
             float diff = (mainCam.orthographicSize - main_zoom) / 1.5f;
-            rect_marker.width += diff; rect_marker.height += diff / 2.5f;
+            rect_marker.width += diff; rect_marker.height += diff / 2f;
             rect_marker.center -= new Vector2(diff / 2, diff / (2 * 3));
             main_zoom = mainCam.orthographicSize;
         }
@@ -133,10 +133,10 @@ public class MiniMapController : MonoBehaviour
         };
 
         Rect r = new Rect();
-        r.xMax = corners_minimap[1].x + 15;
-        r.xMin = corners_minimap[0].x - 15;
-        r.yMax = Screen.height - corners_minimap[1].y + 15;
-        r.yMin = Screen.height - corners_minimap[0].y - 15;
+        r.xMax = corners_minimap[1].x + 10;
+        r.xMin = corners_minimap[0].x - 10;
+        r.yMax = Screen.height - corners_minimap[1].y + 10;
+        r.yMin = Screen.height - corners_minimap[0].y - 10;
         return r;
     }
 
