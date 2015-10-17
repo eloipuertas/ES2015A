@@ -50,6 +50,9 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     public override void Update()
     {
         base.Update();
+
+        // Set the status
+        setStatus(EntityStatus.BUILDING_PHASE_1);
     }
 
     /// <summary>

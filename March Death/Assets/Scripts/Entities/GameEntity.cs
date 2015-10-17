@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define DISABLE_ANIMATOR
+
+using System;
 using System.Reflection;
 using System.Linq;
 using System.Collections.Generic;
@@ -63,7 +65,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     /// <summary>
     /// Returns current status of the Unit
     /// </summary>
-    protected EntityStatus _status;
+    private EntityStatus _status;
     public EntityStatus status
     {
         get
@@ -71,6 +73,13 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
             return _status;
         }
     }
+
+#if !DISABLE_ANIMATOR
+    /// <sumary>
+    /// Triggers animations on the model
+    /// </sumary>
+    Animator _animator = null;
+#endif
 
     protected EntityAbility _accumulatedModifier;
     public R accumulatedModifier<R>() where R : EntityAbility
@@ -200,6 +209,11 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     {
         base.Start();
         setupAbilities();
+
+#if !DISABLE_ANIMATOR
+        // Get the Animator
+        _animator = gameObject.GetComponent<Animator>();
+#endif
     }
 
     public override void Update()
@@ -306,5 +320,14 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         {
             callIfTrue(unit);
         }
+    }
+
+    protected void setStatus(EntityStatus status)
+    {
+        _status = status;
+
+#if !DISABLE_ANIMATOR
+        _animator.SetInteger("animation_state", (int)status);
+#endif
     }
 }

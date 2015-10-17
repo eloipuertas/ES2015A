@@ -200,7 +200,6 @@ public class Resource : Building<Resource.Actions>
         collectionRate = 0;
         harvestUnits = 0;
 
-        _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
 
         // Call GameEntity start

@@ -1,7 +1,19 @@
 using System;
 ﻿using Storage;
 
-public enum EntityStatus { IDLE, MOVING, ATTACKING, DEAD, DESTROYED };
+// Values are set only for clarity purposes on the Animator
+// Once DEAD/DESTROYED, you can not go back to any state!
+public enum EntityStatus
+{
+    BUILDING_PHASE_1 = 0,
+    BUILDING_PHASE_2 = 1,
+    BUILDING_PHASE_3 = 2,
+    IDLE = 4,
+    MOVING = 5,
+    ATTACKING = 6,
+    DEAD = 7,
+    DESTROYED = 8
+};
 
 public interface IGameEntity
 {
