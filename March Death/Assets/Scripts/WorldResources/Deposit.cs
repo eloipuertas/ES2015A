@@ -38,6 +38,11 @@
             
         }
 
+        public float Substract(Resource other)
+        {
+            return _resource.Substract(other.GetAmount());
+        }
+
         public float GetCapacity()
         {
             return _capacity;

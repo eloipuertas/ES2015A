@@ -32,6 +32,7 @@ namespace Managers
             }
         }
 
+
         public void EmptyDeposits()
         {
             foreach (var deposit in _deposits.Values)
@@ -40,39 +41,59 @@ namespace Managers
             }
         }
 
-        public bool IsEnough(Resource other)
+
+        public bool IsEnough(WorldResources.Resource other)
         {
-            //TODO
-            return true;
+            if (_deposits.ContainsKey(other.GetResourceType()))
+            {
+                return _deposits[other.GetResourceType()].GetCapacity() >= other.GetAmount();
+
+            }
+            else
+                throw new System.Exception("Type not in deposits");
+
         }
+
 
         public bool IsEnough(Type type, float amount)
         {
-            //TODO
-            return true;
+            return IsEnough(new WorldResources.Resource(type, amount));
         }
 
 
-
-        public float SubstractAmount(Resource other)
+        public float SubstractAmount(WorldResources.Resource other)
         {
-            //TODO
-            return 1f;
+            if (_deposits.ContainsKey(other.GetResourceType()))
+            {
+                return _deposits[other.GetResourceType()].Substract(other);
+            }
+            else
+                throw new System.Exception("Type not in deposits");
+            
         }
+
 
         public float SubstractAmount(Type type, float amount)
         {
-            //TODO
-            return 1f;
+            return SubstractAmount(new WorldResources.Resource(type, amount));
+
         }
 
-        public void AddAmount(Resource other)
+
+        public void AddAmount(WorldResources.Resource other)
         {
-            //TODO
+            if (_deposits.ContainsKey(other.GetResourceType()))
+            {
+                 _deposits[other.GetResourceType()].AddAmount(other.GetAmount());
+            }
+            else
+                throw new System.Exception("Type not in deposits");
         }
+
+
         public void AddAmount(Type type, float amount)
         {
-            //TODO
+            AddAmount(new WorldResources.Resource(type, amount));
         }
 
     }
