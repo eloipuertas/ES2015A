@@ -9,6 +9,8 @@ public class MiniMapController : MonoBehaviour
     
     // Minimap Rectangle
     GameObject quad;
+    Rect rect_marker;
+    Texture2D tex;
     private float main_zoom;
     private Vector3 act_pos;
     Vector3 cameraOffset;
@@ -25,7 +27,9 @@ public class MiniMapController : MonoBehaviour
 
         mainCam = GameObject.Find("Main Camera").GetComponent<Camera>();
 
-        initializeMinimapRect();
+        initializeCameraPars();
+
+        createMarker();
 
         // moves camera to show the whole map
         if (Terrain.activeTerrain)
@@ -40,18 +44,51 @@ public class MiniMapController : MonoBehaviour
 
     }
 
-    private void initializeMinimapRect()
+    /// <summary>
+    /// Here we draw the texture of the Marker.
+    /// </summary>
+    void OnGUI()
+    {
+        GUI.DrawTexture(rect_marker, tex);
+    }
+
+    private void initializeCameraPars()
     {
         main_zoom = mainCam.orthographicSize;
         act_pos = mainCam.transform.position;
-        cameraOffset = new Vector3(-252.8f, 0f, -252.8f);
-        createRectangle();
+        cameraOffset = new Vector3(252.8f, 0f, 252.8f);
+    }
+
+    /// <summary>
+    /// This method initialize and sets up the Maerker.
+    /// </summary>
+    private void createMarker()
+    {
+        rect_marker = getCameraRect();
+        tex = MinimapOverlays.CreateTextureMarker(Color.red);
+    }
+
+    /// <summary>
+    /// Updates the position and the size of the marker.
+    /// </summary>
+    private void updateMarker()
+    {
+        if (main_zoom != mainCam.orthographicSize) // if the zoom has changed
+        {
+            float diff = (mainCam.orthographicSize - main_zoom) / 1.5f;
+            rect_marker.width += diff; rect_marker.height += diff / 2.5f;
+            rect_marker.center -= new Vector2(diff / 2, diff / (2 * 3));
+            main_zoom = mainCam.orthographicSize;
+        }
+        if (!act_pos.Equals(mainCam.transform.position)) // if the camera has moved
+        {
+            Vector3 v = _camera.WorldToScreenPoint(mainCam.transform.position + cameraOffset); v.y = Screen.height - v.y;
+            rect_marker.center = v;
+            act_pos = mainCam.transform.position;
+        }
     }
 
     // Update is called once per frame
-    /// <summary>
-    /// 
-    /// </summary>
     void Update()
     {
         // GetMouseButton(0) if we want to move the camera by clicking & dragging around the minimap
@@ -67,50 +104,44 @@ public class MiniMapController : MonoBehaviour
                     ground = hit.point;          
                 if(!ground.Equals(new Vector3()))
                     mainCam.GetComponent<CameraController>().lookAtPoint(ground);
-                updateRect();
+                updateMarker();
             }
         }
-        updateRect();
+        updateMarker();
 
     }
 
     /// <summary>
-    /// Creates and sets up the rectangle to show the view on the minimap.
+    /// Returns the Screen rectangle on the minimap that represents what we see in the main camera.
     /// </summary>
-    private void createRectangle()
+    /// <returns></returns>
+    private Rect getCameraRect()
     {
-        Vector3 v = mainCam.transform.position;
+        Vector3[] corners = new Vector3[2]
+        {
+            mainCam.ScreenToWorldPoint(new Vector3(0,0,mainCam.farClipPlane+70)),
+            mainCam.ScreenToWorldPoint(new Vector3(Screen.width,Screen.height,mainCam.farClipPlane+70))
+        };
 
-        quad = new GameObject();
-        quad.AddComponent<MeshFilter>();
-        quad.AddComponent<MeshRenderer>();
-        MeshRenderer mr = quad.GetComponent<MeshRenderer>();
-        Material m = new Material(Shader.Find("Transparent/Diffuse"));
-        m.color = new Color(1f, 0f, 0f, 0.35f);
-        mr.material = m;
-        quad.transform.position = v - cameraOffset;
-        quad.AddComponent<MeshRect>();
-        quad.layer = 8;
+        Debug.Log(mainCam.farClipPlane);
+        //corners[0] += cameraOffset; corners[1] += cameraOffset; //  * 2.65f
+
+        Vector3[] corners_minimap = new Vector3[2]
+        {
+            _camera.WorldToScreenPoint(corners[0]),
+            _camera.WorldToScreenPoint(corners[1])
+        };
+
+        Rect r = new Rect();
+        r.xMax = corners_minimap[1].x + 15;
+        r.xMin = corners_minimap[0].x - 15;
+        r.yMax = Screen.height - corners_minimap[1].y + 15;
+        r.yMin = Screen.height - corners_minimap[0].y - 15;
+        return r;
     }
 
-    /// <summary>
-    /// Updates the parameters of the Rectangle of the minimap.
-    /// </summary>
-    private void updateRect()
-    {
-        if (main_zoom != mainCam.orthographicSize)
-        {
-            float diff = (mainCam.orthographicSize - main_zoom)/ 80;
-            quad.transform.localScale += new Vector3(diff, diff, diff);
-            main_zoom = mainCam.orthographicSize;
-        }
-        if (!act_pos.Equals(mainCam.transform.position))
-        {
-            Vector3 vDiff = mainCam.transform.position - act_pos;
-            quad.transform.Translate(vDiff);
-            act_pos = mainCam.transform.position;
-        }
-    }
+
+
 
     /// <summary>
     /// Checks if a coordinate is inside a certain rectangle
@@ -126,6 +157,7 @@ public class MiniMapController : MonoBehaviour
         }
         else { return false; }
     }
+
 
     private Rect recalcViewport()
     {
@@ -143,6 +175,4 @@ public class MiniMapController : MonoBehaviour
         return new Rect(viewPortPosX, viewPortPosY, viewPortW, viewPortH);
 
     }
-
-
 }
