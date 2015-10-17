@@ -6,119 +6,68 @@ using Storage;
 
 public class Resource : Building<Resource.Actions>
 {
-    public new enum Actions { DAMAGED, DESTROYED, COLLECTION_START, COLLECTION_STOP, CREATE_UNIT };
+    public enum Actions { DAMAGED, DESTROYED, COLLECTION, CREATE_UNIT };
     // Constructor
     public Resource() { }
 
     /// <summary>
-    /// Time elapsed to next update
-    /// </summary>
-    public float updateInterval { get; set; }
-
-    /// <summary>
     ///  Next update time
     /// </summary>
-    //
-    private float nextUpdate;
+    private float _nextUpdate;
 
     /// <summary>
     // Resource could store limited amount of material when not in use
     // or when production is higher than collection
     /// </summary>
-    //
-    private int storeSize;
-    /// <summary>
-    /// amount of materials produced and not collected yet.
-    /// Maximun allowed is storeSize
-    /// </summary>
-    private int stored;
-
-    /// <summary>
-    /// Material amount produced every time interval.
-    /// </summary>
-    public int productionRate { get; set; }
+    private float _stored;
 
     /// <summary>
     /// sum of capacity of units collecting this resource
-    /// the more units the more maxCollectionRate.
+    /// the more units the more collectionRate.
     /// real collectionRate could be lower due to
     /// store limit.
     /// </summary>
-    public int collectionRate { get; set; }
+    private float _collectionRate { get; set; }
 
     /// <summary>
     ///  units collecting this resource
+    /// </summary> 
+    private int harvestUnits { get; set; }
+ 
+    /// <summary>
+    /// material amount send to player (collected) when update succes.
     /// </summary>
-    public int harvestUnits;
-    //public int harvestUnits { get; set; }
+    private float _collectedAmount;
 
     /// <summary>
-    /// max harvesting units allowed
+    /// civilians pay budgets and generate gold every update interval
     /// </summary>
-    public int maxUnits { get; set; }
+    private float _goldAmount;
 
     /// <summary>
-    /// material amount collected when update succes.
+    /// this building can create units.
+    /// unitPosition are the x,y,z map coordinates of new civilian
     /// </summary>
-    private int collectedAmount;
+    private Vector3 _unitPosition;
 
     /// <summary>
-    /// when collider interact with other gameobject method checks if
-    /// it is collecting unit and if unit has the rigth type for collecting
-    ///  resource.Then update number of collectors attached and production.
+    /// this building can create units.
+    /// unitRotation is the rotation of new civilian
     /// </summary>
-    /// <param name="other"></param>
-    void OnTriggerEnter(Collider other)
-    {
+    private Quaternion _unitRotation;
 
-        // space enough to hold new collectingUnit
-        if (harvestUnits < _info.resourceAttributes.maxUnits)
-        {
-            IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
+    /// <summary>
+    /// when you create a civilian some displacement is needed to avoid units 
+    /// overlap. this is the x-axis displacement
+    /// </summary>
+    private int _xDisplacement;
 
-            // check collection unit and right type
-            if (entity.info.isCivil)
-            {
-                Unit unit = (Unit)entity;
-                UnitInfo info = (UnitInfo)entity.info;
+    /// <summary>
+    /// when you create a civilian some displace is needed to avoid units 
+    /// overlap. this is the y-axis displacement
+    /// </summary>
+    private int _yDisplacement;
 
-                //Increase units collecting resource, calculate max capacity.
-                if (match(info.type, type))
-                {
-                    harvestUnits++;
-                    collectionRate += info.attributes.capacity;
-                }
-            }
-        }
-
-
-    }
-    void OnTriggerStay(Collider other)
-    {
-        ;
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-
-        // get entity
-        IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
-
-        if (harvestUnits < _info.resourceAttributes.maxUnits)
-        {
-            if (entity.info.isCivil)
-            {
-                UnitInfo info = (UnitInfo)entity.info;
-
-                //Decrease units collecting resource, calculate max capacity.
-                if (match(info.type, type))
-                {
-                    harvestUnits--;
-                    collectionRate -= info.attributes.capacity;
-                }
-            }
-        }
-    }
 
     /// <summary>
     /// check if collecting unit type matchs rigth resource type
@@ -134,96 +83,185 @@ public class Resource : Building<Resource.Actions>
         return unitType == UnitTypes.CIVIL;
     }
 
-    void collect()
+    /// <summary>
+    /// civilians units collect resources each production cicle.
+    /// the sum of units capacity is the total amount of materials they can 
+    /// take from the store and send to player. Gold is collected via 
+    /// gold taxes and sent to the user, it is not stored
+    /// </summary>
+    private void collect()
     {
-        if (collectionRate > stored)
+        
+        if (_collectionRate > _stored)
         {
             // collect all stored resources
-            collectedAmount = stored;
-            stored = 0;
+            _collectedAmount = _stored;           
+            _stored = 0;
         }
         else
         {
-            // collection capacity lower than stored materials
-            collectedAmount = collectionRate;
-            stored -= collectedAmount;
+            // collection capacity lower than stored materials. some materials
+            //remain at store until new collection cycle.
+            _collectedAmount = _collectionRate;
+            _stored -= _collectedAmount;
         }
-        addResource(collectedAmount);
+        
+        //TODO gold consum and production unit attributes needed
+        //_goldAmount = harvestUnits * (info.attributes.goldProduction - info.attributes.goldConpsumption);
+        sendResource(_collectedAmount, 0);
         return;
     }
 
-    void produce()
+    /// <summary>
+    /// after civilians sends last batch produced they are able to take the 
+    /// new production and store it for the next production cicle
+    /// </summary>
+    private void produce()
     {
-        int remainingSpace = _info.resourceAttributes.storeSize - stored;
-        if (_info.resourceAttributes.productionRate > remainingSpace)
+        float remainingSpace = info.resourceAttributes.storeSize - _stored;
+        
+        if (info.resourceAttributes.productionRate >= remainingSpace)
         {
-            stored = _info.resourceAttributes.storeSize;
+            _stored = info.resourceAttributes.storeSize;
         }
         else
         {
-            stored += _info.resourceAttributes.productionRate;
+            _stored += info.resourceAttributes.productionRate;
         }
         return;
     }
 
-    void addResource(int amount)
+    /// <summary>
+    /// new goods produced are sent to player.
+    /// Method triger an event sending object goods with amount of materials 
+    /// transferred. gold production is sent too.
+    /// </summary>
+    /// <param name="amount"></param>
+    private void sendResource(float amount, float gold)
     {
-        if (type.Equals(BuildingTypes.FARM))
+        if ((amount + gold) > 0.0)
         {
-            //TODO
-            //add amount to player food
-        }
-        if (type.Equals(BuildingTypes.MINE))
+            Goods goods = new Goods();
+            goods.amount = amount;
+            goods.gold = gold;
+
+            if (type.Equals(BuildingTypes.FARM))
+            {
+                goods.type = Goods.GoodsType.FOOD;
+            }
+            else if(type.Equals(BuildingTypes.MINE))
+            {
+                goods.type = Goods.GoodsType.METAL;
+            }
+            else{ goods.type = Goods.GoodsType.WOOD; }
+            fire(Actions.COLLECTION, goods);
+        }         
+    }
+    /// <summary>
+    /// Method create civilian unit.
+    /// If capacity limit of building is not reached unit is positioned inside 
+    /// building limits otherwise unit is positioned outside, 
+    /// just at desired meeting Point.
+    /// civilian sex is randomly selected(last parameter of createUnit method).
+    /// </summary>
+    /// <returns>civilian Gameobect</returns>
+    public void createCivilian()
+    {
+        // TODO set desired rotation, now unit rotation equals building rotation!!
+        // TODO  ---create gameobject meetingPointInside and meetingPointOutside
+        // attached to resource building design---
+        
+        //---unComment next two lines when meeting point objects are created---
+        //GameObject meetingPointInside = this.GetComponent(meetingPointInside);
+        //GameObject meetingPointOutside = this.GetComponent(meetingPointOutside);
+
+        
+        if (harvestUnits < info.resourceAttributes.maxUnits)
         {
-            //TODO
-            //add amount to player metal
+            //uncomment next line and delete next one when meeting point are created
+            //unitPosition = this.GetComponent(meetingPointInside).transform.position;
+            
+            // Units distributed in rows of 5 elements
+            _xDisplacement = harvestUnits % 6;
+            _yDisplacement = harvestUnits / 6;
+            _unitPosition.Set(transform.position.x + _xDisplacement, transform.position.y + _yDisplacement, transform.position.z);
+            GameObject civil = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
+            harvestUnits++;
+
+           _collectionRate += Info.get.of(race, UnitTypes.CIVIL).attributes.capacity; 
+
+            fire(Actions.CREATE_UNIT, civil);
         }
-        if (type.Equals(BuildingTypes.SAWMILL))
+        else
         {
-            //TODO
-            //add amount to player wood
+            // TODO get meeting point and calculate position
+     
+            _unitPosition.Set(transform.position.x + 10 , transform.position.y, transform.position.z);
+            GameObject civil = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
+            fire(Actions.CREATE_UNIT, civil);
+            // TODO method to modify unit coordinates to avoid unit overlap
         }
-        return;
+  
     }
 
+    /// <summary>
+    /// Recruit a Explorer from building. you need to do this to take away worker
+   ///  from building. production decrease when you remove workers
+   /// </summary>
+    public void recruitExplorer(GameObject worker)
+    {
+        if (harvestUnits > 0)
+        {
+            _collectionRate -= Info.get.of(race, UnitTypes.CIVIL).attributes.capacity;  
+            harvestUnits--;
+        } 
+        // TODO: Some alert message if you try to remove unit when no unit at building
+    }
 
+    /// <summary>
+    /// Recruit a worker. you can use a explorer as a worker. beware of building maxUnits.
+    /// </summary>
+    public void recruitWorker(GameObject explorer)
+    {
+        if (harvestUnits < info.resourceAttributes.maxUnits)
+        {
+            _collectionRate -= Info.get.of(race, UnitTypes.CIVIL).attributes.capacity;
+            harvestUnits++;
+        }
+        // TODO: Some alert message if you try to recruit worker and building has no vacancy
+    }
 
     /// <summary>
     /// Object initialization
     /// </summary>
     override public void Start()
-    {
-        type = BuildingTypes.FARM;
-        race = Races.MEN;
-        nextUpdate = 0;
-        stored = 0;
-        collectionRate = 0;
-        harvestUnits = 0;
-
+    {       
+        _nextUpdate = 0;
+        _stored = 0;
+        _collectionRate = 0;
+        harvestUnits = 0; 
         _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
-
-        // Call GameEntity start
+        // new resource building has 1 civilian when created
+        createCivilian();
+        // Call Building start
         base.Start();
     }
 
 
     // Update is called once per frame
-    public override void Update()
+    // when updated, collecting units load materials from store and send it to
+    // player.After they finish sending materials, production cycle succes.
+    // new produced materials can be stored but not collected until
+    // next update.
+    override public void Update()
     {
         base.Update();
-
-        if (Time.time > nextUpdate)
+        if (Time.time > _nextUpdate)
         {
-            nextUpdate = Time.time + _info.resourceAttributes.updateInterval;
-            // when updated, collector units load materials from store.
-            // after they finish loading materials production cycle succes.
-            // new produced materials can be stored but not collected until
-            // next update.
+            _nextUpdate = Time.time + info.resourceAttributes.updateInterval;  
             collect();
-            produce();
-
+            produce();            
         }
-
     }
 }

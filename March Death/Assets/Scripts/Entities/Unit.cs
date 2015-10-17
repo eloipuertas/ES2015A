@@ -122,7 +122,6 @@ public class Unit : GameEntity<Unit.Actions>
         _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
         _auto = this;
-
         // Call GameEntity start
         base.Start();
     }
