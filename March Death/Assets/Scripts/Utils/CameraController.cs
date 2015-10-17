@@ -46,14 +46,14 @@ public class CameraController : MonoBehaviour
     {
         setupCamera();
         _cameraSpeed = 5f;
-        _mouseWeelZoomSensitivity = 5f;
+        _mouseWeelZoomSensitivity = 20f;
         _defaultLerpTime = 2f;
         lerpTime = 2f;
         isManualControlEnabled = true;
         isLerping = false;
         lookAtPoint(Vector3.zero);
-        setCameraZoom(80f);
-        setCameraSpeed(20f);
+        setCameraZoom(35f);
+        setCameraSpeed(45f);
         lookAtPoint(new Vector3(1935f, 79f, 969f));
     }
 
