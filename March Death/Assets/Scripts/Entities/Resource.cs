@@ -178,9 +178,9 @@ public class Resource : Building<Resource.Actions>
         
         if (harvestUnits < info.resourceAttributes.maxUnits)
         {
-            //uncomment next line and delete next one when meeting point are created
+            // TODO get inside meeting point and calculate position
             //unitPosition = this.GetComponent(meetingPointInside).transform.position;
-            
+
             // Units distributed in rows of 5 elements
             _xDisplacement = harvestUnits % 6;
             _yDisplacement = harvestUnits / 6;
@@ -194,7 +194,7 @@ public class Resource : Building<Resource.Actions>
         }
         else
         {
-            // TODO get meeting point and calculate position
+            // TODO get outside meeting point and calculate position
      
             _unitPosition.Set(transform.position.x + 10 , transform.position.y, transform.position.z);
             GameObject civil = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
@@ -230,6 +230,60 @@ public class Resource : Building<Resource.Actions>
         }
         // TODO: Some alert message if you try to recruit worker and building has no vacancy
     }
+
+
+
+
+
+    /// <summary>
+    /// when collider interact with other gameobject method checks if 
+    /// gameobject is a civilian unit. Civilians units are recruited as workers
+    /// while limit of workers are not reached.  
+    /// </summary>
+    /// <param name="other">collider gameobject interacting with our own collider</param>
+    void OnTriggerEnter(Collider other)
+    {
+        
+        // space enough to hold new civil
+        
+        if (harvestUnits < info.resourceAttributes.maxUnits)
+        {
+            IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
+
+            // check if unit is civil
+            if (entity.info.isCivil)
+            {
+                recruitWorker(other.gameObject);
+            }
+           
+        }
+
+    }
+    void OnTriggerStay(Collider other)
+    {
+        ;
+    }
+    /// <summary>
+    /// when collider interaction with other gameobject ends method checks if
+    /// gameobject is civilian unit. Civilians units are recruited as explorers
+    /// and fired as workers.
+    /// </summary>
+    /// <param name="other">collider gameobject interacting with our own collider</param>
+    void OnTriggerExit(Collider other)
+    {
+
+        // get entity
+        IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
+
+        if (harvestUnits < info.resourceAttributes.maxUnits)
+        {
+            if (entity.info.isCivil)
+            {
+                recruitExplorer(other.gameObject);
+            }
+        }
+    }
+
 
     /// <summary>
     /// Object initialization
