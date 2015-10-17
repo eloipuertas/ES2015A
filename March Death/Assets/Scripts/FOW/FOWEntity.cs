@@ -23,6 +23,13 @@ public class FOWEntity : MonoBehaviour
     /// This stores half the size vector, and it's only stored to avoid having to calculate it every time
     /// </summary>
     private Vector2 size2;
+    /// <summary>
+    /// Warning: this marks if an unit is being revealed to the opposite player.
+    /// That means even if the player is seeing this unit this may not be true because the AI isn't seeing it
+    /// </summary>
+    private bool isRevealed;
+    public bool IsOwnedByPlayer { get; set; }
+
     public Rect Bounds
     {
         get
@@ -35,14 +42,32 @@ public class FOWEntity : MonoBehaviour
     }
 
     /// <summary>
-    /// Enables/Disables the renderers of this object.
+    /// Changes the visibility state of this unit.
     /// </summary>
-    /// <param name="isVisible">if true we enable the renderer, if false we disable it</param>
+    /// <param name="isVisible">The new visibilty state</param>
     public void changeVisible(bool isVisible)
     {
-        foreach(Renderer r in GetComponentsInChildren<Renderer>())
+        if (isRevealed != isVisible)
         {
-            r.enabled = isVisible;
+            /* Commented until these function exist
+            if (isVisible) // Hidden->Visible
+                OnEntityDiscovered(this, !IsOwnedByPlayer);
+            else  //Visible->Hidden
+                OnEntityHidden(this, !IsOwnedByPlayer);*/
+            if (!IsOwnedByPlayer)
+                changeRenders(isVisible);
+            isRevealed = isVisible;
+        }
+    }
+    /// <summary>
+    /// Enables/Disables the renderers of this object.
+    /// </summary>
+    /// <param name="visible">if true we enable the renderer, if false we disable it</param>
+    public void changeRenders(bool visible)
+    {
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
+        {
+            r.enabled = visible;
         }
     }
     public void OnEnable()
@@ -54,6 +79,8 @@ public class FOWEntity : MonoBehaviour
             size = Vector2.one;
         }
         size2 = size / 2;
+        IsOwnedByPlayer = true; //TODO: SET when we have a good way too.
+        isRevealed = true;
     }
     public void OnDisable()
     {
