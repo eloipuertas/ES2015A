@@ -54,7 +54,8 @@ public class CameraController : MonoBehaviour
         lookAtPoint(Vector3.zero);
         setCameraZoom(35f);
         setCameraSpeed(45f);
-        lookAtPoint(new Vector3(1935f, 79f, 969f));
+        //lookAtPoint(new Vector3(1935f, 79f, 969f));
+        lookAtPoint (new Vector3 (896.4047f, 90.51f, 581.8263f));
     }
 
     void Update()

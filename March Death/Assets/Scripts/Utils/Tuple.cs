@@ -8,7 +8,7 @@ namespace Utils
     /// </summary>
     /// <typeparam name="T0">Type of the first key</typeparam>
     /// <typeparam name="T1">Type of the second key</typeparam>
-    sealed class Tuple<T0, T1> : IEquatable<Tuple<T0, T1>>
+    public class Tuple<T0, T1> : IEquatable<Tuple<T0, T1>>
     {
         readonly public T0 Key0;
         readonly public T1 Key1;
