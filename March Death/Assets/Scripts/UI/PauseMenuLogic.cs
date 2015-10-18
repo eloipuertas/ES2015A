@@ -14,13 +14,12 @@ public class PauseMenuLogic : MonoBehaviour
 			QuitToMainMenu (); });
 	}
 
-	/// <summary>
-	/// This method quits the game and goes back to main menu.
-	/// </summary>
-	void QuitToMainMenu ()
-	{
-		MenuButtonLogic.Pause_Play ();
-		Application.LoadLevel (0);
+    /// <summary>
+    /// This method quits the game and goes back to main menu.
+    /// </summary>
+	void QuitToMainMenu(){
+		MenuButtonLogic.Pause_Play();
+		Application.LoadLevel(0);
 	}
 
 	/// <summary>
