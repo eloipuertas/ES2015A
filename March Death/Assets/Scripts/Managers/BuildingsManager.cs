@@ -26,7 +26,7 @@ namespace Managers
             //TODO : (hermetico) test and remove after merging
             #region testcreatebuilding
             bool TEST = false;
-            if (TEST) { TEST = false; createBuilding("elf-farm"); }
+            if (TEST) { TEST = false; _createBuilding("elf-farm"); }
             #endregion
             if (_placing)
             {
@@ -40,12 +40,29 @@ namespace Managers
         /// Starts creating a building, required the name of the building ex: 'elf-farm'
         /// </summary>
         /// <param name="name"></param>
-        public void createBuilding(string name)
+        public void _createBuilding_(string name)
         {
             if (!_placing)
             {
                 GameObject newBuilding;
                 newBuilding = (GameObject)Resources.Load("Prefabs/Buildings/" + name, typeof(GameObject));
+                newBuilding = (GameObject)Instantiate(newBuilding, new Vector3(0, 0, 0), Quaternion.identity);
+                this.createBuilding(newBuilding);
+
+            }
+
+        }
+        
+        /// <summary>
+        /// Starts creating a building, required the name of the building ex: 'elf-farm'
+        /// </summary>
+        /// <param name="name"></param>
+        public void createBuilding(string path)
+        {
+            if (!_placing)
+            {
+                GameObject newBuilding;
+                newBuilding = (GameObject)Resources.Load( path, typeof(GameObject));
                 newBuilding = (GameObject)Instantiate(newBuilding, new Vector3(0, 0, 0), Quaternion.identity);
                 this.createBuilding(newBuilding);
 
@@ -110,7 +127,7 @@ namespace Managers
             // alter the color if is not a valid location
             if (checkLocation(toLocation))
             {
-
+                //TODO : (hermetico) restar recursos necesarios para crear el building
                 //Utils.ConstructionGrid.resevePosition(toLocation)
                 newBuilding.transform.position = toLocation;
                 IGameEntity destination = (IGameEntity)newBuilding.GetComponent<Unit>();
