@@ -32,7 +32,7 @@ namespace Assets.Scripts.AI
         public List<Unit> Army { get; set; }
         public List<Unit> Workers { get; set; }
         float timer; //It's not going to overflow this millennium
-        public AIController()
+        void Awake()
         {
             Macro = new MacroManager(this);
             Micro = new MicroManager(this);
