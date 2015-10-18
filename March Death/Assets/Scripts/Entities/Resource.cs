@@ -207,12 +207,14 @@ public class Resource : Building<Resource.Actions>
     /// Recruit a Explorer from building. you need to do this to take away worker
    ///  from building. production decrease when you remove workers
    /// </summary>
-    private void recruitExplorer(GameObject worker)
+    private void recruitExplorer(Unit worker)
     {
         if (harvestUnits > 0)
         {
-            _collectionRate -= Info.get.of(race, UnitTypes.CIVIL).attributes.capacity;  
+            _collectionRate -= worker.info.attributes.capacity;
             harvestUnits--;
+
+            worker.role = Unit.Roles.WANDERING;
         } 
         // TODO: Some alert message if you try to remove unit when no unit at building
     }
@@ -220,19 +222,17 @@ public class Resource : Building<Resource.Actions>
     /// <summary>
     /// Recruit a worker. you can use a explorer as a worker. beware of building maxUnits.
     /// </summary>
-    private void recruitWorker(GameObject explorer)
+    private void recruitWorker(Unit explorer)
     {
         if (harvestUnits < info.resourceAttributes.maxUnits)
         {
-            _collectionRate -= Info.get.of(race, UnitTypes.CIVIL).attributes.capacity;
+            _collectionRate -= explorer.info.attributes.capacity;
             harvestUnits++;
+
+            explorer.role = Unit.Roles.PRODUCING;
         }
         // TODO: Some alert message if you try to recruit worker and building has no vacancy
     }
-
-
-
-
 
     /// <summary>
     /// when collider interact with other gameobject method checks if 
@@ -252,16 +252,18 @@ public class Resource : Building<Resource.Actions>
             // check if unit is civil
             if (entity.info.isCivil)
             {
-                recruitWorker(other.gameObject);
+                recruitWorker((Unit)entity);
             }
            
         }
 
     }
+
     void OnTriggerStay(Collider other)
     {
         ;
     }
+
     /// <summary>
     /// when collider interaction with other gameobject ends method checks if
     /// gameobject is civilian unit. Civilians units are recruited as explorers
@@ -277,12 +279,11 @@ public class Resource : Building<Resource.Actions>
         {
             if (entity.info.isCivil)
             {
-                recruitExplorer(other.gameObject);
+                recruitExplorer((Unit)entity);
             }
         }
     }
-
-
+    
     /// <summary>
     /// Object initialization
     /// </summary>
