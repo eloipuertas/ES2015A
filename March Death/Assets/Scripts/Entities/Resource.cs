@@ -108,7 +108,7 @@ public class Resource : Building<Resource.Actions>
         
         //TODO gold consum and production unit attributes needed
         //_goldAmount = harvestUnits * (info.attributes.goldProduction - info.attributes.goldConpsumption);
-        sendResource(_collectedAmount, 0);
+        sendResource(_collectedAmount);
         return;
     }
 
@@ -137,13 +137,12 @@ public class Resource : Building<Resource.Actions>
     /// transferred. gold production is sent too.
     /// </summary>
     /// <param name="amount"></param>
-    private void sendResource(float amount, float gold)
+    private void sendResource(float amount)
     {
-        if ((amount + gold) > 0.0)
+        if (amount  > 0.0)
         {
             Goods goods = new Goods();
             goods.amount = amount;
-            goods.gold = gold;
 
             if (type.Equals(BuildingTypes.FARM))
             {
@@ -208,7 +207,7 @@ public class Resource : Building<Resource.Actions>
     /// Recruit a Explorer from building. you need to do this to take away worker
    ///  from building. production decrease when you remove workers
    /// </summary>
-    public void recruitExplorer(GameObject worker)
+    private void recruitExplorer(GameObject worker)
     {
         if (harvestUnits > 0)
         {
@@ -221,7 +220,7 @@ public class Resource : Building<Resource.Actions>
     /// <summary>
     /// Recruit a worker. you can use a explorer as a worker. beware of building maxUnits.
     /// </summary>
-    public void recruitWorker(GameObject explorer)
+    private void recruitWorker(GameObject explorer)
     {
         if (harvestUnits < info.resourceAttributes.maxUnits)
         {
