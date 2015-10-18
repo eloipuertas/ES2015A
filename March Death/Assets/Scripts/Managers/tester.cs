@@ -10,7 +10,7 @@ public class tester : MonoBehaviour {
     }
     public void onClick()
     {
-        GameObject.Find("GameController").GetComponent<BuildingsManager>().createBuilding("elf-farm");
+        GameObject.Find("GameController").GetComponent<BuildingsManager>()._createBuilding_("elf-farm");
         Debug.Log("click new building");
 		if (Input.GetMouseButtonUp (0)) 
 		{

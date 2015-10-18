@@ -26,7 +26,7 @@ namespace Managers
             //TODO : (hermetico) test and remove after merging
             #region testcreatebuilding
             bool TEST = false;
-            if (TEST) { TEST = false; _createBuilding("elf-farm"); }
+            if (TEST) { TEST = false; _createBuilding_("elf-farm"); }
             #endregion
             if (_placing)
             {
