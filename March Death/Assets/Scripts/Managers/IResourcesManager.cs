@@ -16,7 +16,7 @@ namespace Managers
         /// Adds the amount
         /// </summary>
         /// <param name="other"></param>
-        void AddAmount(Resource other);
+        void AddAmount(WorldResources.Resource other);
 
         /// <summary>
         /// Substracts the amount and returns the remaining
@@ -31,7 +31,7 @@ namespace Managers
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        float SubstractAmount(Resource other);
+        float SubstractAmount(WorldResources.Resource other);
 
         /// <summary>
         /// Checks the current amount and returns true if is higher or equal to the input amount
@@ -49,7 +49,7 @@ namespace Managers
         /// <param name="type"></param>
         /// <param name="amount"></param>
         /// <returns></returns>
-        bool IsEnough(Resource other);
+        bool IsEnough(WorldResources.Resource other);
 
 
     }
