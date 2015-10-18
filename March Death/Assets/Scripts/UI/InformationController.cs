@@ -1,25 +1,38 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System;
 using Storage;
 using Utils;
 
 public class InformationController : MonoBehaviour {
 
+	private Player player;
+
+	//objects for one unit information
 	private Text txtActorName;
 	private Text txtActorRace;
 	private Text txtActorHealth;
 	private Image imgActorDetail;
 	private Slider sliderActorHealth;
 
+	//objects for multiple units information
+	int columns = 10;
+	int rows = 2;
+	Vector2 buttonSize;
+	Vector2 initialPoint;
+	
 	// Use this for initialization
-	void Start ()
+	void Start () 
 	{
 		//Register to selectable actions
 		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.SELECTED, onUnitSelected);
 		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.DESELECTED, onUnitDeselected);
 
-		//Init menu components
+		GameObject gameObject = GameObject.Find("GameController");
+		player = gameObject.GetComponent ("Player") as Player;
+
+		//Init menu components used for show info for one unit
 		Transform information = GameObject.Find ("HUD").transform.FindChild ("Information");
 		txtActorName = information.transform.FindChild("ActorName").gameObject.GetComponent<Text>();
 		txtActorRace = information.transform.FindChild ("ActorRace").gameObject.GetComponent<Text>();
@@ -27,17 +40,24 @@ public class InformationController : MonoBehaviour {
 		imgActorDetail = information.transform.FindChild ("ActorImage").gameObject.GetComponent<Image>();
 		sliderActorHealth = information.transform.FindChild ("ActorHealthSlider").gameObject.GetComponent<Slider>();
 
+		//Precalculate objects used for show info for multiple units
+		RectTransform rectTransform = GameObject.Find("Information").GetComponent<RectTransform>();
+		Vector2 panelSize = rectTransform.sizeDelta;
+		Vector2 center = rectTransform.position;
+		buttonSize = new Vector2(panelSize.x / columns, panelSize.y / rows);
+		initialPoint = new Vector2(center.x - panelSize.x / 2, center.y + panelSize.y / 2);
+
 		//Default is hidden
-		hideInformation ();
+		HideInformation ();
 	}
-
+	
 	// Update is called once per frame
-	void Update ()
+	void Update () 
 	{
-
+	
 	}
 
-	private void showInformation(GameObject gameObject) 
+	private void ShowInformation(GameObject gameObject) 
 	{
 		IGameEntity entity = gameObject.GetComponent<IGameEntity> ();
 
@@ -46,7 +66,7 @@ public class InformationController : MonoBehaviour {
 		txtActorRace.text = entity.info.race.ToString ();
 		txtActorRace.enabled = true;
 		txtActorHealth.text = entity.healthPercentage.ToString () + "/100";
-		txtActorHealth.enabled = true;
+		txtActorHealth.enabled = true;	
 		imgActorDetail.color = new Color (0, 0, 1, 1);
 		imgActorDetail.enabled = true;
 		sliderActorHealth.value = entity.healthPercentage;
@@ -55,8 +75,17 @@ public class InformationController : MonoBehaviour {
 		sliderBackground.GetComponent<Image>().enabled = true;
 	}
 
-	private void hideInformation()
-	{
+	private void ShowMultipleInformation() {
+
+		for (int i = 0; i < player.SelectedObjects.Count && i < columns * rows; i++)
+		{
+			Selectable selectable = (Selectable)player.SelectedObjects [i];
+			CreateButton(i, selectable);
+		}
+	}
+
+	private void HideInformation() 
+	{	
 		txtActorName.enabled = false;
 		txtActorRace.enabled = false;
 		txtActorHealth.enabled = false;
@@ -65,44 +94,107 @@ public class InformationController : MonoBehaviour {
 		sliderActorHealth.value = 0;
 		Transform sliderBackground = sliderActorHealth.transform.FindChild ("Background");
 		sliderBackground.GetComponent<Image>().enabled = false;
-
 	}
 
-	public void onUnitSelected(System.Object obj)
+	private void CreateButton(int i, Selectable selectable) {
+
+		int line = 1;
+		if (i >= 10) line = 2;
+
+		Vector2 buttonCenter = new Vector2();
+		buttonCenter.x = initialPoint.x + buttonSize.x / 2 + (buttonSize.x * (i % columns));
+		buttonCenter.y = initialPoint.y + (buttonSize.y / 2) - buttonSize.y * line;
+
+		IGameEntity entity = selectable.GetComponent<IGameEntity>();
+		CreateButton(buttonCenter, buttonSize, entity.info.race.ToString());
+	}
+	
+	void CreateButton(Vector2 center, Vector2 size, String text)
 	{
-        GameObject gameObject = (GameObject) obj;
+		var canvasObject = new GameObject(text);
+		var canvas = canvasObject.AddComponent<Canvas>();
+		canvas.tag = "ActionButton";
+		canvasObject.AddComponent<GraphicRaycaster>();
+		canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+		
+		var buttonObject = new GameObject("Button");
+		var image = buttonObject.AddComponent<Image>();
+		image.transform.parent = canvas.transform;
+		image.rectTransform.sizeDelta = size * 0.9f;
+		image.rectTransform.position = center;
+		image.color = new Color(1f, .3f, .3f, .5f);
+		
+		var button = buttonObject.AddComponent<Button>();
+		button.targetGraphic = image;
+		
+		var textObject = new GameObject("ActionText");
+		textObject.transform.parent = buttonObject.transform;
+		var lblText = textObject.AddComponent<Text>();
+		lblText.rectTransform.sizeDelta = size * 0.9f;
+		lblText.rectTransform.position = center;
+		lblText.text = text;
+		lblText.font = Resources.FindObjectsOfTypeAll<Font>()[0];
+		lblText.fontSize = 10;
+		lblText.color = Color.white;
+		lblText.alignment = TextAnchor.MiddleCenter;
+	}
+
+
+	public void onUnitSelected(GameObject gameObject)
+	{
+
+		//Check if is simple click or multiple
+		if (player.SelectedObjects.Count > 1)
+		{
+			HideInformation();
+			ShowMultipleInformation();
+
+		} else
+		{
+			ShowInformation(gameObject);
+		}
 		//TODO: parse actor type (building / unit)
-		showInformation(gameObject);
+
 
 		//Register for unit events
 		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-        Unit unit = (Unit) entity;
+		Unit unit = entity.toUnit ();
 		unit.register(Unit.Actions.DAMAGED, onUnitDamaged);
 		unit.register(Unit.Actions.DIED, onUnitDied);
 	}
 
-	public void onUnitDeselected(System.Object obj)
+	public void onUnitDeselected(GameObject gameObject)
 	{
-        GameObject gameObject = (GameObject) obj;
-		hideInformation ();
+
+		//Check if is simple click or multiple
+		if (player.SelectedObjects.Count > 1)
+		{				
+			ShowMultipleInformation();
+			
+		} else if (player.SelectedObjects.Count == 1)
+		{
+			ShowInformation(gameObject);
+		} else
+		{
+			HideInformation ();
+		}
 
 		//Unregister unit events
 		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-		Unit unit = (Unit) entity;
+		Unit unit = entity.toUnit ();
 		unit.unregister(Unit.Actions.DAMAGED, onUnitDamaged);
 		unit.unregister(Unit.Actions.DIED, onUnitDied);
 	}
 
-	public void onUnitDamaged(System.Object obj)
+	public void onUnitDamaged(GameObject gameObject)
 	{
-        GameObject gameObject = (GameObject) obj;
 		IGameEntity entity = gameObject.GetComponent<IGameEntity> ();
 		sliderActorHealth.value = entity.healthPercentage;
 	}
 
-    public void onUnitDied(System.Object obj)
+	public void onUnitDied(GameObject gameObject)
 	{
-		hideInformation ();
+		HideInformation ();
 	}
-
+		
 }
