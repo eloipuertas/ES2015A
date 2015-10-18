@@ -71,13 +71,13 @@ public class UserInput : MonoBehaviour
 
 		// TODO : (Devel_c) Check positions with the HUD
         if (Input.GetMouseButtonDown (0)) {
-			//camera.disableManualControl();
+			camera.disableManualControl();
 			leftButtonIsDown = true;
 			mouseButtonUpPoint = Input.mousePosition;    
 			topLeft = GetScreenRaycastPoint(mouseButtonUpPoint);
 
 		} else if (Input.GetMouseButtonUp (0)) {
-			//camera.enableManualControl();
+			camera.enableManualControl();
 			leftButtonIsDown = false;
 
 			//Check if is a simple click or dragging if the range is not big enough
