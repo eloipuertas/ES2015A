@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
-
+using Managers;
 public class tester : MonoBehaviour {
 
     void Start()
