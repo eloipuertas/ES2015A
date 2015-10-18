@@ -12,5 +12,7 @@ namespace Storage
         public int maxUnits;
         public int productionRate;
         public float updateInterval;
+        
+
     }
 }

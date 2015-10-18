@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
@@ -121,7 +121,6 @@ public class Unit : GameEntity<Unit.Actions>
     {
         _info = Info.get.of(race, type);
         _auto = this;
-
         // Call GameEntity start
         base.Start();
 

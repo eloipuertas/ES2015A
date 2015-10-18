@@ -29,7 +29,7 @@ namespace Utils
             registerCondition = gameObject => true,
             fireCondition = gameObject => true
         };
-
+        
         private Dictionary<T, List<Action<Object>>> callbacks = new Dictionary<T, List<Action<Object>>>();
 
         private Subscriber()
@@ -70,7 +70,7 @@ namespace Utils
             foreach (UnityEngine.Object obj in alreadyExistingActors)
             {
                 var actor = (SubscribableActor<T, S>)obj;
-
+                
                 if (selector.registerCondition(actor.gameObject))
                 {
                     actor.register(action, func);
