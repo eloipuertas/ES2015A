@@ -44,7 +44,8 @@ public class GameInformation : MonoBehaviour {
 
 	private static void LoadHumanHUD()
 	{
-		Instantiate((GameObject)Resources.Load ("HUD")).name = "HUD";
+		Instantiate((GameObject)Resources.Load ("Human_HUD")).name = "HUD";
+		//Application.LoadLevelAdditive("globalHUDHuman");
 		Instantiate((GameObject)Resources.Load ("HUD_EventSystem")).name = "HUD_EventSystem";
 	}
 
