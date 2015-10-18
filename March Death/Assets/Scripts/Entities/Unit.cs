@@ -13,6 +13,7 @@ using Storage;
 public class Unit : GameEntity<Unit.Actions>
 {
     public enum Actions { MOVEMENT_START, MOVEMENT_END, DAMAGED, DIED };
+    public enum Roles { PRODUCING, WANDERING };
 
     public Unit() { }
 
@@ -20,6 +21,11 @@ public class Unit : GameEntity<Unit.Actions>
     /// Max. euclidean distance to the target
     /// </summary>
     const float ATTACK_RANGE = 1.5f;
+
+    /// <summary>
+    /// Interval between resources update in miliseconds
+    /// </summary>
+    const int RESOURCES_UPDATE_INTERVAL = 5000;
 
     ///<sumary>
     /// Auto-unregister events when we are destroyed
@@ -36,7 +42,17 @@ public class Unit : GameEntity<Unit.Actions>
     /// If in battle, this is the target and last attack time
     /// </summary>
     private Unit _target = null;
-    private double _lastAttack = 0;
+
+    /// <summary>
+    /// Time holders for const updates
+    /// </summary>
+    private float _lastResourcesUpdate = 0;
+    private float _lastAttack = 0;
+
+    /// <summary>
+    /// Get and set current role (mostly for CIVILS)
+    /// </summary>
+    public Roles role { get; set; }
 
     /// <summary>
     /// Point to move to
@@ -168,6 +184,23 @@ public class Unit : GameEntity<Unit.Actions>
             moveTo(hit.point);
         }
 #endif
+
+        float resourcesElapsed = Time.time - _lastResourcesUpdate;
+        if (resourcesElapsed > RESOURCES_UPDATE_INTERVAL)
+        {
+            _lastResourcesUpdate = Time.time;
+
+            // Food is always consumed
+            float foodConsumed = info.unitAttributes.foodConsumption * resourcesElapsed;
+            float goldConsumed = info.unitAttributes.goldConsumption * resourcesElapsed;
+
+            if (info.isCivil)
+            {
+                float goldProduced = info.unitAttributes.goldProduction * resourcesElapsed;
+                goldConsumed = 0;
+            }
+        }
+
         switch (status)
         {
             case EntityStatus.ATTACKING:
@@ -181,6 +214,8 @@ public class Unit : GameEntity<Unit.Actions>
                     // Check if we already have to attack
                     else if (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate))
                     {
+                        _lastAttack = Time.time;
+
                         // TODO: Ranged attacks!
                         _target.receiveAttack(this, false);
                     }

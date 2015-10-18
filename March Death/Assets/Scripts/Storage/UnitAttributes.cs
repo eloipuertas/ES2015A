@@ -13,5 +13,9 @@ namespace Storage
 
         public float attackRate;
         public float movementRate;
+
+        public float foodConsumption;
+        public float goldConsumption;
+        public float goldProduction;
     }
 }
