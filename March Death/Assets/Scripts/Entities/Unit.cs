@@ -16,6 +16,11 @@ public class Unit : GameEntity<Unit.Actions>
 
     public Unit() { }
 
+    /// <summary>
+    /// Max. euclidean distance to the target
+    /// </summary>
+    const float ATTACK_RANGE = 1.5f;
+
     ///<sumary>
     /// Auto-unregister events when we are destroyed
     ///</sumary>
@@ -74,11 +79,18 @@ public class Unit : GameEntity<Unit.Actions>
     /// updates our state
     /// </summary>
     /// <param name="unit"></param>
-    public void attackTarget(Unit unit)
+    public bool attackTarget(Unit unit)
     {
-        _target = unit;
-        _auto += _target.register(Actions.DIED, onTargetDied);
-        setStatus(EntityStatus.ATTACKING);
+        if (Vector3.Distance(unit.transform.position, transform.position) <= ATTACK_RANGE)
+        {
+            _target = unit;
+            _auto += _target.register(Actions.DIED, onTargetDied);
+            setStatus(EntityStatus.ATTACKING);
+
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -86,10 +98,12 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     public void stopAttack()
     {
-        _auto -= _target.unregister(Actions.DIED, onTargetDied);
+        if (_target != null)
+        {
+            _auto -= _target.unregister(Actions.DIED, onTargetDied);
+            _target = null;
+        }
 
-        // TODO: Maybe we should not set it to null? In case we want to attack it again
-        _target = null;
         setStatus(EntityStatus.IDLE);
     }
 
@@ -159,7 +173,13 @@ public class Unit : GameEntity<Unit.Actions>
             case EntityStatus.ATTACKING:
                 if (_target != null)
                 {
-                    if (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate))
+                    // Check if we are still in range
+                    if (Vector3.Distance(_target.transform.position, transform.position) > ATTACK_RANGE)
+                    {
+                        stopAttack();
+                    }
+                    // Check if we already have to attack
+                    else if (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate))
                     {
                         // TODO: Ranged attacks!
                         _target.receiveAttack(this, false);
