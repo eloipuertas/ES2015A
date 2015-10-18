@@ -11,13 +11,7 @@ using Storage;
 /// </summary>
 public class Unit : GameEntity<Unit.Actions>
 {
-    public enum Actions
-    {
-        MOVEMENT_START,
-        MOVEMENT_END,
-        DAMAGED,
-        DIED }
-    ;
+    public enum Actions { MOVEMENT_START, MOVEMENT_END, DAMAGED, DIED };
 
     public Unit ()
     {
@@ -33,9 +27,9 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     public UnitTypes type = UnitTypes.HERO;
 
-    public override E getType<E> ()
+    public override E getType<E>()
     {
-        return (E)Convert.ChangeType (type, typeof(E));
+        return (E)Convert.ChangeType(type, typeof(E));
     }
 
     /// <summary>
@@ -58,7 +52,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// Called once our target dies. It may be used to update unit IA
     /// </summary>
     /// <param name="gob"></param>
-    private void onTargetDied (System.Object obj)
+    private void onTargetDied(System.Object obj)
     {
         // TODO: Our target died, select next? Do nothing?
         setStatus (EntityStatus.IDLE);
@@ -67,17 +61,17 @@ public class Unit : GameEntity<Unit.Actions>
     /// <summary>
     /// When a wound is received, this is called
     /// </summary>
-    protected override void onReceiveDamage ()
+    protected override void onReceiveDamage()
     {
-        fire (Actions.DAMAGED);
+        fire(Actions.DAMAGED);
     }
 
     /// <summary>
     /// When wounds reach its maximum, thus unit dies, this is called
     /// </summary>
-    protected override void onFatalWounds ()
+    protected override void onFatalWounds()
     {
-        fire (Actions.DIED);
+        fire(Actions.DIED);
     }
 
     /// <summary>
@@ -85,66 +79,67 @@ public class Unit : GameEntity<Unit.Actions>
     /// updates our state
     /// </summary>
     /// <param name="unit"></param>
-    public void attackTarget (Unit unit)
+    public void attackTarget(Unit unit)
     {
         _target = unit;
-        _auto += _target.register (Actions.DIED, onTargetDied);
-        setStatus (EntityStatus.ATTACKING);
+        _auto += _target.register(Actions.DIED, onTargetDied);
+        setStatus(EntityStatus.ATTACKING);
     }
 
     /// <summary>
     /// Stops attacking the target and goes back to an IDLE state
     /// </summary>
-    public void stopAttack ()
+    public void stopAttack()
     {
-        _auto -= _target.unregister (Actions.DIED, onTargetDied);
+        _auto -= _target.unregister(Actions.DIED, onTargetDied);
 
         // TODO: Maybe we should not set it to null? In case we want to attack it again
         _target = null;
-        setStatus (EntityStatus.IDLE);
+        setStatus(EntityStatus.IDLE);
     }
 
     /// <summary>
     /// Starts moving the unit towards a point on a terrain
     /// </summary>
     /// <param name="movePoint">Point to move to</param>
-    public void moveTo (Vector3 movePoint)
+    public void moveTo(Vector3 movePoint)
     {
         _movePoint = movePoint;
 
-        float distance = Vector3.Distance (movePoint, transform.position);
-        if (distance > 1.50f) {
+        float distance = Vector3.Distance(movePoint, transform.position);
+        if (distance > 1.50f)
+        {
             // TODO: SMOOTH TURNING
-            Quaternion targetRotation = Quaternion.LookRotation (movePoint - transform.position);
+            Quaternion targetRotation = Quaternion.LookRotation(movePoint - transform.position);
             targetRotation.x = 0;   // lock rotation on x-axis
             transform.rotation = targetRotation;
         }
 
-        setStatus (EntityStatus.MOVING);
-        fire (Actions.MOVEMENT_START);
+        setStatus(EntityStatus.MOVING);
+        fire(Actions.MOVEMENT_START);
     }
 
     /// <summary>
     /// Object initialization
     /// </summary>
-    public override void Start ()
+    public override void Start()
     {
-        _info = Info.get.of (race, type);
+        _info = Info.get.of(race, type);
         _auto = this;
 
         // Call GameEntity start
-        base.Start ();
+        base.Start();
 
         // Set the status
-        setStatus (EntityStatus.IDLE);
+        setStatus(EntityStatus.IDLE);
     }
 
     /// <summary>
     /// Called once a frame to update the object
     /// </summary>
-    public override void Update ()
+    public override void Update()
     {
-        base.Update ();
+        base.Update();
 
 #if TEST_INPUT
         if (Input.GetMouseButtonDown(0))
@@ -164,35 +159,39 @@ public class Unit : GameEntity<Unit.Actions>
             moveTo(hit.point);
         }
 #endif
-        switch (status) {
-        case EntityStatus.ATTACKING:
-            if (_target != null) {
-                if (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate)) {
-                    // TODO: Ranged attacks!
-                    _target.receiveAttack (this, false);
+        switch (status)
+        {
+            case EntityStatus.ATTACKING:
+                if (_target != null)
+                {
+                    if (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate))
+                    {
+                        // TODO: Ranged attacks!
+                        _target.receiveAttack(this, false);
+                    }
                 }
-            }
-            break;
+                break;
         }
     }
 
     /// <summary>
     /// Called every fixed physics frame
     /// </summary>
-    void FixedUpdate ()
+    void FixedUpdate()
     {
         switch (status) {
-        case EntityStatus.MOVING:
+            case EntityStatus.MOVING:
                 // TODO: Steps on the last sector are smoothened due to distance being small
                 // Althought it's an unintended behaviour, it may be interesating to leave it as is
-            transform.position = Vector3.MoveTowards (transform.position, _movePoint, Time.fixedDeltaTime * info.unitAttributes.movementRate);
+                transform.position = Vector3.MoveTowards(transform.position, _movePoint, Time.fixedDeltaTime * info.unitAttributes.movementRate);
 
-                // If distance is lower than 0.5, stop movement
-            if (Vector3.Distance (transform.position, _movePoint) <= 0.5f) {
-                setStatus (EntityStatus.IDLE);
-                fire (Actions.MOVEMENT_END);
-            }
-            break;
+                 // If distance is lower than 0.5, stop movement
+                if (Vector3.Distance(transform.position, _movePoint) <= 0.5f)
+                {
+                    setStatus(EntityStatus.IDLE);
+                    fire(Actions.MOVEMENT_END);
+                }
+                break;
         }
     }
 
