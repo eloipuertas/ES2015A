@@ -11,8 +11,8 @@ public class ConstructionGrid : MonoBehaviour
 
     void Start()
     {
-        dimensions = new Vector2 (5f, 5f);
-        reservedPositions = new ArrayList ();
+        dimensions = new Vector2(5f, 5f);
+        reservedPositions = new ArrayList();
     }
 
     void Update()
@@ -28,8 +28,8 @@ public class ConstructionGrid : MonoBehaviour
     public Vector3 discretizeMapCoords(Vector3 position)
     {
         Vector3 discretizedCoords = new Vector3();
-        discretizedCoords.x = (float)Math.Floor (position.x / dimensions.x) * dimensions.x + dimensions.x / 2;
-        discretizedCoords.z = (float)Math.Floor (position.z / dimensions.y) * dimensions.y + dimensions.y / 2;
+        discretizedCoords.x = (float)Math.Floor(position.x / dimensions.x) * dimensions.x + dimensions.x / 2;
+        discretizedCoords.z = (float)Math.Floor(position.z / dimensions.y) * dimensions.y + dimensions.y / 2;
         discretizedCoords.y = position.y;
         return discretizedCoords;
     }
@@ -111,7 +111,7 @@ public class ConstructionGrid : MonoBehaviour
         //If this position is contained on the array return false
         if (reservedPositions.Contains(new Vector2(discretizedPosition.x, discretizedPosition.z)))
         {
-            Debug.Log ("This position is already reserved");
+            Debug.Log("This position is already reserved");
             return false;
         }
 

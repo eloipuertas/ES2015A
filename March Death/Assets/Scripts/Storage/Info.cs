@@ -99,7 +99,7 @@ namespace Storage
                         Debug.LogWarning("Intentional? Duplicated " + typeof(ComponentType) + " prefab ('" + component.getRace() + "', '" + component.getType<EnumType>() + "')");
                     }
 
-                    store [key].Add (folder + "/" + gameObject.name);
+                    store [key].Add(folder + "/" + gameObject.name);
                 }
             }
         }
@@ -117,7 +117,7 @@ namespace Storage
 
             if (!unitStore.ContainsKey(key))
             {
-                throw new System.ArgumentException ("Race (" + race + ") and Type (" + type + ") does not exist");
+                throw new System.ArgumentException("Race (" + race + ") and Type (" + type + ") does not exist");
             }
 
             return (UnitInfo)unitStore[key];
@@ -136,7 +136,7 @@ namespace Storage
 
             if (!buildingStore.ContainsKey(key))
             {
-                throw new System.ArgumentException ("Race (" + race + ") and Type (" + type + ") does not exist");
+                throw new System.ArgumentException("Race (" + race + ") and Type (" + type + ") does not exist");
             }
 
             return (BuildingInfo)buildingStore[key];
@@ -225,7 +225,7 @@ namespace Storage
         public GameObject createUnit(Races race, UnitTypes type, Vector3 position, Quaternion rotation, int variant = 0)
         {
             string prefab = getPrefab(race, type, variant);
-            return UnityEngine.Object.Instantiate((GameObject)Resources.Load (prefab, typeof(GameObject)), position, rotation) as GameObject;
+            return UnityEngine.Object.Instantiate((GameObject)Resources.Load(prefab, typeof(GameObject)), position, rotation) as GameObject;
         }
 
         /// <summary>

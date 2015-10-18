@@ -12,7 +12,7 @@ namespace Utils
         {
             if (!typeof(T).IsEnum)
             {
-                throw new ArgumentException ("T must be an enumerated type");
+                throw new ArgumentException("T must be an enumerated type");
             }
 
             foreach (T action in Enum.GetValues(typeof(T)))

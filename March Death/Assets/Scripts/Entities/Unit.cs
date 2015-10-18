@@ -13,7 +13,7 @@ public class Unit : GameEntity<Unit.Actions>
 {
     public enum Actions { MOVEMENT_START, MOVEMENT_END, DAMAGED, DIED };
 
-    public Unit ()
+    public Unit()
     {
     }
 
@@ -55,7 +55,7 @@ public class Unit : GameEntity<Unit.Actions>
     private void onTargetDied(System.Object obj)
     {
         // TODO: Our target died, select next? Do nothing?
-        setStatus (EntityStatus.IDLE);
+        setStatus(EntityStatus.IDLE);
     }
 
     /// <summary>
