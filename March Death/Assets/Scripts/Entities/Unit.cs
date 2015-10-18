@@ -194,7 +194,7 @@ public class Unit : GameEntity<Unit.Actions>
             float foodConsumed = info.unitAttributes.foodConsumption * resourcesElapsed;
             float goldConsumed = info.unitAttributes.goldConsumption * resourcesElapsed;
 
-            if (info.isCivil)
+            if (info.isCivil && role == Roles.PRODUCING)
             {
                 float goldProduced = info.unitAttributes.goldProduction * resourcesElapsed;
                 goldConsumed = 0;
