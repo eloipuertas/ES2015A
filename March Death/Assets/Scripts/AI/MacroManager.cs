@@ -38,6 +38,17 @@ namespace Assets.Scripts.AI
         {
 
         }
+        /// <summary>
+        /// The micro is asking how many civils the army can spend (for exploring or defending)
+        /// </summary>
+        public int canTakeArms()
+        {
+            return ai.Workers.Count; 
+        }
+        /// <summary>
+        /// The micro is forcibly taking num civils from the macro
+        /// </summary>
+        /// <param name="num"></param>
         public void takeArms(int num)
         {
             if (ai.Workers.Count > 0)

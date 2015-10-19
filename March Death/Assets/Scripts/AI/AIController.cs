@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using Utils;
 
 /// <summary>
 /// Class tasked with deciding what the enemy will do.
@@ -22,38 +23,40 @@ namespace Assets.Scripts.AI
 
         List<AIModule> modules;
         //TODO: change this when decided about what do we really need to keep about buildings 
-        public List<MonoBehaviour> OwnBuildings { get; set; }
-        public List<MonoBehaviour> EnemyBuildings { get; set; }
+        public List<IGameEntity> OwnBuildings { get; set; }
+        public List<IGameEntity> EnemyBuildings { get; set; }
+        public List<Unit> EnemyUnits { get; set; }
         /// <summary>
         /// Just a basic way to keep track of what the enemy has more
         /// </summary>
         public Dictionary<UnitTypes,int> UnitsFound { get; set; }
 
-        public List<Unit> Army { get; set; }
-        public List<Unit> Workers { get; set; }
-
-        /// <summary>
-        /// The micro is asking if the macro can spare some civils to the army (for exploring or defending)
-        /// </summary>
-        /// <param name="num"></param>
-        public void takeArms(int num)
-        {
-            Macro.takeArms(num);
-        }
+        public List<Unit> Army;
+        public List<Unit> Workers;
 
         float timer; //It's not going to overflow this millennium
         void Awake()
         {
+            //Init lists
             Macro = new MacroManager(this);
             Micro = new MicroManager(this);
+            EnemyUnits = new List<Unit>();
+            EnemyBuildings = new List<IGameEntity>();
             modules = new List<AIModule>();
-            Army = new List<Unit>();
-            Workers = new List<Unit>();
-
+            //Army = new List<Unit>();
+            //DEBUGWorkers = new List<Unit>();
             modules.Add(new AIModule(Macro.MacroHigh, 30f));
             modules.Add(new AIModule(Macro.MacroLow, 1f));
             modules.Add(new AIModule(Micro.Micro, 1f));
             timer = 0;
+
+            ActorSelector selector = new ActorSelector()
+            {
+                registerCondition = gameObject => gameObject.GetComponent<FOWEntity>().IsOwnedByPlayer,
+                fireCondition = gameObject => true
+            };
+            Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.DISCOVERED, OnEntityFound, selector);
+            Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.HIDDEN, OnEntityLost, selector);
         }
         void Update()
         {
@@ -61,6 +64,22 @@ namespace Assets.Scripts.AI
             foreach (AIModule m in modules)
                 if (Math.Round(timer % m.period) == 0)
                     m.Callback();
+        }
+        void OnEntityFound(System.Object obj)
+        {
+            IGameEntity g = ((GameObject)obj).GetComponent<IGameEntity>();
+            if (g.info.isUnit)
+                EnemyUnits.Add((Unit)g);
+            else if (g.info.isBuilding)
+                EnemyBuildings.Add(g);
+        }
+        void OnEntityLost(System.Object obj)
+        {
+            IGameEntity g = ((GameObject)obj).GetComponent<IGameEntity>();
+            if (g.info.isUnit)
+                EnemyUnits.Remove((Unit)g);
+            else if (g.info.isBuilding)
+                EnemyBuildings.Remove(g);
         }
     }
     struct AIModule
