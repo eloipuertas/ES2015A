@@ -33,7 +33,7 @@ public class MiniMapController : MonoBehaviour
         {
             float diagonal = Mathf.Sqrt(Mathf.Pow(Terrain.activeTerrain.terrainData.size.x, 2) + Mathf.Pow(Terrain.activeTerrain.terrainData.size.y, 2));
             _camera.transform.position = new Vector3(Terrain.activeTerrain.terrainData.size.x * 0.5f, Terrain.activeTerrain.terrainData.size.x, Terrain.activeTerrain.terrainData.size.z * 0.5f);
-            _camera.transform.rotation = Quaternion.Euler(90f, 45f,0); 
+            _camera.transform.rotation = Quaternion.Euler(90f, 135f,0); 
             _camera.orthographicSize = diagonal * 0.75f; // a hack
             _camera.farClipPlane = Terrain.activeTerrain.terrainData.size.x * 1.5f;
 
@@ -80,7 +80,7 @@ public class MiniMapController : MonoBehaviour
         }
         if (!act_pos.Equals(mainCam.transform.position)) // if the camera has moved
         {
-            Vector3 v = _camera.WorldToScreenPoint(mainCam.transform.position + cameraOffset); v.y = Screen.height - v.y;
+            Vector3 v = _camera.WorldToScreenPoint(mainCam.transform.position - CameraController.cameraOffset); v.y = Screen.height - v.y;
             rect_marker.center = v;
             act_pos = mainCam.transform.position;
         }
@@ -134,7 +134,7 @@ public class MiniMapController : MonoBehaviour
         r.yMax = Screen.height - corners_minimap[1].y + 12;
         r.yMin = Screen.height - corners_minimap[0].y - 12;
 
-        Vector3 v = _camera.WorldToScreenPoint(mainCam.transform.position + cameraOffset);
+        Vector3 v = _camera.WorldToScreenPoint(mainCam.transform.position - CameraController.cameraOffset);
         v.y = Screen.height - v.y;
         r.center = v;
   
