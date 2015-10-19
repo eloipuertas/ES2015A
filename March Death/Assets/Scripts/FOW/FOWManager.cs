@@ -36,7 +36,7 @@ public class FOWManager : MonoBehaviour
     /// This will contain the grid for the vision of the AI.
     /// This can be only an enum because it doesn't need to be passed to the shader nor does it need to have all the fancy gradient fading the normal FOW has.
     /// </summary>
-    visible[] aiVision;
+    public visible[] aiVision { get; set; }
 
     void Start()
     {
@@ -122,8 +122,7 @@ public class FOWManager : MonoBehaviour
             }
             //Hide or show the other entities
             foreach (FOWEntity e in entities)
-                if (!e.IsOwnedByPlayer)
-                    e.changeVisible(isThereinRect(e.Bounds,visible.visible));
+                e.changeVisible(isThereinRect(e.Bounds,visible.visible,!e.IsOwnedByPlayer));
             
             fowTex.SetPixels32(pixels);
             fowTex.Apply();
@@ -151,16 +150,19 @@ public class FOWManager : MonoBehaviour
                 if (dist > entity.Range * entity.Range)
                     continue;
                 int n = x + y * fowTex.width;
-                float fade = 1;
-                if (dist > entity.Range)
-                    fade = Mathf.Clamp01((entity.Range - Mathf.Sqrt(dist)) / (entity.Range / 2));
-                if (entity.IsOwnedByPlayer)
+                if (n <= pixels.Length)
                 {
-                    pixels[n].g = (byte)Mathf.Max(pixels[n].g, 255 * fade);
-                    pixels[n].b = (byte)Mathf.Max(pixels[n].b, 255 * fade);
+                    float fade = 1;
+                    if (dist > entity.Range)
+                        fade = Mathf.Clamp01((entity.Range - Mathf.Sqrt(dist)) / (entity.Range / 2));
+                    if (entity.IsOwnedByPlayer)
+                    {
+                        pixels[n].g = (byte)Mathf.Max(pixels[n].g, 255 * fade);
+                        pixels[n].b = (byte)Mathf.Max(pixels[n].b, 255 * fade);
+                    }
+                    else
+                        aiVision[n] = (visible.explored | visible.visible);
                 }
-                else
-                    aiVision[n] = (visible.explored | visible.visible);
             }
         }
     }
@@ -187,8 +189,8 @@ public class FOWManager : MonoBehaviour
                     if (askForPlayer)
                     {
                         if ((vis == visible.explored && pixels[p].g > 0) ||
-                           (vis == visible.visible && pixels[p].b > 0 || (NotFullyOpaque && pixels[p].g > 0)) ||
-                           (vis == visible.unexplored && pixels[p].b == 0 && pixels[p].g == 0))
+                           (vis == visible.visible && pixels[p].b > 127 || (NotFullyOpaque && pixels[p].g > 0)) ||
+                           (vis == visible.unexplored && pixels[p].g == 0))
                             return true;
                     }else if ((vis & aiVision[p]) == vis)
                         return true;
@@ -228,9 +230,32 @@ public class FOWManager : MonoBehaviour
         if (Instance && Instance.entities.Contains(e))
             Instance.entities.Remove(e);
     }
-
+    public Vector2 getGridSize()
+    {
+        return new Vector2(fowTex.width,fowTex.height);
+    }
+    /// <summary>
+    /// Can't return a z coord because I don't really know it.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
+    public Vector2 CoordtoWorld(int x, int y)
+    {
+        return new Vector2(x/Quality,y/Quality);
+    }
+    public Vector2 CoordtoGrid(Vector3 coord)
+    {
+        int x = Mathf.RoundToInt(coord.x * Quality);
+        int y = Mathf.RoundToInt(coord.z * Quality - 1);
+        if (x < 0) x = 0;
+        else if (x >= fowTex.width) x = fowTex.width - 1;
+        if (y < 0) y = 0;
+        else if (y >= fowTex.height) y = fowTex.height - 1;
+        return new Vector2(x, y);
+    }
     static FOWManager _instance;
-    static FOWManager Instance
+    public static FOWManager Instance
     {
         get
         {

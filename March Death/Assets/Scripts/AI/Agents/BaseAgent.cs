@@ -11,7 +11,7 @@ namespace Assets.Scripts.AI.Agents
         /// This confidence will be applied to every confidence return by this agent.
         /// </summary>
         int baseConfidence { get; set; }
-        AIController ai;
+        protected AIController ai;
         public float modifier { get; set; }
         public BaseAgent(AIController ai)
         {
