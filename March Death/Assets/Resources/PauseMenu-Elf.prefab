@@ -12,7 +12,7 @@ GameObject:
   - 114: {fileID: 11402798}
   - 114: {fileID: 11434260}
   m_Layer: 5
-  m_Name: Continue
+  m_Name: Resume
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28,6 +28,7 @@ GameObject:
   - 224: {fileID: 22477258}
   - 222: {fileID: 22222262}
   - 114: {fileID: 11474296}
+  - 114: {fileID: 11491244}
   m_Layer: 5
   m_Name: BackgroundMenuPanel
   m_TagString: Untagged
@@ -47,7 +48,7 @@ GameObject:
   - 114: {fileID: 11426486}
   - 114: {fileID: 11448002}
   m_Layer: 5
-  m_Name: exit button
+  m_Name: Exit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -65,7 +66,7 @@ GameObject:
   - 114: {fileID: 11459082}
   - 114: {fileID: 11446796}
   m_Layer: 5
-  m_Name: PauseMenu
+  m_Name: PauseMenu-Elf
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -330,6 +331,17 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &11491244
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 129024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98a0ed0ef7361bc4fb9c6e359fcdf825, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11498028
 MonoBehaviour:
   m_ObjectHideFlags: 1

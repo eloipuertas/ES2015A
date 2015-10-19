@@ -8,9 +8,9 @@ public class PauseMenuLogic : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-		GameObject.Find ("Button").GetComponent<Button> ().onClick.AddListener (() => {
+		GameObject.Find ("Resume").GetComponent<Button> ().onClick.AddListener (() => {
 			QuitPauseMenu (); });
-		GameObject.Find ("exit button").GetComponent<Button> ().onClick.AddListener (() => {
+		GameObject.Find ("Exit").GetComponent<Button> ().onClick.AddListener (() => {
 			QuitToMainMenu (); });
 	}
 
@@ -28,7 +28,7 @@ public class PauseMenuLogic : MonoBehaviour
 	/// </summary>
 	void QuitPauseMenu ()
 	{
-		GameObject root = GameObject.Find ("PausePanel");
+        GameObject root = GameObject.Find ("BackgroundMenuPanel");
 		Destroy (root);
 
 		MenuButtonLogic.Pause_Play ();
