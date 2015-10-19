@@ -24,7 +24,7 @@ public class CameraController : MonoBehaviour
     private const float BASE_ACCELERATION = 80f;
     private const float MAX_ACCELERATION = 200f;
 
-    private Vector3 cameraOffset;
+    public static Vector3 cameraOffset;
     private Vector3 lastLookedPoint;
     private GameObject followingGameObject;
     private GameObject cameraContainer;
