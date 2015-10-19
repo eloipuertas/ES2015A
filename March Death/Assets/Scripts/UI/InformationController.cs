@@ -140,8 +140,9 @@ public class InformationController : MonoBehaviour {
 	}
 
 
-	public void onUnitSelected(GameObject gameObject)
+	public void onUnitSelected(System.Object obj)
 	{
+        GameObject gameObject = (GameObject) obj;
 
 		//Check if is simple click or multiple
 		if (player.SelectedObjects.Count > 1)
@@ -158,13 +159,14 @@ public class InformationController : MonoBehaviour {
 
 		//Register for unit events
 		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-		Unit unit = entity.toUnit ();
+        Unit unit = (Unit) entity;
 		unit.register(Unit.Actions.DAMAGED, onUnitDamaged);
 		unit.register(Unit.Actions.DIED, onUnitDied);
 	}
 
-	public void onUnitDeselected(GameObject gameObject)
+	public void onUnitDeselected(System.Object obj)
 	{
+        GameObject gameObject = (GameObject) obj;
 
 		//Check if is simple click or multiple
 		if (player.SelectedObjects.Count > 1)
@@ -181,18 +183,19 @@ public class InformationController : MonoBehaviour {
 
 		//Unregister unit events
 		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-		Unit unit = entity.toUnit ();
+        Unit unit = (Unit) entity;
 		unit.unregister(Unit.Actions.DAMAGED, onUnitDamaged);
 		unit.unregister(Unit.Actions.DIED, onUnitDied);
 	}
 
-	public void onUnitDamaged(GameObject gameObject)
+	public void onUnitDamaged(System.Object obj)
 	{
+        GameObject gameObject = (GameObject) obj;
 		IGameEntity entity = gameObject.GetComponent<IGameEntity> ();
 		sliderActorHealth.value = entity.healthPercentage;
 	}
 
-	public void onUnitDied(GameObject gameObject)
+    public void onUnitDied(System.Object obj)
 	{
 		HideInformation ();
 	}
