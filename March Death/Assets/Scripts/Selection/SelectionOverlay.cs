@@ -4,7 +4,7 @@ using System.Collections;
 public static class SelectionOverlay{
 
     private static int Height = 100, Width = 100, Corner = 30;
-    private static int HealthHeight = 20;
+    private static int HealthHeight = 10;
 
     private static Color BorderColour = Color.white;
     private static Color HealthColour = Color.green;
@@ -96,7 +96,7 @@ public static class SelectionOverlay{
                 }
                 else
                 {
-                    texture.SetPixel(i, j, Color.clear);
+                    texture.SetPixel(i, j, Color.red);
                 }
             }
         }
