@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Utils;
 namespace Managers
 {
     public class BuildingsManager : MonoBehaviour
@@ -7,15 +8,18 @@ namespace Managers
 
         Player player;
         UserInput inputs;
-
+        private ConstructionGrid grid;
         private bool _placing = false;
         private GameObject newBuilding;
+        bool move = true;
+        float yoffset = 0f;
 
         // Use this for initialization
         void Start()
         {
             player = GetComponent<Player>();
             inputs = GetComponent<UserInput>();
+            grid = GetComponent<ConstructionGrid>();
 
         }
 
@@ -26,8 +30,9 @@ namespace Managers
             //TODO : (hermetico) test and remove after merging
             #region testcreatebuilding
             bool TEST = false;
-            if (TEST) { TEST = false; _createBuilding_("elf-farm"); }
+            if (TEST) { TEST = false; _createBuilding_("Men-Sawmill"); }
             #endregion
+
             if (_placing)
             {
                 relocate();
@@ -45,7 +50,7 @@ namespace Managers
             if (!_placing)
             {
                 GameObject newBuilding;
-                newBuilding = (GameObject)Resources.Load("Prefabs/Buildings/" + name, typeof(GameObject));
+                newBuilding = (GameObject)Resources.Load("Prefabs/Buildings/Resources/" + name, typeof(GameObject));
                 newBuilding = (GameObject)Instantiate(newBuilding, new Vector3(0, 0, 0), Quaternion.identity);
                 this.createBuilding(newBuilding);
 
@@ -79,11 +84,12 @@ namespace Managers
             if (!_placing)
             {
                 this.newBuilding = newBuilding;
-                newBuilding.GetComponent<Collider>().isTrigger = true; //HACK : (hermetico) controlar colision objeto con resto
+                newBuilding.AddComponent<CollisionDetector>();
+                this.newBuilding.GetComponent<Rigidbody>().detectCollisions = false;
+                //newBuilding.GetComponent<Collider>().isTrigger = true; //HACK : (hermetico) controlar colision objeto con resto
                 _placing = true;
-                Cursor.visible = false;
+                //Cursor.visible = false;
                 player.setCurrently(Player.status.PLACING_BUILDING);
-
             }
         }
 
@@ -94,13 +100,13 @@ namespace Managers
         /// <returns></returns>
         private Vector3 adaptLocation(Vector3 location)
         {
-            // TODO : (hermetico) uncomment when merge with devel_c
-            //location = Utils.ConstructionGrid.discretizeMapCoords(toLocation);
+            
+            location = grid.discretizeMapCoords(location);
             return location;
         }
 
         /// <summary>
-        /// Checks if is valid locatoin through ConstructorGrid
+        /// Checks if is valid locatoin through Constructiongrid
         /// </summary>
         /// <param name="location"></param>
         /// <returns></returns>
@@ -108,9 +114,8 @@ namespace Managers
         {
             bool check = false;
 
-            // TODO : (hermetico) uncomment when merge with devel_c
-            //check = Utils.isNewPositionAbleForConstrucction(location)
-            check = location.y < 89 ? true : false;
+            check = grid.isNewPositionAbleForConstrucction(location)
+                && !(newBuilding.AddComponent<CollisionDetector>().isThereCollision);
 
             return check;
 
@@ -121,19 +126,28 @@ namespace Managers
         /// </summary>
         public void placeBuilding()
         {
+            // 1. getPoint
             Vector3 toLocation = inputs.FindHitPoint();
+
+            // 2. offsetPoint
+            toLocation = locationOffset(toLocation);
+
+            // 3. discretize
             toLocation = adaptLocation(toLocation);
 
             // alter the color if is not a valid location
             if (checkLocation(toLocation))
             {
+
                 //TODO : (hermetico) restar recursos necesarios para crear el building
-                //Utils.ConstructionGrid.resevePosition(toLocation)
+                Destroy(newBuilding.GetComponent<CollisionDetector>());
+                grid.reservePosition(toLocation);
                 newBuilding.transform.position = toLocation;
+                this.newBuilding.GetComponent<Rigidbody>().detectCollisions = false;
                 IGameEntity destination = (IGameEntity)newBuilding.GetComponent<Unit>();
                 player.addEntityToList(destination);
-                newBuilding.GetComponent<Collider>().isTrigger = false; //HACK : (hermetico) controlar colision objeto con resto
-                                                                        // remaining operations
+                
+                // remaining operations
                 _finishPlacing();
             }
 
@@ -159,7 +173,7 @@ namespace Managers
 
         private void _finishPlacing()
         {
-            Cursor.visible = true;
+            //Cursor.visible = true;
             _placing = false;
             player.setCurrently(Player.status.IDLE);
         }
@@ -170,15 +184,17 @@ namespace Managers
         private void relocate()
         {
 
-
+            // 1. getPoint
             Vector3 toLocation = inputs.FindHitPoint();
 
-            // move the object to match toLocation with the min corner
-
-
+            // 2. offsetPoint
+            toLocation = locationOffset(toLocation);
+            
+            // 3. discretize
             toLocation = adaptLocation(toLocation);
 
-            // alter the color if is not a valid location
+            // 4. check and move alter the color if is not a valid location
+            newBuilding.transform.position = toLocation;
             if (checkLocation(toLocation))
             {
                 _drawState(Color.green);
@@ -187,8 +203,6 @@ namespace Managers
             {
                 _drawState(Color.red);
             }
-
-            newBuilding.transform.position = toLocation;
 
         }
 
@@ -232,19 +246,42 @@ namespace Managers
 
         }
 
-        /*
+        
         /// <summary>
         /// Moves the location based on the collider, because if we move the object on with the center on the hitpoint
         /// the next hitPoint will be the same object that we are placing, and not the surface of the terrain
         /// </summary>
         /// <param name="location"></param>
         /// <returns></returns>
-        private Vector3 locationTrick(Vector3 location) {
-            Vector3 min = newBuilding.GetComponent<Collider>().bounds.min;
-            Vector3 max = newBuilding.GetComponent<Collider>().bounds.max;
-            location += ((max - min) / 2f);
-            return location;
+        private Vector3 locationOffset(Vector3 location) {
+            Bounds newBounds = newBuilding.GetComponent<Collider>().bounds;
+            Vector3 min = newBounds.min;
+            Vector3 max = newBounds.max;
+            // estos calculos dependen de la camara principal
+            // movemos el punto a partir del tamaño del objeto
+            // para no situar el objeto encima del raton
+            location.x += ((max.x - min.x) / 2f);
+            location.z -= ((max.z - min.z) / 2f);
+            location.y += ((max.y - min.y) / 2f);
+
+            // ahora hacemos un raicasting, para que el objeto no quede entre
+            // del terreno
+            return location;// inputs.FindHitPoint(location);
         }
-        */
+        
+    }
+    public class CollisionDetector : MonoBehaviour
+    {
+        private bool _isThereCollision;
+        public bool isThereCollision{ get { return _isThereCollision; } }
+        void OnCollisionEnter(Collision collisionInfo)
+        {
+            _isThereCollision = true;
+            collisionInfo.gameObject.SetActive(true);
+        }
+        void OnCollisionExit(Collision collisionInfo)
+        {
+            _isThereCollision = false;
+        }
     }
 }
