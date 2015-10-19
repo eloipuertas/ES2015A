@@ -1,6 +1,5 @@
 using System;
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 using Utils;
@@ -17,6 +16,7 @@ namespace Storage
     {
         private Dictionary<Tuple<Races, UnitTypes>, EntityInfo> unitStore = new Dictionary<Tuple<Races, UnitTypes>, EntityInfo>();
         private Dictionary<Tuple<Races, UnitTypes>, List<string>> unitPrefabs = new Dictionary<Tuple<Races, UnitTypes>, List<string>>();
+
         private Dictionary<Tuple<Races, BuildingTypes>, EntityInfo> buildingStore = new Dictionary<Tuple<Races, BuildingTypes>, EntityInfo>();
         private Dictionary<Tuple<Races, BuildingTypes>, List<string>> buildingPrefabs = new Dictionary<Tuple<Races, BuildingTypes>, List<string>>();
 
@@ -99,7 +99,7 @@ namespace Storage
                         Debug.LogWarning("Intentional? Duplicated " + typeof(ComponentType) + " prefab ('" + component.getRace() + "', '" + component.getType<EnumType>() + "')");
                     }
 
-                    store [key].Add(folder + "/" + gameObject.name);
+                    store[key].Add(folder + "/" + gameObject.name);
                 }
             }
         }
@@ -155,12 +155,12 @@ namespace Storage
 
             if (!unitPrefabs.ContainsKey(key))
             {
-                throw new System.ArgumentException("Unit prefab for ('" + race + "', '" + type + "') not found");
+                throw new System.ArgumentException("Unit prefab for ('" + race+ "', '" + type + "') not found");
             }
 
             if (variant < 0)
             {
-                variant = Utils.D6.get.rollN(unitPrefabs [key].Count);
+                variant = Utils.D6.get.rollN(unitPrefabs[key].Count);
             }
 
             return unitPrefabs[key][variant];
@@ -184,7 +184,7 @@ namespace Storage
 
             if (variant < 0)
             {
-                variant = Utils.D6.get.rollN(buildingPrefabs [key].Count);
+                variant = Utils.D6.get.rollN(buildingPrefabs[key].Count);
             }
 
             return buildingPrefabs[key][variant];

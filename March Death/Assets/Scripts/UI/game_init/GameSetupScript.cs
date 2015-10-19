@@ -47,7 +47,7 @@ public class GameSetupScript : MonoBehaviour {
     void DrawWindow(int window)
     {
         GUI.Label(new Rect(5, 20, messageBox.width, 20), "Please, select a civilization");
-        if (GUI.Button(new Rect(5, 100, messageBox.width - 10, 20), "Ok"))
+        if (GUI.Button(new Rect(5, 50, messageBox.width - 10, 20), "Ok"))
         {
             showMsgBox = false;
         }

@@ -5,6 +5,7 @@ using UnityEngine;
 using Utils;
 using Storage;
 
+
 /// <summary>
 /// Unit base class. Extends actor (which in turn extends MonoBehaviour) to
 /// handle basic API operations
@@ -13,9 +14,7 @@ public class Unit : GameEntity<Unit.Actions>
 {
     public enum Actions { MOVEMENT_START, MOVEMENT_END, DAMAGED, DIED };
 
-    public Unit()
-    {
-    }
+    public Unit() { }
 
     ///<sumary>
     /// Auto-unregister events when we are destroyed
@@ -26,11 +25,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// Edit this on the Prefab to set Units of certain races/types
     /// </summary>
     public UnitTypes type = UnitTypes.HERO;
-
-    public override E getType<E>()
-    {
-        return (E)Convert.ChangeType(type, typeof(E));
-    }
+    public override E getType<E>() { return (E)Convert.ChangeType(type, typeof(E)); }
 
     /// <summary>
     /// If in battle, this is the target and last attack time
@@ -55,7 +50,7 @@ public class Unit : GameEntity<Unit.Actions>
     private void onTargetDied(System.Object obj)
     {
         // TODO: Our target died, select next? Do nothing?
-        setStatus(EntityStatus.IDLE);
+        _status = EntityStatus.IDLE;
     }
 
     /// <summary>
@@ -83,7 +78,7 @@ public class Unit : GameEntity<Unit.Actions>
     {
         _target = unit;
         _auto += _target.register(Actions.DIED, onTargetDied);
-        setStatus(EntityStatus.ATTACKING);
+        _status = EntityStatus.ATTACKING;
     }
 
     /// <summary>
@@ -95,7 +90,7 @@ public class Unit : GameEntity<Unit.Actions>
 
         // TODO: Maybe we should not set it to null? In case we want to attack it again
         _target = null;
-        setStatus(EntityStatus.IDLE);
+        _status = EntityStatus.IDLE;
     }
 
     /// <summary>
@@ -115,7 +110,7 @@ public class Unit : GameEntity<Unit.Actions>
             transform.rotation = targetRotation;
         }
 
-        setStatus(EntityStatus.MOVING);
+        _status = EntityStatus.MOVING;
         fire(Actions.MOVEMENT_START);
     }
 
@@ -124,14 +119,12 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     public override void Start()
     {
+        _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
         _auto = this;
 
         // Call GameEntity start
         base.Start();
-
-        // Set the status
-        setStatus(EntityStatus.IDLE);
     }
 
     /// <summary>
@@ -159,7 +152,7 @@ public class Unit : GameEntity<Unit.Actions>
             moveTo(hit.point);
         }
 #endif
-        switch (status)
+        switch (_status)
         {
             case EntityStatus.ATTACKING:
                 if (_target != null)
@@ -179,16 +172,17 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     void FixedUpdate()
     {
-        switch (status) {
+        switch (_status)
+        {
             case EntityStatus.MOVING:
                 // TODO: Steps on the last sector are smoothened due to distance being small
                 // Althought it's an unintended behaviour, it may be interesating to leave it as is
                 transform.position = Vector3.MoveTowards(transform.position, _movePoint, Time.fixedDeltaTime * info.unitAttributes.movementRate);
 
-                 // If distance is lower than 0.5, stop movement
+                // If distance is lower than 0.5, stop movement
                 if (Vector3.Distance(transform.position, _movePoint) <= 0.5f)
                 {
-                    setStatus(EntityStatus.IDLE);
+                    _status = EntityStatus.IDLE;
                     fire(Actions.MOVEMENT_END);
                 }
                 break;

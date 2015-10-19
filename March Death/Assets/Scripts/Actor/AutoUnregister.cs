@@ -7,7 +7,7 @@ namespace Utils
     public sealed class AutoUnregister
     {
         private IObserver observer;
-        private List<IKeyGetter> results = new List<IKeyGetter> ();
+        private List<IKeyGetter> results = new List<IKeyGetter>();
 
         public AutoUnregister(IObserver observer)
         {
@@ -17,13 +17,13 @@ namespace Utils
 
         public static AutoUnregister operator +(AutoUnregister self, IKeyGetter result)
         {
-            self.results.Add (result);
+            self.results.Add(result);
             return self;
         }
 
         public static AutoUnregister operator -(AutoUnregister self, IKeyGetter result)
         {
-            self.results.Remove (result);
+            self.results.Remove(result);
             return self;
         }
 

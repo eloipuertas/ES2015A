@@ -3,15 +3,14 @@ using System.Collections;
 using System.Linq;
 using System;
 
-public class ConstructionGrid : MonoBehaviour
-{
+public class ConstructionGrid : MonoBehaviour {
+
     private Vector2 dimensions;
     private ArrayList reservedPositions;
-    private const float DIFERENCE_OF_HEIGHTS_TOLERANCE = 3f;
+    private const float DIFERENCE_OF_HEIGHTS_TOLERANCE = 0.4f;
 
-    void Start()
-    {
-        dimensions = new Vector2(20f, 20f);
+    void Start () {
+        dimensions = new Vector2(5f, 5f);
         reservedPositions = new ArrayList();
     }
 
@@ -19,17 +18,17 @@ public class ConstructionGrid : MonoBehaviour
     {
         
     }
-    
+	
     /// <summary>
     /// Returns the center of a row of the grid where the building will be placed
     /// </summary>
     /// <param name="position"></param>
     /// <returns></returns>
-    public Vector3 discretizeMapCoords(Vector3 position)
+	public Vector3 discretizeMapCoords(Vector3 position)
     {
         Vector3 discretizedCoords = new Vector3();
-        discretizedCoords.x = (float)Math.Floor(position.x / dimensions.x) * dimensions.x + dimensions.x / 2;
-        discretizedCoords.z = (float)Math.Floor(position.z / dimensions.y) * dimensions.y + dimensions.y / 2;
+        discretizedCoords.x = (float) Math.Floor(position.x / dimensions.x) * dimensions.x + dimensions.x / 2;
+        discretizedCoords.z = (float) Math.Floor(position.z / dimensions.y) * dimensions.y + dimensions.y / 2;
         discretizedCoords.y = position.y;
         return discretizedCoords;
     }
@@ -73,10 +72,8 @@ public class ConstructionGrid : MonoBehaviour
     private float getPointHeight(Vector3 point)
     {
         RaycastHit hit;
-        if (Physics.Raycast(point, Vector3.down, out hit))
-            return hit.point.y; 
-        if (Physics.Raycast(point, Vector3.up, out hit))
-            return hit.point.y;
+        if (Physics.Raycast(point, Vector3.down, out hit)) return hit.point.y; 
+        if (Physics.Raycast(point, Vector3.up, out hit)) return hit.point.y;
         return float.NegativeInfinity;
     }
 
@@ -93,7 +90,7 @@ public class ConstructionGrid : MonoBehaviour
         float BottomLeftHeight = getPointHeight(new Vector3(discretizedPosition.x + dimensions.x / 2, discretizedPosition.y, discretizedPosition.z - dimensions.y / 2));
         float BottomRightHeight = getPointHeight(new Vector3(discretizedPosition.x + dimensions.x / 2, discretizedPosition.y, discretizedPosition.z + dimensions.y / 2));
 
-        var heights = new float[] { centerHeight, topLeftHeight, topRightHeight, BottomLeftHeight, BottomRightHeight };
+        var heights = new float[]{ centerHeight, topLeftHeight, topRightHeight, BottomLeftHeight, BottomRightHeight };
         float max_height = heights.Max();
         float min_height = heights.Min();
         float difference = max_height - min_height;
