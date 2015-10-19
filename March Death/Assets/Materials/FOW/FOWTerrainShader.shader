@@ -21,7 +21,7 @@
 		CGPROGRAM
 			
 		#pragma target 4.0
-		#pragma surface surf Lambert
+		#pragma surface surf Lambert exclude_path:prepass
 
 		sampler2D _FOWTex;
 		float4 _FOWTex_ST;
@@ -69,5 +69,6 @@
 		}
 		ENDCG
 	}
+	Dependency "AddPassShader" = "Fog Of War/TerrainAddPass"
 	FallBack "Diffuse"
 }

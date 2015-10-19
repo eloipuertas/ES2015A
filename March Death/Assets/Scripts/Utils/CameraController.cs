@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 
+
 /// <summary>
 /// Attach this script to the main camera and it will be able to be controlled like an Isometric Camera.
 /// </summary>
@@ -8,11 +9,23 @@ using System;
 public class CameraController : MonoBehaviour
 {
 
+    public struct MapBounds
+    {
+        public Vector3 minxyz;
+        public Vector3 maxxyz;
+    }
+
+    public enum  CameraOrientation { NORTH_WEST, SOUTH_WEST, SOUTH_EST, NORTH_EST };
+    public enum CameraInteractionState { MOVING, STOPPED }
+
     private const float CAMERA_MAX_ZOOM = 5f;
     private const float CAMERA_MIN_ZOOM = 100f;
     private const float MOUSE_BOUNDS = 2f;
+    private const float BASE_ACCELERATION = 80f;
+    private const float MAX_ACCELERATION = 200f;
 
     private Vector3 cameraOffset;
+    private Vector3 lastLookedPoint;
     private GameObject followingGameObject;
     private GameObject cameraContainer;
     private bool isManualControlEnabled;
@@ -25,6 +38,14 @@ public class CameraController : MonoBehaviour
     private float _cameraSpeed;
     private float _mouseWeelZoomSensitivity;
     private float _defaultLerpTime;
+    private float _camera_zoom;
+    private float _acceleration;
+    private Vector3 _internalDisplacement;
+
+    private CameraOrientation _camera_orientation;
+    private CameraInteractionState actual_state, last_state;
+
+    private MapBounds map1bounds;
 
 
     public float defaultLerpTime
@@ -42,23 +63,33 @@ public class CameraController : MonoBehaviour
         get { return _cameraSpeed; }
     }
 
+    public float cameraZoom
+    {
+        get { return _camera_zoom; }
+    }
+
     void Start()
     {
         setupCamera();
         _cameraSpeed = 5f;
-        _mouseWeelZoomSensitivity = 5f;
+        _mouseWeelZoomSensitivity = 20f;
+        _acceleration = 0f;
         _defaultLerpTime = 2f;
         lerpTime = 2f;
         isManualControlEnabled = true;
         isLerping = false;
-        lookAtPoint(Vector3.zero);
-        setCameraZoom(80f);
-        setCameraSpeed(20f);
-        lookAtPoint(new Vector3(1935f, 79f, 969f));
+        map1bounds.maxxyz = new Vector3(790, 250.34f, 1250);
+        map1bounds.minxyz = new Vector3(-160, 250.34f, 203);
+        actual_state = CameraInteractionState.STOPPED;
+        last_state = CameraInteractionState.STOPPED;
+        setCameraZoom(50f);
+        setCameraSpeed(40f);
+        lookAtPoint(new Vector3(896.4047f, 90.51f, 581.8263f));
     }
 
     void Update()
     {
+
         if (isManualControlEnabled)
         {
             handlePlayerInput();
@@ -73,6 +104,13 @@ public class CameraController : MonoBehaviour
         {
             lookGameObject(followingGameObject);
         }
+
+    }
+
+    void LateUpdate()
+    {
+        cameraContainer.transform.position = new Vector3(Mathf.Clamp(cameraContainer.transform.position.x, map1bounds.minxyz.x, map1bounds.maxxyz.x),
+                    cameraContainer.transform.position.y, Mathf.Clamp(cameraContainer.transform.position.z, map1bounds.minxyz.z, map1bounds.maxxyz.z));
     }
 
     /// <summary>
@@ -84,6 +122,7 @@ public class CameraController : MonoBehaviour
         stopAllAutomaticTasks();
         Vector3 newCameraPos = target + cameraOffset;
         cameraContainer.transform.position = newCameraPos;
+        lastLookedPoint = target;
     }
 
     /// <summary>
@@ -94,6 +133,7 @@ public class CameraController : MonoBehaviour
     {
         Vector3 newCameraPos = target.transform.position + cameraOffset;
         cameraContainer.transform.position = newCameraPos;
+        lastLookedPoint = target.transform.position;
     }
 
     /// <summary>
@@ -262,8 +302,46 @@ public class CameraController : MonoBehaviour
         transform.localPosition = Vector3.zero;
         transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 0, transform.localEulerAngles.z);
         cameraContainer.transform.position = desiredCameraPosition;
-        cameraContainer.transform.Rotate(Vector3.up, 45f);
         Camera.main.orthographic = true;
+        setCameraOrientation(CameraOrientation.SOUTH_WEST);
+ 
+    }
+
+    /// <summary>
+    /// Used to set a new camera orientation (Usefull if the map changes its rotation) 
+    /// Orientations can be NORT_WEST (used in the first demo) , SOUTH_WEST, SOUTH_EST, NORTH_EST
+    /// </summary>
+    /// <param name="newOrientation"></param>
+    public void setCameraOrientation(CameraOrientation newOrientation)
+    {
+        float baseVerticalRotation = 45f;
+        float verticalRotationOffset = 90f;
+        float numOffsets = 0;
+
+        switch (newOrientation)
+        {
+            case CameraOrientation.NORTH_WEST:
+                cameraOffset = new Vector3(-252.8f, 250.34f, -252.8f);
+                baseVerticalRotation = 45f;
+                numOffsets = 0;
+                break;
+            case CameraOrientation.SOUTH_WEST:
+                cameraOffset = new Vector3(-252.8f, 250.34f, +252.8f);
+                numOffsets = 1;
+                break;
+            case CameraOrientation.SOUTH_EST:
+                cameraOffset = new Vector3(+252.8f, 250.34f, +252.8f);
+                numOffsets = 2;
+                break;
+            case CameraOrientation.NORTH_EST:
+                cameraOffset = new Vector3(+252.8f, 250.34f, -252.8f);
+                numOffsets = 3;
+                break;
+            default:
+                break;
+        }
+        cameraContainer.transform.rotation = Quaternion.Euler(cameraContainer.transform.localRotation.eulerAngles.x, baseVerticalRotation + verticalRotationOffset * numOffsets, cameraContainer.transform.localEulerAngles.z);
+        _camera_orientation = newOrientation;
     }
 
 
@@ -279,7 +357,8 @@ public class CameraController : MonoBehaviour
         }
 
         float fov = Mathf.Clamp(newZoom, CAMERA_MAX_ZOOM, CAMERA_MIN_ZOOM);
-        Camera.main.orthographicSize = fov;     
+        Camera.main.orthographicSize = fov;
+        _camera_zoom = fov;     
     }
 
 
@@ -303,27 +382,48 @@ public class CameraController : MonoBehaviour
     /// </summary>
     private void handlePlayerInput()
     {
+        last_state = actual_state;
+        actual_state = CameraInteractionState.STOPPED;
+
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) || Input.mousePosition.y >= Screen.height - MOUSE_BOUNDS )
         {
-            cameraContainer.transform.Translate(Vector3.forward * Time.deltaTime * _cameraSpeed);
+            _internalDisplacement = Vector3.forward * Time.deltaTime * (_cameraSpeed + _acceleration);
+            cameraContainer.transform.Translate(_internalDisplacement); 
+            actual_state = CameraInteractionState.MOVING;
         }
 
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) || Input.mousePosition.x <= MOUSE_BOUNDS )
         {
-            cameraContainer.transform.Translate(Vector3.left * Time.deltaTime * _cameraSpeed);
+            _internalDisplacement = Vector3.left * Time.deltaTime * (_cameraSpeed + _acceleration);
+            cameraContainer.transform.Translate(_internalDisplacement);
+            actual_state = CameraInteractionState.MOVING;
         }
 
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) || Input.mousePosition.y <= MOUSE_BOUNDS )
         {
-            cameraContainer.transform.Translate(Vector3.back * Time.deltaTime * _cameraSpeed);
+            _internalDisplacement = Vector3.back * Time.deltaTime * (_cameraSpeed + _acceleration);
+            Vector3 nextFramePosition = cameraContainer.transform.position + _internalDisplacement;
+            cameraContainer.transform.Translate(_internalDisplacement);          
+            actual_state = CameraInteractionState.MOVING;
         }
 
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || Input.mousePosition.x >= Screen.width - MOUSE_BOUNDS )
         {
-            cameraContainer.transform.Translate(Vector3.right * Time.deltaTime * _cameraSpeed);
+            _internalDisplacement = Vector3.right * Time.deltaTime * (_cameraSpeed + _acceleration);
+            cameraContainer.transform.Translate(_internalDisplacement); 
+            actual_state = CameraInteractionState.MOVING;
         }
 
-  
+        if(actual_state == CameraInteractionState.MOVING)
+        {
+            _acceleration += BASE_ACCELERATION * Time.deltaTime;
+            if (_acceleration > MAX_ACCELERATION) _acceleration = MAX_ACCELERATION;
+        }
+        else
+        {
+            _acceleration = 0f;
+        }
+
         handleZoom();
     }
 

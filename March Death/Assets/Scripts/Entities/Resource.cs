@@ -1,321 +1,73 @@
 ﻿using System;
 using System.Reflection;
-using System.Collections.Generic;
 using UnityEngine;
 using Storage;
 
 
-
-public class Resource : Utils.Actor<Resource.Actions>, IGameEntity
+public class Resource : Building<Resource.Actions>
 {
-    public enum Actions { DAMAGED, DESTROYED };
-
+    public enum Actions { DAMAGED, DESTROYED, COLLECTION, CREATE_UNIT };
     // Constructor
     public Resource() { }
 
     /// <summary>
-    /// Edit this on the Prefab to set Resources of certain races/types
-    /// </summary>
-    public Races race = Races.MEN;
-    public ResourceTypes type = ResourceTypes.FARM;
-
-
-    /// <summary>
-    /// Time elapsed to next update
-    /// </summary>
-    public float updateInterval { get; set; }
-
-    /// <summary>
     ///  Next update time
     /// </summary>
-    // 
-    private float nextUpdate;
+    private float _nextUpdate;
 
     /// <summary>
     // Resource could store limited amount of material when not in use
     // or when production is higher than collection
     /// </summary>
-    // 
-    private int storeSize;
-    /// <summary>
-    /// amount of materials produced and not collected yet.
-    /// Maximun allowed is storeSize
-    /// </summary>
-    private int stored;
-
-    /// <summary>
-    /// Material amount produced every time interval.
-    /// </summary>
-    public int productionRate { get; set; }
+    private float _stored;
 
     /// <summary>
     /// sum of capacity of units collecting this resource
-    /// the more units the more maxCollectionRate.
-    /// real collectionRate could be lower due to 
+    /// the more units the more collectionRate.
+    /// real collectionRate could be lower due to
     /// store limit.
     /// </summary>
-    public int collectionRate { get; set; }
-
+    private float _collectionRate { get; set; }
 
     /// <summary>
     ///  units collecting this resource
+    /// </summary> 
+    private int harvestUnits { get; set; }
+ 
+    /// <summary>
+    /// material amount send to player (collected) when update succes.
     /// </summary>
-    public int harvestUnits;
-    //public int harvestUnits { get; set; }
-
-
+    private float _collectedAmount;
 
     /// <summary>
-    /// max harvesting units allowed
+    /// civilians pay budgets and generate gold every update interval
     /// </summary>
-    public int maxUnits { get; set; }
+    private float _goldAmount;
 
     /// <summary>
-    /// material amount collected when update succes.
+    /// this building can create units.
+    /// unitPosition are the x,y,z map coordinates of new civilian
     /// </summary>
-    private int collectedAmount;
+    private Vector3 _unitPosition;
 
     /// <summary>
-    /// List of ability objects of this resource
+    /// this building can create units.
+    /// unitRotation is the rotation of new civilian
     /// </summary>
-    private List<IResourceAbility> _abilities;
+    private Quaternion _unitRotation;
 
     /// <summary>
-    /// Contains all static information of the Resource.
-    /// That means: max health, damage, defense, etc.
+    /// when you create a civilian some displacement is needed to avoid units 
+    /// overlap. this is the x-axis displacement
     /// </summary>
-    private ResourceInfo _info;
-    private Storage.ResourceAttributes _attributes;
-    public EntityInfo info
-    {
-        get
-        {
-            return _info;
-        }
-    }
+    private int _xDisplacement;
 
     /// <summary>
-    /// Returns current status of the Resource
+    /// when you create a civilian some displace is needed to avoid units 
+    /// overlap. this is the y-axis displacement
     /// </summary>
-    private EntityStatus _status;
-    public EntityStatus status
-    {
-        get
-        {
-            return _status;
-        }
-    }
+    private int _yDisplacement;
 
-    /// <summary>
-    /// Returns the number of wounds a Resource received
-    /// </summary>
-    private float _woundsReceived;
-    public float wounds
-    {
-        get
-        {
-            return _woundsReceived;
-        }
-    }
-
-
-    /// <summary>
-    /// Returns percentual value of health (100% meaning all life)
-    /// </summary>
-    public float healthPercentage
-    {
-        get
-        {
-            return (_attributes.wounds - _woundsReceived) * 100f / _attributes.wounds;
-        }
-    }
-
-
-    /// <summary>
-    /// Returns percentual value of damage (100% meaning 0% life)
-    /// </summary>
-    public float damagePercentage
-    {
-        get
-        {
-            return 100f - healthPercentage;
-        }
-    }
-
-    /// <summary>
-    /// Returns true in case an attack will land on this resource
-    /// </summary>
-    /// <param name="from">Unit which attacked</param>
-    /// <param name="isRanged">Set to true in case the attack is range, false if melee</param>
-    /// <returns>True if it hits, false otherwise</returns>
-    private bool willAttackLand(Unit from, bool isRanged = false)
-    {
-        int dice = Utils.D6.get.rollSpecial();
-
-        if (isRanged)
-        {
-            // TODO: Specil units (ie gigants) and distance!
-            return dice > 1 && (_attributes.projectileAbility + dice >= 7);
-        }
-
-        return HitTables.meleeHit[((UnitAttributes)from.info.attributes).weaponAbility, _attributes.weaponAbility] <= dice;
-    }
-
-    /// <summary>
-    /// Retuns true if an attack will cause wounds to this resource
-    /// </summary>
-    /// <param name="from">Attacker</param>
-    /// <returns>True if causes wounds, false otherwise</returns>
-    private bool willAttackCauseWounds(Unit from)
-    {
-        int dice = Utils.D6.get.rollOnce();
-
-        return HitTables.wounds[((UnitAttributes)from.info.attributes).strength, _attributes.resistance] <= dice;
-    }
-
-    /// <summary>
-    /// Automatically calculates if an attack will hit, and in case it
-    /// does it updates the current state.
-    /// </summary>
-    /// <param name="from">Attacker</param>
-    /// <param name="isRanged">True if the attack is ranged, false if melee</param>
-    public void receiveAttack(Unit from, bool isRanged)
-    {
-        // Do not attack dead targets
-        if (_status == EntityStatus.DEAD)
-        {
-            throw new InvalidOperationException("Can not receive damage while not alive");
-        }
-
-        // If it hits and produces damage, update wounds
-        if (willAttackLand(from, isRanged) && willAttackCauseWounds(from))
-        {
-            _woundsReceived += 1;
-            fire(Actions.DAMAGED);
-        }
-
-        // Check if we are dead
-        if (_woundsReceived == _attributes.wounds)
-        {
-            _status = EntityStatus.DEAD;
-            //_target = null;
-
-            fire(Actions.DESTROYED);
-        }
-    }
-
-    /// <summary>
-    /// Iterates all abilities on the resource
-    /// </summary>
-    private void setupAbilities()
-    {
-        _abilities = new List<IResourceAbility>();
-
-        foreach (ResourceAbility ability in _info.actions)
-        {
-            // Try to get class with this name
-            string abilityName = ability.name.Replace(" ", "");
-
-            try
-            {
-                var constructor = Type.GetType(abilityName).
-                    GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(UnitAbility), typeof(GameObject) }, null);
-                if (constructor == null)
-                {
-                    // Invalid constructor, use GenericAbility
-                    _abilities.Add(new GenericResourceAbility(ability));
-                }
-                else
-                {
-                    // Class found, use that!
-                    _abilities.Add((IResourceAbility)constructor.Invoke(new object[2] { ability, gameObject }));
-                }
-            }
-            catch (Exception /*e*/)
-            {
-                // No such class, use the GenericAbility class
-                _abilities.Add(new GenericResourceAbility(ability));
-            }
-        }
-    }
-
-
-    /// <summary>
-    /// Returns an action given a name
-    /// </summary>
-    /// <param name="name">Name of the action</param>
-    /// <exception cref="System.ArgumentException">
-    /// Thrown when no action with the given name is found
-    /// </exception>
-    /// <returns>Always returns a valid IResourceAbility (IAction)</returns>
-    public IAction getAction(string name)
-    {
-        foreach (IResourceAbility ability in _abilities)
-        {
-            if (ability.info.name.Equals(name))
-            {
-                return ability;
-            }
-        }
-
-        throw new ArgumentException("Invalid action " + name + "requested");
-    }
-
-    /// <summary>
-    /// when collider interact with other gameobject method checks if 
-    /// it is collecting unit and if unit has the rigth type for collecting
-    ///  resource.Then update number of collectors attached and production.
-    /// </summary>
-    /// <param name="other"></param>
-    void OnTriggerEnter(Collider other)
-    {
-
-        // space enough to hold new collectingUnit
-        if (harvestUnits < _attributes.maxUnits)
-        {
-            IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
-
-            // check collection unit and right type
-            if (entity.info.isCivil)
-            {
-                Unit unit = (Unit)entity;
-                UnitInfo info = entity.info.toUnitInfo;
-                //Increase units collecting resource, calculate max capacity.
-                if (match(info.type, type))
-                {
-                    harvestUnits++;
-                    collectionRate += info.attributes.capacity;
-                }
-            }
-        }
-
-
-    }
-    void OnTriggerStay(Collider other)
-    {
-        ;
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-
-        // get entity
-        IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
-
-        if (harvestUnits < _attributes.maxUnits)
-        {
-            if (entity.info.isCivil)
-            {
-                UnitInfo info = entity.info.toUnitInfo;
-                //Decrease units collecting resource, calculate max capacity.
-                if (match(info.type, type))
-                {
-                    harvestUnits--;
-                    collectionRate -= info.attributes.capacity;
-                }
-            }
-        }
-    }
 
     /// <summary>
     /// check if collecting unit type matchs rigth resource type
@@ -326,133 +78,242 @@ public class Resource : Utils.Actor<Resource.Actions>, IGameEntity
     /// true if resource and unit type match,
     /// false otherwise
     /// </returns>
-    bool match(UnitTypes unitType, ResourceTypes type)
+    bool match(UnitTypes unitType, BuildingTypes type)
     {
-        if (type.Equals(ResourceTypes.FARM))
-        {
-            return unitType.Equals(UnitTypes.FARMER);
-        }
-        if (type.Equals(ResourceTypes.MINE))
-        {
-            return unitType.Equals(UnitTypes.MINER);
-        }
-        if (type.Equals(ResourceTypes.SAWMILL))
-        {
-            return unitType.Equals(UnitTypes.LUMBERJACK);
-        }
-        return false;
-
+        return unitType == UnitTypes.CIVIL;
     }
-    void collect()
+
+    /// <summary>
+    /// civilians units collect resources each production cicle.
+    /// the sum of units capacity is the total amount of materials they can 
+    /// take from the store and send to player. Gold is collected via 
+    /// gold taxes and sent to the user, it is not stored
+    /// </summary>
+    private void collect()
     {
-        if (collectionRate > stored)
+        
+        if (_collectionRate > _stored)
         {
             // collect all stored resources
-            collectedAmount = stored;
-            stored = 0;
+            _collectedAmount = _stored;           
+            _stored = 0;
         }
         else
         {
-            // collection capacity lower than stored materials
-            collectedAmount = collectionRate;
-            stored -= collectedAmount;
+            // collection capacity lower than stored materials. some materials
+            //remain at store until new collection cycle.
+            _collectedAmount = _collectionRate;
+            _stored -= _collectedAmount;
         }
-        addResource(collectedAmount);
+        
+        //TODO gold consum and production unit attributes needed
+        //_goldAmount = harvestUnits * (info.attributes.goldProduction - info.attributes.goldConpsumption);
+        sendResource(_collectedAmount);
         return;
     }
 
-    void produce()
+    /// <summary>
+    /// after civilians sends last batch produced they are able to take the 
+    /// new production and store it for the next production cicle
+    /// </summary>
+    private void produce()
     {
-        int remainingSpace = _attributes.storeSize - stored;
-        if (_attributes.productionRate > remainingSpace)
+        float remainingSpace = info.resourceAttributes.storeSize - _stored;
+        
+        if (info.resourceAttributes.productionRate >= remainingSpace)
         {
-            stored = _attributes.storeSize;
+            _stored = info.resourceAttributes.storeSize;
         }
         else
         {
-            stored += _attributes.productionRate;
+            _stored += info.resourceAttributes.productionRate;
         }
         return;
     }
 
-    void addResource(int amount)
+    /// <summary>
+    /// new goods produced are sent to player.
+    /// Method triger an event sending object goods with amount of materials 
+    /// transferred. gold production is sent too.
+    /// </summary>
+    /// <param name="amount"></param>
+    private void sendResource(float amount)
     {
-        if (type.Equals(ResourceTypes.FARM))
+        if (amount  > 0.0)
         {
-            //TODO
-            //add amount to player food
-        }
-        if (type.Equals(ResourceTypes.MINE))
+            Goods goods = new Goods();
+            goods.amount = amount;
+
+            if (type.Equals(BuildingTypes.FARM))
+            {
+                goods.type = Goods.GoodsType.FOOD;
+            }
+            else if(type.Equals(BuildingTypes.MINE))
+            {
+                goods.type = Goods.GoodsType.METAL;
+            }
+            else{ goods.type = Goods.GoodsType.WOOD; }
+            fire(Actions.COLLECTION, goods);
+        }         
+    }
+    /// <summary>
+    /// Method create civilian unit.
+    /// If capacity limit of building is not reached unit is positioned inside 
+    /// building limits otherwise unit is positioned outside, 
+    /// just at desired meeting Point.
+    /// civilian sex is randomly selected(last parameter of createUnit method).
+    /// </summary>
+    /// <returns>civilian Gameobect</returns>
+    public void createCivilian()
+    {
+        // TODO set desired rotation, now unit rotation equals building rotation!!
+        // TODO  ---create gameobject meetingPointInside and meetingPointOutside
+        // attached to resource building design---
+        
+        //---unComment next two lines when meeting point objects are created---
+        //GameObject meetingPointInside = this.GetComponent(meetingPointInside);
+        //GameObject meetingPointOutside = this.GetComponent(meetingPointOutside);
+
+        
+        if (harvestUnits < info.resourceAttributes.maxUnits)
         {
-            //TODO
-            //add amount to player metal
+            // TODO get inside meeting point and calculate position
+            //unitPosition = this.GetComponent(meetingPointInside).transform.position;
+
+            // Units distributed in rows of 5 elements
+            _xDisplacement = harvestUnits % 6;
+            _yDisplacement = harvestUnits / 6;
+            _unitPosition.Set(transform.position.x + _xDisplacement, transform.position.y + _yDisplacement, transform.position.z);
+            GameObject civil = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
+            harvestUnits++;
+
+           _collectionRate += Info.get.of(race, UnitTypes.CIVIL).attributes.capacity; 
+
+            fire(Actions.CREATE_UNIT, civil);
         }
-        if (type.Equals(ResourceTypes.SAWMILL))
+        else
         {
-            //TODO
-            //add amount to player wood
+            // TODO get outside meeting point and calculate position
+     
+            _unitPosition.Set(transform.position.x + 10 , transform.position.y, transform.position.z);
+            GameObject civil = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
+            fire(Actions.CREATE_UNIT, civil);
+            // TODO method to modify unit coordinates to avoid unit overlap
         }
-        return;
+  
     }
 
+    /// <summary>
+    /// Recruit a Explorer from building. you need to do this to take away worker
+   ///  from building. production decrease when you remove workers
+   /// </summary>
+    private void recruitExplorer(Unit worker)
+    {
+        if (harvestUnits > 0)
+        {
+            _collectionRate -= worker.info.attributes.capacity;
+            harvestUnits--;
 
+            worker.role = Unit.Roles.WANDERING;
+        } 
+        // TODO: Some alert message if you try to remove unit when no unit at building
+    }
 
+    /// <summary>
+    /// Recruit a worker. you can use a explorer as a worker. beware of building maxUnits.
+    /// </summary>
+    private void recruitWorker(Unit explorer)
+    {
+        if (harvestUnits < info.resourceAttributes.maxUnits)
+        {
+            _collectionRate -= explorer.info.attributes.capacity;
+            harvestUnits++;
+
+            explorer.role = Unit.Roles.PRODUCING;
+        }
+        // TODO: Some alert message if you try to recruit worker and building has no vacancy
+    }
+
+    /// <summary>
+    /// when collider interact with other gameobject method checks if 
+    /// gameobject is a civilian unit. Civilians units are recruited as workers
+    /// while limit of workers are not reached.  
+    /// </summary>
+    /// <param name="other">collider gameobject interacting with our own collider</param>
+    void OnTriggerEnter(Collider other)
+    {
+        
+        // space enough to hold new civil
+        
+        if (harvestUnits < info.resourceAttributes.maxUnits)
+        {
+            IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
+
+            // check if unit is civil
+            if (entity.info.isCivil)
+            {
+                recruitWorker((Unit)entity);
+            }
+           
+        }
+
+    }
+
+    void OnTriggerStay(Collider other)
+    {
+        ;
+    }
+
+    /// <summary>
+    /// when collider interaction with other gameobject ends method checks if
+    /// gameobject is civilian unit. Civilians units are recruited as explorers
+    /// and fired as workers.
+    /// </summary>
+    /// <param name="other">collider gameobject interacting with our own collider</param>
+    void OnTriggerExit(Collider other)
+    {
+        // get entity
+        IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
+
+        if (harvestUnits < info.resourceAttributes.maxUnits)
+        {
+            if (entity.info.isCivil)
+            {
+                recruitExplorer((Unit)entity);
+            }
+        }
+    }
+    
     /// <summary>
     /// Object initialization
     /// </summary>
     override public void Start()
-    {
-        // Call actor start
-        base.Start();
-
-        type = ResourceTypes.FARM;
-        race = Races.MEN;
-        nextUpdate = 0;
-        stored = 0;
-        collectionRate = 0;
+    {       
+        _nextUpdate = 0;
+        _stored = 0;
+        _collectionRate = 0;
         harvestUnits = 0;
-        
-        _status = EntityStatus.IDLE;
         _info = Info.get.of(race, type);
-
-        _attributes = (Storage.ResourceAttributes)_info.attributes;
-        setupAbilities();
+        // new resource building has 1 civilian when created
+        createCivilian();
+        // Call Building start
+        base.Start();
     }
 
 
     // Update is called once per frame
-    void Update()
+    // when updated, collecting units load materials from store and send it to
+    // player.After they finish sending materials, production cycle succes.
+    // new produced materials can be stored but not collected until
+    // next update.
+    override public void Update()
     {
-
-        if (Time.time > nextUpdate)
+        base.Update();
+        if (Time.time > _nextUpdate)
         {
-            nextUpdate = Time.time + _attributes.updateInterval;
-            // when updated, collector units load materials from store.
-            // after they finish loading materials production cycle succes.
-            // new produced materials can be stored but not collected until
-            // next update.
+            _nextUpdate = Time.time + info.resourceAttributes.updateInterval;  
             collect();
-            produce();
-
+            produce();            
         }
-
     }
-    /// <summary>    
-    /// Returns NULL as this cannot be converted to Unit
-	/// </summary>
-    /// <returns>Object casted to Unit</returns>
-    public Unit toUnit() { return null; }
-
-    /// <summary>
-    /// Casts this IGameEntity to Unity (pointless if already building)
-    /// </summary>
-    /// <returns>Always null</returns>
-    public Building toBuilding() { return null; }
-
-    /// <summary>
-    /// Casts this IGameEntity to Resource (pointless if already resource)
-    /// </summary>
-    /// <returns>Always null</returns>
-    public Resource toResource() { return this; }
-
 }

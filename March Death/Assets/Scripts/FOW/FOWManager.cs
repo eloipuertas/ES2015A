@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -16,6 +17,7 @@ public class FOWManager : MonoBehaviour
     public float Quality=1;
     /// <summary>
     /// If enabled zones that should be completly black will just be a little darker. Used mainly for debugging purposes.
+    /// Also you will be able to see fowEntities in semifog
     /// </summary>
     public bool NotFullyOpaque = false;
     /// <summary>
@@ -24,11 +26,17 @@ public class FOWManager : MonoBehaviour
     [Range(0,400)]
     public float FadeRate=200;
 
-    public bool Enabled = true;
+    public bool Enabled;
 
     List<FOWEntity> entities = new List<FOWEntity>();
     Texture2D fowTex;
     Color32[] pixels;
+
+    /// <summary>
+    /// This will contain the grid for the vision of the AI.
+    /// This can be only an enum because it doesn't need to be passed to the shader nor does it need to have all the fancy gradient fading the normal FOW has.
+    /// </summary>
+    visible[] aiVision;
 
     void Start()
     {
@@ -57,11 +65,15 @@ public class FOWManager : MonoBehaviour
                 DestroyImmediate(fowTex);
             fowTex = new Texture2D(width, height, TextureFormat.RGB24, false);
             pixels = fowTex.GetPixels32();
-
+            aiVision = new visible[width * height];
+            
             //Paint it all black
             Color cc = NotFullyOpaque? new Color(0, 1, 0, 255): Color.black;
             for (int i = 0; i < pixels.Length; i++)
+            {
                 pixels[i] = cc;
+                aiVision[i] = visible.unexplored;
+            }
 
             fowTex.SetPixels32(pixels);
 
@@ -99,11 +111,8 @@ public class FOWManager : MonoBehaviour
             for (int i = 0; i < pixels.Length; i++)
             {
                 if (pixels[i].b > 0)
-                {
-                    if (!NotFullyOpaque)
-                        pixels[i].g = (byte)Mathf.Max(pixels[i].g - fade, 0);
                     pixels[i].b = (byte)Mathf.Max(pixels[i].b - fade, 0);
-                }
+                aiVision[i] &= ~visible.visible; //Remove the visible flag
             }
             //Reveal the area around the revealer entities
             foreach (FOWEntity e in entities)
@@ -113,13 +122,9 @@ public class FOWManager : MonoBehaviour
             }
             //Hide or show the other entities
             foreach (FOWEntity e in entities)
-            {
-                if (!e.IsRevealer)
-                {
-                    e.changeVisible(isRectVisible(e.Bounds));
-                }
-            }
-
+                if (!e.IsOwnedByPlayer)
+                    e.changeVisible(isThereinRect(e.Bounds,visible.visible));
+            
             fowTex.SetPixels32(pixels);
             fowTex.Apply();
         }
@@ -127,7 +132,7 @@ public class FOWManager : MonoBehaviour
     /// <summary>
     /// Reveals an area around the entity passed as paramater
     /// </summary>
-    /// <param name="entity">Entity which reveals an area (Should have range>0)</param>
+    /// <param name="entity">Entity which reveals an area</param>
     private void reveal(FOWEntity entity)
     {
         Rect rect = entity.Bounds;
@@ -149,28 +154,44 @@ public class FOWManager : MonoBehaviour
                 float fade = 1;
                 if (dist > entity.Range)
                     fade = Mathf.Clamp01((entity.Range - Mathf.Sqrt(dist)) / (entity.Range / 2));
-                pixels[n].g = (byte)Mathf.Max(pixels[n].g, 255 * fade);
-                pixels[n].b = (byte)Mathf.Max(pixels[n].b, 255 * fade);
+                if (entity.IsOwnedByPlayer)
+                {
+                    pixels[n].g = (byte)Mathf.Max(pixels[n].g, 255 * fade);
+                    pixels[n].b = (byte)Mathf.Max(pixels[n].b, 255 * fade);
+                }
+                else
+                    aiVision[n] = (visible.explored | visible.visible);
             }
         }
     }
     /// <summary>
-    /// Checks if there is some point of the rectange visible right now.
+    /// Checks if there is some point of the rectange with visiblity = vis
     /// (Might be a little wonky if the quality is too low)
     /// </summary>
-    /// <param name="rect"></param>
-    /// <returns>true if atleast a pixel of the rectangle is visible, false otherwise</returns>
-    private bool isRectVisible(Rect rect)
+    /// <param name="rect">Rectange in world coords to check</param>
+    /// <param name="vis">visible.unexplored: means that a point has been never revealed
+    ///                   visible.explored: means that a point has been explored OR is being explored
+    ///                   visible.visible: means that a point is currently being revealed </param>
+    /// <param name="checkForPlayer">Defaults to true. if true we will check the player visibility map
+    ///                                                if false we will check the AI visibility map.</param>
+    /// <returns>true if atleast a pixel of the rectangle is in vis state, false otherwise</returns>
+    public bool isThereinRect(Rect rect,visible vis, bool askForPlayer=true)
     {
         int xMin, xMax, yMin, yMax;
         getBounds(rect, 0, out xMin, out xMax, out yMin, out yMax);
-
         for (int x = xMin; x <= xMax; x++)
             for (int y = yMin; y <= yMax; ++y)
-            { 
+            {
                 int p = x + y * fowTex.width;
-                if (pixels[p].g > 0 || pixels[p].b>0)
-                    return true;
+                if (p <= pixels.Length)
+                    if (askForPlayer)
+                    {
+                        if ((vis == visible.explored && pixels[p].g > 0) ||
+                           (vis == visible.visible && pixels[p].b > 0 || (NotFullyOpaque && pixels[p].g > 0)) ||
+                           (vis == visible.unexplored && pixels[p].b == 0 && pixels[p].g == 0))
+                            return true;
+                    }else if ((vis & aiVision[p]) == vis)
+                        return true;
             }
         return false;
     }
@@ -217,5 +238,11 @@ public class FOWManager : MonoBehaviour
                 _instance = GameObject.FindObjectOfType<FOWManager>();
             return _instance;
         }
+    }
+    [Flags]
+    public enum visible{
+        unexplored=1, //No one has been near this area
+        explored=2,   //Someone revelaed this area and then left
+        visible=4    //Someone is currently revealing this area
     }
 }
