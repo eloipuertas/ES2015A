@@ -31,6 +31,16 @@ namespace Assets.Scripts.AI
 
         public List<Unit> Army { get; set; }
         public List<Unit> Workers { get; set; }
+
+        /// <summary>
+        /// The micro is asking if the macro can spare some civils to the army (for exploring or defending)
+        /// </summary>
+        /// <param name="num"></param>
+        public void takeArms(int num)
+        {
+            Macro.takeArms(num);
+        }
+
         float timer; //It's not going to overflow this millennium
         void Awake()
         {
@@ -42,7 +52,7 @@ namespace Assets.Scripts.AI
 
             modules.Add(new AIModule(Macro.MacroHigh, 30f));
             modules.Add(new AIModule(Macro.MacroLow, 1f));
-            modules.Add(new AIModule(Micro.Micro, 0.3f));
+            modules.Add(new AIModule(Micro.Micro, 1f));
             timer = 0;
         }
         void Update()
@@ -65,4 +75,5 @@ namespace Assets.Scripts.AI
         /// </summary>
         public float period;
     }
+    
 }

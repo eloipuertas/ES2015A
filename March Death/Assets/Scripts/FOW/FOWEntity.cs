@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
+using Utils;
 /// <summary>
 /// Class which makes an entity capable of interacting with the FOW.
 /// </summary>
-public class FOWEntity : MonoBehaviour
+public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
 {
+    public enum Actions { DISCOVERED,HIDDEN }
     /// <summary>
     /// If true this entity will reveal the area around it.
     /// </summary>
@@ -27,9 +29,9 @@ public class FOWEntity : MonoBehaviour
     /// Warning: this marks if an unit is being revealed to the opposite player.
     /// That means even if the player is seeing this unit this may not be true because the AI isn't seeing it
     /// </summary>
-    private bool isRevealed;
+    public bool isRevealed { get; set; }
     public bool IsOwnedByPlayer { get; set; }
-
+    bool first;
     public Rect Bounds
     {
         get
@@ -49,12 +51,11 @@ public class FOWEntity : MonoBehaviour
     {
         if (isRevealed != isVisible)
         {
-            /* Commented until these function exist
-            if (isVisible) // Hidden->Visible
-                OnEntityDiscovered(this, !IsOwnedByPlayer);
-            else  //Visible->Hidden
-                OnEntityHidden(this, !IsOwnedByPlayer);*/
-            if (!IsOwnedByPlayer)
+            if (!first)
+                fire((isVisible) ? Actions.DISCOVERED : Actions.HIDDEN);
+            else
+                first = false;
+            if (!IsOwnedByPlayer && false)
                 changeRenders(isVisible);
             isRevealed = isVisible;
         }
@@ -79,8 +80,9 @@ public class FOWEntity : MonoBehaviour
             size = Vector2.one;
         }
         size2 = size / 2;
-        IsOwnedByPlayer = true; //TODO: SET when we have a good way too.
+        IsOwnedByPlayer = this.gameObject.GetComponent<IGameEntity>().getRace() ==Storage.Races.MEN; //TODO: SET when we have a good way too.
         isRevealed = true;
+        first = !IsOwnedByPlayer;
     }
     public void OnDisable()
     {

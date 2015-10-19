@@ -15,7 +15,7 @@ namespace Assets.Scripts.AI.Agents
 
         public override int getConfidence(List<Unit> units)
         {
-            return 21;
+            return 15;
         }
     }
 }

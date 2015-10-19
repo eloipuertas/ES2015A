@@ -20,7 +20,6 @@ namespace Assets.Scripts.AI
         /// </summary>
         List<BuildingTypes> buildingPref;
         List<UnitTypes> UnitPref;
-
         AIController ai;
         public MacroManager(AIController ai)
         {
@@ -38,6 +37,16 @@ namespace Assets.Scripts.AI
         public void MacroLow()
         {
 
+        }
+        public void takeArms(int num)
+        {
+            if (ai.Workers.Count > 0)
+            {
+                int min = Math.Min(num, ai.Workers.Count);
+                List<Unit> lu = ai.Workers.GetRange(0, min);
+                ai.Workers.RemoveRange(0, min);
+                ai.Army.AddRange(lu);
+            }
         }
     }
 }
