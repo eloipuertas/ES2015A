@@ -129,8 +129,10 @@ public class UserInput : MonoBehaviour
 			Selectable selectedObject = unit.GetComponent<Selectable>();
 			if (AreaContainsObject(selectedArea, unitPosition)) {
                 unitSelected = true;
-				if (!player.SelectedObjects.Contains(selectedObject)) selectedObject.Select();	
-			//} else {  //TODO Why deselect?
+				if (!player.SelectedObjects.Contains(selectedObject)) selectedObject.Select();
+                
+                // move units doesn't work if the code below is uncommented	
+			//} else {  
 				//if (player.SelectedObjects.Contains(selectedObject)) selectedObject.Deselect();
 			}
 		}
@@ -227,18 +229,19 @@ public class UserInput : MonoBehaviour
     /// </summary>
     private void RightMouseClick()
     {
-		if(player.isCurrently(Player.status.PLACING_BUILDING))
-	        {
-	            GetComponent<BuildingsManager>().cancelPlacing();
-	        }
-		else
-		{
-			for (int i = player.SelectedObjects.Count-1; i >= 0; i--)
-			{
-				Selectable selectedObject = (Selectable) player.SelectedObjects[i];
-				selectedObject.Deselect();
-			}
-		}
+        if (player.isCurrently(Player.status.PLACING_BUILDING))
+        {
+            GetComponent<BuildingsManager>().cancelPlacing();
+        }
+        else if (player.isCurrently(Player.status.SELECTED_UNTIS))
+        {
+            for (int i = player.SelectedObjects.Count - 1; i >= 0; i--)
+            {
+                Selectable selectedObject = (Selectable)player.SelectedObjects[i];
+                selectedObject.Deselect();
+            }
+            player.setCurrently(Player.status.IDLE);
+        }
     }
 	private bool IsSimpleClick(Vector2 v1, Vector2 v2) 
 	{

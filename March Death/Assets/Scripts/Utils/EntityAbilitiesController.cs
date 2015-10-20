@@ -40,6 +40,7 @@ public class EntityAbilitiesController : MonoBehaviour
 	void showActions(GameObject gameObject)
 	{
 		GameObject actionPanel = GameObject.Find("actions");
+        if (!actionPanel) return;
 		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 		var rectTransform = actionPanel.GetComponent<RectTransform>();
 		var extents = 0.9f * rectTransform.sizeDelta / 2.0f;
