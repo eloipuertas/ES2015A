@@ -21,7 +21,7 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
     // Update is called once per frame
     protected virtual void Update() {
 
-        if (mainCam == null) {
+        if (mainCam == null) { // not initialized yet in start I suppose
             mainCam = GameObject.FindGameObjectWithTag("minimap_cam").GetComponent<Camera>();
         }
         marker_rect = MinimapOverlays.CalculateBoxFromCntr(this.transform.position, mainCam, 1); 
@@ -30,7 +30,8 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
 
     protected virtual void OnGUI()
     {
-        GUI.DrawTexture(marker_rect, box_text);
+        if(gameObject.GetComponent<FOWEntity>().IsRevealed)
+            GUI.DrawTexture(marker_rect, box_text);
     }
 
     private Color getRaceColor(Races r)

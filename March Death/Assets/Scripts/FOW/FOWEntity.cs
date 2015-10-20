@@ -29,6 +29,7 @@ public class FOWEntity : MonoBehaviour
     /// </summary>
     private bool isRevealed;
     public bool IsOwnedByPlayer { get; set; }
+    public bool IsRevealed { get { return isRevealed; } }
 
     public Rect Bounds
     {
