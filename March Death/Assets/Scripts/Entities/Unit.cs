@@ -99,9 +99,12 @@ public class Unit : GameEntity<Unit.Actions>
     {
         if (Vector3.Distance(unit.transform.position, transform.position) <= ATTACK_RANGE)
         {
-            _target = unit;
-            _auto += _target.register(Actions.DIED, onTargetDied);
-            setStatus(EntityStatus.ATTACKING);
+            if (_target != unit)
+            {
+                _target = unit;
+                _auto += _target.register(Actions.DIED, onTargetDied);
+                setStatus(EntityStatus.ATTACKING);
+            }
 
             return true;
         }

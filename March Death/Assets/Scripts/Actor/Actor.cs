@@ -79,7 +79,7 @@ namespace Utils
         {
             foreach (Action<Object> func in callbacks[action].ToList())
             {
-                if (SelectorStore<T>.get.selectors[action][func].fireCondition(gameObject))
+                if (SelectorStore<T>.get.Selector(action, func).fireCondition(gameObject))
                 {
                     func.Invoke(gameObject);
                 }
@@ -90,7 +90,7 @@ namespace Utils
         {
             foreach (Action<Object> func in callbacks[action].ToList())
             {
-                if (SelectorStore<T>.get.selectors[action][func].fireCondition(gameObject))
+                if (SelectorStore<T>.get.Selector(action, func).fireCondition(gameObject))
                 {
                     func.Invoke(obj);
                 }
