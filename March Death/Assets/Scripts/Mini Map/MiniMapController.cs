@@ -32,7 +32,7 @@ public class MiniMapController : MonoBehaviour
         if (Terrain.activeTerrain)
         {
             float diagonal = Mathf.Sqrt(Mathf.Pow(Terrain.activeTerrain.terrainData.size.x, 2) + Mathf.Pow(Terrain.activeTerrain.terrainData.size.y, 2));
-            _camera.transform.position = new Vector3(Terrain.activeTerrain.terrainData.size.x * 0.5f, Terrain.activeTerrain.terrainData.size.x, Terrain.activeTerrain.terrainData.size.z * 0.5f);
+            _camera.transform.position = new Vector3(Terrain.activeTerrain.terrainData.size.x * 0.5f, Terrain.activeTerrain.terrainData.size.x * 0.4f, Terrain.activeTerrain.terrainData.size.z * 0.5f);
             _camera.transform.rotation = Quaternion.Euler(90f, 135f,0); 
             _camera.orthographicSize = diagonal * 0.95f; // a hack
             _camera.farClipPlane = Terrain.activeTerrain.terrainData.size.x * 1.5f;
