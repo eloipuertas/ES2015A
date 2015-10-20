@@ -69,9 +69,11 @@ namespace Assets.Scripts.AI
         {
             IGameEntity g = ((GameObject)obj).GetComponent<IGameEntity>();
             if (g.info.isUnit)
-                EnemyUnits.Add((Unit)g);
+                if (!EnemyUnits.Contains((Unit)g)) 
+                    EnemyUnits.Add((Unit)g);
             else if (g.info.isBuilding)
-                EnemyBuildings.Add(g);
+                    if (!EnemyBuildings.Contains(g))
+                        EnemyBuildings.Add(g);
         }
         void OnEntityLost(System.Object obj)
         {
