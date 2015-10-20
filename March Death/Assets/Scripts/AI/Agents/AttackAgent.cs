@@ -39,9 +39,9 @@ namespace Assets.Scripts.AI.Agents
                     }
                 }
 
-                foreach(Unit u in ai.Army)
-                    if (u.status != EntityStatus.DEAD && !u.attackTarget(bTar))
-                        u.moveTo(bTar.transform.position);
+                foreach (Unit u in ai.Army)
+                    if (u.status != EntityStatus.DEAD)
+                        u.attackTarget(bTar);
             }
         }
         float valOfUnit(Unit u)
