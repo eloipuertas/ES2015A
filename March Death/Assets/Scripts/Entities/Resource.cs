@@ -207,8 +207,14 @@ public class Resource : Building<Resource.Actions>
             _xDisplacement = harvestUnits % 5;
             _yDisplacement = harvestUnits / 5;
             _unitPosition.Set(_center.x + _xDisplacement, _center.y , _center.z + _yDisplacement );
-            Debug.Log("x,y: " + _xDisplacement + ", " + _yDisplacement);
-            GameObject civil = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
+            
+
+            
+            // Method createUnit form Info returns GameObject Instance;
+            GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1) ;  
+            Unit civil = gob.GetComponent<Unit>();
+            civil.role = Unit.Roles.PRODUCING;   
+
             totalUnits++;
             harvestUnits++;
 
@@ -221,8 +227,11 @@ public class Resource : Building<Resource.Actions>
             // TODO get outside meeting point and calculate position
             _xDisplacement = (totalUnits - harvestUnits) % 5;
             _yDisplacement = (totalUnits - harvestUnits) / 5;
-            _unitPosition.Set(_center.x + 10 + _xDisplacement, _center.y + 10 , _center.z + _yDisplacement);    
-            GameObject civil = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
+            _unitPosition.Set(_center.x + 10 + _xDisplacement, _center.y  , _center.z + 10 + _yDisplacement);
+            GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
+            Unit civil = gob.GetComponent<Unit>();
+            civil.role = Unit.Roles.WANDERING;
+
             totalUnits++;
             fire(Actions.CREATE_UNIT, civil);
             // TODO method to modify unit coordinates to avoid unit overlap
@@ -242,7 +251,13 @@ public class Resource : Building<Resource.Actions>
             harvestUnits--;
 
             worker.role = Unit.Roles.WANDERING;
-        } 
+        }
+
+        // No workers
+        if (harvestUnits == 0)
+        {
+            setStatus(EntityStatus.IDLE);
+        }
         // TODO: Some alert message if you try to remove unit when no unit at building
     }
 
@@ -276,12 +291,13 @@ public class Resource : Building<Resource.Actions>
         {
             IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
 
-            // check if unit is civil
-            if (entity.info.isCivil)
+            if (entity.info.isUnit)
             {
-                recruitWorker((Unit)entity);
-
-            }           
+                if (entity.info.isCivil)
+                {
+                    recruitWorker((Unit)entity);
+                }
+            }
         }
     }
 
@@ -304,10 +320,13 @@ public class Resource : Building<Resource.Actions>
 
         if (harvestUnits < info.resourceAttributes.maxUnits)
         {
-            if (entity.info.isCivil)
+            if (entity.info.isUnit)
             {
-                recruitExplorer((Unit)entity);
-            }
+                if (entity.info.isCivil)
+                {
+                    recruitExplorer((Unit)entity);
+                }
+            }  
         }
     }
     
@@ -325,8 +344,10 @@ public class Resource : Building<Resource.Actions>
         _info = Info.get.of(race, type);
         totalUnits = 0;
         _unitRotation = transform.rotation;
+        setStatus(EntityStatus.WORKING);
         // new resource building has 1 civilian when created
         createCivilian(); 
+         
         
         // Call Building start
         base.Start();
