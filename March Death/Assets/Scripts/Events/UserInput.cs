@@ -128,15 +128,19 @@ public class UserInput : MonoBehaviour
 			Vector3 unitPosition = unit.transform.position;
 			Selectable selectedObject = unit.GetComponent<Selectable>();
 			if (AreaContainsObject(selectedArea, unitPosition)) {
-                unitSelected = true;
 				if (!player.SelectedObjects.Contains(selectedObject)) selectedObject.Select();
                 
                 // move units doesn't work if the code below is uncommented	
-			//} else {  
-				//if (player.SelectedObjects.Contains(selectedObject)) selectedObject.Deselect();
+			} else {  
+				if (player.SelectedObjects.Contains(selectedObject)) selectedObject.Deselect();
 			}
 		}
-        if (unitSelected) player.setCurrently(Player.status.SELECTED_UNTIS);
+
+		if (player.SelectedObjects.Count > 0) {
+			player.setCurrently(Player.status.SELECTED_UNITS);
+		} else {
+			player.setCurrently(Player.status.IDLE);
+		}
 	}
 
 	//math formula to know if a given point is inside an area
@@ -171,7 +175,7 @@ public class UserInput : MonoBehaviour
                 if (selectedObject)
                 {
                     selectedObject.SelectUnique();
-                    player.setCurrently(Player.status.SELECTED_UNTIS);
+					player.setCurrently(Player.status.SELECTED_UNITS);
                 }
             }
         }
@@ -181,7 +185,7 @@ public class UserInput : MonoBehaviour
             // This is needed because just after clicking in a button to place the building, the onMouseUp event is triggered
             GetComponent<BuildingsManager>().placeBuilding();
         }
-        else if (player.isCurrently(Player.status.SELECTED_UNTIS)) // There are people selected what should we do?
+		else if (player.isCurrently(Player.status.SELECTED_UNITS)) // There are people selected what should we do?
         {
             GameObject hitObject = FindHitObject();
 
@@ -219,7 +223,7 @@ public class UserInput : MonoBehaviour
                         {
                             // the rest of the units will be deselected
                             selectedObject.SelectUnique();
-                            player.setCurrently(Player.status.SELECTED_UNTIS);
+							player.setCurrently(Player.status.SELECTED_UNITS);
                         }
                     }
                     //else if (hitPoint != this.invalidPosition)
@@ -270,7 +274,7 @@ public class UserInput : MonoBehaviour
         {
             GetComponent<BuildingsManager>().cancelPlacing();
         }
-        else if (player.isCurrently(Player.status.SELECTED_UNTIS))
+		else if (player.isCurrently(Player.status.SELECTED_UNITS))
         {
             for (int i = player.SelectedObjects.Count - 1; i >= 0; i--)
             {

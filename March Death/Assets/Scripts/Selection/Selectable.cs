@@ -84,7 +84,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 			player.SelectedObjects.Add (this);
 		}
         this.currentlySelected = true;
-		fire (Actions.SELECTED);
+		//fire (Actions.SELECTED);
 
     }
 
@@ -95,7 +95,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 		}
 
 		this.currentlySelected = true;
-		fire (Actions.SELECTED);
+		//fire (Actions.SELECTED);
 	}
 
 	public virtual void Deselect()
@@ -106,7 +106,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 		}
 
         currentlySelected = false;
-		fire (Actions.DESELECTED);
+		//fire (Actions.DESELECTED);
     }
 
     private void DrawSelection()

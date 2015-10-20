@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     /// Information regarding the current status of the player
     /// </summary>
     private status _currently;
-    public enum status {IDLE, PLACING_BUILDING, SELECTING_UNITS, SELECTED_UNTIS /*...*/}
+    public enum status {IDLE, PLACING_BUILDING, SELECTING_UNITS, SELECTED_UNITS /*...*/}
 
     /// <summary>
     /// The race of the player
