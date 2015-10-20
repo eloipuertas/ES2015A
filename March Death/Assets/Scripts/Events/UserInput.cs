@@ -159,24 +159,10 @@ public class UserInput : MonoBehaviour
 
     private void LeftMouseClick()
     {
-        if (player.isCurrently(Player.status.PLACING_BUILDING) && !EventSystem.current.IsPointerOverGameObject() )       
-        {   // HACK : (Hermetico)
-            // Check if the player is placing the building but is not over game objetct. 
-            // This is needed because just after clicking in a button to place the building, the onMouseUp event is triggered
-            GetComponent<BuildingsManager>().placeBuilding();
-        }
-        else if(player.isCurrently(Player.status.SELECTED_UNTIS)) // move people to there
+
+        if (player.isCurrently(Player.status.IDLE)) 
         {
             GameObject hitObject = FindHitObject();
-            if(hitObject.name=="Terrain")
-                uManager.moveUnits(FindHitPoint());
-
-        }
-        else // we are doing something else
-        {
-            GameObject hitObject = FindHitObject();
-            Vector3 hitPoint = FindHitPoint();
-
             if (hitObject)
             {
 
@@ -185,16 +171,67 @@ public class UserInput : MonoBehaviour
                 if (selectedObject)
                 {
                     selectedObject.SelectUnique();
+                    player.setCurrently(Player.status.SELECTED_UNTIS);
                 }
             }
-            else if (hitPoint != this.invalidPosition)
-            {
-                /* TODO check if click is not out of bounds ( perhaps the click is in the HUD ) */
+        }
+        else if (player.isCurrently(Player.status.PLACING_BUILDING) && !EventSystem.current.IsPointerOverGameObject())
+        {   // HACK : (Hermetico)
+            // Check if the player is placing the building but is not over game objetct. 
+            // This is needed because just after clicking in a button to place the building, the onMouseUp event is triggered
+            GetComponent<BuildingsManager>().placeBuilding();
+        }
+        else if (player.isCurrently(Player.status.SELECTED_UNTIS)) // There are people selected what should we do?
+        {
+            GameObject hitObject = FindHitObject();
 
-            }
-            else
+            if (!hitObject) // out of bounds click
             {
-                //TODO where is the hit???
+                Debug.Log("The click is out of bounds?");
+            }
+            else if (hitObject.name == "Terrain") // if it is the terrain, let's go there
+            {
+                uManager.MoveTo(FindHitPoint());
+            }
+            else // let's find what it is
+            {
+                IGameEntity entity = hitObject.GetComponent<IGameEntity>();
+
+                if (entity.info.race != player.race) // If it is another race, we'll attack, but if it's the same race?
+                {
+                    uManager.AttackTo(entity);
+                }
+                else // it is our own race, but we have units selected, we should deselect them first
+                {
+                    // TODO: (hermetico) deselect units first
+                    //Vector3 hitPoint = FindHitPoint();
+
+                    if (hitObject)
+                    {
+
+                        //maybe, if we are sure that the hit object is not a enemy race it will be
+                        // our race, so that it will be selectable too. Prior to delete de check below
+                        // double check that the reasoning is correct
+
+                        Selectable selectedObject = hitObject.GetComponent<Selectable>();
+                        // We just be sure that is a selectable object
+                        if (selectedObject)
+                        {
+                            // the rest of the units will be deselected
+                            selectedObject.SelectUnique();
+                            player.setCurrently(Player.status.SELECTED_UNTIS);
+                        }
+                    }
+                    //else if (hitPoint != this.invalidPosition)
+                    //{
+                    /* TODO check if click is not out of bounds ( perhaps the click is in the HUD ) */
+
+                    // }
+                    //else
+                    //{
+                    //TODO where is the hit???
+                    //}
+                }
             }
         }
     }

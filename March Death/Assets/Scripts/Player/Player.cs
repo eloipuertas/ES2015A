@@ -12,6 +12,12 @@ public class Player : MonoBehaviour
     public enum status {IDLE, PLACING_BUILDING, SELECTING_UNITS, SELECTED_UNTIS /*...*/}
 
     /// <summary>
+    /// The race of the player
+    /// </summary>
+    public Storage.Races _selfRace;
+    public Storage.Races race { get { return _selfRace; } }
+
+    /// <summary>
     /// Information regarding the entities of the player
     /// </summary>
     private List<IGameEntity> _activeEntities = new List<IGameEntity>();
@@ -23,7 +29,12 @@ public class Player : MonoBehaviour
 	public ArrayList SelectedObjects = new ArrayList();
     
     // Use this for initialization
-    void Start(){}
+    void Start()
+    {   
+        //request the race of the player
+        _selfRace = GetComponent<GameInformation>().GetPlayerRace();
+        Debug.Log("Player is " +_selfRace);
+    }
 
     // Update is called once per frame
     void Update() { }

@@ -74,6 +74,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public virtual void SelectUnique()
     {
 		//Deselect other selected objects
+        //TODO : We could move this operation inside the player object
 		foreach (Selectable selectedObject in player.SelectedObjects) {
 			if (selectedObject == this) continue;
 			selectedObject.Deselect();
