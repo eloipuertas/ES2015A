@@ -501,6 +501,7 @@ GameObject:
   - 4: {fileID: 415966}
   - 95: {fileID: 9581172}
   - 65: {fileID: 6541580}
+  - 114: {fileID: 11478050}
   m_Layer: 0
   m_Name: elf_civil_male
   m_TagString: Untagged
@@ -1441,7 +1442,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 137418}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: .0469717979, y: -.866508961, z: .47764349}
+  m_LocalPosition: {x: 399.554413, y: 79.0026245, z: 736.865295}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 417816}
@@ -2691,6 +2692,19 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11478050
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 137418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40d423a6be68c17458a847c1bf328e80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 1
+  type: 0
 --- !u!137 &13727490
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
