@@ -75,8 +75,13 @@ public class InformationController : MonoBehaviour {
 		txtActorRace.enabled = true;
 		txtActorHealth.text = entity.healthPercentage.ToString () + "/100";
 		txtActorHealth.enabled = true;	
-		imgActorDetail.color = new Color (0, 0, 1, 1);
+		/* Ready for next sprint
+		Texture2D actorTexture = (Texture2D)Resources.Load ("SelectionTexture");
+		Sprite image = Sprite.Create(actorTexture, new Rect(0, 0, actorTexture.width, actorTexture.height), new Vector2(0.5f, 0.5f));
+		//imgActorDetail.color = new Color (0, 0, 1, 1);
 		imgActorDetail.enabled = true;
+		imgActorDetail.sprite = image;
+		*/
 		sliderActorHealth.value = entity.healthPercentage;
 		sliderActorHealth.enabled = true;
 		Transform sliderBackground = sliderActorHealth.transform.FindChild ("Background");
@@ -85,11 +90,16 @@ public class InformationController : MonoBehaviour {
 
 	private void ShowMultipleInformation() {
 
+		/*
+		 * Ready for next Sprint
+		HideInformation ();
+
 		for (int i = 0; i < player.SelectedObjects.Count && i < columns * rows; i++)
 		{
 			Selectable selectable = (Selectable)player.SelectedObjects [i];
 			CreateButton(i, selectable);
 		}
+		*/
 	}
 
 	private void HideInformation() 

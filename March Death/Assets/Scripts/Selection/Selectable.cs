@@ -75,7 +75,8 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
 		//Deselect other selected objects
         //TODO : We could move this operation inside the player object
-		foreach (Selectable selectedObject in player.SelectedObjects) {
+		ArrayList selectedUnits = player.getSelectedObjects ();
+		foreach (Selectable selectedObject in selectedUnits) {
 			if (selectedObject == this) continue;
 			selectedObject.Deselect();
 		}
