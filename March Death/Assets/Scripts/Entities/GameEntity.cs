@@ -130,6 +130,11 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         return transform;
     }
 
+    public UnityEngine.GameObject getGameObject()
+    {
+        return gameObject;
+    }
+
     protected List<Ability> _abilities = new List<Ability>();
     public Ability getAbility(string name)
     {

@@ -27,6 +27,7 @@ public interface IGameEntity : IBaseActor
     float healthPercentage { get; }
 
     UnityEngine.Transform getTransform();
+    UnityEngine.GameObject getGameObject();
     Ability getAbility(string name);
 
     Races getRace();

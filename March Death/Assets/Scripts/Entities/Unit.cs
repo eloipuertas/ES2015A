@@ -79,6 +79,11 @@ public class Unit : GameEntity<Unit.Actions>
         setStatus(EntityStatus.IDLE);
     }
 
+    private void onTargetHidden(System.Object obj)
+    {
+        moveTo(((GameObject)obj).transform.position);
+    }
+
     /// <summary>
     /// When a wound is received, this is called
     /// </summary>
@@ -118,6 +123,7 @@ public class Unit : GameEntity<Unit.Actions>
             if (_target != (IGameEntity)entity)
             {
                 _auto += entity.registerFatalWounds(onTargetDied);
+                _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
                 _target = entity;
                 setStatus(EntityStatus.ATTACKING);
             }
@@ -141,6 +147,7 @@ public class Unit : GameEntity<Unit.Actions>
         if (_target != null)
         {
             _auto -= _target.unregisterFatalWounds(onTargetDied);
+            _auto -= _target.getGameObject().GetComponent<FOWEntity>().unregister(FOWEntity.Actions.HIDDEN, onTargetHidden);
             _target = null;
         }
 
