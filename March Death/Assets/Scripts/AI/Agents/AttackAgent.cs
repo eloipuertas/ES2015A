@@ -11,14 +11,15 @@ namespace Assets.Scripts.AI.Agents
         float valOfCitizen;
         public AttackAgent(AIController ai) : base(ai)
         {
-            valOfCitizen = 1f; //TO CALC
+            valOfCitizen = 1f;
         }
         public override void controlUnits(List<Unit> units)
         {
             Vector3 Squadpos = Vector3.zero;
             if (ai.Army.Count > 0)
             {
-                //We assume our squad is mostly together TODO: Stop assuming members of the same squad are close
+                //We assume our squad is mostly together 
+                //TODO: Stop assuming members of the same squad are close
                 Squadpos = ai.Army[0].transform.position;
             }
             if (ai.EnemyUnits.Count > 0)
@@ -39,7 +40,7 @@ namespace Assets.Scripts.AI.Agents
                 }
 
                 foreach(Unit u in ai.Army)
-                    if (!u.attackTarget(bTar))
+                    if (u.status != EntityStatus.DEAD && !u.attackTarget(bTar))
                         u.moveTo(bTar.transform.position);
             }
         }
@@ -49,13 +50,13 @@ namespace Assets.Scripts.AI.Agents
             if (ai.DifficultyLvl < 5)
                 return u.healthPercentage * u.info.unitAttributes.resistance+ u.info.unitAttributes.strength;
             else
-                return u.healthPercentage * (u.info.unitAttributes.attackRate * u.info.unitAttributes.strength);
+                return u.healthPercentage * (u.info.unitAttributes.resistance + u.info.unitAttributes.attackRate * u.info.unitAttributes.strength);
         }
         public override int getConfidence(List<Unit> units)
         {
             if (ai.EnemyUnits.Count == 0)
                 return 0;
-            //Recalc our army value only when it changes
+            //TODO: Recalc our army value only when it changes
             float val = 0;
             foreach (Unit u in ai.Army)
                 val += valOfUnit(u);

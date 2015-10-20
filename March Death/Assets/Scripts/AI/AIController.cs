@@ -31,8 +31,8 @@ namespace Assets.Scripts.AI
         /// </summary>
         public Dictionary<UnitTypes,int> UnitsFound { get; set; }
 
-        public List<Unit> Army;
-        public List<Unit> Workers;
+        public List<Unit> Army { get; set; }
+        public List<Unit> Workers { get; set; }
 
         float timer; //It's not going to overflow this millennium
         void Awake()
@@ -43,8 +43,8 @@ namespace Assets.Scripts.AI
             EnemyUnits = new List<Unit>();
             EnemyBuildings = new List<IGameEntity>();
             modules = new List<AIModule>();
-            //Army = new List<Unit>();
-            //DEBUGWorkers = new List<Unit>();
+            Army = new List<Unit>();
+            Workers = new List<Unit>();
             modules.Add(new AIModule(Macro.MacroHigh, 30f));
             modules.Add(new AIModule(Macro.MacroLow, 1f));
             modules.Add(new AIModule(Micro.Micro, 1f));

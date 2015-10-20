@@ -55,7 +55,7 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
                 fire((isVisible) ? Actions.DISCOVERED : Actions.HIDDEN);
             else
                 first = false;
-            if (!IsOwnedByPlayer && false)
+            if (!IsOwnedByPlayer)
                 changeRenders(isVisible);
             isRevealed = isVisible;
         }
