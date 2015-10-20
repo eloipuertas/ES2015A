@@ -81,7 +81,7 @@ public class MiniMapController : MonoBehaviour
         }
         if (!act_pos.Equals(mainCam.transform.position)) // if the camera has moved
         {
-            Vector3 v = _camera.WorldToScreenPoint(mainCam.transform.position - CameraController.cameraOffset); v.y = Screen.height - v.y;
+            Vector3 v = _camera.WorldToScreenPoint(mainCam.transform.position - mainCam.GetComponent<CameraController>().getCameraOffset); v.y = Screen.height - v.y;
             rect_marker.center = v;
             act_pos = mainCam.transform.position;
         }
@@ -135,7 +135,7 @@ public class MiniMapController : MonoBehaviour
         r.yMax = Screen.height - corners_minimap[1].y + 12;
         r.yMin = Screen.height - corners_minimap[0].y - 12;
 
-        Vector3 v = _camera.WorldToScreenPoint(mainCam.transform.position - CameraController.cameraOffset);
+        Vector3 v = _camera.WorldToScreenPoint(mainCam.transform.position - mainCam.GetComponent<CameraController>().getCameraOffset);
         v.y = Screen.height - v.y;
         r.center = v;
   

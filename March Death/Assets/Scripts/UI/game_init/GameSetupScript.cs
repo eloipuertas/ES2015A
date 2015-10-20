@@ -69,7 +69,7 @@ public class GameSetupScript : MonoBehaviour {
     {
         if (raceSelected)
         {
-		    Application.LoadLevel(3);
+		    Application.LoadLevel("ES2015A");
         }
         else
         {
