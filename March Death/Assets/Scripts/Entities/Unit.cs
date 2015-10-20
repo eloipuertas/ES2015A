@@ -41,7 +41,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// <summary>
     /// If in battle, this is the target and last attack time
     /// </summary>
-    private Unit _target = null;
+    private IGameEntity _target = null;
 
     /// <summary>
     /// Time holders for const updates
@@ -90,19 +90,30 @@ public class Unit : GameEntity<Unit.Actions>
         fire(Actions.DIED);
     }
 
+    public override IKeyGetter registerFatalWounds(Action<object> func)
+    {
+        return register(Actions.DIED, func);
+    }
+
+    public override IKeyGetter unregisterFatalWounds(Action<object> func)
+    {
+        return unregister(Actions.DIED, func);
+    }
+
     /// <summary>
     /// Sets up our attack target, registers callback for its death and
     /// updates our state
     /// </summary>
     /// <param name="unit"></param>
-    public bool attackTarget(Unit unit)
+    public bool attackTarget<A>(GameEntity<A> entity) where A : struct, IConvertible
     {
-        if (Vector3.Distance(unit.transform.position, transform.position) <= ATTACK_RANGE)
+        if (Vector3.Distance(entity.transform.position, transform.position) <= ATTACK_RANGE)
         {
-            if (_target != unit)
+            // Note: Cast is redundant but avoids warning
+            if (_target != (IGameEntity)entity)
             {
-                _target = unit;
-                _auto += _target.register(Actions.DIED, onTargetDied);
+                _auto += entity.registerFatalWounds(onTargetDied);
+                _target = entity;
                 setStatus(EntityStatus.ATTACKING);
             }
 
@@ -119,7 +130,7 @@ public class Unit : GameEntity<Unit.Actions>
     {
         if (_target != null)
         {
-            _auto -= _target.unregister(Actions.DIED, onTargetDied);
+            _auto -= _target.unregisterFatalWounds(onTargetDied);
             _target = null;
         }
 
@@ -154,6 +165,7 @@ public class Unit : GameEntity<Unit.Actions>
     {
         _info = Info.get.of(race, type);
         _auto = this;
+
         // Call GameEntity start
         base.Start();
 
@@ -209,7 +221,7 @@ public class Unit : GameEntity<Unit.Actions>
                 if (_target != null)
                 {
                     // Check if we are still in range
-                    if (Vector3.Distance(_target.transform.position, transform.position) > ATTACK_RANGE)
+                    if (Vector3.Distance(_target.getTransform().position, transform.position) > ATTACK_RANGE)
                     {
                         stopAttack();
                     }
@@ -247,5 +259,4 @@ public class Unit : GameEntity<Unit.Actions>
                 break;
         }
     }
-
 }
