@@ -86,8 +86,9 @@ public class UserInput : MonoBehaviour
 			if (IsSimpleClick (mouseButtonDownPoint, mouseButtonUpPoint))
 			{
 				LeftMouseClick ();
+			} else {
+				SelectUnitsInArea();
 			}
-
 
 		} else if (Input.GetMouseButtonDown (1)) {
 			leftButtonIsDown = false;
@@ -104,7 +105,7 @@ public class UserInput : MonoBehaviour
 			bottomLeft  = GetScreenRaycastPoint(new Vector2( mouseButtonDownPoint.x+width(), mouseButtonDownPoint.y));
 			topRight    = GetScreenRaycastPoint(new Vector2( mouseButtonDownPoint.x, mouseButtonDownPoint.y-height()));
 
-			SelectUnitsInArea();
+			//SelectUnitsInArea();
 		}
     }
 
@@ -128,15 +129,16 @@ public class UserInput : MonoBehaviour
 			Vector3 unitPosition = unit.transform.position;
 			Selectable selectedObject = unit.GetComponent<Selectable>();
 			if (AreaContainsObject(selectedArea, unitPosition)) {
-                unitSelected = true;
 				if (!player.SelectedObjects.Contains(selectedObject)) selectedObject.Select();
                 
                 // move units doesn't work if the code below is uncommented	
-			//} else {  
-				//if (player.SelectedObjects.Contains(selectedObject)) selectedObject.Deselect();
+			} else {  
+				if (player.SelectedObjects.Contains(selectedObject)) selectedObject.Deselect();
 			}
 		}
-        if (unitSelected) player.setCurrently(Player.status.SELECTED_UNTIS);
+
+		Player.status currentAction = player.SelectedObjects.Count > 0 ? Player.status.SELECTED_UNTIS : Player.status.IDLE;
+		player.setCurrently (currentAction);
 	}
 
 	//math formula to know if a given point is inside an area
@@ -160,7 +162,7 @@ public class UserInput : MonoBehaviour
     private void LeftMouseClick()
     {
 
-        if (player.isCurrently(Player.status.IDLE)) 
+		if (player.isCurrently(Player.status.IDLE)) 
         {
             GameObject hitObject = FindHitObject();
             if (hitObject)
@@ -181,7 +183,7 @@ public class UserInput : MonoBehaviour
             // This is needed because just after clicking in a button to place the building, the onMouseUp event is triggered
             GetComponent<BuildingsManager>().placeBuilding();
         }
-        else if (player.isCurrently(Player.status.SELECTED_UNTIS)) // There are people selected what should we do?
+		else if (player.isCurrently(Player.status.SELECTED_UNTIS)) // There are people selected what should we do?
         {
             GameObject hitObject = FindHitObject();
 
