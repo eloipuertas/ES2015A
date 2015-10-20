@@ -249,13 +249,13 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
             return true;
         }
 
-        int attackerAbility = Math.Max(10, from.info.unitAttributes.weaponAbility +
+        int attackerAbility = Math.Min(10, from.info.unitAttributes.weaponAbility +
             from.accumulatedModifier<UnitAbility>().weaponAbilityModifier);
 
-        int defenderAbility = Math.Max(10, info.unitAttributes.weaponAbility +
+        int defenderAbility = Math.Min(10, info.unitAttributes.weaponAbility +
             accumulatedModifier<UnitAbility>().weaponAbilityModifier);
 
-        return HitTables.meleeHit[attackerAbility, defenderAbility] <= dice;
+        return HitTables.meleeHit[attackerAbility - 1, defenderAbility - 1] <= dice;
     }
 
     /// <summary>
@@ -271,14 +271,15 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
             return true;
         }
 
-        int attackerStrength = Math.Max(10, from.info.unitAttributes.strength +
+        int attackerStrength = Math.Min(10, from.info.unitAttributes.strength +
             from.accumulatedModifier<UnitAbility>().weaponAbilityModifier);
 
-        int defenderResistance = Math.Max(10, info.unitAttributes.resistance +
+        int defenderResistance = Math.Min(10, info.unitAttributes.resistance +
             accumulatedModifier<UnitAbility>().resistanceModifier);
 
         int dice = Utils.D6.get.rollOnce();
-        return HitTables.wounds[attackerStrength, defenderResistance] <= dice;
+     
+        return HitTables.wounds[attackerStrength - 1, defenderResistance - 1] <= dice;
     }
 
     protected abstract void onReceiveDamage();
@@ -299,7 +300,8 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         }
 
         // If it hits and produces damage, update wounds
-        if (willAttackLand(from, isRanged) && willAttackCauseWounds(from))
+        bool hitAndWounds = willAttackLand(from, isRanged) && willAttackCauseWounds(from);
+        if (hitAndWounds)
         {
             _woundsReceived += 1;
             onReceiveDamage();

@@ -37,7 +37,11 @@ namespace Assets.Scripts.AI.Agents
         {
             //PLACEHOLDER, until sprint2 when we split things
             if (units.Count < 2)
-                ai.takeArms(2 - units.Count());
+            {
+                int num = 2 - units.Count();
+                if (ai.Macro.canTakeArms() >= num)
+                    ai.Macro.takeArms(num);
+            }
             foreach (Unit u in units)
             {
                 u.moveTo(findPlaceToExplore(u, fowManager.aiVision, fowManager.getGridSize()));

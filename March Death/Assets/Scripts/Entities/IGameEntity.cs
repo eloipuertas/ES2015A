@@ -12,7 +12,8 @@ public enum EntityStatus
     MOVING = 5,
     ATTACKING = 6,
     DEAD = 7,
-    DESTROYED = 8
+    DESTROYED = 8,
+    WORKING = 9
 };
 
 public interface IGameEntity
