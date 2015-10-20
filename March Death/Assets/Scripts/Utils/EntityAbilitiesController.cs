@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using System;
 using Utils;
+using System.IO;
 
 public class EntityAbilitiesController : MonoBehaviour
 {
@@ -85,36 +86,26 @@ public class EntityAbilitiesController : MonoBehaviour
     /// <param name="extends">The extents of the button</param>
     /// <param name="action">Actin name</param>
     /// <param name="actionMethod">Method that will be called when we click the button</param>
-    void CreateButton(GameObject panel, Vector2 center, Vector2 extends, String action, UnityAction actionMethod, Boolean enabled)
+    void CreateButton(GameObject panel, Vector2 center, Vector2 extends, String ability, UnityAction actionMethod, Boolean enabled)
     {
-        var canvasObject = new GameObject(action);
+        var canvasObject = new GameObject(ability);
         var canvas = canvasObject.AddComponent<Canvas>();
         canvas.tag = "ActionButton";
         canvasObject.AddComponent<GraphicRaycaster>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-
+ 
         var buttonObject = new GameObject("Button");
+
         var image = buttonObject.AddComponent<Image>();
-        image.transform.parent = canvas.transform;
+        image.transform.SetParent(canvas.transform);
         image.rectTransform.sizeDelta = extends * 1.5f;
         image.rectTransform.position = center;
-        image.color = new Color(1f, .3f, .3f, .5f);
+        image.sprite = CreateSprite(ability);
 
         var button = buttonObject.AddComponent<Button>();
         button.targetGraphic = image;
 		button.onClick.AddListener(() => actionMethod());
 		button.enabled = enabled;
-
-        var textObject = new GameObject("ActionText");
-        textObject.transform.parent = buttonObject.transform;
-        var text = textObject.AddComponent<Text>();
-        text.rectTransform.sizeDelta = extends * 1.5f;
-        text.rectTransform.position = center;
-        text.text = action;
-        text.font = Resources.FindObjectsOfTypeAll<Font>()[0];
-        text.fontSize = 10;
-        text.color = Color.yellow;
-        text.alignment = TextAnchor.MiddleCenter;
     }
 
     /// <summary>
@@ -123,5 +114,26 @@ public class EntityAbilitiesController : MonoBehaviour
 	void SayHello()
     {
         Debug.Log("Hello everybody!");
+    }
+	
+	Sprite CreateSprite(String ability)
+    {
+        char separator = Path.DirectorySeparatorChar;
+        Sprite newImg=null;
+        Texture2D tex = null;
+        byte[] fileData;
+
+        String sPath = Application.dataPath +separator+"Resources"+separator+ "ActionButtons" + separator;
+        string sName = sPath+ability+".png";
+
+        if (File.Exists(sName))
+        {
+            fileData = File.ReadAllBytes(sName);
+            tex = new Texture2D(100, 100, TextureFormat.RGB24, false);
+            tex.LoadImage(fileData);
+
+            newImg = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+        }
+        return newImg;
     }
 }
