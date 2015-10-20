@@ -32,17 +32,17 @@ public class Resource : Building<Resource.Actions>
     /// <summary>
     ///  units collecting this resource
     /// </summary> 
-    private int harvestUnits { get; set; }
- 
+    public int harvestUnits { get; private set; }
+
+    /// <summary>
+    /// number of units created by this building. dead or alive
+    /// </summary>
+    public int totalUnits { get ;private set;}
+
     /// <summary>
     /// material amount send to player (collected) when update succes.
     /// </summary>
     private float _collectedAmount;
-
-    /// <summary>
-    /// civilians pay budgets and generate gold every update interval
-    /// </summary>
-    private float _goldAmount;
 
     /// <summary>
     /// this building can create units.
@@ -57,6 +57,18 @@ public class Resource : Building<Resource.Actions>
     private Quaternion _unitRotation;
 
     /// <summary>
+    /// coordinates where new civilians are positioned before maxUnits limit is
+   ///  reached.
+    /// </summary>
+    private Vector3 meetingPointInsidePosition;
+
+    /// <summary>
+    /// coordinates where new civilians are positioned after maxUnits limit is
+    ///  reached.
+    /// </summary>
+    private Vector3 meetingPointOutsidePosition;
+
+    /// <summary>
     /// when you create a civilian some displacement is needed to avoid units 
     /// overlap. this is the x-axis displacement
     /// </summary>
@@ -68,6 +80,17 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     private int _yDisplacement;
 
+    /// <summary>
+    ///  x, y, z coordinates of our building
+    /// </summary>
+    private Vector3 _center
+    {
+        get
+        {
+            return transform.position;
+        }     
+    }
+
 
     /// <summary>
     /// check if collecting unit type matchs rigth resource type
@@ -78,7 +101,7 @@ public class Resource : Building<Resource.Actions>
     /// true if resource and unit type match,
     /// false otherwise
     /// </returns>
-    bool match(UnitTypes unitType, BuildingTypes type)
+    private bool match(UnitTypes unitType, BuildingTypes type)
     {
         return unitType == UnitTypes.CIVIL;
     }
@@ -86,8 +109,7 @@ public class Resource : Building<Resource.Actions>
     /// <summary>
     /// civilians units collect resources each production cicle.
     /// the sum of units capacity is the total amount of materials they can 
-    /// take from the store and send to player. Gold is collected via 
-    /// gold taxes and sent to the user, it is not stored
+    /// take from the store and send to player. 
     /// </summary>
     private void collect()
     {
@@ -105,21 +127,21 @@ public class Resource : Building<Resource.Actions>
             _collectedAmount = _collectionRate;
             _stored -= _collectedAmount;
         }
-        
-        //TODO gold consum and production unit attributes needed
-        //_goldAmount = harvestUnits * (info.attributes.goldProduction - info.attributes.goldConpsumption);
         sendResource(_collectedAmount);
         return;
     }
 
     /// <summary>
     /// after civilians sends last batch produced they are able to take the 
-    /// new production and store it for the next production cicle
+    /// new production and store it for the next production cycle
     /// </summary>
     private void produce()
     {
         float remainingSpace = info.resourceAttributes.storeSize - _stored;
-        
+
+        // Production rate bigger than remaining store space means we will 
+        // lose part or whole production!!
+
         if (info.resourceAttributes.productionRate >= remainingSpace)
         {
             _stored = info.resourceAttributes.storeSize;
@@ -181,22 +203,27 @@ public class Resource : Building<Resource.Actions>
             //unitPosition = this.GetComponent(meetingPointInside).transform.position;
 
             // Units distributed in rows of 5 elements
-            _xDisplacement = harvestUnits % 6;
-            _yDisplacement = harvestUnits / 6;
-            _unitPosition.Set(transform.position.x + _xDisplacement, transform.position.y + _yDisplacement, transform.position.z);
+            
+            _xDisplacement = harvestUnits % 5;
+            _yDisplacement = harvestUnits / 5;
+            _unitPosition.Set(_center.x + _xDisplacement, _center.y , _center.z + _yDisplacement );
+            Debug.Log("x,y: " + _xDisplacement + ", " + _yDisplacement);
             GameObject civil = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
+            totalUnits++;
             harvestUnits++;
 
-           _collectionRate += Info.get.of(race, UnitTypes.CIVIL).attributes.capacity; 
+            _collectionRate += Info.get.of(race, UnitTypes.CIVIL).attributes.capacity;
 
             fire(Actions.CREATE_UNIT, civil);
         }
         else
         {
             // TODO get outside meeting point and calculate position
-     
-            _unitPosition.Set(transform.position.x + 10 , transform.position.y, transform.position.z);
+            _xDisplacement = (totalUnits - harvestUnits) % 5;
+            _yDisplacement = (totalUnits - harvestUnits) / 5;
+            _unitPosition.Set(_center.x + 10 + _xDisplacement, _center.y + 10 , _center.z + _yDisplacement);    
             GameObject civil = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
+            totalUnits++;
             fire(Actions.CREATE_UNIT, civil);
             // TODO method to modify unit coordinates to avoid unit overlap
         }
@@ -253,10 +280,9 @@ public class Resource : Building<Resource.Actions>
             if (entity.info.isCivil)
             {
                 recruitWorker((Unit)entity);
-            }
-           
-        }
 
+            }           
+        }
     }
 
     void OnTriggerStay(Collider other)
@@ -271,6 +297,7 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     /// <param name="other">collider gameobject interacting with our own collider</param>
     void OnTriggerExit(Collider other)
+
     {
         // get entity
         IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
@@ -293,9 +320,14 @@ public class Resource : Building<Resource.Actions>
         _stored = 0;
         _collectionRate = 0;
         harvestUnits = 0;
+        _xDisplacement = 0;
+        _yDisplacement = 0;
         _info = Info.get.of(race, type);
+        totalUnits = 0;
+        _unitRotation = transform.rotation;
         // new resource building has 1 civilian when created
-        createCivilian();
+        createCivilian(); 
+        
         // Call Building start
         base.Start();
     }
