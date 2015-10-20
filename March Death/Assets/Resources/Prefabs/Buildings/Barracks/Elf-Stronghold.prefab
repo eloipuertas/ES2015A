@@ -282,8 +282,8 @@ GameObject:
   - 4: {fileID: 410006}
   - 54: {fileID: 5460904}
   - 65: {fileID: 6519162}
-  - 95: {fileID: 9515498}
-  - 114: {fileID: 11420306}
+  - 114: {fileID: 11436734}
+  - 114: {fileID: 11492526}
   m_Layer: 0
   m_Name: Elf-Stronghold
   m_TagString: Untagged
@@ -1630,9 +1630,20 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &11420306
+--- !u!114 &11436734
 MonoBehaviour:
   m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 154094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed8fedea892f030418970e7ce2a2bc2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &11492526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 154094}
