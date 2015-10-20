@@ -44,6 +44,11 @@ public class Unit : GameEntity<Unit.Actions>
     private IGameEntity _target = null;
 
     /// <summary>
+    /// Set to true if we are following our target (ie. attacking but not in range)
+    /// </summary>
+    private bool followingTarget = false;
+
+    /// <summary>
     /// Time holders for const updates
     /// </summary>
     private float _lastResourcesUpdate = 0;
@@ -119,6 +124,11 @@ public class Unit : GameEntity<Unit.Actions>
 
             return true;
         }
+        else
+        {
+            followingTarget = true;
+            setStatus(EntityStatus.MOVING);
+        }
 
         return false;
     }
@@ -154,6 +164,7 @@ public class Unit : GameEntity<Unit.Actions>
             transform.rotation = targetRotation;
         }
 
+        followingTarget = false;
         setStatus(EntityStatus.MOVING);
         fire(Actions.MOVEMENT_START);
     }
@@ -223,7 +234,8 @@ public class Unit : GameEntity<Unit.Actions>
                     // Check if we are still in range
                     if (Vector3.Distance(_target.getTransform().position, transform.position) > ATTACK_RANGE)
                     {
-                        stopAttack();
+                        followingTarget = true;
+                        setStatus(EntityStatus.MOVING);
                     }
                     // Check if we already have to attack
                     else if (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate))
@@ -248,13 +260,27 @@ public class Unit : GameEntity<Unit.Actions>
             case EntityStatus.MOVING:
                 // TODO: Steps on the last sector are smoothened due to distance being small
                 // Althought it's an unintended behaviour, it may be interesating to leave it as is
+                Vector3 origin = transform.position;
+
+                if (followingTarget)
+                {
+                    origin = _target.getTransform().position;
+                }
+
                 transform.position = Vector3.MoveTowards(transform.position, _movePoint, Time.fixedDeltaTime * info.unitAttributes.movementRate);
 
                 // If distance is lower than 0.5, stop movement
                 if (Vector3.Distance(transform.position, _movePoint) <= 0.5f)
                 {
-                    setStatus(EntityStatus.IDLE);
-                    fire(Actions.MOVEMENT_END);
+                    if (followingTarget)
+                    {
+                        setStatus(EntityStatus.ATTACKING);
+                    }
+                    else
+                    {
+                        setStatus(EntityStatus.IDLE);
+                        fire(Actions.MOVEMENT_END);
+                    }
                 }
                 break;
         }
