@@ -15,9 +15,9 @@ public class InformationController : MonoBehaviour {
 	private Text txtActorHealth;
 	private Image imgActorDetail;
 	private Slider sliderActorHealth;
-
-	//objects for multiple units information
-	int columns = 10;
+    
+    //objects for multiple units information
+    int columns = 10;
 	int rows = 2;
 	Vector2 buttonSize;
 	Vector2 initialPoint;
@@ -25,15 +25,23 @@ public class InformationController : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
-		//Register to selectable actions
-		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.SELECTED, onUnitSelected);
-		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.DESELECTED, onUnitDeselected);
 
-		GameObject gameObject = GameObject.Find("GameController");
-		player = gameObject.GetComponent ("Player") as Player;
 
-		//Init menu components used for show info for one unit
-		Transform information = GameObject.Find ("HUD").transform.FindChild ("Information");
+        GameObject gameObject = GameObject.Find("GameController");
+        player = gameObject.GetComponent("Player") as Player;
+
+
+        //Register to selectable actions
+        Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.SELECTED, onUnitSelected, new ActorSelector()
+        {
+            registerCondition = checkRace => checkRace.GetComponent<IGameEntity>().info.race == gameObject.GetComponent<GameInformation>().GetPlayerRace()
+        });
+
+        Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.DESELECTED, onUnitDeselected);
+
+
+        //Init menu components used for show info for one unit
+        Transform information = GameObject.Find ("HUD").transform.FindChild ("Information");
 		txtActorName = information.transform.FindChild("ActorName").gameObject.GetComponent<Text>();
 		txtActorRace = information.transform.FindChild ("ActorRace").gameObject.GetComponent<Text>();
 		txtActorHealth = information.transform.FindChild("ActorHealth").gameObject.GetComponent<Text>();

@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     /// Information regarding the current status of the player
     /// </summary>
     private status _currently;
-    public enum status {IDLE, PLACING_BUILDING, SELECTING_UNITS /*...*/}
+    public enum status {IDLE, PLACING_BUILDING, SELECTING_UNITS, SELECTED_UNTIS /*...*/}
 
     /// <summary>
     /// Information regarding the entities of the player
@@ -21,11 +21,13 @@ public class Player : MonoBehaviour
 	public ArrayList currentUnits = new ArrayList ();
 
 	public ArrayList SelectedObjects = new ArrayList();
+    
     // Use this for initialization
     void Start(){}
 
     // Update is called once per frame
     void Update() { }
+    
     /// <summary>
     /// Add a IGameEntity to the list
     /// Player has a list with all the entities associated to him
@@ -41,6 +43,7 @@ public class Player : MonoBehaviour
 	{
 		currentUnits.Add (unit);
 	}
+    
     /// <summary>
     /// Returns the count of the current associated entities
     /// </summary>
@@ -68,5 +71,10 @@ public class Player : MonoBehaviour
     public void setCurrently(status newStatus)
     {
         _currently = newStatus;
+    }
+
+    public ArrayList getSelectedObjects()
+    {
+        return (ArrayList) SelectedObjects.Clone();
     }
 }

@@ -7,6 +7,7 @@ using Managers;
 public class UserInput : MonoBehaviour
 {
     private Player player;
+    private UnitsManager uManager;
 
     //Should be better to create a constants class or structure
     private Vector3 invalidPosition = new Vector3(-99999, -99999, -99999);
@@ -44,6 +45,7 @@ public class UserInput : MonoBehaviour
         player = GetComponent<Player>();
 		selectionTexture = (Texture2D)Resources.Load("SelectionTexture");	
 		camera = GameObject.Find("Main Camera").GetComponent ("CameraController") as CameraController;
+        uManager = GetComponent<UnitsManager>();
     }
 
 	void OnGUI() {
@@ -114,6 +116,7 @@ public class UserInput : MonoBehaviour
 
 	private void SelectUnitsInArea() {
 		Vector3[] selectedArea = new Vector3[4];
+        bool unitSelected = false;
 
 		//set the array with the 4 points of the polygon
 		selectedArea[0] = topLeft;
@@ -125,11 +128,13 @@ public class UserInput : MonoBehaviour
 			Vector3 unitPosition = unit.transform.position;
 			Selectable selectedObject = unit.GetComponent<Selectable>();
 			if (AreaContainsObject(selectedArea, unitPosition)) {
+                unitSelected = true;
 				if (!player.SelectedObjects.Contains(selectedObject)) selectedObject.Select();	
-			} else {
-				if (player.SelectedObjects.Contains(selectedObject)) selectedObject.Deselect();
+			//} else {  //TODO Why deselect?
+				//if (player.SelectedObjects.Contains(selectedObject)) selectedObject.Deselect();
 			}
 		}
+        if (unitSelected) player.setCurrently(Player.status.SELECTED_UNTIS);
 	}
 
 	//math formula to know if a given point is inside an area
@@ -157,6 +162,13 @@ public class UserInput : MonoBehaviour
             // Check if the player is placing the building but is not over game objetct. 
             // This is needed because just after clicking in a button to place the building, the onMouseUp event is triggered
             GetComponent<BuildingsManager>().placeBuilding();
+        }
+        else if(player.isCurrently(Player.status.SELECTED_UNTIS)) // move people to there
+        {
+            GameObject hitObject = FindHitObject();
+            if(hitObject.name=="Terrain")
+                uManager.moveUnits(FindHitPoint());
+
         }
         else // we are doing something else
         {
