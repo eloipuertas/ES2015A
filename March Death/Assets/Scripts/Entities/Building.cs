@@ -32,7 +32,18 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     /// </summary>
     protected override void onFatalWounds()
     {
+
         fire((T) Enum.Parse(typeof(T), "DESTROYED", true));
+    }
+
+    /// <summary>
+    /// When destroyed, it's called
+    /// </summary>
+    public void OnDestroy() 
+    {
+        ConstructionGrid grid = Object.find("GameController").GetComponent<ConstructionGrid>();
+        Vector3 disc_pos = grid.discretizeMapCoords(gameObject.transform.position);
+        grid.liberatePosition(disc_pos);
     }
 
     /// <summary>
