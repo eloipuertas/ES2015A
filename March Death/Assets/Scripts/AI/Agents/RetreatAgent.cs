@@ -22,7 +22,6 @@ namespace Assets.Scripts.AI.Agents
 
         Unit hero;
 
-        float valOfCitizen;
         AttackAgent attackAgent;
 
         Rect enemySquadBoundingBox, ownSquadBoundingBox;
