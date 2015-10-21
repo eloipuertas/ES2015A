@@ -23,6 +23,11 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     public T DAMAGED { get; set; }
     public T DESTROYED { get; set; }
 
+    private float buildTime1 = 0;
+    private float buildTime2 = 0;
+    private float buildTime3 = 0;
+
+
     /// <summary>
     /// When a wound is received, this is called
     /// </summary>
@@ -71,6 +76,9 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 
         // Call GameEntity start
         base.Start();
+
+        // Set the status
+        setStatus(EntityStatus.BUILDING_PHASE_1);
     }
 
     /// <summary>
@@ -80,8 +88,29 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     {
         base.Update();
 
-        // Set the status
-        setStatus(EntityStatus.BUILDING_PHASE_1);
+        switch (status)
+        {
+            case EntityStatus.BUILDING_PHASE_1:
+                if (buildTime1 >= 3000)
+                    setStatus(EntityStatus.BUILDING_PHASE_2);
+                else
+                    buildTime1 += Time.deltaTime;
+                break;
+
+            case EntityStatus.BUILDING_PHASE_2:
+                if (buildTime2 >= 10000)
+                    setStatus(EntityStatus.BUILDING_PHASE_3);
+                else
+                    buildTime2 += Time.deltaTime;
+                break;
+
+            case EntityStatus.BUILDING_PHASE_3:
+                if (buildTime3 >= 3000)
+                    setStatus(EntityStatus.IDLE);
+                else
+                    buildTime3 += Time.deltaTime;
+                break;
+        }
     }
 
     /// <summary>

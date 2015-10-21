@@ -344,7 +344,7 @@ public class Resource : Building<Resource.Actions>
         _info = Info.get.of(race, type);
         totalUnits = 0;
         _unitRotation = transform.rotation;
-        setStatus(EntityStatus.WORKING);
+
         // new resource building has 1 civilian when created
         createCivilian(); 
          
