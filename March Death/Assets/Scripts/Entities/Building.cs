@@ -41,7 +41,7 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     /// </summary>
     public void OnDestroy() 
     {
-        ConstructionGrid grid = Object.find("GameController").GetComponent<ConstructionGrid>();
+        ConstructionGrid grid = GameObject.Find("GameController").GetComponent<ConstructionGrid>();
         Vector3 disc_pos = grid.discretizeMapCoords(gameObject.transform.position);
         grid.liberatePosition(disc_pos);
     }
