@@ -20,8 +20,8 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     public override E getType<E>() { return (E)Convert.ChangeType(type, typeof(E)); }
 
     /// Precach some actions
-    public T DAMAGED;
-    public T DESTROYED;
+    public T DAMAGED { get; set; }
+    public T DESTROYED { get; set; }
 
     /// <summary>
     /// When a wound is received, this is called
