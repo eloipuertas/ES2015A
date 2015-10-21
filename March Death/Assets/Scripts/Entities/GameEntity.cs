@@ -47,7 +47,14 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     {
         get
         {
-            return (info.unitAttributes.wounds - _woundsReceived) * 100f / info.unitAttributes.wounds;
+            if (info.isBuilding)
+            {
+                return (info.buildingAttributes.wounds - _woundsReceived) * 100f / info.buildingAttributes.wounds;
+            }
+            else
+            {
+                return (info.unitAttributes.wounds - _woundsReceived) * 100f / info.unitAttributes.wounds;
+            }
         }
     }
 
@@ -284,7 +291,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
             accumulatedModifier<UnitAbility>().resistanceModifier);
 
         int dice = Utils.D6.get.rollOnce();
-     
+
         return HitTables.wounds[attackerStrength - 1, defenderResistance - 1] <= dice;
     }
 

@@ -280,6 +280,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 410006}
+  - 95: {fileID: 9576114}
   - 54: {fileID: 5460904}
   - 65: {fileID: 6519162}
   - 114: {fileID: 11492526}
@@ -1615,6 +1616,23 @@ BoxCollider:
   m_Size: {x: 15, y: 24, z: 23}
   m_Center: {x: 0, y: 12, z: 0}
 --- !u!95 &9515498
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 154094}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+--- !u!95 &9576114
 Animator:
   serializedVersion: 3
   m_ObjectHideFlags: 1
