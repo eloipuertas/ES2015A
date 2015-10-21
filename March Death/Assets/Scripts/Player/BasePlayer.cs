@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Assets.Scripts.AI;
 
 public class BasePlayer : Utils.SingletonMono<BasePlayer> {
 
@@ -30,11 +31,29 @@ public class BasePlayer : Utils.SingletonMono<BasePlayer> {
     protected Managers.UnitsManager _units;
     public Managers.UnitsManager units { get { return _units;  } }
 
+    static GameInformation info = null;
+    static BasePlayer player = null;
+    static BasePlayer ia = null;
 
 
-    
-    void Start () {}
-	
-	
-	void Update () {}
+    public virtual void Start ()
+    {
+        GameObject gameController = GameObject.FindGameObjectWithTag("GameController");
+
+        info = gameController.GetComponent<GameInformation>();
+        player = gameController.GetComponent<Player>();
+        ia = gameController.GetComponent<AIController>();
+    }
+
+    static BasePlayer getOwner(IGameEntity entity)
+    {
+        if (entity.info.race == info.GetPlayerRace())
+        {
+            return player;
+        }
+
+        return ia;
+    }
+
+    void Update () {}
 }

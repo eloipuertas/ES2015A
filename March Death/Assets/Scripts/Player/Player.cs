@@ -23,7 +23,7 @@ public class Player : BasePlayer
 	public ArrayList SelectedObjects = new ArrayList();
     
     // Use this for initialization
-    void Start()
+    public override void Start()
     {   
         //request the race of the player
         _selfRace = GetComponent<GameInformation>().GetPlayerRace();

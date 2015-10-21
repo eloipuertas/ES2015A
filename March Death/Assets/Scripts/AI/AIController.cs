@@ -11,7 +11,7 @@ using Utils;
 /// </summary>
 namespace Assets.Scripts.AI 
 {
-    public class AIController : MonoBehaviour
+    public class AIController : BasePlayer
     {
         public MacroManager Macro { get; set; }
         public MicroManager Micro { get; set; }
