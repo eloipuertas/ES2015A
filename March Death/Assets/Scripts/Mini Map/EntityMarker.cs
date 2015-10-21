@@ -34,7 +34,7 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
 
     protected virtual void OnGUI()
     {
-        if(gameObject.GetComponent<FOWEntity>().IsRevealed)
+        //if(gameObject.GetComponent<FOWEntity>().IsRevealed)
             GUI.DrawTexture(marker_rect, box_text);
     }
 
