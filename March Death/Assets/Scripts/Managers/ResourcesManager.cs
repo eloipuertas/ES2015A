@@ -15,6 +15,9 @@ namespace Managers
         {
             _deposits = new Dictionary<Type, Deposit>();
 
+            InitDeposit(new WorldResources.Resource(Type.FOOD, 2000));
+            InitDeposit(new WorldResources.Resource(Type.METAL, 2000));
+            InitDeposit(new WorldResources.Resource(Type.WOOD, 2000));
         }
 
 
@@ -44,6 +47,9 @@ namespace Managers
 
         public bool IsEnough(WorldResources.Resource other)
         {
+            // HACK: It's a hack
+            return true;
+
             if (_deposits.ContainsKey(other.GetResourceType()))
             {
                 return _deposits[other.GetResourceType()].GetCapacity() >= other.GetAmount();

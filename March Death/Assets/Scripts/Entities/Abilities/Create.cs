@@ -4,13 +4,13 @@ using Managers;
 
 using UnityEngine;
 
-class Create : Ability
+abstract class Create : Ability
 {
     private bool _enabled = false;
 	private IGameEntity _entity;
 	private BuildingInfo _info_tobuild;
     
-    protected BuildingTypes _type;
+    protected abstract BuildingTypes _type { get; }
 
 
     public override bool isActive

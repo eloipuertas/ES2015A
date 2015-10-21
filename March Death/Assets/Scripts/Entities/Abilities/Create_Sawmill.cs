@@ -5,7 +5,7 @@ using UnityEngine;
 
 class CreateSawmill : Create
 {    
-    protected BuildingTypes _type = BuildingTypes.SAWMILL;
+    protected override BuildingTypes _type { get { return BuildingTypes.SAWMILL; } }
 
     public CreateSawmill(EntityAbility info, GameObject gameObject) :
         base(info, gameObject)

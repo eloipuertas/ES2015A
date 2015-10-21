@@ -66,7 +66,11 @@ public class EntityAbilitiesController : MonoBehaviour
             Ability abilityObj = entity.getAbility(ability);
             if (abilityObj.isUsable)
             {
-                UnityAction actionMethod = new UnityAction(() => SayHello());
+                UnityAction actionMethod = new UnityAction(() =>
+                {
+                    Debug.Log(abilityObj);
+                    abilityObj.enable();
+                });
 
                 var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
                 buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Rows) + 1));
