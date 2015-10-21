@@ -1,0 +1,119 @@
+os:
+  - osx
+language: objective-c
+osx_image: xcode61
+install:
+  - ./Scripts/install.sh
+script:
+  - ./Scripts/build.sh
+
+#---
+
+#os:
+#  - linux
+#language: c
+#install:
+#  - ./Scripts/install.sh
+#script:
+#  - ./Scripts/build.sh
+#cache:
+#  directories:
+#    - /home/travis/build/gpascualg/unity
+#    - /home/travis/build/gpascualg/Build
+#addons:
+#  apt:
+#    packages:
+#      - build-essential
+#      - mono-2.0-gac
+#      - mono-2.0-gac:i386
+#      - mono-2.0-service
+#      - mono-2.0-service:i386
+#      - mono-4.0-gac
+#      - mono-4.0-gac:i386
+#      - mono-4.0-service
+#      - mono-4.0-service:i386
+#      - mono-complete
+#      - mono-complete:i386
+#      - mono-csharp-shell
+#      - mono-csharp-shell:i386
+#      - mono-dbg
+#      - mono-dbg:i386
+#      - mono-devel
+#      - mono-devel:i386
+#      - mono-dmcs
+#      - mono-dmcs:i386
+#      - mono-gac
+#      - mono-gac:i386
+#      - mono-gmcs
+#      - mono-gmcs:i386
+#      - mono-jay
+#      - mono-jay:i386
+#      - mono-mcs
+#      - mono-mcs:i386
+#      - mono-runtime
+#      - mono-runtime-dbg
+#      - mono-runtime-dbg:i386
+#      - mono-runtime-sgen
+#      - mono-runtime-sgen:i386
+#      - mono-runtime:i386
+#      - mono-utils
+#      - mono-utils:i386
+#      - mono-xbuild
+#      - mono-xbuild:i386
+#      - monodevelop-monogame
+#      - monodoc-base
+#      - monodoc-base:i386
+#      - monodoc-gtk3.0-manual
+#      - monodoc-manual
+#      - monodoc-manual:i386
+#      - monodoc-monogame-manual
+#      - monodevelop-monogame
+#      - libmono-2.0-1
+#      - libmono-2.0-1-dbg
+#      - libmono-2.0-1-dbg:i386
+#      - libmono-2.0-1:i386
+#      - libmono-2.0-dev
+#      - libmono-2.0-dev:i386
+#      - gdb
+#      - libpthread-stubs0
+#      - libpthread-stubs0-dev
+#      - libpthread-stubs0-dev:i386
+#      - libpthread-stubs0:i386
+#      - debconf
+#      - gconf-service
+#      - lib32gcc1
+#      - lib32stdc++6
+#      - libasound2
+#      - libc6
+#      - libc6-i386
+#      - libcairo2
+#      - libcap2
+#      - libcups2
+#      - libdbus-1-3
+#      - libexpat1
+#      - libfontconfig1
+#      - libfreetype6
+#      - libgcc1
+#      - libgconf-2-4
+#      - libgdk-pixbuf2.0-0
+#      - libgl1-mesa-glx
+#      - libglib2.0-0
+#      - libglu1-mesa
+#      - libgtk2.0-0
+#      - libnspr4
+#      - libnss3
+#      - libpango1.0-0
+#      - libstdc++6
+#      - libx11-6
+#      - libxcomposite1
+#      - libxcursor1
+#      - libxdamage1
+#      - libxext6
+#      - libxfixes3
+#      - libxi6
+#      - libxrandr2
+#      - libxrender1
+#      - libxtst6
+#      - zlib1g
+#      - libpng12-0
+#      - xvfb
