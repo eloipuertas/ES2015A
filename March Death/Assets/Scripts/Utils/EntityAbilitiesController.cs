@@ -135,18 +135,22 @@ public class EntityAbilitiesController : MonoBehaviour
         Sprite newImg = null;
         Texture2D tex = null;
         byte[] fileData;
+		
 
         String sPath = Application.dataPath + separator + "Resources" + separator + "ActionButtons" + separator;
-        string sName = sPath + ability + ".png";
-
+        string sName = sPath + ability.Replace(" ","_") + ".png";
+		Debug.LogError(sName);
         if (File.Exists(sName))
         {
+			Debug.LogError("File exist");
             fileData = File.ReadAllBytes(sName);
             tex = new Texture2D(100, 100, TextureFormat.RGB24, false);
             tex.LoadImage(fileData);
 
             newImg = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-        }
+        }else{
+			Debug.LogError("File not find");
+		}
         return newImg;
     }
 }
