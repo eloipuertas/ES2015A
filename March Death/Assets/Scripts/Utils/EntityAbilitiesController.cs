@@ -16,9 +16,17 @@ public class EntityAbilitiesController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-		//Register to selectable actions
-		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.SELECTED, onActorSelected);
-		Subscriber<Selectable.Actions, Selectable>.get.registerForAll (Selectable.Actions.DESELECTED, onActorDeselected);
+        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
+
+        //Register to selectable actions
+        Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.SELECTED, onActorSelected, new ActorSelector()
+        {
+            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
+        });
+        Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.DESELECTED, onActorDeselected, new ActorSelector()
+        {
+            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
+        });
     }
 
     // Update is called once per frame
@@ -27,44 +35,49 @@ public class EntityAbilitiesController : MonoBehaviour
 
     }
 
-	public void onActorSelected(System.Object obj)
-	{
-		destroyButtons ();
-		showActions((GameObject)obj);
-	}
+    public void onActorSelected(System.Object obj)
+    {
+        destroyButtons();
+        showActions((GameObject)obj);
+    }
 
-	public void onActorDeselected(System.Object obj)
-	{
-		destroyButtons();
-	}
+    public void onActorDeselected(System.Object obj)
+    {
+        destroyButtons();
+    }
 
-	void showActions(GameObject gameObject)
-	{
-		GameObject actionPanel = GameObject.Find("actions");
+    void showActions(GameObject gameObject)
+    {
+        GameObject actionPanel = GameObject.Find("actions");
+
         if (!actionPanel) return;
-		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-		var rectTransform = actionPanel.GetComponent<RectTransform>();
-		var extents = 0.9f * rectTransform.sizeDelta / 2.0f;
-		var buttonExtents = new Vector2(extents.x / Button_Columns, extents.y / Button_Rows);
-		var position = rectTransform.position;
-		var point = new Vector2(position.x - extents.x, position.y + extents.y);
-		var abilities = entity.info.abilities;
-		var nabilities = abilities.Count;
+        IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+        var rectTransform = actionPanel.GetComponent<RectTransform>();
+        var extents = 0.9f * rectTransform.sizeDelta / 2.0f;
+        var buttonExtents = new Vector2(extents.x / Button_Columns, extents.y / Button_Rows);
+        var position = rectTransform.position;
+        var point = new Vector2(position.x - extents.x, position.y + extents.y);
+        var abilities = entity.info.abilities;
+        var nabilities = abilities.Count;
 
-		for (int i = 0; i < nabilities; i++)
-		{
-			String ability = abilities[i].name;
-			Ability abilityObj = entity.getAbility(ability);
-			if (abilityObj.isUsable)
-			{
-				UnityAction actionMethod = new UnityAction(() => SayHello());
+        for (int i = 0; i < nabilities; i++)
+        {
+            String ability = abilities[i].name;
+            Ability abilityObj = entity.getAbility(ability);
+            if (abilityObj.isUsable)
+            {
+                UnityAction actionMethod = new UnityAction(() =>
+                {
+                    Debug.Log(abilityObj);
+                    abilityObj.enable();
+                });
 
-				var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
-				buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Rows) + 1));
-				CreateButton(actionPanel, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
-			}
-		}
-	}
+                var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
+                buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Rows) + 1));
+                CreateButton(actionPanel, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
+            }
+        }
+    }
 
     void destroyButtons()
     {
@@ -93,7 +106,7 @@ public class EntityAbilitiesController : MonoBehaviour
         canvas.tag = "ActionButton";
         canvasObject.AddComponent<GraphicRaycaster>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
- 
+
         var buttonObject = new GameObject("Button");
 
         var image = buttonObject.AddComponent<Image>();
@@ -104,8 +117,8 @@ public class EntityAbilitiesController : MonoBehaviour
 
         var button = buttonObject.AddComponent<Button>();
         button.targetGraphic = image;
-		button.onClick.AddListener(() => actionMethod());
-		button.enabled = enabled;
+        button.onClick.AddListener(() => actionMethod());
+        button.enabled = enabled;
     }
 
     /// <summary>
@@ -115,16 +128,16 @@ public class EntityAbilitiesController : MonoBehaviour
     {
         Debug.Log("Hello everybody!");
     }
-	
-	Sprite CreateSprite(String ability)
+
+    Sprite CreateSprite(String ability)
     {
         char separator = Path.DirectorySeparatorChar;
-        Sprite newImg=null;
+        Sprite newImg = null;
         Texture2D tex = null;
         byte[] fileData;
 
-        String sPath = Application.dataPath +separator+"Resources"+separator+ "ActionButtons" + separator;
-        string sName = sPath+ability+".png";
+        String sPath = Application.dataPath + separator + "Resources" + separator + "ActionButtons" + separator;
+        string sName = sPath + ability + ".png";
 
         if (File.Exists(sName))
         {
