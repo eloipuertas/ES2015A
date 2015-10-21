@@ -41,7 +41,12 @@ public class Unit : GameEntity<Unit.Actions>
     /// <summary>
     /// If in battle, this is the target and last attack time
     /// </summary>
-    private Unit _target = null;
+    private IGameEntity _target = null;
+
+    /// <summary>
+    /// Set to true if we are following our target (ie. attacking but not in range)
+    /// </summary>
+    private bool followingTarget = false;
 
     /// <summary>
     /// Time holders for const updates
@@ -74,6 +79,11 @@ public class Unit : GameEntity<Unit.Actions>
         setStatus(EntityStatus.IDLE);
     }
 
+    private void onTargetHidden(System.Object obj)
+    {
+        moveTo(((GameObject)obj).transform.position);
+    }
+
     /// <summary>
     /// When a wound is received, this is called
     /// </summary>
@@ -90,20 +100,41 @@ public class Unit : GameEntity<Unit.Actions>
         fire(Actions.DIED);
     }
 
+    public override IKeyGetter registerFatalWounds(Action<object> func)
+    {
+        return register(Actions.DIED, func);
+    }
+
+    public override IKeyGetter unregisterFatalWounds(Action<object> func)
+    {
+        return unregister(Actions.DIED, func);
+    }
+
     /// <summary>
     /// Sets up our attack target, registers callback for its death and
     /// updates our state
     /// </summary>
     /// <param name="unit"></param>
-    public bool attackTarget(Unit unit)
+    public bool attackTarget<A>(GameEntity<A> entity) where A : struct, IConvertible
     {
-        if (Vector3.Distance(unit.transform.position, transform.position) <= ATTACK_RANGE)
+        Debug.Log(entity);
+        // Note: Cast is redundant but avoids warning
+        if (_target != (IGameEntity)entity)
         {
-            _target = unit;
-            _auto += _target.register(Actions.DIED, onTargetDied);
-            setStatus(EntityStatus.ATTACKING);
+            _auto += entity.registerFatalWounds(onTargetDied);
+            _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
+            _target = entity;
 
-            return true;
+            if (Vector3.Distance(entity.transform.position, transform.position) <= ATTACK_RANGE)
+            {
+                setStatus(EntityStatus.ATTACKING);
+                return true;
+            }
+            else
+            {
+                followingTarget = true;
+                setStatus(EntityStatus.MOVING);
+            }
         }
 
         return false;
@@ -116,7 +147,8 @@ public class Unit : GameEntity<Unit.Actions>
     {
         if (_target != null)
         {
-            _auto -= _target.unregister(Actions.DIED, onTargetDied);
+            _auto -= _target.unregisterFatalWounds(onTargetDied);
+            _auto -= _target.getGameObject().GetComponent<FOWEntity>().unregister(FOWEntity.Actions.HIDDEN, onTargetHidden);
             _target = null;
         }
 
@@ -140,6 +172,7 @@ public class Unit : GameEntity<Unit.Actions>
             transform.rotation = targetRotation;
         }
 
+        followingTarget = false;
         setStatus(EntityStatus.MOVING);
         fire(Actions.MOVEMENT_START);
     }
@@ -151,6 +184,7 @@ public class Unit : GameEntity<Unit.Actions>
     {
         _info = Info.get.of(race, type);
         _auto = this;
+
         // Call GameEntity start
         base.Start();
 
@@ -206,9 +240,10 @@ public class Unit : GameEntity<Unit.Actions>
                 if (_target != null)
                 {
                     // Check if we are still in range
-                    if (Vector3.Distance(_target.transform.position, transform.position) > ATTACK_RANGE)
+                    if (Vector3.Distance(_target.getTransform().position, transform.position) > ATTACK_RANGE)
                     {
-                        stopAttack();
+                        followingTarget = true;
+                        setStatus(EntityStatus.MOVING);
                     }
                     // Check if we already have to attack
                     else if (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate))
@@ -233,9 +268,22 @@ public class Unit : GameEntity<Unit.Actions>
             case EntityStatus.MOVING:
                 // TODO: Steps on the last sector are smoothened due to distance being small
                 // Althought it's an unintended behaviour, it may be interesating to leave it as is
-                transform.position = Vector3.MoveTowards(transform.position, _movePoint, Time.fixedDeltaTime * info.unitAttributes.movementRate);
+                Vector3 destination = _movePoint;
+
+                if (followingTarget)
+                {
+                    destination = _target.getTransform().position;
+                }
+
+                transform.position = Vector3.MoveTowards(transform.position, destination, Time.fixedDeltaTime * info.unitAttributes.movementRate);
 
                 // If distance is lower than 0.5, stop movement
+                if (followingTarget && Vector3.Distance(transform.position, destination) <= ATTACK_RANGE)
+                {
+                    Debug.Log("ATTACKING!");
+                    setStatus(EntityStatus.ATTACKING);
+                }
+
                 if (Vector3.Distance(transform.position, _movePoint) <= 0.5f)
                 {
                     setStatus(EntityStatus.IDLE);
@@ -244,5 +292,4 @@ public class Unit : GameEntity<Unit.Actions>
                 break;
         }
     }
-
 }

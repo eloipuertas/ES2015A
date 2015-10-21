@@ -6,8 +6,24 @@ namespace Utils
 {
     public sealed class SelectorStore<T> : Singleton<SelectorStore<T>> where T : struct, IConvertible
     {
-        public Dictionary<T, Dictionary<Action<Object>, ActorSelector>> selectors = new Dictionary<T, Dictionary<Action<Object>, ActorSelector>>();
+        public static ActorSelector defaultSelector = new ActorSelector()
+        {
+            registerCondition = gameObject => true,
+            fireCondition = gameObject => true
+        };
 
+        public Dictionary<T, Dictionary<Action<Object>, ActorSelector>> _selectors = new Dictionary<T, Dictionary<Action<Object>, ActorSelector>>();
+
+        public ActorSelector Selector(T action, Action<Object> func)
+        {
+            if (!_selectors[action].ContainsKey(func))
+            {
+                return defaultSelector;
+            }
+
+            return _selectors[action][func];
+        }
+        
         private SelectorStore()
         {
             if (!typeof(T).IsEnum)
@@ -17,19 +33,13 @@ namespace Utils
 
             foreach (T action in Enum.GetValues(typeof(T)))
             {
-                selectors.Add(action, new Dictionary<Action<Object>, ActorSelector>());
+                _selectors.Add(action, new Dictionary<Action<Object>, ActorSelector>());
             }
         }
     }
 
     public sealed class Subscriber<T, S> : Singleton<Subscriber<T, S>> where T : struct, IConvertible where S : class
     {
-        static ActorSelector defaultSelector = new ActorSelector()
-        {
-            registerCondition = gameObject => true,
-            fireCondition = gameObject => true
-        };
-        
         private Dictionary<T, List<Action<Object>>> callbacks = new Dictionary<T, List<Action<Object>>>();
 
         private Subscriber()
@@ -44,26 +54,16 @@ namespace Utils
                 callbacks.Add(action, new List<Action<Object>>());
             }
         }
-
-        public ActorSelector getSelector(T action, Action<Object> func)
-        {
-            if (SelectorStore<T>.get.selectors[action].ContainsKey(func))
-            {
-                return SelectorStore<T>.get.selectors[action][func];
-            }
-
-            return defaultSelector;
-        }
-
+        
         public void registerForAll(T action, Action<Object> func)
         {
-            registerForAll(action, func, defaultSelector);
+            registerForAll(action, func, SelectorStore<T>.defaultSelector);
         }
 
         public void registerForAll(T action, Action<Object> func, ActorSelector selector)
         {
             callbacks[action].Add(func);
-            SelectorStore<T>.get.selectors[action].Add(func, selector);
+            SelectorStore<T>.get._selectors[action].Add(func, selector);
 
             // Find all already existing gameobjects of this type
             UnityEngine.Object[] alreadyExistingActors = UnityEngine.Object.FindObjectsOfType(typeof(SubscribableActor<T,S>));
@@ -81,7 +81,7 @@ namespace Utils
         public void unregisterFromAll(T action, Action<Object> func)
         {
             callbacks[action].Remove(func);
-            SelectorStore<T>.get.selectors[action].Remove(func);
+            SelectorStore<T>.get._selectors[action].Remove(func);
 
             // Find all already existing gameobjects of this type
             UnityEngine.Object[] alreadyExistingActors = UnityEngine.Object.FindObjectsOfType(typeof(SubscribableActor<T,S>));
@@ -97,7 +97,7 @@ namespace Utils
             {
                 foreach (Action<Object> action in entry.Value.ToList())
                 {
-                    if (SelectorStore<T>.get.selectors[entry.Key][action].registerCondition(actor.gameObject))
+                    if (SelectorStore<T>.get.Selector(entry.Key, action).registerCondition(actor.gameObject))
                     {
                         actor.register(entry.Key, action);
                     }

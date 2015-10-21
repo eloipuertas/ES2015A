@@ -1,5 +1,6 @@
 using System;
 ﻿using Storage;
+using Utils;
 
 // Values are set only for clarity purposes on the Animator
 // Once DEAD/DESTROYED, you can not go back to any state!
@@ -12,10 +13,11 @@ public enum EntityStatus
     MOVING = 4,
     ATTACKING = 5,
     DEAD = 6,
-    DESTROYED = 7
+    DESTROYED = 7,
+    WORKING = 8
 };
 
-public interface IGameEntity
+public interface IGameEntity : IBaseActor
 {
     EntityInfo info { get; }
     EntityStatus status { get; }
@@ -24,10 +26,17 @@ public interface IGameEntity
     float damagePercentage { get; }
     float healthPercentage { get; }
 
+    UnityEngine.Transform getTransform();
+    UnityEngine.GameObject getGameObject();
     Ability getAbility(string name);
 
     Races getRace();
     E getType<E>() where E : struct, IConvertible;
+
+    IKeyGetter registerFatalWounds(Action<System.Object> func);
+    IKeyGetter unregisterFatalWounds(Action<System.Object> func);
+
+    void receiveAttack(Unit from, bool isRanged);
 
     void doIfUnit(Action<Unit> callIfTrue);
 }

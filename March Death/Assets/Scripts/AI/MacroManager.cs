@@ -20,7 +20,6 @@ namespace Assets.Scripts.AI
         /// </summary>
         List<BuildingTypes> buildingPref;
         List<UnitTypes> UnitPref;
-
         AIController ai;
         public MacroManager(AIController ai)
         {
@@ -38,6 +37,27 @@ namespace Assets.Scripts.AI
         public void MacroLow()
         {
 
+        }
+        /// <summary>
+        /// The micro is asking how many civils the army can spend (for exploring or defending)
+        /// </summary>
+        public int canTakeArms()
+        {
+            return ai.Workers.Count; 
+        }
+        /// <summary>
+        /// The micro is forcibly taking num civils from the macro
+        /// </summary>
+        /// <param name="num"></param>
+        public void takeArms(int num)
+        {
+            if (ai.Workers.Count > 0)
+            {
+                int min = Math.Min(num, ai.Workers.Count);
+                List<Unit> lu = ai.Workers.GetRange(0, min);
+                ai.Workers.RemoveRange(0, min);
+                ai.Army.AddRange(lu);
+            }
         }
     }
 }
