@@ -22,7 +22,11 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
     protected virtual void Update() {
 
         if (mainCam == null) { // not initialized yet in start I suppose
-            mainCam = GameObject.FindGameObjectWithTag("minimap_cam").GetComponent<Camera>();
+            if (GameObject.FindGameObjectWithTag("minimap_cam"))
+            {
+                mainCam = GameObject.FindGameObjectWithTag("minimap_cam").GetComponent<Camera>();
+            }
+            else Debug.LogWarning("no hay minmap");
         }
         marker_rect = MinimapOverlays.CalculateBoxFromCntr(this.transform.position, mainCam, 1); 
         box_text = MinimapOverlays.CreateTextureUnit(getRaceColor(this.gameObject.GetComponent<IGameEntity>().info.race));
