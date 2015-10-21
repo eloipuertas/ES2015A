@@ -779,6 +779,7 @@ GameObject:
   - 114: {fileID: 11499858}
   - 114: {fileID: 11499468}
   - 114: {fileID: 11463282}
+  - 114: {fileID: 11477212}
   m_Layer: 0
   m_Name: Human_Stronghold
   m_TagString: Untagged
@@ -4939,6 +4940,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsRevealer: 0
   Range: 0
+--- !u!114 &11477212
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 152608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43c34b4ae45e2c94f90ae970db2ad9f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11499468
 MonoBehaviour:
   m_ObjectHideFlags: 1

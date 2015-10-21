@@ -180,33 +180,39 @@ public class InformationController : MonoBehaviour {
 
 		//Register for unit events
 		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-        Unit unit = (Unit) entity;
-		unit.register(Unit.Actions.DAMAGED, onUnitDamaged);
-		unit.register(Unit.Actions.DIED, onUnitDied);
+
+        entity.doIfUnit(unit =>
+        {
+            unit.register(Unit.Actions.DAMAGED, onUnitDamaged);
+            unit.register(Unit.Actions.DIED, onUnitDied);
+        });
 	}
 
-	public void onUnitDeselected(System.Object obj)
-	{
-        GameObject gameObject = (GameObject) obj;
+    public void onUnitDeselected(System.Object obj)
+    {
+        GameObject gameObject = (GameObject)obj;
 
-		//Check if is simple click or multiple
-		if (player.SelectedObjects.Count > 1)
-		{				
-			ShowMultipleInformation();
-			
-		} else if (player.SelectedObjects.Count == 1)
-		{
-			ShowInformation(gameObject);
-		} else
-		{
-			HideInformation ();
-		}
+        //Check if is simple click or multiple
+        if (player.SelectedObjects.Count > 1)
+        {
+            ShowMultipleInformation();
 
-		//Unregister unit events
-		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-        Unit unit = (Unit) entity;
-		unit.unregister(Unit.Actions.DAMAGED, onUnitDamaged);
-		unit.unregister(Unit.Actions.DIED, onUnitDied);
+        } else if (player.SelectedObjects.Count == 1)
+        {
+            ShowInformation(gameObject);
+        } else
+        {
+            HideInformation();
+        }
+
+        //Unregister unit events
+        IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+
+        entity.doIfUnit(unit =>
+        {
+            unit.unregister(Unit.Actions.DAMAGED, onUnitDamaged);
+            unit.unregister(Unit.Actions.DIED, onUnitDied);
+        });
 	}
 
 	public void onUnitDamaged(System.Object obj)

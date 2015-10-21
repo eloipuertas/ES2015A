@@ -82,6 +82,7 @@ GameObject:
   - 114: {fileID: 11452272}
   - 114: {fileID: 11463788}
   - 114: {fileID: 11478740}
+  - 114: {fileID: 11486080}
   m_Layer: 0
   m_Name: ElfMine
   m_TagString: Untagged
@@ -785,6 +786,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsRevealer: 0
   Range: 0
+--- !u!114 &11486080
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 138030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43c34b4ae45e2c94f90ae970db2ad9f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
