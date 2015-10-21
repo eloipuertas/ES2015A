@@ -33,6 +33,7 @@ namespace Assets.Scripts.AI
         public Dictionary<UnitTypes,int> UnitsFound { get; set; }
 
         Vector3 buildPosition;
+        public Vector3 rootBasePosition;
         public List<Unit> Army { get; set; }
         public List<Unit> Workers { get; set; }
 
@@ -41,6 +42,9 @@ namespace Assets.Scripts.AI
             base.Start();
 
             _selfRace = info.GetPlayerRace() == Races.MEN ? Races.ELVES : Races.MEN;
+
+            if (_selfRace == Races.ELVES) Army.Add(GameObject.Find("elf_hero").gameObject.GetComponent<Unit>());
+            else Army.Add(GameObject.Find("MenHero").gameObject.GetComponent<Unit>());
         }
         
         void Awake()
@@ -61,10 +65,7 @@ namespace Assets.Scripts.AI
             for (int i = 0; i < modules.Count; i++)
                 timers[i] = 0;
             buildPosition = new Vector3(706, 80, 765);
-
-            Debug.Log(_selfRace);
-            if(_selfRace == Races.ELVES) Army.Add(GameObject.Find("elf_hero").gameObject.GetComponent<Unit>());
-            else Army.Add(GameObject.Find("MenHero").gameObject.GetComponent<Unit>());
+            rootBasePosition = new Vector3(706, 80, 765);
 
             ActorSelector selector = new ActorSelector()
             {
@@ -76,6 +77,7 @@ namespace Assets.Scripts.AI
         }
         void Update()
         {
+            Debug.Log(_selfRace);
             for (int i = 0; i < modules.Count; i++)
             {
                 timers[i] += Time.deltaTime;
