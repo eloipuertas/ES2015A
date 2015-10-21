@@ -57,7 +57,23 @@ namespace Managers
             }
 
         }
-        
+
+        /// <summary>
+        /// Starts creating a building, required the name of the building ex: 'elf-farm'
+        /// </summary>
+        /// <param name="name"></param>
+        public void createBuilding(Storage.Races race, Storage.BuildingTypes type )
+        {
+            if (!_placing)
+            {
+                GameObject newBuilding;
+                newBuilding = Storage.Info.get.createBuilding(race, type);
+                this.createBuilding(newBuilding);
+            }
+
+        }
+
+
         /// <summary>
         /// Starts creating a building, required the name of the building ex: 'elf-farm'
         /// </summary>
