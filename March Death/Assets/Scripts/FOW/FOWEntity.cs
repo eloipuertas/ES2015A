@@ -83,7 +83,8 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
             size = Vector2.one;
         }
         size2 = size / 2;
-        IsOwnedByPlayer = this.gameObject.GetComponent<IGameEntity>().getRace() ==Storage.Races.MEN; //TODO: SET when we have a good way too.
+        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
+        IsOwnedByPlayer = this.gameObject.GetComponent<IGameEntity>().getRace() == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace(); 
         isRevealed = true;
         first = !IsOwnedByPlayer;
     }
