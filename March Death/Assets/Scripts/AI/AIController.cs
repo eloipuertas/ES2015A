@@ -22,6 +22,7 @@ namespace Assets.Scripts.AI
         public int DifficultyLvl { get; set; }
 
         List<AIModule> modules;
+        float[] timers;
         //TODO: change this when decided about what do we really need to keep about buildings 
         public List<IGameEntity> OwnBuildings { get; set; }
         public List<IGameEntity> EnemyBuildings { get; set; }
@@ -41,24 +42,26 @@ namespace Assets.Scripts.AI
 
             _selfRace = info.GetPlayerRace() == Races.MEN ? Races.ELVES : Races.MEN;
         }
-
-        float timer; //It's not going to overflow this millennium
+        
         void Awake()
         {
             //Init lists
-            Macro = new MacroManager(this);
-            Micro = new MicroManager(this);
             EnemyUnits = new List<Unit>();
             EnemyBuildings = new List<IGameEntity>();
             OwnBuildings = new List<IGameEntity>();
             modules = new List<AIModule>();
             Army = new List<Unit>();
             Workers = new List<Unit>();
-            modules.Add(new AIModule(Macro.MacroHigh, 30f));
-            modules.Add(new AIModule(Macro.MacroLow, 5f));
-            modules.Add(new AIModule(Micro.Micro, 1f));
-            timer = 0;
-            buildPosition = new Vector3(620, 80, 858);
+            Macro = new MacroManager(this);
+            Micro = new MicroManager(this);
+            modules.Add(new AIModule(Macro.MacroHigh, 30));
+            modules.Add(new AIModule(Macro.MacroLow, 5));
+            modules.Add(new AIModule(Micro.Micro, 1));
+            timers = new float[modules.Count];
+            for (int i = 0; i < modules.Count; i++)
+                timers[i] = 0;
+            buildPosition = new Vector3(706, 80, 765);
+
 
             ActorSelector selector = new ActorSelector()
             {
@@ -70,10 +73,16 @@ namespace Assets.Scripts.AI
         }
         void Update()
         {
-            timer += Time.deltaTime;
-            foreach (AIModule m in modules)
-                if (Math.Round(timer % m.period) == 0)
-                    m.Callback();
+            for (int i = 0; i < modules.Count; i++)
+            {
+                Debug.Log(timers[i]);
+                timers[i] += Time.deltaTime;
+                if (timers[i] > modules[i].period)
+                {
+                    modules[i].Callback();
+                    timers[i] = 0f;
+                }
+            }
         }
         void OnEntityFound(System.Object obj)
         {
@@ -96,7 +105,7 @@ namespace Assets.Scripts.AI
         public void CreateBuilding(BuildingTypes btype)
         {
             GameObject g = Info.get.createBuilding(Races.ELVES, btype, buildPosition, Quaternion.Euler(0,0,0));
-            buildPosition += new Vector3(5, 0, 0);
+            buildPosition += new Vector3(0, 0,20);
             Resource build = (Resource)g.GetComponent<IGameEntity>();
             build.register(Resource.Actions.CREATE_UNIT, OnCivilCreated);
             build.register(Resource.Actions.DESTROYED, OnBuildingDestroyed);
@@ -125,7 +134,7 @@ namespace Assets.Scripts.AI
     }
     struct AIModule
     {
-        public AIModule(Action Callback, float period) {
+        public AIModule(Action Callback, int period) {
             this.Callback = Callback;
             this.period = period;
         }
@@ -133,7 +142,7 @@ namespace Assets.Scripts.AI
         /// <summary>
         /// Time in seconds between each call to Callback
         /// </summary>
-        public float period;
+        public int period;
     }
     
 }

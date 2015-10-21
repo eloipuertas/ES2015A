@@ -354,7 +354,8 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         _status = status;
 
 #if !DISABLE_ANIMATOR
-        _animator.SetInteger("animation_state", (int)status);
+        //TODO: Hack to get this working for the sprint, why is _animator
+        GetComponent<Animator>().SetInteger("animation_state", (int)status);
 #endif
     }
 }
