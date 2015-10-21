@@ -6,7 +6,8 @@ using UnityEngine;
 class Create : Ability
 {
     private bool _enabled = false;
-    private IGameEntity _entity;
+	private IGameEntity _entity;
+	private BuildingInfo _info_tobuild;
     
     protected BuildingTypes _type;
 
@@ -23,14 +24,16 @@ class Create : Ability
     {
         get
         {
-            //Check resources
-            return true;
+			return BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, _info_tobuild.resources.food) &&
+					BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, _info_tobuild.resources.wood) &&
+					BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, _info_tobuild.resources.metal);            
         }
     }
 
     public Create(EntityAbility info, GameObject gameObject) : base(info, gameObject)
     {
-        _entity = _gameObject.GetComponent<IGameEntity>();
+		_entity = _gameObject.GetComponent<IGameEntity>();
+		_info_tobuild = Info.get.of(_entity.info.race, _type);
     }
 
     public override void disable()
@@ -41,7 +44,7 @@ class Create : Ability
 
     public override void enable()
     {
-        GameObject.Find("GameController").createBuilding(_entity.info.race, _type);
+		GameObject.Find("GameController").GetComponent<BuildingsManager>().createBuilding(_entity.info.race, _type);
      
         _enabled = true;
         base.enable();
