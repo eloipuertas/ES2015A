@@ -31,16 +31,17 @@ public class BasePlayer : Utils.SingletonMono<BasePlayer> {
     protected Managers.UnitsManager _units;
     public Managers.UnitsManager units { get { return _units;  } }
 
-    static GameInformation info = null;
-    static BasePlayer player = null;
-    static BasePlayer ia = null;
+    protected static GameInformation info = null;
+    protected static BasePlayer player = null;
+    protected static BasePlayer ia = null;
 
 
     public virtual void Start ()
     {
         GameObject gameController = GameObject.FindGameObjectWithTag("GameController");
+        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
 
-        info = gameController.GetComponent<GameInformation>();
+        info = gameInformationObject.GetComponent<GameInformation>();
         player = gameController.GetComponent<Player>();
         ia = gameController.GetComponent<AIController>();
     }

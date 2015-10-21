@@ -27,17 +27,20 @@ public class InformationController : MonoBehaviour {
 	{
 
 
-        GameObject gameObject = GameObject.Find("GameController");
-        player = gameObject.GetComponent("Player") as Player;
+        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
+        player = gameInformationObject.GetComponent("Player") as Player;
 
 
         //Register to selectable actions
         Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.SELECTED, onUnitSelected, new ActorSelector()
         {
-            registerCondition = checkRace => checkRace.GetComponent<IGameEntity>().info.race == gameObject.GetComponent<GameInformation>().GetPlayerRace()
+            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
         });
 
-        Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.DESELECTED, onUnitDeselected);
+        Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.DESELECTED, onUnitDeselected, new ActorSelector()
+        {
+            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
+        });
 
 
         //Init menu components used for show info for one unit

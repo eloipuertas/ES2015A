@@ -35,6 +35,13 @@ namespace Assets.Scripts.AI
         //public List<Unit> Army { get; set; }
         public List<Unit> Workers { get; set; }
 
+        public override void Start()
+        {
+            base.Start();
+
+            _selfRace = info.GetPlayerRace() == Races.MEN ? Races.ELVES : Races.MEN;
+        }
+
         float timer; //It's not going to overflow this millennium
         void Awake()
         {

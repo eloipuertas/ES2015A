@@ -25,8 +25,10 @@ public class Player : BasePlayer
     // Use this for initialization
     public override void Start()
     {   
+        base.Start();
+
         //request the race of the player
-        _selfRace = GetComponent<GameInformation>().GetPlayerRace();
+        _selfRace = info.GetPlayerRace();
         _resources = new Managers.ResourcesManager();
         _units = new Managers.UnitsManager(this);
     }
