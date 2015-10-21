@@ -62,6 +62,9 @@ namespace Assets.Scripts.AI
                 timers[i] = 0;
             buildPosition = new Vector3(706, 80, 765);
 
+            Debug.Log(_selfRace);
+            if(_selfRace == Races.ELVES) Army.Add(GameObject.Find("elf_hero").gameObject.GetComponent<Unit>());
+            else Army.Add(GameObject.Find("MenHero").gameObject.GetComponent<Unit>());
 
             ActorSelector selector = new ActorSelector()
             {
@@ -75,7 +78,6 @@ namespace Assets.Scripts.AI
         {
             for (int i = 0; i < modules.Count; i++)
             {
-                Debug.Log(timers[i]);
                 timers[i] += Time.deltaTime;
                 if (timers[i] > modules[i].period)
                 {
@@ -104,7 +106,7 @@ namespace Assets.Scripts.AI
         }
         public void CreateBuilding(BuildingTypes btype)
         {
-            GameObject g = Info.get.createBuilding(Races.ELVES, btype, buildPosition, Quaternion.Euler(0,0,0));
+            GameObject g = Info.get.createBuilding(_selfRace, btype, buildPosition, Quaternion.Euler(0,0,0));
             buildPosition += new Vector3(0, 0,20);
             Resource build = (Resource)g.GetComponent<IGameEntity>();
             build.register(Resource.Actions.CREATE_UNIT, OnCivilCreated);
