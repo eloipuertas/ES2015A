@@ -32,7 +32,6 @@ namespace Assets.Scripts.AI.Agents
 
         public RetreatAgent(AIController ai, AttackAgent aA) : base(ai)
         {
-            valOfCitizen = 1f;
             attackAgent = aA;
             enemySquadBoundingBox = new Rect();
             ownSquadBoundingBox = new Rect();
