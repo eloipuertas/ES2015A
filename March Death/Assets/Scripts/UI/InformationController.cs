@@ -28,7 +28,7 @@ public class InformationController : MonoBehaviour {
 
 
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
-        player = gameInformationObject.GetComponent("Player") as Player;
+        player = GameObject.FindGameObjectWithTag("GameController").GetComponent("Player") as Player;
 
 
         //Register to selectable actions
