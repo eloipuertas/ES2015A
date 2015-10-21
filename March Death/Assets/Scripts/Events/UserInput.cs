@@ -7,7 +7,7 @@ using Managers;
 public class UserInput : MonoBehaviour
 {
     private Player player;
-    private UnitsManager uManager;
+    private UnitsManager uManager { get { return player.units; } }
 
     //Should be better to create a constants class or structure
     private Vector3 invalidPosition = new Vector3(-99999, -99999, -99999);
@@ -45,7 +45,6 @@ public class UserInput : MonoBehaviour
         player = GetComponent<Player>();
 		selectionTexture = (Texture2D)Resources.Load("SelectionTexture");	
 		camera = GameObject.Find("Main Camera").GetComponent ("CameraController") as CameraController;
-        uManager = GetComponent<UnitsManager>();
     }
 
 	void OnGUI() {

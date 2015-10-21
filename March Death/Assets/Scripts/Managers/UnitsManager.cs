@@ -1,45 +1,45 @@
 ﻿using UnityEngine;
 using System.Collections;
-
-public class UnitsManager : MonoBehaviour {
-
-    Player player;
-    UserInput inputs;
-    private ArrayList _selectedUnits { get { return player.getSelectedObjects(); } }
-
-    // Use this for initialization
-    void Start()
+namespace Managers
+{
+    public class UnitsManager
     {
-        player = GetComponent<Player>();
-        inputs = GetComponent<UserInput>();
 
-    }
+        private Player _player;
+        private UserInput _inputs;
+        private ArrayList _selectedUnits { get { return _player.getSelectedObjects(); } }
 
-    public void MoveTo(Vector3 point)
-    {
-        foreach (Selectable unit in _selectedUnits)
+        // Use this for initialization
+        public  UnitsManager( Player player )
         {
-            if (unit.GetComponent<IGameEntity>().info.isUnit)
-                unit.GetComponent<Unit>().moveTo(point);
+            _player = player;
+            _inputs = _player.GetComponent<UserInput>();
+
         }
-        Debug.Log("Moving there");
-    }
 
-    public void AttackTo(IGameEntity enemy)
-    {
-        foreach (Selectable unit in _selectedUnits)
+        public void MoveTo(Vector3 point)
         {
-            if (unit.GetComponent<IGameEntity>().info.isUnit && enemy.info.isUnit)
+            foreach (Selectable unit in _selectedUnits)
             {
-                // so far we only can attack units
-                unit.GetComponent<Unit>().attackTarget((Unit)enemy);
+                if (unit.GetComponent<IGameEntity>().info.isUnit)
+                    unit.GetComponent<Unit>().moveTo(point);
             }
+            Debug.Log("Moving there");
         }
-        Debug.Log("attacking");
-    }
 
-    // Update is called once per frame
-    void Update () {
-	
-	}
+
+        public void AttackTo(IGameEntity enemy)
+        {
+            foreach (Selectable unit in _selectedUnits)
+            {
+                //TODO :(hermetico) check attack buildings too
+                if (unit.GetComponent<IGameEntity>().info.isUnit && enemy.info.isUnit)
+                {
+                    // so far we only can attack units
+                    unit.GetComponent<Unit>().attackTarget((Unit)enemy);
+                }
+            }
+            Debug.Log("attacking");
+        }
+    }
 }
