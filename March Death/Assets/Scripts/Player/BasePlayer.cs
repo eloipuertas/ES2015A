@@ -45,7 +45,7 @@ public class BasePlayer : Utils.SingletonMono<BasePlayer> {
         ia = gameController.GetComponent<AIController>();
     }
 
-    static BasePlayer getOwner(IGameEntity entity)
+    public static BasePlayer getOwner(IGameEntity entity)
     {
         if (entity.info.race == info.GetPlayerRace())
         {
