@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using Storage;
@@ -90,6 +91,11 @@ public class Resource : Building<Resource.Actions>
             return transform.position;
         }     
     }
+
+    private readonly object syncLock = new object();
+    bool hasCreatedCivil = false;
+    List<GameObject> pendingProducers = new List<GameObject>();
+    List<GameObject> pendingWanderers = new List<GameObject>();
 
 
     /// <summary>
@@ -211,16 +217,16 @@ public class Resource : Building<Resource.Actions>
 
             
             // Method createUnit form Info returns GameObject Instance;
-            GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1) ;  
-            Unit civil = gob.GetComponent<Unit>();
-            civil.role = Unit.Roles.PRODUCING;   
+            GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
+
+            lock (syncLock)
+            {
+                pendingProducers.Add(gob);
+            }
 
             totalUnits++;
             harvestUnits++;
-
             _collectionRate += Info.get.of(race, UnitTypes.CIVIL).attributes.capacity;
-
-            fire(Actions.CREATE_UNIT, civil);
         }
         else
         {
@@ -229,11 +235,13 @@ public class Resource : Building<Resource.Actions>
             _yDisplacement = (totalUnits - harvestUnits) / 5;
             _unitPosition.Set(_center.x + 10 + _xDisplacement, _center.y  , _center.z + 10 + _yDisplacement);
             GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
-            Unit civil = gob.GetComponent<Unit>();
-            civil.role = Unit.Roles.WANDERING;
+
+            lock (syncLock)
+            {
+                pendingWanderers.Add(gob);
+            }
 
             totalUnits++;
-            fire(Actions.CREATE_UNIT, civil);
             // TODO method to modify unit coordinates to avoid unit overlap
         }
   
@@ -343,11 +351,7 @@ public class Resource : Building<Resource.Actions>
         _yDisplacement = 0;
         _info = Info.get.of(race, type);
         totalUnits = 0;
-        _unitRotation = transform.rotation;
-
-        // new resource building has 1 civilian when created
-        createCivilian(); 
-         
+        _unitRotation = transform.rotation;         
         
         // Call Building start
         base.Start();
@@ -362,11 +366,38 @@ public class Resource : Building<Resource.Actions>
     override public void Update()
     {
         base.Update();
+        
+        lock (syncLock)
+        {
+            foreach (GameObject gob in pendingProducers)
+            {
+                Unit civil = gob.GetComponent<Unit>();
+                civil.role = Unit.Roles.PRODUCING;
+                fire(Actions.CREATE_UNIT, civil);
+            }
+
+            foreach (GameObject gob in pendingWanderers)
+            {
+                Unit civil = gob.GetComponent<Unit>();
+                civil.role = Unit.Roles.WANDERING;
+                fire(Actions.CREATE_UNIT, civil);
+            }
+        }
+
         if (Time.time > _nextUpdate)
         {
             _nextUpdate = Time.time + info.resourceAttributes.updateInterval;  
             collect();
             produce();            
+        }
+    }
+
+    public void LateUpdate()
+    {
+        if (!hasCreatedCivil)
+        {
+            hasCreatedCivil = true;
+            createCivilian();
         }
     }
 }

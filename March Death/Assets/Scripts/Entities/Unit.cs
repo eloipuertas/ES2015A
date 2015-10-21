@@ -117,7 +117,6 @@ public class Unit : GameEntity<Unit.Actions>
     /// <param name="unit"></param>
     public bool attackTarget<A>(GameEntity<A> entity) where A : struct, IConvertible
     {
-        Debug.Log(entity);
         // Note: Cast is redundant but avoids warning
         if (_target != (IGameEntity)entity)
         {
@@ -285,7 +284,6 @@ public class Unit : GameEntity<Unit.Actions>
                 // If distance is lower than 0.5, stop movement
                 if (followingTarget && Vector3.Distance(transform.position, destination) <= ATTACK_RANGE)
                 {
-                    Debug.Log("ATTACKING!");
                     setStatus(EntityStatus.ATTACKING);
                 }
 
