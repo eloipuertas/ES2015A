@@ -16,11 +16,11 @@ namespace Assets.Scripts.AI.Agents
         public override void controlUnits(List<Unit> units)
         {
             Vector3 Squadpos = Vector3.zero;
-            if (ai.Army.Count > 0)
+            if (units.Count > 0)
             {
                 //We assume our squad is mostly together 
                 //TODO: Stop assuming members of the same squad are close
-                Squadpos = ai.Army[0].transform.position;
+                Squadpos = units[0].transform.position;
             }
             if (ai.EnemyUnits.Count > 0)
             {
@@ -39,7 +39,7 @@ namespace Assets.Scripts.AI.Agents
                     }
                 }
 
-                foreach(Unit u in ai.Army)
+                foreach(Unit u in units)
                     if (u.status != EntityStatus.DEAD && !u.attackTarget(bTar))
                         u.moveTo(bTar.transform.position);
             }
@@ -72,6 +72,8 @@ namespace Assets.Scripts.AI.Agents
                     return Mathf.RoundToInt(nval * 8);
                 }
             }
+
+            Debug.Log("Attack Agent Heuristic: " + Mathf.RoundToInt(val * 8));               
             return Mathf.RoundToInt(val*8);
         }
     }

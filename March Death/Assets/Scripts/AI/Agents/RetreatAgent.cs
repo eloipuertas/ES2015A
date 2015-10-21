@@ -11,12 +11,16 @@ namespace Assets.Scripts.AI.Agents
     {
 
         private const float HERO_HEALTH_TOLERANCE_BEFORE_RETREAT = 40f;
+        private const float HERO_MIN_DISTANCE_WITH_ENEMIES_WHERE_IN_DANGER = 200f;
         private const float AI_MULTIPLIER_FACTOR = 8f;
-        private const int DEFCON1 = 10000;
-        private const int DEFCON2 = 1000;
-        private const int DEFCON3 = 100;
-        private const int DEFCON4 = 10;
-        private const int DEFCON5 = 1;
+
+        private const int DEFCON1 = 100000;
+        private const int DEFCON2 = 10000;
+        private const int DEFCON3 = 1000;
+        private const int DEFCON4 = 100;
+        private const int DEFCON5 = 10;
+
+        Unit hero;
 
         float valOfCitizen;
         AttackAgent attackAgent;
@@ -35,20 +39,21 @@ namespace Assets.Scripts.AI.Agents
             ownSquadBoundingBox = new Rect();
             isHeroInDanger = false;
             minDistanceBetweenHeroAndNearestEnemy = 0f;
+
+            //Find our hero
+            foreach (Unit u in ai.Army)
+            {
+                if (u.type == Storage.UnitTypes.HERO)
+                {
+                    hero = u;
+                }
+            }
+
         }
 
         public override void controlUnits(List<Unit> units)
         {
 
-            /*
-                TODO: 
-                1 - Mirar on estan els enemics (Done)
-                2 - Mirar on estem nosaltres (Done)
-                3 - Intentar entendre com puc estar protegit (m....)
-                4 - Si l'heroi s'esta morint intentar pasar l'atack agent (intentant estar aprop del heroi)
-                i l'enemic (tot retirant-nos cap a la base).
-                5 - Si l'heroi no s'esta morint intentar resguardar-me una mica enrrere.
-            */
             isHeroInDanger = false;
 
             // Mirar on estan els enemics
@@ -75,11 +80,12 @@ namespace Assets.Scripts.AI.Agents
                             u.moveTo(safeArea);
                             isHeroInDanger = true;
                         }
+                        else
+                        {
+                            squadToAtackManager.Add(u);
+                        }
                     }
-                    else
-                    {
-                        squadToAtackManager.Add(u);
-                    }
+
                 }
                 
                 if(isHeroInDanger) attackAgent.controlUnits(squadToAtackManager);
@@ -91,15 +97,29 @@ namespace Assets.Scripts.AI.Agents
         {
             if (ai.EnemyUnits.Count == 0)
                 return 0;
+            
+            minDistanceBetweenHeroAndNearestEnemy = 0;
+            
+            //Calculate the min distance between enemies and our hero
+
+            foreach (Unit u in ai.EnemyUnits)
+            {
+                float distance = Vector3.Distance(u.transform.position, hero.transform.position);
+                if (distance < minDistanceBetweenHeroAndNearestEnemy)
+                    minDistanceBetweenHeroAndNearestEnemy = distance;
+            } 
 
             float val = 0;
 
+            //Heuristic calculus
             foreach (Unit u in ai.Army) {
-                if (u.type == Storage.UnitTypes.HERO && u.healthPercentage < HERO_HEALTH_TOLERANCE_BEFORE_RETREAT)
+                if (u.type == Storage.UnitTypes.HERO && u.healthPercentage < HERO_HEALTH_TOLERANCE_BEFORE_RETREAT &&
+                    minDistanceBetweenHeroAndNearestEnemy < HERO_MIN_DISTANCE_WITH_ENEMIES_WHERE_IN_DANGER)
                 {
                     val += DEFCON1;
                 }
             }
+
             return Mathf.RoundToInt(val * AI_MULTIPLIER_FACTOR);
         }
 
@@ -134,7 +154,8 @@ namespace Assets.Scripts.AI.Agents
             Vector2 enemySquadCenter = enemySquadBoundingBox.center;
             Vector2 ownSquadCenter = ownSquadBoundingBox.center;
             Vector2 safePointxzDirection = enemySquadCenter - ownSquadCenter;
-            safeArea = new Vector3(ownSquadCenter.x - safePointxzDirection.x * 30, ai.Army[0].transform.position.y, ownSquadCenter.y - safePointxzDirection.y * 10);
+            safeArea = new Vector3(780.6606f, 80.52f, 910.3286f);
+            //safeArea = new Vector3(ownSquadCenter.x - safePointxzDirection.x * 30, ai.Army[0].transform.position.y, ownSquadCenter.y - safePointxzDirection.y * 10);
 
         }
     }
