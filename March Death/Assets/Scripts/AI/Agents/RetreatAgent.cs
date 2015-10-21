@@ -152,7 +152,7 @@ namespace Assets.Scripts.AI.Agents
             Vector2 enemySquadCenter = enemySquadBoundingBox.center;
             Vector2 ownSquadCenter = ownSquadBoundingBox.center;
             Vector2 safePointxzDirection = enemySquadCenter - ownSquadCenter;
-            safeArea = new Vector3(780.6606f, 80.52f, 910.3286f);
+            safeArea = ai.rootBasePosition;
             //safeArea = new Vector3(ownSquadCenter.x - safePointxzDirection.x * 30, ai.Army[0].transform.position.y, ownSquadCenter.y - safePointxzDirection.y * 10);
 
         }
