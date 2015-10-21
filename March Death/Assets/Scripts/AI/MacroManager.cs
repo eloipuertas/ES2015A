@@ -24,19 +24,33 @@ namespace Assets.Scripts.AI
         public MacroManager(AIController ai)
         {
             this.ai = ai;
+            buildingPref = new List<BuildingTypes>() { BuildingTypes.FARM, BuildingTypes.MINE, BuildingTypes.SAWMILL };
+            UnitPref = new List<UnitTypes>() {UnitTypes.CIVIL};
         }
         /// <summary>
         /// Called every few seconds, plans ahead and makes lists with what it wants
         /// </summary>
         public void MacroHigh()
         {
+            foreach (Resource r in ai.OwnBuildings)
+                if (r.harvestUnits == 10) //TODO ask for the actual max
+                    buildingPref.Add(r.type);
         }
         /// <summary>
         /// Called fast enough, acomplishes what the macroHigh asks for
         /// </summary>
         public void MacroLow()
         {
-
+            if (buildingPref.Count > 0) //TODO and has resources
+            {
+                ai.CreateBuilding(buildingPref[0]);
+                buildingPref.RemoveAt(0);
+            }
+            foreach(Resource r in ai.OwnBuildings)
+            {
+                if (r.harvestUnits < 10)
+                    r.createCivilian();
+            }
         }
         /// <summary>
         /// The micro is asking how many civils the army can spend (for exploring or defending)
