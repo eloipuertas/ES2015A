@@ -784,8 +784,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: caa19c7f960625f4b83094529589a1c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRevealer: 0
-  Range: 0
+  IsRevealer: 1
+  Range: 40
 --- !u!114 &11486080
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -835,6 +835,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: type
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Range
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: IsRevealer
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
