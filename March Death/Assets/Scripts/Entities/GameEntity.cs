@@ -123,10 +123,16 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
             ((BuildingAbility)_accumulatedModifier).woundsModifier =
                 addOrSubs * ability.info<BuildingAbility>().woundsModifier;
         }
-        else if (info.isResource)
-        {
+    }
 
-        }
+    public UnityEngine.Transform getTransform()
+    {
+        return transform;
+    }
+
+    public UnityEngine.GameObject getGameObject()
+    {
+        return gameObject;
     }
 
     protected List<Ability> _abilities = new List<Ability>();
@@ -285,6 +291,9 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     protected abstract void onReceiveDamage();
     protected abstract void onFatalWounds();
 
+    public abstract IKeyGetter registerFatalWounds(Action<System.Object> func);
+    public abstract IKeyGetter unregisterFatalWounds(Action<System.Object> func);
+
     /// <summary>
     /// Automatically calculates if an attack will hit, and in case it
     /// does it updates the current state.
@@ -313,6 +322,15 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
             _status = info.isUnit ? EntityStatus.DEAD : EntityStatus.DESTROYED;
             onFatalWounds();
         }
+
+        // If we are a unit and doing nothing, attack back
+        doIfUnit(unit =>
+        {
+            if (unit.status == EntityStatus.IDLE)
+            {
+                unit.attackTarget(from);
+            }
+        });
     }
 
     public void doIfUnit(Action<Unit> callIfTrue)

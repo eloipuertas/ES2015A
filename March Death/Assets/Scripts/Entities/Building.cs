@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 using Storage;
-
+using Utils;
 
 /// <summary>
 /// Building base class. Extends actor (which in turn extends MonoBehaviour) to
@@ -19,12 +19,16 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     public BuildingTypes type = BuildingTypes.STRONGHOLD;
     public override E getType<E>() { return (E)Convert.ChangeType(type, typeof(E)); }
 
+    /// Precach some actions
+    public T DAMAGED;
+    public T DESTROYED;
+
     /// <summary>
     /// When a wound is received, this is called
     /// </summary>
     protected override void onReceiveDamage()
     {
-        fire((T) Enum.Parse(typeof(T), "DAMAGED", true));
+        fire(DAMAGED);
     }
 
     /// <summary>
@@ -32,18 +36,29 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     /// </summary>
     protected override void onFatalWounds()
     {
+        fire(DESTROYED);
+    }
 
-        fire((T) Enum.Parse(typeof(T), "DESTROYED", true));
+    public override IKeyGetter registerFatalWounds(Action<System.Object> func)
+    {
+        return register(DESTROYED, func);
+    }
+
+    public override IKeyGetter unregisterFatalWounds(Action<System.Object> func)
+    {
+        return unregister(DESTROYED, func);
     }
 
     /// <summary>
     /// When destroyed, it's called
     /// </summary>
-    public void OnDestroy() 
+    public override void OnDestroy() 
     {
         ConstructionGrid grid = GameObject.Find("GameController").GetComponent<ConstructionGrid>();
         Vector3 disc_pos = grid.discretizeMapCoords(gameObject.transform.position);
         grid.liberatePosition(disc_pos);
+
+        base.OnDestroy();
     }
 
     /// <summary>
@@ -51,6 +66,9 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     /// </summary>
     public override void Start()
     {
+        DAMAGED = (T)Enum.Parse(typeof(T), "DAMAGED", true);
+        DESTROYED = (T)Enum.Parse(typeof(T), "DESTROYED", true);
+
         // Call GameEntity start
         base.Start();
     }
