@@ -642,6 +642,7 @@ GameObject:
   - 114: {fileID: 11494356}
   - 114: {fileID: 11453012}
   - 114: {fileID: 11451072}
+  - 114: {fileID: 11498974}
   m_Layer: 0
   m_Name: elf_hero
   m_TagString: Untagged
@@ -2802,6 +2803,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   race: 1
   type: 1
+--- !u!114 &11498974
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 147808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed8fedea892f030418970e7ce2a2bc2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!137 &13747566
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
