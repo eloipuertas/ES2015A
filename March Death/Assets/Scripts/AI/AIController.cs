@@ -31,8 +31,8 @@ namespace Assets.Scripts.AI
         /// </summary>
         public Dictionary<UnitTypes,int> UnitsFound { get; set; }
 
-        public List<Unit> Army;
-        //public List<Unit> Army { get; set; }
+        Vector3 buildPosition;
+        public List<Unit> Army { get; set; }
         public List<Unit> Workers { get; set; }
 
         public override void Start()
@@ -50,13 +50,15 @@ namespace Assets.Scripts.AI
             Micro = new MicroManager(this);
             EnemyUnits = new List<Unit>();
             EnemyBuildings = new List<IGameEntity>();
+            OwnBuildings = new List<IGameEntity>();
             modules = new List<AIModule>();
-            //Army = new List<Unit>();
+            Army = new List<Unit>();
             Workers = new List<Unit>();
             modules.Add(new AIModule(Macro.MacroHigh, 30f));
-            modules.Add(new AIModule(Macro.MacroLow, 1f));
+            modules.Add(new AIModule(Macro.MacroLow, 5f));
             modules.Add(new AIModule(Micro.Micro, 1f));
             timer = 0;
+            buildPosition = new Vector3(620, 80, 858);
 
             ActorSelector selector = new ActorSelector()
             {
@@ -90,6 +92,35 @@ namespace Assets.Scripts.AI
                 EnemyUnits.Remove((Unit)g);
             else if (g.info.isBuilding)
                 EnemyBuildings.Remove(g);
+        }
+        public void CreateBuilding(BuildingTypes btype)
+        {
+            GameObject g = Info.get.createBuilding(Races.ELVES, btype, buildPosition, Quaternion.Euler(0,0,0));
+            buildPosition += new Vector3(5, 0, 0);
+            Resource build = (Resource)g.GetComponent<IGameEntity>();
+            build.register(Resource.Actions.CREATE_UNIT, OnCivilCreated);
+            build.register(Resource.Actions.DESTROYED, OnBuildingDestroyed);
+        }
+        void OnCivilCreated(System.Object obj)
+        {
+            Unit u = (Unit)obj;
+            Workers.Add(u);
+            u.register(Unit.Actions.DIED, OnUnitDead);
+
+        }
+        void OnBuildingDestroyed(System.Object obj)
+        {
+            GameObject g = (GameObject)obj;
+            Resource res = g.GetComponent<Resource>();
+            OwnBuildings.Remove(res);
+        }
+        void OnUnitDead(System.Object obj)
+        {
+            Unit u = (Unit)obj;
+            if(Workers.Contains(u))
+                Workers.Remove(u);
+            if (Army.Contains(u))
+                Army.Remove(u);
         }
     }
     struct AIModule

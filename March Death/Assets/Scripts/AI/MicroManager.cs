@@ -25,7 +25,9 @@ namespace Assets.Scripts.AI
             agents = new List<BaseAgent>();
             this.ai = ai;
             agents.Add(new ExplorerAgent(ai));
-            agents.Add(new AttackAgent(ai));
+            AttackAgent aA = new AttackAgent(ai);
+            agents.Add(aA);
+            agents.Add(new RetreatAgent(ai, aA));
         }
         /// <summary>
         /// Called pretty fast, it's just like Update()
