@@ -20,8 +20,8 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     public override E getType<E>() { return (E)Convert.ChangeType(type, typeof(E)); }
 
     /// Precach some actions
-    public T DAMAGED;
-    public T DESTROYED;
+    public T DAMAGED { get; set; }
+    public T DESTROYED { get; set; }
 
     /// <summary>
     /// When a wound is received, this is called
@@ -54,7 +54,7 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     /// </summary>
     public override void OnDestroy() 
     {
-        ConstructionGrid grid = GameObject.Find("GameController").GetComponent<ConstructionGrid>();
+        ConstructionGrid grid = GameObject.FindGameObjectWithTag("GameController").GetComponent<ConstructionGrid>();
         Vector3 disc_pos = grid.discretizeMapCoords(gameObject.transform.position);
         grid.liberatePosition(disc_pos);
 

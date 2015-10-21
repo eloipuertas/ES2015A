@@ -9,12 +9,12 @@ public enum EntityStatus
     BUILDING_PHASE_1 = 0,
     BUILDING_PHASE_2 = 1,
     BUILDING_PHASE_3 = 2,
-    IDLE = 4,
-    MOVING = 5,
-    ATTACKING = 6,
-    DEAD = 7,
-    DESTROYED = 8,
-    WORKING = 9
+    IDLE = 3,
+    MOVING = 4,
+    ATTACKING = 5,
+    DEAD = 6,
+    DESTROYED = 7,
+    WORKING = 8
 };
 
 public interface IGameEntity : IBaseActor

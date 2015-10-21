@@ -31,7 +31,10 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
     /// </summary>
     public bool isRevealed { get; set; }
     public bool IsOwnedByPlayer { get; set; }
+    public bool IsRevealed { get { return isRevealed; } }
+
     bool first;
+
     public Rect Bounds
     {
         get

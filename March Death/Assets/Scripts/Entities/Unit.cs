@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
@@ -226,12 +226,17 @@ public class Unit : GameEntity<Unit.Actions>
             // Food is always consumed
             float foodConsumed = info.unitAttributes.foodConsumption * resourcesElapsed;
             float goldConsumed = info.unitAttributes.goldConsumption * resourcesElapsed;
+            float goldProduced = 0;
 
             if (info.isCivil && role == Roles.PRODUCING)
             {
-                float goldProduced = info.unitAttributes.goldProduction * resourcesElapsed;
+                goldProduced = info.unitAttributes.goldProduction * resourcesElapsed;
                 goldConsumed = 0;
             }
+
+            BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.GOLD, goldProduced);
+            BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.GOLD, goldConsumed);
+            BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.FOOD, foodConsumed);
         }
 
         switch (status)

@@ -25,6 +25,11 @@ public class CameraController : MonoBehaviour
     private const float MAX_ACCELERATION = 200f;
 
     private Vector3 cameraOffset;
+    public Vector3 getCameraOffset {
+        get {
+            return cameraOffset;
+        }
+    }
     private Vector3 lastLookedPoint;
     private GameObject followingGameObject;
     private GameObject cameraContainer;
@@ -47,6 +52,7 @@ public class CameraController : MonoBehaviour
 
     private MapBounds map1bounds;
 
+    
 
     public float defaultLerpTime
     {

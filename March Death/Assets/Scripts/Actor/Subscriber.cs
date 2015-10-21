@@ -23,7 +23,7 @@ namespace Utils
 
             return _selectors[action][func];
         }
-
+        
         private SelectorStore()
         {
             if (!typeof(T).IsEnum)
@@ -39,7 +39,7 @@ namespace Utils
     }
 
     public sealed class Subscriber<T, S> : Singleton<Subscriber<T, S>> where T : struct, IConvertible where S : class
-    {        
+    {
         private Dictionary<T, List<Action<Object>>> callbacks = new Dictionary<T, List<Action<Object>>>();
 
         private Subscriber()
@@ -97,7 +97,7 @@ namespace Utils
             {
                 foreach (Action<Object> action in entry.Value.ToList())
                 {
-                    if (SelectorStore<T>.get._selectors[entry.Key][action].registerCondition(actor.gameObject))
+                    if (SelectorStore<T>.get.Selector(entry.Key, action).registerCondition(actor.gameObject))
                     {
                         actor.register(entry.Key, action);
                     }

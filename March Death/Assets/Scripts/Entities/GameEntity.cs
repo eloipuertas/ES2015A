@@ -1,4 +1,4 @@
-﻿#define DISABLE_ANIMATOR
+﻿//#define DISABLE_ANIMATOR
 
 using System;
 using System.Reflection;

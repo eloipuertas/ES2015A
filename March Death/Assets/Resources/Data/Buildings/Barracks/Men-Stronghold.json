@@ -1,4 +1,4 @@
-{
+	{
     "race": "MEN",
     "type": "STRONGHOLD",
 
@@ -15,19 +15,21 @@
         "metal": 100,
         "food": 0
     },
-
-    "abilities":[
-        {
-            "name": "CreateMine"
-        },
-        {
-            "name": "CreateSawmill"
-        },
-        {
-            "name": "CreateFarm"
-        },
+	
+	"abilities":[
+		{
+			"name":"Create_Farm"
+		},
+		
+		{
+			"name":"Create_Mine"
+		},
+		
+		{
+			"name":"Create_Sawmill"
+		},
         {
             "name": "Sell"
         }
-    ]
+	]
 }
