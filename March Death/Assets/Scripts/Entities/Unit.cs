@@ -117,23 +117,24 @@ public class Unit : GameEntity<Unit.Actions>
     /// <param name="unit"></param>
     public bool attackTarget<A>(GameEntity<A> entity) where A : struct, IConvertible
     {
-        if (Vector3.Distance(entity.transform.position, transform.position) <= ATTACK_RANGE)
+        Debug.Log(entity);
+        // Note: Cast is redundant but avoids warning
+        if (_target != (IGameEntity)entity)
         {
-            // Note: Cast is redundant but avoids warning
-            if (_target != (IGameEntity)entity)
-            {
-                _auto += entity.registerFatalWounds(onTargetDied);
-                _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
-                _target = entity;
-                setStatus(EntityStatus.ATTACKING);
-            }
+            _auto += entity.registerFatalWounds(onTargetDied);
+            _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
+            _target = entity;
 
-            return true;
-        }
-        else
-        {
-            followingTarget = true;
-            setStatus(EntityStatus.MOVING);
+            if (Vector3.Distance(entity.transform.position, transform.position) <= ATTACK_RANGE)
+            {
+                setStatus(EntityStatus.ATTACKING);
+                return true;
+            }
+            else
+            {
+                followingTarget = true;
+                setStatus(EntityStatus.MOVING);
+            }
         }
 
         return false;
@@ -267,27 +268,26 @@ public class Unit : GameEntity<Unit.Actions>
             case EntityStatus.MOVING:
                 // TODO: Steps on the last sector are smoothened due to distance being small
                 // Althought it's an unintended behaviour, it may be interesating to leave it as is
-                Vector3 origin = transform.position;
+                Vector3 destination = _movePoint;
 
                 if (followingTarget)
                 {
-                    origin = _target.getTransform().position;
+                    destination = _target.getTransform().position;
                 }
 
-                transform.position = Vector3.MoveTowards(transform.position, _movePoint, Time.fixedDeltaTime * info.unitAttributes.movementRate);
+                transform.position = Vector3.MoveTowards(transform.position, destination, Time.fixedDeltaTime * info.unitAttributes.movementRate);
 
                 // If distance is lower than 0.5, stop movement
+                if (followingTarget && Vector3.Distance(transform.position, destination) <= ATTACK_RANGE)
+                {
+                    Debug.Log("ATTACKING!");
+                    setStatus(EntityStatus.ATTACKING);
+                }
+
                 if (Vector3.Distance(transform.position, _movePoint) <= 0.5f)
                 {
-                    if (followingTarget)
-                    {
-                        setStatus(EntityStatus.ATTACKING);
-                    }
-                    else
-                    {
-                        setStatus(EntityStatus.IDLE);
-                        fire(Actions.MOVEMENT_END);
-                    }
+                    setStatus(EntityStatus.IDLE);
+                    fire(Actions.MOVEMENT_END);
                 }
                 break;
         }
