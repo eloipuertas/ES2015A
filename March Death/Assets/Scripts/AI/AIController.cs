@@ -41,7 +41,7 @@ namespace Assets.Scripts.AI
         {
             base.Start();
 
-            _selfRace = info.GetPlayerRace() == Races.ELVES ? Races.ELVES : Races.MEN;
+            _selfRace = info.GetPlayerRace() == Races.MEN ? Races.ELVES : Races.MEN;
 
             if (_selfRace == Races.ELVES) Army.Add(GameObject.Find("elf_hero").gameObject.GetComponent<Unit>());
             else Army.Add(GameObject.Find("MenHero").gameObject.GetComponent<Unit>());
