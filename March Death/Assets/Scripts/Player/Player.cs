@@ -3,19 +3,13 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public class Player : MonoBehaviour
+public class Player : BasePlayer
 {
     /// <summary>
     /// Information regarding the current status of the player
     /// </summary>
     private status _currently;
     public enum status {IDLE, PLACING_BUILDING, SELECTING_UNITS, SELECTED_UNTIS /*...*/}
-
-    /// <summary>
-    /// The race of the player
-    /// </summary>
-    public Storage.Races _selfRace;
-    public Storage.Races race { get { return _selfRace; } }
 
     /// <summary>
     /// Information regarding the entities of the player
@@ -33,7 +27,8 @@ public class Player : MonoBehaviour
     {   
         //request the race of the player
         _selfRace = GetComponent<GameInformation>().GetPlayerRace();
-        Debug.Log("Player is " +_selfRace);
+        _resources = new Managers.ResourcesManager();
+        _units = new Managers.UnitsManager(this);
     }
 
     // Update is called once per frame
