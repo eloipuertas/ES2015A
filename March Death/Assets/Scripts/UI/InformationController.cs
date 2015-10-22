@@ -25,8 +25,6 @@ public class InformationController : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
-
-
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
         player = GameObject.FindGameObjectWithTag("GameController").GetComponent("Player") as Player;
 

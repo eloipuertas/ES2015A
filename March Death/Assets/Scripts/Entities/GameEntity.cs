@@ -19,6 +19,11 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public Races getRace() { return race; }
     public abstract E getType<E>() where E : struct, IConvertible;
 
+    /// <summary>
+    /// Called when Start has been called
+    /// </summary>
+    public Action<GameObject> onStartDone = null;
+
     protected EntityInfo _info;
     public EntityInfo info
     {
@@ -218,9 +223,9 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         }
     }
 
-    public override void Start()
+    public override void Awake()
     {
-        base.Start();
+        base.Awake();
         setupAbilities();
 
 #if !DISABLE_ANIMATOR

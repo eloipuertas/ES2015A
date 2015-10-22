@@ -69,13 +69,13 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     /// <summary>
     /// Object initialization
     /// </summary>
-    public override void Start()
+    public override void Awake()
     {
         DAMAGED = (T)Enum.Parse(typeof(T), "DAMAGED", true);
         DESTROYED = (T)Enum.Parse(typeof(T), "DESTROYED", true);
 
         // Call GameEntity start
-        base.Start();
+        base.Awake();
 
         // Set the status
         setStatus(EntityStatus.BUILDING_PHASE_1);
