@@ -20,6 +20,9 @@ BUILD_OSX=-1
 # Create folder if it does not exist
 mkdir -p Assets
 
+# Monkey-patch ProjectSettings
+sed -i 's/displayResolutionDialog: 1/displayResolutionDialog: 0/g' March\ Death/ProjectSettings/ProjectSettings.asset
+
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then
 
     echo "Attempting to build $project for Windows"
@@ -62,7 +65,7 @@ if [ "$TRAVIS_OS_NAME" == "osx" ]; then
 
             BUILD_LINUX=$?
 
-            if [ BUILD_LINUX == 0 ]; then
+            if [ $BUILD_LINUX == 0 ]; then
 
               ln -s $BUILD_DIR/linux/$project.x86_64 $BUILD_DIR/linux/$project
 

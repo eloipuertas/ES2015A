@@ -7,8 +7,8 @@ export project="MarchWars"
 touch $(pwd)/men.out
 touch $(pwd)/elves.out
 
-$BUILD_DIR/$project -nographics --test=$(pwd)/men.out --player-race=MEN --test-time=15000 && \
-    $BUILD_DIR/$project -nographics --test=$(pwd)/elves.out --player-race=ELVES --test-time=15000
+$BUILD_DIR/$project -nographics -batchmode --test=$(pwd)/men.out --player-race=MEN --test-time=15000 && \
+    $BUILD_DIR/$project -nographics -batchmode --test=$(pwd)/elves.out --player-race=ELVES --test-time=15000
 
 MEN_ERRORS=-1
 ELVES_ERRORS=-1
