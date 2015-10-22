@@ -77,7 +77,6 @@ namespace Assets.Scripts.AI
         }
         void Update()
         {
-            Debug.Log(_selfRace);
             for (int i = 0; i < modules.Count; i++)
             {
                 timers[i] += Time.deltaTime;

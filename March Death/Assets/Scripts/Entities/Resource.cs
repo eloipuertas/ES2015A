@@ -219,10 +219,9 @@ public class Resource : Building<Resource.Actions>
             // Method createUnit form Info returns GameObject Instance;
             GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
 
-            lock (syncLock)
-            {
-                pendingProducers.Add(gob);
-            }
+            Unit civil = gob.GetComponent<Unit>();
+            civil.role = Unit.Roles.PRODUCING;
+            fire(Actions.CREATE_UNIT, civil);
 
             totalUnits++;
             harvestUnits++;
@@ -236,10 +235,9 @@ public class Resource : Building<Resource.Actions>
             _unitPosition.Set(_center.x + 10 + _xDisplacement, _center.y  , _center.z + 10 + _yDisplacement);
             GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
 
-            lock (syncLock)
-            {
-                pendingWanderers.Add(gob);
-            }
+            Unit civil = gob.GetComponent<Unit>();
+            civil.role = Unit.Roles.WANDERING;
+            fire(Actions.CREATE_UNIT, civil);
 
             totalUnits++;
             // TODO method to modify unit coordinates to avoid unit overlap
@@ -341,7 +339,7 @@ public class Resource : Building<Resource.Actions>
     /// <summary>
     /// Object initialization
     /// </summary>
-    override public void Start()
+    override public void Awake()
     {       
         _nextUpdate = 0;
         _stored = 0;
@@ -354,7 +352,12 @@ public class Resource : Building<Resource.Actions>
         _unitRotation = transform.rotation;         
         
         // Call Building start
-        base.Start();
+        base.Awake();
+    }
+
+    public virtual void Start()
+    {
+        createCivilian();
     }
 
 
@@ -366,38 +369,12 @@ public class Resource : Building<Resource.Actions>
     override public void Update()
     {
         base.Update();
-        
-        lock (syncLock)
-        {
-            foreach (GameObject gob in pendingProducers)
-            {
-                Unit civil = gob.GetComponent<Unit>();
-                civil.role = Unit.Roles.PRODUCING;
-                fire(Actions.CREATE_UNIT, civil);
-            }
-
-            foreach (GameObject gob in pendingWanderers)
-            {
-                Unit civil = gob.GetComponent<Unit>();
-                civil.role = Unit.Roles.WANDERING;
-                fire(Actions.CREATE_UNIT, civil);
-            }
-        }
 
         if (Time.time > _nextUpdate)
         {
             _nextUpdate = Time.time + info.resourceAttributes.updateInterval;  
             collect();
             produce();            
-        }
-    }
-
-    public void LateUpdate()
-    {
-        if (!hasCreatedCivil)
-        {
-            hasCreatedCivil = true;
-            createCivilian();
         }
     }
 }

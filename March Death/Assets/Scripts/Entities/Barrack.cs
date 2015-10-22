@@ -11,11 +11,11 @@ public class Barrack : Building<Barrack.Actions>
     /// <summary>
     /// Object initialization
     /// </summary>
-    public override void Start()
+    public override void Awake()
     {
         _info = Info.get.of(race, type);
 
-        // Call GameEntity start
-        base.Start();
+        // Call GameEntity Awake
+        base.Awake();
     }
 }

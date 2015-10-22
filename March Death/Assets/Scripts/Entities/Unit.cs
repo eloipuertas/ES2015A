@@ -179,13 +179,13 @@ public class Unit : GameEntity<Unit.Actions>
     /// <summary>
     /// Object initialization
     /// </summary>
-    public override void Start()
+    public override void Awake()
     {
         _info = Info.get.of(race, type);
         _auto = this;
 
         // Call GameEntity start
-        base.Start();
+        base.Awake();
 
         // Set the status
         setStatus(EntityStatus.IDLE);

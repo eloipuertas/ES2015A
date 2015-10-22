@@ -25,8 +25,6 @@ public class InformationController : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
-
-
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
         player = GameObject.FindGameObjectWithTag("GameController").GetComponent("Player") as Player;
 
@@ -34,7 +32,13 @@ public class InformationController : MonoBehaviour {
         //Register to selectable actions
         Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.SELECTED, onUnitSelected, new ActorSelector()
         {
-            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
+            registerCondition = (checkRace) => {
+                Debug.Log(checkRace);
+                Debug.Log(checkRace.GetComponent<IGameEntity>());
+                Debug.Log(checkRace.GetComponent<IGameEntity>().info);
+                Debug.Log(checkRace.GetComponent<IGameEntity>().info.race);
+                return checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace();
+                }
         });
 
         Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.DESELECTED, onUnitDeselected, new ActorSelector()
