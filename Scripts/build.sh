@@ -31,7 +31,7 @@ if [ "$TRAVIS_OS_NAME" == "osx" ]; then
       -nographics \
       -silent-crashes \
       -logFile $(pwd)/unity.log \
-      -projectPath $(pwd) \
+      -projectPath "$(pwd)/March Death" \
       -buildWindowsPlayer "$BUILD_DIR/windows/$project" \
       -quit
 
@@ -45,7 +45,7 @@ if [ "$TRAVIS_OS_NAME" == "osx" ]; then
           -nographics \
           -silent-crashes \
           -logFile $(pwd)/unity.log \
-          -projectPath $(pwd) \
+          -projectPath "$(pwd)/March Death" \
           -buildOSXUniversalPlayer "$BUILD_DIR/osx/$project" \
           -quit
 
@@ -59,7 +59,7 @@ if [ "$TRAVIS_OS_NAME" == "osx" ]; then
               -nographics \
               -silent-crashes \
               -logFile $(pwd)/unity.log \
-              -projectPath $(pwd) \
+              -projectPath "$(pwd)/March Death" \
               -buildLinuxUniversalPlayer "$BUILD_DIR/linux/$project" \
               -quit
 
@@ -86,13 +86,15 @@ else
       -nographics \
       -silent-crashes \
       -logFile $(pwd)/unity.log \
-      -projectPath $(pwd) \
+      -projectPath "$(pwd)/March Death" \
       -buildLinuxUniversalPlayer "$BUILD_DIR/linux/$project" \
       -quit
 
     BUILD_LINUX=$?
 
     if [ $BUILD_LINUX == 0 ]; then
+
+        ln -s $BUILD_DIR/linux/$project.x86_64 $BUILD_DIR/linux/$project
 
         echo -e "\n\n-------------------------\n\n"
         echo "Attempting to build $project for Windows"
@@ -101,8 +103,8 @@ else
           -nographics \
           -silent-crashes \
           -logFile $(pwd)/unity.log \
-          -projectPath $(pwd) \
-          -buildWindowsPlayer "$BUILD_DIR/windows/$project.exe" \
+          -projectPath "$(pwd)/March Death" \
+          -buildWindowsPlayer "$BUILD_DIR/windows/$project" \
           -quit
 
         BUILD_WIN=$?
