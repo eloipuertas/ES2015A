@@ -79,7 +79,7 @@ namespace Assets.Scripts.AI
 
             if (AI_DEBUG_ENABLED)
             {
-                gameObject.AddComponent<AIDebugSystem>();
+                AIDebugSystem.CreateComponent(gameObject, this);
             }
 
         }
