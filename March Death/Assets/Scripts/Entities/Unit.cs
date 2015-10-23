@@ -18,11 +18,6 @@ public class Unit : GameEntity<Unit.Actions>
     public Unit() { }
 
     /// <summary>
-    /// Max. euclidean distance to the target
-    /// </summary>
-    const float ATTACK_RANGE = 1.5f;
-
-    /// <summary>
     /// Interval between resources update in miliseconds
     /// </summary>
     const int RESOURCES_UPDATE_INTERVAL = 5000;
@@ -124,7 +119,7 @@ public class Unit : GameEntity<Unit.Actions>
             _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
             _target = entity;
 
-            if (Vector3.Distance(entity.transform.position, transform.position) <= ATTACK_RANGE)
+            if (Vector3.Distance(entity.transform.position, transform.position) <= info.unitAttributes.attackRange)
             {
                 setStatus(EntityStatus.ATTACKING);
                 return true;
@@ -154,6 +149,15 @@ public class Unit : GameEntity<Unit.Actions>
         setStatus(EntityStatus.IDLE);
     }
 
+    public void faceTo(Vector3 point)
+    {
+        // TODO: SMOOTH TURNING
+        Quaternion targetRotation = Quaternion.LookRotation(point - transform.position);
+        targetRotation.x = 0;   // lock rotation on x-axis
+        targetRotation.z = 0;   // lock rotation on z-axis
+        transform.rotation = targetRotation;
+    }
+
     /// <summary>
     /// Starts moving the unit towards a point on a terrain
     /// </summary>
@@ -161,15 +165,7 @@ public class Unit : GameEntity<Unit.Actions>
     public void moveTo(Vector3 movePoint)
     {
         _movePoint = movePoint;
-
-        float distance = Vector3.Distance(movePoint, transform.position);
-        if (distance > 1.50f)
-        {
-            // TODO: SMOOTH TURNING
-            Quaternion targetRotation = Quaternion.LookRotation(movePoint - transform.position);
-            targetRotation.x = 0;   // lock rotation on x-axis
-            transform.rotation = targetRotation;
-        }
+        faceTo(movePoint);
 
         followingTarget = false;
         setStatus(EntityStatus.MOVING);
@@ -244,7 +240,7 @@ public class Unit : GameEntity<Unit.Actions>
                 if (_target != null)
                 {
                     // Check if we are still in range
-                    if (Vector3.Distance(_target.getTransform().position, transform.position) > ATTACK_RANGE)
+                    if (Vector3.Distance(_target.getTransform().position, transform.position) > info.unitAttributes.attackRange)
                     {
                         followingTarget = true;
                         setStatus(EntityStatus.MOVING);
@@ -277,12 +273,13 @@ public class Unit : GameEntity<Unit.Actions>
                 if (followingTarget)
                 {
                     destination = _target.getTransform().position;
+                    faceTo(destination);
                 }
 
                 transform.position = Vector3.MoveTowards(transform.position, destination, Time.fixedDeltaTime * info.unitAttributes.movementRate);
 
                 // If distance is lower than 0.5, stop movement
-                if (followingTarget && Vector3.Distance(transform.position, destination) <= ATTACK_RANGE)
+                if (followingTarget && Vector3.Distance(transform.position, destination) <= info.unitAttributes.attackRange)
                 {
                     setStatus(EntityStatus.ATTACKING);
                 }
