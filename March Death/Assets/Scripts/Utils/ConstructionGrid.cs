@@ -7,7 +7,7 @@ public class ConstructionGrid : MonoBehaviour {
 
     private Vector2 dimensions;
     private ArrayList reservedPositions;
-    private const float DIFERENCE_OF_HEIGHTS_TOLERANCE = 0.4f;
+    private const float DIFERENCE_OF_HEIGHTS_TOLERANCE = 3f;
 
     void Start () {
         dimensions = new Vector2(5f, 5f);
