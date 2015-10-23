@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Storage
 {
-    class HitTables
+    static class HitTables
     {
         public static int[,] meleeHit = new int[,]
         {
