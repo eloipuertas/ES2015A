@@ -20,7 +20,7 @@ namespace Assets.Scripts.AI.Agents
         /// </summary>
         int[,] dirHelper = new int[8,2]{ { 0, -1 }, { -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 } };
 
-        public ExplorerAgent(AIController ai) : base(ai)
+        public ExplorerAgent(AIController ai, String name) : base(ai, name)
         {
             ActorSelector selector = new ActorSelector()
             {

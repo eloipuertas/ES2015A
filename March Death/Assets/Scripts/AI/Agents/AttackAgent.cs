@@ -9,7 +9,7 @@ namespace Assets.Scripts.AI.Agents
     public class AttackAgent : BaseAgent
     {
         float valOfCitizen;
-        public AttackAgent(AIController ai) : base(ai)
+        public AttackAgent(AIController ai, string name) : base(ai, name)
         {
             valOfCitizen = 1f;
         }

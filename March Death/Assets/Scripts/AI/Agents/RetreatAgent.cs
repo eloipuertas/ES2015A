@@ -30,7 +30,7 @@ namespace Assets.Scripts.AI.Agents
 
         bool isHeroInDanger;
 
-        public RetreatAgent(AIController ai, AttackAgent aA) : base(ai)
+        public RetreatAgent(AIController ai, AttackAgent aA, string name) : base(ai, name)
         {
             attackAgent = aA;
             enemySquadBoundingBox = new Rect();

@@ -24,10 +24,10 @@ namespace Assets.Scripts.AI
         {
             agents = new List<BaseAgent>();
             this.ai = ai;
-            agents.Add(new ExplorerAgent(ai));
-            AttackAgent aA = new AttackAgent(ai);
+            agents.Add(new ExplorerAgent(ai, "Explorer"));
+            AttackAgent aA = new AttackAgent(ai, "Atack");
             agents.Add(aA);
-            agents.Add(new RetreatAgent(ai, aA));
+            agents.Add(new RetreatAgent(ai, aA, "Retreat"));
         }
         /// <summary>
         /// Called pretty fast, it's just like Update()
@@ -48,6 +48,12 @@ namespace Assets.Scripts.AI
                         bAgent = a;
                     }
                 }
+                if(ai.aiDebug != null)
+                {
+                    ai.aiDebug.controllingAgent = bAgent.agentName;
+                    ai.aiDebug.confidence = bVal;
+                }
+
                 bAgent.controlUnits(lu);
             }
         }

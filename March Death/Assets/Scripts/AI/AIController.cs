@@ -13,10 +13,11 @@ namespace Assets.Scripts.AI
 {
     public class AIController : BasePlayer
     {
-        private const bool AI_DEBUG_ENABLED = true;
+        public const bool AI_DEBUG_ENABLED = true;
 
         public MacroManager Macro { get; set; }
         public MicroManager Micro { get; set; }
+        public AIDebugSystem aiDebug;
 
         /// <summary>
         /// Will be used to calculate the lvl of the AI
@@ -79,7 +80,7 @@ namespace Assets.Scripts.AI
 
             if (AI_DEBUG_ENABLED)
             {
-                AIDebugSystem.CreateComponent(gameObject, this);
+                aiDebug = AIDebugSystem.CreateComponent(gameObject, this);
             }
 
         }
