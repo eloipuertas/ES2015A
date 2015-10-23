@@ -161,17 +161,38 @@ public class MiniMapController : MonoBehaviour
     }
 
 
-    private Rect recalcViewport()
-    {
-		float viewPortPosX = 0.03f;
-		float viewPortPosY = 0.037f;
-
-		RectTransform mapTrans = mapContainer.GetComponent<RectTransform> ();
-		float viewPortW = mapTrans.rect.width / (float)Screen.width;
-		float viewPortH = mapTrans.rect.height / (float)Screen.height;
-
-        //Assign camera viewport
-        return new Rect(viewPortPosX, viewPortPosY, viewPortW, viewPortH);
-
-    }
+	private Rect recalcViewport()
+	{
+		GameInformation info = (GameInformation)GameObject.Find("GameInformationObject").GetComponent("GameInformation");
+		float viewPortPosX, viewPortPosY;
+		float viewPortW, viewPortH;
+		
+		switch (info.GetPlayerRace()) {
+		case Storage.Races.MEN:
+			viewPortPosX = 0.018f;
+			viewPortPosY = 0.02f; // _prev = 0.007f
+			
+			// The minimap size
+			viewPortW = (1f / (float)Screen.width) * ((float)Screen.width / 4.9701f);  // _prev = 3.9701f
+			// the height will be the ratio of the hole for the map 140/201
+			viewPortH = (1f / (float)Screen.height) * (((float)Screen.width / 3.6701f) * (140f / 201f));
+			break;
+		case Storage.Races.ELVES:
+			viewPortPosX = 0.018f;
+			viewPortPosY = 0.02f;
+			
+			// The minimap size
+			viewPortW = (1f / (float)Screen.width) * ((float)Screen.width / 5.2701f);
+			// the height will be the ratio of the hole for the map 140/201
+			viewPortH = (1f / (float)Screen.height) * (((float)Screen.width / 4.1701f) * (140f / 201f));
+			break;
+		default:
+			viewPortPosX = 0; viewPortPosY = 0;
+			viewPortW = 0; viewPortH = 0;
+			break;
+		}
+		//Assign camera viewport
+		return new Rect(viewPortPosX, viewPortPosY, viewPortW, viewPortH);
+		
+	}
 }
