@@ -13,6 +13,8 @@ namespace Assets.Scripts.AI
 {
     public class AIController : BasePlayer
     {
+        private const bool AI_DEBUG_ENABLED = true;
+
         public MacroManager Macro { get; set; }
         public MicroManager Micro { get; set; }
 
@@ -74,6 +76,12 @@ namespace Assets.Scripts.AI
             };
             Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.DISCOVERED, OnEntityFound, selector);
             Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.HIDDEN, OnEntityLost, selector);
+
+            if (AI_DEBUG_ENABLED)
+            {
+                gameObject.AddComponent<AIDebugSystem>();
+            }
+
         }
         void Update()
         {
