@@ -10,8 +10,6 @@ public class AIDebugSystem : MonoBehaviour {
     public string controllingAgent;
     public float confidence;
 
-    private GUIStyle redFont;
-
     public static AIDebugSystem CreateComponent(GameObject parent, AIController controller)
     {
         AIDebugSystem AIDSys = parent.AddComponent<AIDebugSystem>();
@@ -20,11 +18,6 @@ public class AIDebugSystem : MonoBehaviour {
         return AIDSys;
     }
     
-    void Start()
-    {
-        redFont.normal.textColor = Color.red;
-    }
-
 	void Update () {
         if (Input.GetKeyDown(KeyCode.F9))
         {
