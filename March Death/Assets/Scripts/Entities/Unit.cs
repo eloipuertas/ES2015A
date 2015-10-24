@@ -98,8 +98,12 @@ public class Unit : GameEntity<Unit.Actions>
         setStatus(EntityStatus.IDLE);
     }
 
+    /// <summary>
+    /// Callback issued when a target hides in the FOW
+    /// </summary>
     private void onTargetHidden(System.Object obj)
     {
+        // Move to last known position (ie. current position)
         moveTo(((GameObject)obj).transform.position);
     }
 
@@ -119,16 +123,28 @@ public class Unit : GameEntity<Unit.Actions>
         fire(Actions.DIED);
     }
 
+    /// <summary>
+    /// Registers for DEAD events
+    /// </summary>
+    /// <returns>Register result</returns>
     public override IKeyGetter registerFatalWounds(Action<object> func)
     {
         return register(Actions.DIED, func);
     }
 
+    /// <summary>
+    /// Unregisters of DEAD events
+    /// </summary>
+    /// <returns>Register result</returns>
     public override IKeyGetter unregisterFatalWounds(Action<object> func)
     {
         return unregister(Actions.DIED, func);
     }
 
+    /// <summary>
+    /// Calculates if this unit can do a ranged attack to its target
+    /// </summary>
+    /// <returns>True if in range, false otherwise</returns>
     public bool canDoRangedAttack()
     {
         if (!isRanged)
@@ -136,15 +152,22 @@ public class Unit : GameEntity<Unit.Actions>
             return false;
         }
 
+        // Must be within Nearest <> Furthest
         return _distanceToTarget < info.unitAttributes.rangedAttackFurthest &&
             _distanceToTarget > info.unitAttributes.rangedAttackNearest;
     }
 
+    /// <summary>
+    /// Calculates what modifiers should be applied to ranged attacks, taking
+    /// into account distance to target and (not yet) target dimensions
+    /// </summary>
+    /// <returns>RangedAbility modifier</returns>
     public override int computeRangedModifiers()
     {
         int modifier = 0;
 
-        if (_distanceToTarget > (info.unitAttributes.rangedAttackFurthest - info.unitAttributes.rangedAttackNearest) / 2)
+        // If distance is greater than half the longest range, we penalize ability by 1
+        if (_distanceToTarget > info.unitAttributes.rangedAttackFurthest / 2)
         {
             modifier -= 1;
         }
@@ -153,19 +176,34 @@ public class Unit : GameEntity<Unit.Actions>
     }
 
     /// <summary>
+    /// Update current distance (taken from transform.position) to the target
+    /// </summary>
+    private void updateDistanceToTarget()
+    {
+        _distanceToTarget = Vector3.Distance(_target.getTransform().position, transform.position);
+    }
+
+    /// <summary>
     /// Sets up our attack target, registers callback for its death and
-    /// updates our state
+    /// updates our state.
+    /// If target is in range, attaks it, otherwise starts moving towards it.
     /// </summary>
     /// <param name="unit"></param>
+    /// <returns>Returns true if target is in range, false otherwise</returns>
     public bool attackTarget<A>(GameEntity<A> entity) where A : struct, IConvertible
     {
         // Note: Cast is redundant but avoids warning
         if (_target != (IGameEntity)entity)
         {
+            // Register for DEAD/DESTROYED and HIDDEN
             _auto += entity.registerFatalWounds(onTargetDied);
             _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
             _target = entity;
 
+            // Update distance for immediate usage (ie. canDoRangedAttack)
+            updateDistanceToTarget();
+
+            // Update status and return
             setStatus(EntityStatus.ATTACKING);
             return true;
         }
@@ -180,6 +218,7 @@ public class Unit : GameEntity<Unit.Actions>
     {
         if (_target != null)
         {
+            // Unregister all events
             _auto -= _target.unregisterFatalWounds(onTargetDied);
             _auto -= _target.getGameObject().GetComponent<FOWEntity>().unregister(FOWEntity.Actions.HIDDEN, onTargetHidden);
             _target = null;
@@ -188,6 +227,11 @@ public class Unit : GameEntity<Unit.Actions>
         }
     }
 
+    /// <summary>
+    /// Faces to where the point is
+    /// </summary>
+    /// <param name="point">Point to face to</param>
+    /// <returns>Register result</returns>
     public void faceTo(Vector3 point)
     {
         // TODO: SMOOTH TURNING
@@ -237,7 +281,7 @@ public class Unit : GameEntity<Unit.Actions>
         // Avoids computing it serveral (5+ times)
         if (_target != null)
         {
-            _distanceToTarget = Vector3.Distance(_target.getTransform().position, transform.position);
+            updateDistanceToTarget();
         }
 
         // Calculate food consumption
@@ -251,19 +295,23 @@ public class Unit : GameEntity<Unit.Actions>
             float goldConsumed = info.unitAttributes.goldConsumption * resourcesElapsed;
             float goldProduced = 0;
 
+            // Civils produce gold when working and doesn't consume it
             if (info.isCivil && role == Roles.PRODUCING)
             {
                 goldProduced = info.unitAttributes.goldProduction * resourcesElapsed;
                 goldConsumed = 0;
             }
 
+            // Update this unit resources
             BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.GOLD, goldProduced);
             BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.GOLD, goldConsumed);
             BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.FOOD, foodConsumed);
         }
 
+        // Status dependant functionality
         switch (status)
         {
+            // If we are attacking and have target
             case EntityStatus.ATTACKING:
                 if (_target != null)
                 {
@@ -293,6 +341,8 @@ public class Unit : GameEntity<Unit.Actions>
         {
             case EntityStatus.MOVING:
                 // If we are already in range, start attacking
+                // Must be called before MoveTowards because it uses _distanceToTarget, which
+                // would be otherwise outdated
                 if (followingTarget && _distanceToTarget <= currentAttackRange())
                 {
                     setStatus(EntityStatus.ATTACKING);
@@ -307,6 +357,7 @@ public class Unit : GameEntity<Unit.Actions>
                     faceTo(destination);
                 }
 
+                // Move toward target destination at fixed steps
                 transform.position = Vector3.MoveTowards(transform.position, destination, Time.fixedDeltaTime * info.unitAttributes.movementRate);
 
                 // HACK: 0.5f is not proven to always work, it is still here beacause NavAgents will be used
