@@ -10,7 +10,7 @@ public class UserInput : MonoBehaviour
     private UnitsManager uManager { get { return player.units; } }
 
     //Should be better to create a constants class or structure
-    private Vector3 invalidPosition = new Vector3(-99999, -99999, -99999);
+    public Vector3 invalidPosition { get{ return new Vector3(-99999, -99999, -99999); } }
 
 	//range in which a mouse down and mouse up event will be treated as "the same location" on the map.
 	private int mouseButtonReleaseRange = 20;
@@ -38,6 +38,8 @@ public class UserInput : MonoBehaviour
 	private RaycastHit hit = new RaycastHit();
 
 	CameraController camera;
+
+    public LayerMask TerrainLayerMask;
 
     // Use this for initialization
     void Start()
@@ -259,6 +261,19 @@ public class UserInput : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit)) return hit.point;
         return this.invalidPosition;
+    }
+
+    /// <summary>
+    /// Returns the point of the terrain where the mouse hits
+    /// </summary>
+    /// <returns></returns>
+    public Vector3 FindTerrainHitPoint()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, TerrainLayerMask))
+            return hit.point;
+        else
+            return this.invalidPosition;
     }
 
 
