@@ -5,10 +5,11 @@ using Storage;
 public class Main_Game : MonoBehaviour {
 
 	private GameInformation info;
-	Transform strongholdTransform;
+	private CameraController cam;
+	private Player user;
 
-	public GameObject playerStronghold;
-    public GameObject playerHero;
+	Transform strongholdTransform;
+	GameObject playerHero;
 
 	// Use this for initialization
 	void Start () {
@@ -16,6 +17,8 @@ public class Main_Game : MonoBehaviour {
         playerHero = GameObject.Find("PlayerHero");
         if(GameObject.Find("GameInformationObject"))
 		    info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
+		user = GameObject.FindGameObjectWithTag("GameController").GetComponent("Player") as Player;
+		cam = GameObject.FindWithTag("MainCamera").GetComponent<CameraController>();
 		LoadPlayerStronghold();
         LoadPlayerUnits();
         if(info)info.LoadHUD();
@@ -23,12 +26,14 @@ public class Main_Game : MonoBehaviour {
 
 	private void LoadPlayerStronghold()
 	{
+		GameObject playerStronghold;
         if (info)
         {
-            // TODO Add stronghold reference to the player
             playerStronghold = Info.get.createBuilding(info.GetPlayerRace(),
                                                        BuildingTypes.STRONGHOLD,
                                                    strongholdTransform.position, strongholdTransform.rotation);
+			user.buildings.createBuilding(playerStronghold);
+			cam.lookGameObject(playerStronghold);
         }
 	}
 
