@@ -86,7 +86,6 @@ namespace Assets.Scripts.AI
         }
         void Update()
         {
-            Debug.Log(_selfRace);
             for (int i = 0; i < modules.Count; i++)
             {
                 timers[i] += Time.deltaTime;
@@ -138,8 +137,9 @@ namespace Assets.Scripts.AI
         }
         void OnUnitDead(System.Object obj)
         {
-            Unit u = (Unit)obj;
-            if(Workers.Contains(u))
+            GameObject g = (GameObject)obj;
+            Unit u = g.GetComponent<Unit>();
+            if (Workers.Contains(u))
                 Workers.Remove(u);
             if (Army.Contains(u))
                 Army.Remove(u);
