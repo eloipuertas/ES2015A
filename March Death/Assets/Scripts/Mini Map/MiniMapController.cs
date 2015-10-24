@@ -39,8 +39,8 @@ public class MiniMapController : MonoBehaviour
             _camera.transform.rotation = Quaternion.Euler(90f, 135f,0); 
             _camera.orthographicSize = diagonal * 0.95f; // a hack
             _camera.farClipPlane = Terrain.activeTerrain.terrainData.size.x * 1.5f;
-            _camera.clearFlags = CameraClearFlags.Color;
-            _camera.backgroundColor = Color.clear; // Set a more fancy background, black
+            _camera.clearFlags = CameraClearFlags.Depth;
+            //_camera.backgroundColor = Color.clear; // Set a more fancy background, black
         }
 
         createMarker();
