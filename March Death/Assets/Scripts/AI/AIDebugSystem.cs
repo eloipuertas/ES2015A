@@ -7,10 +7,15 @@ public class AIDebugSystem : MonoBehaviour {
     bool showInfo { get; set; }
     public Rect windowRect = new Rect(20, 20, 200, 80);
 
+    private const int WINDOW_HEIGHT_OFFSET_TOLERANCE = 20;
+
     public string controllingAgent;
     public float confidence;
-
-    private GUIStyle redFont;
+    private int nextLine = 0;
+    private int lineHeight = 15;
+    private int marginLeft = 10;
+    private int textWidth = 100;
+    private int textHeight = 20;
 
     public static AIDebugSystem CreateComponent(GameObject parent, AIController controller)
     {
@@ -20,10 +25,6 @@ public class AIDebugSystem : MonoBehaviour {
         return AIDSys;
     }
     
-    void Start()
-    {
-        redFont.normal.textColor = Color.red;
-    }
 
 	void Update () {
         if (Input.GetKeyDown(KeyCode.F9))
@@ -41,13 +42,32 @@ public class AIDebugSystem : MonoBehaviour {
 
     void DoMyWindow(int windowID)
     {
-        GUI.Label(new Rect(10, 15, 100, 20), "Choosen Agent:");
+        resetLines();
+        GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), "Choosen Agent:");
         GUI.contentColor = Color.red;
-        GUI.Label(new Rect(10, 30, 100, 20), controllingAgent);
+        GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), controllingAgent);
         GUI.contentColor = Color.white;
-        GUI.Label(new Rect(10, 45, 100, 20), "Confidence:");
+        GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), "Confidence:");
         GUI.contentColor = Color.green;
-        GUI.Label(new Rect(10, 60, 100, 20), confidence.ToString());
+        GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), confidence.ToString());
         GUI.DragWindow();
+    }
+
+    public void resetLines()
+    {
+        nextLine = 0;
+    }
+
+    public int getNextLine()
+    {
+        nextLine += lineHeight;
+
+        //We need to ensure that we have enought space int the window
+        if(nextLine + WINDOW_HEIGHT_OFFSET_TOLERANCE >= windowRect.height)
+        {
+            windowRect.height += lineHeight;
+        }
+
+        return nextLine;
     }
 }
