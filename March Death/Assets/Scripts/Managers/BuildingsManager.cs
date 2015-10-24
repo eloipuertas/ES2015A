@@ -12,7 +12,7 @@ namespace Managers
         private bool _placing = false;
         private GameObject newBuilding;
         bool move = true;
-        float yoffset = 0f;
+        float yoffset = 1f;
 
         // Use this for initialization
         void Start()
@@ -69,6 +69,8 @@ namespace Managers
                 GameObject newBuilding;
                 newBuilding = Storage.Info.get.createBuilding(race, type);
                 this.createBuilding(newBuilding);
+                PackToMoveBuilding();
+
             }
 
         }
@@ -100,7 +102,7 @@ namespace Managers
             if (!_placing)
             {
                 this.newBuilding = newBuilding;
-                newBuilding.AddComponent<CollisionDetector>();
+
                 this.newBuilding.GetComponent<Rigidbody>().detectCollisions = false;
                 //newBuilding.GetComponent<Collider>().isTrigger = true; //HACK : (hermetico) controlar colision objeto con resto
                 _placing = true;
@@ -109,17 +111,7 @@ namespace Managers
             }
         }
 
-        /// <summary>
-        /// Discretizes the location through ConstructioGrid
-        /// </summary>
-        /// <param name="location"></param>
-        /// <returns></returns>
-        private Vector3 adaptLocation(Vector3 location)
-        {
-            
-            location = grid.discretizeMapCoords(location);
-            return location;
-        }
+
 
         /// <summary>
         /// Checks if is valid locatoin through Constructiongrid
@@ -130,8 +122,7 @@ namespace Managers
         {
             bool check = false;
 
-            check = grid.isNewPositionAbleForConstrucction(location)
-                && !(newBuilding.AddComponent<CollisionDetector>().isThereCollision);
+            check = grid.isNewPositionAbleForConstrucction(location);
 
             return check;
 
@@ -140,32 +131,31 @@ namespace Managers
         /// <summary>
         /// Places the building, checking if is a suitable place
         /// </summary>
-        public void placeBuilding()
+        public bool placeBuilding()
         {
-            // 1. getPoint
-            Vector3 toLocation = inputs.FindHitPoint();
-
-            // 2. offsetPoint
-            toLocation = locationOffset(toLocation);
-
-            // 3. discretize
-            toLocation = adaptLocation(toLocation);
+            Vector3 newDestination = GetNewDestination();
+            // if is not a vaild point, the building remains quiet
+            if (newDestination == inputs.invalidPosition) return false;
 
             // alter the color if is not a valid location
-            if (checkLocation(toLocation))
+            if (checkLocation(newDestination))
             {
 
                 //TODO : (hermetico) restar recursos necesarios para crear el building
-                Destroy(newBuilding.GetComponent<CollisionDetector>());
-                grid.reservePosition(toLocation);
-                newBuilding.transform.position = toLocation;
-                this.newBuilding.GetComponent<Rigidbody>().detectCollisions = false;
+                grid.reservePosition(newDestination);
+                newBuilding.transform.position = newDestination;
                 IGameEntity destination = (IGameEntity)newBuilding.GetComponent<Unit>();
                 player.addEntityToList(destination);
-                
+                PackToPlaceBuilding();
                 // remaining operations
                 _finishPlacing();
+
+
+
+                return true;
             }
+            else
+                return false;
 
 
         }
@@ -194,24 +184,31 @@ namespace Managers
             player.setCurrently(Player.status.IDLE);
         }
 
+
+        private Vector3 GetNewDestination()
+        {
+            // 1. getPoint
+            Vector3 toLocation = inputs.FindTerrainHitPoint();
+            // let the buildings not to fall down
+            toLocation.y += yoffset;
+            // 2. discretize
+            toLocation = grid.discretizeMapCoords(toLocation);
+            return toLocation;
+
+        }
         /// <summary>
         /// Moves the building to the mouse position
         /// </summary>
         private void relocate()
         {
 
-            // 1. getPoint
-            Vector3 toLocation = inputs.FindHitPoint();
+            Vector3 newDestination = GetNewDestination();
+            // if is not a vaild point, the building remains quiet
+            if (newDestination == inputs.invalidPosition) return;
 
-            // 2. offsetPoint
-            toLocation = locationOffset(toLocation);
-            
-            // 3. discretize
-            toLocation = adaptLocation(toLocation);
-
-            // 4. check and move alter the color if is not a valid location
-            newBuilding.transform.position = toLocation;
-            if (checkLocation(toLocation))
+            // 2. check and move alter the color if is not a valid location
+            newBuilding.transform.position = newDestination;
+            if (checkLocation(newDestination))
             {
                 _drawState(Color.green);
             }
@@ -222,6 +219,20 @@ namespace Managers
 
         }
 
+
+        private void PackToMoveBuilding()
+        {
+            this.newBuilding.GetComponent<FOWEntity>().IsRevealer = false;
+            this.newBuilding.GetComponent<Rigidbody>().detectCollisions = false;
+
+
+        }
+
+        private void PackToPlaceBuilding()
+        {
+            this.newBuilding.GetComponent<FOWEntity>().IsRevealer = true;
+            this.newBuilding.GetComponent<Rigidbody>().detectCollisions = true;
+        }
 
         /// <summary>
         /// Draws a surrounding box based on the collider
@@ -285,19 +296,5 @@ namespace Managers
             return location;// inputs.FindHitPoint(location);
         }
         
-    }
-    public class CollisionDetector : MonoBehaviour
-    {
-        private bool _isThereCollision;
-        public bool isThereCollision{ get { return _isThereCollision; } }
-        void OnCollisionEnter(Collision collisionInfo)
-        {
-            _isThereCollision = true;
-            collisionInfo.gameObject.SetActive(true);
-        }
-        void OnCollisionExit(Collision collisionInfo)
-        {
-            _isThereCollision = false;
-        }
     }
 }
