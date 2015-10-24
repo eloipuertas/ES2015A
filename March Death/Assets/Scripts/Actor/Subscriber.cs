@@ -10,7 +10,7 @@ namespace Utils
 
         private Subscriber()
         {
-#if DEBUG
+#if UNITY_EDITOR
             if (!typeof(T).IsEnum)
             {
                 throw new ArgumentException("T must be an enumerated type");

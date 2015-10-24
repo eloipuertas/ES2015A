@@ -37,6 +37,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// If in battle, this is the target and last attack time
     /// </summary>
     private IGameEntity _target = null;
+    private float _distanceToTarget = 0;
 
     /// <summary>
     /// Set to true if we are following our target (ie. attacking but not in range)
@@ -62,7 +63,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// <summary>
     /// Can this unit perform ranged attacks?
     /// </summary>
-    public int isRanged
+    public bool isRanged
     {
         get
         {
@@ -77,8 +78,7 @@ public class Unit : GameEntity<Unit.Actions>
     {
         if (isRanged)
         {
-            Vector3 distance = Vector3.Distance(_target.getTransform().position, transform.position);
-            if (distance > info.unitAttributes.rangedAttackNearest)
+            if (_distanceToTarget > info.unitAttributes.rangedAttackNearest)
             {
                 return info.unitAttributes.rangedAttackFurthest;
             }
@@ -125,28 +125,26 @@ public class Unit : GameEntity<Unit.Actions>
     }
 
     public override IKeyGetter unregisterFatalWounds(Action<object> func)
-        return unregister(Actions.DIED, func);
     {
+        return unregister(Actions.DIED, func);
     }
 
-    public bool canDoRangedAttack<A>(GameEntity<A> entity) where A : struct, IConvertible
+    public bool canDoRangedAttack()
     {
         if (!isRanged)
         {
             return false;
         }
 
-        Vector3 distance = Vector3.Distance(entity.transform.position, transform.position);
-        return distance < info.unitAttributes.rangedAttackFurthest &&
-            distance > info.unitAttributes.rangedAttackNearest;
+        return _distanceToTarget < info.unitAttributes.rangedAttackFurthest &&
+            _distanceToTarget > info.unitAttributes.rangedAttackNearest;
     }
 
     public override int computeRangedModifiers()
     {
         int modifier = 0;
 
-        Vector3 distance = Vector3.Distance(_target.getTransform().position, transform.position);
-        if (distance > (info.unitAttributes.rangedAttackFurthest - info.unitAttributes.rangedAttackNearest) / 2)
+        if (_distanceToTarget > (info.unitAttributes.rangedAttackFurthest - info.unitAttributes.rangedAttackNearest) / 2)
         {
             modifier -= 1;
         }
@@ -235,25 +233,14 @@ public class Unit : GameEntity<Unit.Actions>
     {
         base.Update();
 
-#if TEST_INPUT
-        if (Input.GetMouseButtonDown(0))
+        // Precompute distance to our target if we have target
+        // Avoids computing it serveral (5+ times)
+        if (_target != null)
         {
-            Camera mainCamera = Camera.main;
-
-            // We need to actually hit an object
-            RaycastHit hit;
-            if (!Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out hit, 1000))
-                return;
-
-            // We need to hit something (with a collider on it)
-            if (!hit.transform)
-                return;
-
-            // Get input vector from kayboard or analog stick and make it length 1 at most
-            moveTo(hit.point);
+            _distanceToTarget = Vector3.Distance(_target.getTransform().position, transform.position);
         }
-#endif
 
+        // Calculate food consumption
         float resourcesElapsed = Time.time - _lastResourcesUpdate;
         if (resourcesElapsed > RESOURCES_UPDATE_INTERVAL)
         {
@@ -281,7 +268,7 @@ public class Unit : GameEntity<Unit.Actions>
                 if (_target != null)
                 {
                     // Check if we are still in range
-                    if (Vector3.Distance(_target.getTransform().position, transform.position) > currentAttackRange())
+                    if (_distanceToTarget > currentAttackRange())
                     {
                         followingTarget = true;
                         setStatus(EntityStatus.MOVING);
@@ -305,8 +292,15 @@ public class Unit : GameEntity<Unit.Actions>
         switch (status)
         {
             case EntityStatus.MOVING:
-                Vector3 destination = _movePoint;
+                // If we are already in range, start attacking
+                if (followingTarget && _distanceToTarget <= currentAttackRange())
+                {
+                    setStatus(EntityStatus.ATTACKING);
+                    return;
+                }
 
+                // Save destination point to avoid code duplication
+                Vector3 destination = _movePoint;
                 if (followingTarget)
                 {
                     destination = _target.getTransform().position;
@@ -315,14 +309,8 @@ public class Unit : GameEntity<Unit.Actions>
 
                 transform.position = Vector3.MoveTowards(transform.position, destination, Time.fixedDeltaTime * info.unitAttributes.movementRate);
 
-                // If we are already in range, start attacking
-                if (followingTarget && Vector3.Distance(transform.position, destination) <= currentAttackRange())
-                {
-                    setStatus(EntityStatus.ATTACKING);
-                }
-
                 // HACK: 0.5f is not proven to always work, it is still here beacause NavAgents will be used
-                if (Vector3.Distance(transform.position, _movePoint) <= 0.5f)
+                if (!followingTarget && Vector3.Distance(transform.position, _movePoint) <= 0.5f)
                 {
                     setStatus(EntityStatus.IDLE);
                     fire(Actions.MOVEMENT_END);
