@@ -100,6 +100,11 @@ namespace Assets.Scripts.AI.Agents
             
             //Calculate the min distance between enemies and our hero
 
+            if(hero == null)
+            {
+                return 0;
+            }
+
             foreach (Unit u in ai.EnemyUnits)
             {
                 float distance = Vector3.Distance(u.transform.position, hero.transform.position);
