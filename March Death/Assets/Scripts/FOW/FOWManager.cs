@@ -28,7 +28,7 @@ public class FOWManager : MonoBehaviour
 
     public bool Enabled;
 
-    List<FOWEntity> entities = new List<FOWEntity>();
+    List<FOWEntity> entities;
     Texture2D fowTex;
     Color32[] pixels;
 
@@ -38,10 +38,11 @@ public class FOWManager : MonoBehaviour
     /// </summary>
     public visible[] aiVision { get; set; }
 
-    void Start()
+    void Awake()
     {
         if (Application.isPlaying)
             InitializeTexture();
+        entities= new List<FOWEntity>();
     }
     /// <summary>
     /// Creates a new texture the size of terrain
@@ -219,16 +220,15 @@ public class FOWManager : MonoBehaviour
         if (xMax < xMin) xMax = xMin;
         if (yMax < yMin) yMax = yMin;
     }
-    public static void addEntity(FOWEntity e)
+    public void addEntity(FOWEntity e)
     {
-        if (Instance && !Instance.entities.Contains(e))
-            Instance.entities.Add(e);
+        if (!entities.Contains(e))
+            entities.Add(e);
     }
-
-    public static void removeEntity(FOWEntity e)
+    public void removeEntity(FOWEntity e)
     {
-        if (Instance && Instance.entities.Contains(e))
-            Instance.entities.Remove(e);
+        if (entities.Contains(e))
+            entities.Remove(e);
     }
     public Vector2 getGridSize()
     {

@@ -189,6 +189,7 @@ public class Unit : GameEntity<Unit.Actions>
 
         // Set the status
         setStatus(EntityStatus.IDLE);
+        activateFOWEntity();
     }
 
     /// <summary>
