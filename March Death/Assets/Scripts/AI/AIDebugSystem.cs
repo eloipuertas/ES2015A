@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 using Assets.Scripts.AI;
+using System.Collections.Generic;
+using Assets.Scripts.AI.Agents;
 
 public class AIDebugSystem : MonoBehaviour {
 
     AIController controller { get; set; }
+
     bool showInfo { get; set; }
     public Rect windowRect = new Rect(20, 20, 200, 80);
 
@@ -17,6 +20,8 @@ public class AIDebugSystem : MonoBehaviour {
     private int textWidth = 100;
     private int textHeight = 20;
 
+    Dictionary<string, float> agentsConfidence;
+
     public static AIDebugSystem CreateComponent(GameObject parent, AIController controller)
     {
         AIDebugSystem AIDSys = parent.AddComponent<AIDebugSystem>();
@@ -25,6 +30,15 @@ public class AIDebugSystem : MonoBehaviour {
         return AIDSys;
     }
     
+    void Start()
+    {
+        agentsConfidence = new Dictionary<string, float>();
+
+        foreach(BaseAgent agent in controller.Micro.agents)
+        {
+            agentsConfidence.Add(agent.agentName, 0);
+        }
+    }
 
 	void Update () {
         if (Input.GetKeyDown(KeyCode.F9))
@@ -50,7 +64,33 @@ public class AIDebugSystem : MonoBehaviour {
         GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), "Confidence:");
         GUI.contentColor = Color.green;
         GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), confidence.ToString());
+        GUI.contentColor = Color.white;
+        GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), "Other Agents Confidence:");
+        showConfidences();
         GUI.DragWindow();
+    }
+
+    public void showConfidences()
+    {
+        foreach(KeyValuePair<string, float> agent in agentsConfidence)
+        {
+            //We dont want to display the same agent 2 times
+            if (agent.Key.Equals(controllingAgent))
+            {
+                continue;
+            }
+            
+            GUI.contentColor = Color.magenta;
+            GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), agent.Key);
+            GUI.contentColor = Color.yellow;
+            GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), agent.Value.ToString());
+            
+        }
+    }
+
+    public void setAgentConfidence(string name, float conf)
+    {
+        agentsConfidence[name] = conf;
     }
 
     public void resetLines()
