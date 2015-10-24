@@ -92,7 +92,8 @@ GameObject:
   m_Component:
   - 4: {fileID: 495072}
   - 33: {fileID: 3370826}
-  - 23: {fileID: 2383286}
+  - 137: {fileID: 13768338}
+  - 183: {fileID: 18353736}
   m_Layer: 0
   m_Name: Plane.013
   m_TagString: Untagged
@@ -2524,8 +2525,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 152608}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 446.36792, y: 79.0026245, z: 740.126831}
+  m_LocalRotation: {x: 0, y: .707106829, z: 0, w: .707106709}
+  m_LocalPosition: {x: 428.201996, y: 78.9880676, z: 664.438843}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 406894}
@@ -2658,7 +2659,7 @@ Transform:
   m_GameObject: {fileID: 162222}
   m_LocalRotation: {x: -.707106829, y: 0, z: -0, w: .707106709}
   m_LocalPosition: {x: 6.24821997, y: 11.0941544, z: 0}
-  m_LocalScale: {x: 3.74342203, y: 3.74342227, z: 147.102783}
+  m_LocalScale: {x: 5.12364197, y: 5.1236372, z: 201.340179}
   m_Children: []
   m_Father: {fileID: 487018}
   m_RootOrder: 47
@@ -2741,8 +2742,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 106000}
   m_LocalRotation: {x: -.5, y: -.49999997, z: .5, w: .50000006}
-  m_LocalPosition: {x: 6.24866724, y: 12.5721588, z: -1.19590998}
-  m_LocalScale: {x: 42.0774002, y: 74.831871, z: 42.0774002}
+  m_LocalPosition: {x: 6.25, y: 13.2200003, z: -1.63}
+  m_LocalScale: {x: 57.5915642, y: 102.422684, z: 57.5915108}
   m_Children: []
   m_Father: {fileID: 487018}
   m_RootOrder: 65
@@ -4330,30 +4331,6 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!23 &2383286
-MeshRenderer:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 106000}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_Materials:
-  - {fileID: 2100000, guid: fb7d05f71b5620345ae498ade9d50b6c, type: 2}
-  m_SubsetIndices: 
-  m_StaticBatchRoot: {fileID: 0}
-  m_UseLightProbes: 1
-  m_ReflectionProbeUsage: 1
-  m_ProbeAnchor: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_PreserveUVs: 0
-  m_ImportantGI: 0
-  m_AutoUVMaxDistance: .5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingOrder: 0
 --- !u!23 &2383654
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -5275,7 +5252,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 25, y: 1, z: 18}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!95 &9552350
 Animator:
@@ -5342,6 +5319,228 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsRevealer: 1
   Range: 40
+--- !u!137 &13768338
+SkinnedMeshRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 106000}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_Materials:
+  - {fileID: 2100000, guid: fb7d05f71b5620345ae498ade9d50b6c, type: 2}
+  m_SubsetIndices: 
+  m_StaticBatchRoot: {fileID: 0}
+  m_UseLightProbes: 1
+  m_ReflectionProbeUsage: 1
+  m_ProbeAnchor: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_ImportantGI: 0
+  m_AutoUVMaxDistance: .5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  serializedVersion: 2
+  m_Quality: 0
+  m_UpdateWhenOffscreen: 0
+  m_Mesh: {fileID: 4300000, guid: cb4f6f5c110feae46aa722a68c0659b3, type: 3}
+  m_Bones: []
+  m_BlendShapeWeights: []
+  m_RootBone: {fileID: 0}
+  m_AABB:
+    m_Center: {x: -.00115644932, y: .00198459625, z: 1.71661377e-05}
+    m_Extent: {x: .0163536705, y: .0170720536, z: 6.89119561e-09}
+  m_DirtyAABB: 0
+--- !u!183 &18353736
+Cloth:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 106000}
+  m_Enabled: 1
+  m_StretchingStiffness: .300000012
+  m_BendingStiffness: .300000012
+  m_UseTethers: 1
+  m_UseGravity: 1
+  m_Damping: 0
+  m_ExternalAcceleration: {x: -50, y: 10, z: 0}
+  m_RandomAcceleration: {x: 10, y: 5, z: 5}
+  m_WorldVelocityScale: .5
+  m_WorldAccelerationScale: 1
+  m_Friction: .5
+  m_CollisionMassScale: 0
+  m_UseContinuousCollision: 1
+  m_UseVirtualParticles: 1
+  m_SolverFrequency: 120
+  m_SleepThreshold: .100000001
+  m_Coefficients:
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 0
+    collisionSphereDistance: 0
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  - maxDistance: 0
+    collisionSphereDistance: 0
+  - maxDistance: 3.40282347e+38
+    collisionSphereDistance: 3.40282347e+38
+  m_CapsuleColliders: []
+  m_SphereColliders: []
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
