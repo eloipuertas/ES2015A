@@ -19,7 +19,7 @@ namespace Assets.Scripts.AI
         /// <summary>
         /// Commite of agents who will each vote at what to do with every squad
         /// </summary>
-        List<BaseAgent> agents;
+        public List<BaseAgent> agents;
         public MicroManager(AIController ai)
         {
             agents = new List<BaseAgent>();
@@ -42,6 +42,7 @@ namespace Assets.Scripts.AI
                 foreach(BaseAgent a in agents)
                 {
                     val = a.getConfidence(lu) * a.modifier + getError();
+                    ai.aiDebug.setAgentConfidence(a.agentName, val);
                     if (val > bVal)
                     {
                         bVal = val;
