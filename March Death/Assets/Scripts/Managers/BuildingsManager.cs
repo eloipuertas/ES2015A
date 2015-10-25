@@ -181,7 +181,7 @@ namespace Managers
         {
             //Cursor.visible = true;
             _placing = false;
-            player.setCurrently(Player.status.IDLE);
+
         }
 
 
