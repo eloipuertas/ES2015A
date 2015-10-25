@@ -57,14 +57,12 @@ public class Main_Game : MonoBehaviour {
 
     public void ClearGame()
     {
-		GameObject obj;// = GameObject.Find("GameInformationObject").gameObject;
-		//Destroy(obj);
-		obj = GameObject.Find("HUD");
-		obj.GetComponentInChildren<InformationController>().Clear();
-		/*Destroy(obj);
-		obj = GameObject.Find("HUD_EventSystem");
-		Destroy(obj);*/
-		obj = GameObject.Find("GameInformationObject").gameObject;
-		Destroy(obj);
+        GameObject obj;
+        // Unregisters events in the HUD
+        obj = GameObject.Find("HUD");
+        obj.GetComponentInChildren<InformationController>().Clear();
+        obj.GetComponentInChildren<EntityAbilitiesController>().Clear();
+        obj = GameObject.Find("GameInformationObject").gameObject;
+        Destroy(obj);
     }
 }

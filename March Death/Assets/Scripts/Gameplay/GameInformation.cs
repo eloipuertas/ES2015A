@@ -38,7 +38,7 @@ public class GameInformation : MonoBehaviour {
 
     private void LoadElfHUD()
     {
-        Instantiate((GameObject)Resources.Load ("HUD_ELF2")).name = "HUD";
+        Instantiate((GameObject)Resources.Load ("HUD-Elf")).name = "HUD";
         Instantiate((GameObject)Resources.Load ("HUD_EventSystem")).name = "HUD_EventSystem";
     }
 
