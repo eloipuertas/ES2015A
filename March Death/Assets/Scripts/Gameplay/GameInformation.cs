@@ -20,7 +20,7 @@ public class GameInformation : MonoBehaviour {
 
     void Awake()
     {
-        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(this);
     }
 
     public void LoadHUD()
@@ -28,7 +28,7 @@ public class GameInformation : MonoBehaviour {
         switch (playerRace)
         {
         case Races.ELVES:
-            LoadElfHUD();;
+            LoadElfHUD();
             break;
         case Races.MEN:
             LoadHumanHUD();
@@ -36,15 +36,13 @@ public class GameInformation : MonoBehaviour {
         }
     }
 
-    // TODO Modify to use the actual HUD for each civilization
-
-    private static void LoadElfHUD()
+    private void LoadElfHUD()
     {
         Instantiate((GameObject)Resources.Load ("HUD-Elf")).name = "HUD";
         Instantiate((GameObject)Resources.Load ("HUD_EventSystem")).name = "HUD_EventSystem";
     }
 
-    private static void LoadHumanHUD()
+    private void LoadHumanHUD()
     {
         Instantiate((GameObject)Resources.Load ("HUD-Human")).name = "HUD";
         //Application.LoadLevelAdditive("globalHUDHuman");
