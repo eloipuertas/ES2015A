@@ -34,6 +34,7 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
     public bool IsOwnedByPlayer { get; set; }
     public bool IsRevealed { get { return isRevealed; } }
     private bool activated;
+    private bool notFullyOpaque;
     public override void Start()
     {
         base.Start();
@@ -71,9 +72,12 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
     /// <param name="visible">if true we enable the renderer, if false we disable it</param>
     public void changeRenders(bool visible)
     {
-        foreach (Renderer r in GetComponentsInChildren<Renderer>())
+        if (!notFullyOpaque)
         {
-            r.enabled = visible;
+            foreach (Renderer r in GetComponentsInChildren<Renderer>())
+            {
+                r.enabled = visible;
+            }
         }
     }
     /// <summary>
@@ -117,7 +121,9 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
         if (fow)
         {
             fow.addEntity(this);
-            isRevealed = fow.isThereinRect(Bounds, FOWManager.visible.visible, !IsOwnedByPlayer);
+            if(fow.Enabled)
+                isRevealed = fow.isThereinRect(Bounds, FOWManager.visible.visible, !IsOwnedByPlayer);
+            notFullyOpaque = fow.NotFullyOpaque;
             if (!IsOwnedByPlayer)
                 changeRenders(isRevealed);
             //If the entity gets created in a visible zone it's still "discovered".

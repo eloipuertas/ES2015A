@@ -35,36 +35,39 @@ namespace Assets.Scripts.AI.Agents
         }
         public override void controlUnits(List<Unit> units)
         {
-            //PLACEHOLDER, until sprint2 when we split things
-            if (units.Count < 2)
+            if (fowManager.Enabled)
             {
-                int num = 2 - units.Count();
-                if (ai.Macro.canTakeArms() >= num)
-                    ai.Macro.takeArms(num);
-            }
-            foreach (Unit u in units)
-            {
-                u.moveTo(findPlaceToExplore(u, fowManager.aiVision, fowManager.getGridSize()));
-            }
-            //We have a previous last seen location for the hero, better send someone to scout it
-            if (heroLastPos!=Vector3.zero && !heroVisible && units.Count>0 )
-            {
-                float bVal = float.MaxValue;
-                Unit bUnit = units[0];
-                //better find which unit is closer to the last hero position
-                foreach (Unit u in units) 
+                //PLACEHOLDER, until sprint2 when we split things
+                if (units.Count < 2)
                 {
-                    float dist = Vector3.Distance(u.transform.position, heroLastPos);
-                    //We arrived where the hero was before, scout around here
-                    if (dist < 3f)
-                        heroLastPos = Vector3.zero; 
-                    else if (bVal > dist)
-                    {
-                        bVal = dist;
-                        bUnit = u;
-                    }
+                    int num = 2 - units.Count();
+                    if (ai.Macro.canTakeArms() >= num)
+                        ai.Macro.takeArms(num);
                 }
-                bUnit.moveTo(heroLastPos);
+                foreach (Unit u in units)
+                {
+                    u.moveTo(findPlaceToExplore(u, fowManager.aiVision, fowManager.getGridSize()));
+                }
+                //We have a previous last seen location for the hero, better send someone to scout it
+                if (heroLastPos != Vector3.zero && !heroVisible && units.Count > 0)
+                {
+                    float bVal = float.MaxValue;
+                    Unit bUnit = units[0];
+                    //better find which unit is closer to the last hero position
+                    foreach (Unit u in units)
+                    {
+                        float dist = Vector3.Distance(u.transform.position, heroLastPos);
+                        //We arrived where the hero was before, scout around here
+                        if (dist < 3f)
+                            heroLastPos = Vector3.zero;
+                        else if (bVal > dist)
+                        {
+                            bVal = dist;
+                            bUnit = u;
+                        }
+                    }
+                    bUnit.moveTo(heroLastPos);
+                }
             }
         }
         Vector3 findPlaceToExplore(Unit u,FOWManager.visible[] grid, Vector2 size)
@@ -101,6 +104,8 @@ namespace Assets.Scripts.AI.Agents
         }
         public override int getConfidence(List<Unit> units)
         {
+            if (!fowManager.Enabled)
+                return - 1000;
             if (heroVisible)
                 return 0;
             return 20;
