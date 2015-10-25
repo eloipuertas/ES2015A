@@ -375,4 +375,10 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         _animator.SetInteger("animation_state", (int)status);
 #endif
     }
+    protected void activateFOWEntity()
+    {
+        FOWEntity fe = gameObject.AddComponent<FOWEntity>() as FOWEntity;
+        fe.Range = info.attributes.sightRange;
+        fe.Activate(info.race);
+    }
 }

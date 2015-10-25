@@ -79,6 +79,7 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 
         // Set the status
         setStatus(EntityStatus.BUILDING_PHASE_1);
+        activateFOWEntity();
     }
 
     /// <summary>

@@ -10,5 +10,6 @@ namespace Storage
         public int capacity;
         public int resistance;
         public int wounds;
+        public int sightRange;
     }
 }
