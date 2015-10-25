@@ -17,12 +17,13 @@ public class Main_Game : MonoBehaviour {
         playerHero = GameObject.Find("PlayerHero");
         if(GameObject.Find("GameInformationObject"))
 		    info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
-		user = GameObject.FindGameObjectWithTag("GameController").GetComponent("Player") as Player;
+		user = GameObject.Find("GameController").GetComponent("Player") as Player;
 		cam = GameObject.FindWithTag("MainCamera").GetComponent<CameraController>();
-		LoadPlayerStronghold();
+		if (cam == null) Debug.Log("WARNING: No CAM");
+        if(info) info.LoadHUD();
+        LoadPlayerStronghold();
         LoadPlayerUnits();
-        if(info)info.LoadHUD();
-    }
+	}
 
 	private void LoadPlayerStronghold()
 	{
@@ -45,6 +46,25 @@ public class Main_Game : MonoBehaviour {
             playerHero = Info.get.createUnit(info.GetPlayerRace(),
                                              UnitTypes.HERO, playerHero.transform.position,
                                          playerHero.transform.rotation);
+			user.FillPlayerUnits(playerHero);
         }
+    }
+
+    public GameInformation GetGameInformationObject()
+    {
+		return info;
+    }
+
+    public void ClearGame()
+    {
+		GameObject obj;// = GameObject.Find("GameInformationObject").gameObject;
+		//Destroy(obj);
+		obj = GameObject.Find("HUD");
+		obj.GetComponentInChildren<InformationController>().Clear();
+		/*Destroy(obj);
+		obj = GameObject.Find("HUD_EventSystem");
+		Destroy(obj);*/
+		obj = GameObject.Find("GameInformationObject").gameObject;
+		Destroy(obj);
     }
 }

@@ -224,5 +224,11 @@ public class InformationController : MonoBehaviour {
 	{
 		HideInformation ();
 	}
+
+	public void Clear()
+	{
+		Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.SELECTED, onUnitSelected);
+		Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.DESELECTED, onUnitDeselected);
+	}
 		
 }
