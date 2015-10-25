@@ -342,6 +342,9 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         {
             _status = info.isUnit ? EntityStatus.DEAD : EntityStatus.DESTROYED;
             onFatalWounds();
+
+            // TODO: When killed it should be destroyed (previously animated and so on..)
+            //Destroy(this);
         }
 
         // If we are a unit and doing nothing, attack back
@@ -369,7 +372,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 
 #if !DISABLE_ANIMATOR
         //TODO: Hack to get this working for the sprint, why is _animator
-        GetComponent<Animator>().SetInteger("animation_state", (int)status);
+        _animator.SetInteger("animation_state", (int)status);
 #endif
     }
 }
