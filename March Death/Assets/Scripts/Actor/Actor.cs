@@ -11,10 +11,12 @@ namespace Utils
 
         public Actor()
         {
+#if UNITY_EDITOR
             if (!typeof(T).IsEnum)
             {
                 throw new ArgumentException("T must be an enumerated type");
             }
+#endif
 
             foreach (T action in Enum.GetValues(typeof(T)))
             {
@@ -22,7 +24,7 @@ namespace Utils
             }
         }
 
-        public virtual void Start() { }
+        public virtual void Awake() { }
         public virtual void Update() { }
 
         public virtual void OnDestroy()

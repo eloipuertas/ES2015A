@@ -19,6 +19,11 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public Races getRace() { return race; }
     public abstract E getType<E>() where E : struct, IConvertible;
 
+    /// <summary>
+    /// Called when Start has been called
+    /// </summary>
+    public Action<GameObject> onStartDone = null;
+
     protected EntityInfo _info;
     public EntityInfo info
     {
@@ -218,9 +223,9 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         }
     }
 
-    public override void Start()
+    public override void Awake()
     {
-        base.Start();
+        base.Awake();
         setupAbilities();
 
 #if !DISABLE_ANIMATOR
@@ -238,6 +243,14 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     }
 
     /// <summary>
+    /// Based on distance and target type computes how ranged ability is modified
+    /// </summary>
+    public virtual int computeRangedModifiers()
+    {
+        return 0;
+    }
+
+    /// <summary>
     /// Returns true in case an attack will land on this unit
     /// </summary>
     /// <param name="from">Unit which attacked</param>
@@ -249,9 +262,10 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 
         if (isRanged)
         {
-            // TODO: Specil units (ie gigants) and distance!
+            // TODO: Specil units (ie gigants)
             int projectileAbility = from.info.unitAttributes.projectileAbility +
-                from.accumulatedModifier<UnitAbility>().projectileAbilityModifier;
+                from.accumulatedModifier<UnitAbility>().projectileAbilityModifier +
+                from.computeRangedModifiers();
 
             return dice > 1 && (projectileAbility + dice >= 7);
         }

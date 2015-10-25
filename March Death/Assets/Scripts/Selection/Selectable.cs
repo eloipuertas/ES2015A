@@ -22,9 +22,9 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     //Pendiente
     //IGameEntity gameEntity;
 
-    public override void Start()
+    public override void Awake()
     {
-        base.Start();
+        base.Awake();
 
 		GameObject gameObject = GameObject.Find("GameController");
 		player = gameObject.GetComponent ("Player") as Player;

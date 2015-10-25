@@ -135,10 +135,10 @@ public class EntityAbilitiesController : MonoBehaviour
         Sprite newImg = null;
         Texture2D tex = null;
         byte[] fileData;
+		
 
         String sPath = Application.dataPath + separator + "Resources" + separator + "ActionButtons" + separator;
-        string sName = sPath + ability + ".png";
-
+        string sName = sPath + ability.Replace(" ","_") + ".png";
         if (File.Exists(sName))
         {
             fileData = File.ReadAllBytes(sName);

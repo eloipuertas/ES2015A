@@ -13,13 +13,14 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
     private Texture2D box_text;
 
     // Use this for initialization
-    public override void Start () {
+    public override void Awake() {
 
-        base.Start();
+        base.Awake();
     }
 
     // Update is called once per frame
-    protected virtual void Update() {
+    public override void Update() {
+        base.Update();
 
         if (mainCam == null) { // not initialized yet in start I suppose
             if (GameObject.FindGameObjectWithTag("minimap_cam"))
