@@ -7,7 +7,7 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
     public enum Actions { BEING_ATTACKED, NORMAL};
 
     private const float REFRESH_TIME = 1.0f;
-    private float tot_timer = 0f;
+    private float tot_timer = 1f;
 
     private GameObject plane;
     private Camera minimap_cam, mainCam;
@@ -42,6 +42,7 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
     protected virtual void OnGUI()
     {
         //if(gameObject.GetComponent<FOWEntity>().IsRevealed)
+            GUI.depth = 1;
             GUI.DrawTexture(marker_rect, box_text);
     }
 

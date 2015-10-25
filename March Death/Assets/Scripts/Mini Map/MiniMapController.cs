@@ -4,6 +4,9 @@ using System.Collections;
 public class MiniMapController : MonoBehaviour
 {
 
+    private const float REFRESH_TIME = 1.0f/50;
+    private float tot_timer = 1f;
+
     private Camera _camera;
     private Camera mainCam;
     
@@ -35,12 +38,15 @@ public class MiniMapController : MonoBehaviour
         if (Terrain.activeTerrain)
         {
             float diagonal = Mathf.Sqrt(Mathf.Pow(Terrain.activeTerrain.terrainData.size.x, 2) + Mathf.Pow(Terrain.activeTerrain.terrainData.size.y, 2));
-            _camera.transform.position = new Vector3(Terrain.activeTerrain.terrainData.size.x * 0.5f, Terrain.activeTerrain.terrainData.size.x * 0.4f, Terrain.activeTerrain.terrainData.size.z * 0.5f);
+            _camera.transform.position = new Vector3(Terrain.activeTerrain.terrainData.size.x * 0.5f, 
+                Terrain.activeTerrain.terrainData.size.x * 0.4f,
+                Terrain.activeTerrain.terrainData.size.z * 0.5f);
             _camera.transform.rotation = Quaternion.Euler(90f, 135f,0); 
             _camera.orthographicSize = diagonal * 0.95f; // a hack
             _camera.farClipPlane = Terrain.activeTerrain.terrainData.size.x * 1.5f;
             _camera.clearFlags = CameraClearFlags.Depth;
             //_camera.backgroundColor = Color.clear; // Set a more fancy background, black
+            _camera.enabled = false; // Disable camera to only render whenever we want.
         }
 
         createMarker();
@@ -51,6 +57,15 @@ public class MiniMapController : MonoBehaviour
     /// </summary>
     void OnGUI()
     {
+        GUI.depth = 2;
+        if (tot_timer >= REFRESH_TIME)
+        {
+            _camera.Render();
+            tot_timer = 0f;
+        }
+        else
+            tot_timer += Time.deltaTime;
+
         GUI.DrawTexture(rect_marker, tex);
     }
 
@@ -58,7 +73,6 @@ public class MiniMapController : MonoBehaviour
     {
         main_zoom = mainCam.orthographicSize;
         act_pos = mainCam.transform.position;
-        cameraOffset = new Vector3(252.8f, 0f, 252.8f);
     }
 
     /// <summary>
