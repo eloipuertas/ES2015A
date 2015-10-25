@@ -35,17 +35,10 @@
 			float2 uv_Splat2 : TEXCOORD3;
 			float2 uv_Splat3 : TEXCOORD4;
 		};
-		void GrayBrightFromFOW(half4 fow, out half lightness, out half grayscale) {
-			grayscale = fow.b;
-			fow.rg = saturate(fow.rg * 5 - 2);
-			lightness = (fow.r + fow.g * (1 + fow.b)) / 3;
-		}
 
-		half4 TransformColourFOW(half3 c, half4 fow) {
-			half lightness, grayscale;
-			GrayBrightFromFOW(fow, lightness, grayscale);
-			half3 t = c.rgb * lightness;
-			return half4(lerp(dot(t, half3(0.5f, 0.4f, 0.1f)).rrr, t.rgb, grayscale),1 );
+		half3 TransformColourFOW(half3 c, half3 fow) {
+			half3 t = c.rgb * ((saturate(fow.g * 5 - 2)* (1 + fow.b)) / 3);
+			return lerp(dot(t, half3(0.5f, 0.4f, 0.1f)).rrr, t.rgb, fow.b);
 		}
 
 		sampler2D _Control;
@@ -61,11 +54,9 @@
 			c += splat_control.g * tex2D(_Splat1, IN.uv_Splat1).rgb;
 			c += splat_control.b * tex2D(_Splat2, IN.uv_Splat2).rgb;
 			c += splat_control.a * tex2D(_Splat3, IN.uv_Splat3).rgb;
-			half4 fow = tex2D(_FOWTex, TRANSFORM_TEX(IN.worldPos.xz, _FOWTex));
+			half3 fow = tex2D(_FOWTex, TRANSFORM_TEX(IN.worldPos.xz, _FOWTex));
 
-			half4 t = TransformColourFOW(c, fow);
-
-			o.Albedo = t.rgb;
+			o.Albedo = TransformColourFOW(c, fow);
 			o.Alpha = 1;
 		}
 		ENDCG

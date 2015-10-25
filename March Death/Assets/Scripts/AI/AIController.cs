@@ -46,18 +46,14 @@ namespace Assets.Scripts.AI
 
             _selfRace = info.GetPlayerRace() == Races.MEN ? Races.ELVES : Races.MEN;
 
-            if (_selfRace == Races.ELVES) Army.Add(GameObject.Find("elf_hero").gameObject.GetComponent<Unit>());
-            else Army.Add(GameObject.Find("MenHero").gameObject.GetComponent<Unit>());
-        }
-        
-        void Awake()
-        {
             //Init lists
             EnemyUnits = new List<Unit>();
             EnemyBuildings = new List<IGameEntity>();
             OwnBuildings = new List<IGameEntity>();
             modules = new List<AIModule>();
             Army = new List<Unit>();
+            if (_selfRace == Races.ELVES) Army.Add(GameObject.Find("elf_hero").gameObject.GetComponent<Unit>());
+            else Army.Add(GameObject.Find("MenHero").gameObject.GetComponent<Unit>());
             Workers = new List<Unit>();
             Macro = new MacroManager(this);
             Micro = new MicroManager(this);
