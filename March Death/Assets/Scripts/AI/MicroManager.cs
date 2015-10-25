@@ -42,14 +42,15 @@ namespace Assets.Scripts.AI
                 foreach(BaseAgent a in agents)
                 {
                     val = a.getConfidence(lu) * a.modifier + getError();
-                    ai.aiDebug.setAgentConfidence(a.agentName, val);
+                    if(AIController.AI_DEBUG_ENABLED) ai.aiDebug.setAgentConfidence(a.agentName, val);
                     if (val > bVal)
                     {
                         bVal = val;
                         bAgent = a;
                     }
                 }
-                if(ai.aiDebug != null)
+
+                if(AIController.AI_DEBUG_ENABLED)
                 {
                     ai.aiDebug.controllingAgent = bAgent.agentName;
                     ai.aiDebug.confidence = bVal;

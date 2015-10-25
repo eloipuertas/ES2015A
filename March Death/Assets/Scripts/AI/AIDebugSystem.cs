@@ -21,6 +21,8 @@ public class AIDebugSystem : MonoBehaviour {
     private int textHeight = 20;
 
     Dictionary<string, float> agentsConfidence;
+    Dictionary<int, Unit> registeredUnits;
+    Dictionary<int, string> individualUnitInfo;
 
     public static AIDebugSystem CreateComponent(GameObject parent, AIController controller)
     {
@@ -33,6 +35,8 @@ public class AIDebugSystem : MonoBehaviour {
     void Start()
     {
         agentsConfidence = new Dictionary<string, float>();
+        individualUnitInfo = new Dictionary<int, string>();
+        registeredUnits = new Dictionary<int, Unit>();
 
         foreach(BaseAgent agent in controller.Micro.agents)
         {
@@ -52,6 +56,7 @@ public class AIDebugSystem : MonoBehaviour {
     {
         if (!showInfo) return;
         windowRect = GUI.Window(0, windowRect, DoMyWindow, "AI Debug");
+        showAIInfoOverUnits();
     }
 
     void DoMyWindow(int windowID)
@@ -83,8 +88,30 @@ public class AIDebugSystem : MonoBehaviour {
             GUI.contentColor = Color.magenta;
             GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), agent.Key);
             GUI.contentColor = Color.yellow;
-            GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), agent.Value.ToString());
-            
+            GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), agent.Value.ToString());            
+        }
+    }
+
+    public void showAIInfoOverUnits()
+    {
+        
+        foreach(KeyValuePair<int, Unit> u in registeredUnits)
+        {
+            Vector3 infoPosition = Camera.main.WorldToScreenPoint(u.Value.transform.position);
+            GUI.Label(new Rect((infoPosition.x), (Screen.height - infoPosition.y), 100, 50), individualUnitInfo[u.Key]);
+        }        
+    }
+
+    public void registerDebugInfoAboutUnit(Unit unit, string info)
+    {
+        if(registeredUnits.ContainsKey(unit.GetInstanceID()))
+        {
+            individualUnitInfo[unit.GetInstanceID()] = info;
+        }
+        else
+        {
+            registeredUnits.Add(unit.GetInstanceID(), unit);
+            individualUnitInfo.Add(unit.GetInstanceID(), info);
         }
     }
 

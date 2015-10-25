@@ -40,8 +40,17 @@ namespace Assets.Scripts.AI.Agents
                 }
 
                 foreach(Unit u in units)
+                {
                     if (u.status != EntityStatus.DEAD && !u.attackTarget(bTar))
+                    {
                         u.moveTo(bTar.transform.position);
+                        if(AIController.AI_DEBUG_ENABLED)
+                        {
+                            ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
+                        }
+                    }     
+                }
+                    
             }
         }
         float valOfUnit(Unit u)

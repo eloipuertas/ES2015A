@@ -84,6 +84,10 @@ namespace Assets.Scripts.AI.Agents
                         }
                     }
 
+                    if (AIController.AI_DEBUG_ENABLED)
+                    {
+                        ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
+                    }
                 }
                 
                 if(isHeroInDanger) attackAgent.controlUnits(squadToAtackManager);

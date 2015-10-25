@@ -45,6 +45,10 @@ namespace Assets.Scripts.AI.Agents
             foreach (Unit u in units)
             {
                 u.moveTo(findPlaceToExplore(u, fowManager.aiVision, fowManager.getGridSize()));
+                if (AIController.AI_DEBUG_ENABLED)
+                {
+                    ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
+                }
             }
             //We have a previous last seen location for the hero, better send someone to scout it
             if (heroLastPos!=Vector3.zero && !heroVisible && units.Count>0 )
