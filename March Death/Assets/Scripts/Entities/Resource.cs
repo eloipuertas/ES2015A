@@ -91,6 +91,10 @@ public class Resource : Building<Resource.Actions>
             return transform.position;
         }     
     }
+    /// <summary>
+    /// current player
+    /// </summary>
+    private Player player;
 
     private readonly object syncLock = new object();
     bool hasCreatedCivil = false;
@@ -220,6 +224,8 @@ public class Resource : Building<Resource.Actions>
 
             Unit civil = gob.GetComponent<Unit>();
             civil.role = Unit.Roles.PRODUCING;
+            Player player = (Player)BasePlayer.getOwner(this);
+            player.addEntityToList(civil);
             fire(Actions.CREATE_UNIT, civil);
 
             totalUnits++;
@@ -236,12 +242,16 @@ public class Resource : Building<Resource.Actions>
 
             Unit civil = gob.GetComponent<Unit>();
             civil.role = Unit.Roles.WANDERING;
+
+            Player player = (Player)BasePlayer.getOwner(this);
+            player.addEntityToList(civil);
             fire(Actions.CREATE_UNIT, civil);
 
             totalUnits++;
-            // TODO method to modify unit coordinates to avoid unit overlap
+            
         }
-  
+        
+
     }
 
     /// <summary>

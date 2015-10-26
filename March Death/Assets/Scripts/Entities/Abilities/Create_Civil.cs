@@ -14,7 +14,8 @@ class CreateCivil : Ability
         base(info, gameObject)
     {
         _entity = _gameObject.GetComponent<IGameEntity>();
-        Resource res = (Resource)_entity;
+        
+        res = (Resource)_entity;
           
     }
 
@@ -30,12 +31,15 @@ class CreateCivil : Ability
     {
         get
         {
-            
+            // DEBUGGING 
+            return true;
+            /*
+            // we need to check if player has enough materials to spend in building construction
             return BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, _unitInfo.resources.food) &&
                    BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, _unitInfo.resources.wood) &&
                    //BasePlayer..getOwner(_entity).resources.IsEnough(WorldResources.Type.GOL, _unitInfo.resources.wood) &&
                    BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, _unitInfo.resources.metal);
-                   
+             */
         }
     }
     public override void disable()
@@ -46,11 +50,9 @@ class CreateCivil : Ability
 
     public override void enable()
     {
-
-        GameObject.Find("GameController").GetComponent<ResourcesManager>().payCivilUnit(_entity.info.race, UnitTypes.CIVIL);
         _enabled = true;
-        base.enable();
-        res.createCivilian();// Debugging, not functional
-        
+        base.enable(); 
+        res.createCivilian(); 
+
     }
 }
