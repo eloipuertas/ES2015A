@@ -260,6 +260,7 @@ public class Unit : GameEntity<Unit.Actions>
         }
         
         _followingTarget = false;
+        _target = null;
         _hasPath = false;
         _movePoint = movePoint;
         setStatus(EntityStatus.MOVING);
