@@ -22,7 +22,7 @@ if [ $? == 0 ]; then
 
         echo -e "\n\033[32;1mTests Completed Successfully\033[0m\n"
 
-        return 0
+        exit 0
 
     fi
 
@@ -36,4 +36,4 @@ if [ $? == 0 ]; then
 
 fi
 
-return $(($MEN_ERRORS+$ELVES_ERRORS))
+exit $(($MEN_ERRORS+$ELVES_ERRORS))

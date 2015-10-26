@@ -120,7 +120,7 @@ fi
 
 if [ $BUILD_WIN == 0 ] && [ $BUILD_LINUX == 0 ] && [ $BUILD_OSX == 0 ]; then
     echo -e "\n\033[32;1mBuild Completed Successfully\033[0m\n"
-    return 0
+    exit 0
 fi
 
 echo -e "\nLog:\n"
@@ -131,4 +131,4 @@ echo -e "\tWindows: ${BUILD_WIN}\n"
 echo -e "\tOS X: ${BUILD_OSX}\n"
 echo -e "\tLinux: ${BUILD_LINUX}\n"
 
-return 1
+exit 1
