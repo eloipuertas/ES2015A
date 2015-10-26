@@ -42,7 +42,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// <summary>
     /// Set to true if we are following our target (ie. attacking but not in range)
     /// </summary>
-    private bool followingTarget = false;
+    private bool _followingTarget = false;
 
     /// <summary>
     /// Time holders for const updates
@@ -59,6 +59,11 @@ public class Unit : GameEntity<Unit.Actions>
     /// Point to move to
     /// </summary>
     private Vector3 _movePoint;
+
+    /// <summary>
+    /// NavAgent, used fot map navigation
+    /// </summary>
+    private NavMeshAgent _navAgent;
 
     /// <summary>
     /// Can this unit perform ranged attacks?
@@ -96,6 +101,7 @@ public class Unit : GameEntity<Unit.Actions>
     {
         // TODO: Our target died, select next? Do nothing?
         setStatus(EntityStatus.IDLE);
+        _target = null;
     }
 
     /// <summary>
@@ -105,6 +111,7 @@ public class Unit : GameEntity<Unit.Actions>
     {
         // Move to last known position (ie. current position)
         moveTo(((GameObject)obj).transform.position);
+        _target = null;
     }
 
     /// <summary>
@@ -234,11 +241,9 @@ public class Unit : GameEntity<Unit.Actions>
     /// <returns>Register result</returns>
     public void faceTo(Vector3 point)
     {
-        // TODO: SMOOTH TURNING
-        Quaternion targetRotation = Quaternion.LookRotation(point - transform.position);
-        targetRotation.x = 0;   // lock rotation on x-axis
-        targetRotation.z = 0;   // lock rotation on z-axis
-        transform.rotation = targetRotation;
+        Vector3 direction = (point - transform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10f);
     }
 
     /// <summary>
@@ -247,10 +252,10 @@ public class Unit : GameEntity<Unit.Actions>
     /// <param name="movePoint">Point to move to</param>
     public void moveTo(Vector3 movePoint)
     {
+        _followingTarget = false;
         _movePoint = movePoint;
-        faceTo(movePoint);
+        _navAgent.SetDestination(movePoint);
 
-        followingTarget = false;
         setStatus(EntityStatus.MOVING);
         fire(Actions.MOVEMENT_START);
     }
@@ -263,12 +268,23 @@ public class Unit : GameEntity<Unit.Actions>
         _info = Info.get.of(race, type);
         _auto = this;
 
-        // Call GameEntity start
+        // Call GameEntity awake
         base.Awake();
 
         // Set the status
         setStatus(EntityStatus.IDLE);
+    }
+
+    /// <summary>
+    /// Object initialization
+    /// </summary>
+    public void Start()
+    {
         activateFOWEntity();
+
+        _navAgent = GetComponent<NavMeshAgent>();
+        _navAgent.speed = _info.unitAttributes.movementRate;
+        _navAgent.acceleration = info.unitAttributes.movementRate * 2.5f;
     }
 
     /// <summary>
@@ -316,10 +332,13 @@ public class Unit : GameEntity<Unit.Actions>
             case EntityStatus.ATTACKING:
                 if (_target != null)
                 {
+                    // Look at it
+                    faceTo(_target.getTransform().position);
+
                     // Check if we are still in range
                     if (_distanceToTarget > currentAttackRange())
                     {
-                        followingTarget = true;
+                        _followingTarget = true;
                         setStatus(EntityStatus.MOVING);
                     }
                     // Check if we already have to attack
@@ -344,28 +363,36 @@ public class Unit : GameEntity<Unit.Actions>
                 // If we are already in range, start attacking
                 // Must be called before MoveTowards because it uses _distanceToTarget, which
                 // would be otherwise outdated
-                if (followingTarget && _distanceToTarget <= currentAttackRange())
+                if (_followingTarget && _distanceToTarget <= currentAttackRange())
                 {
+                    _navAgent.Stop();
                     setStatus(EntityStatus.ATTACKING);
                     return;
                 }
 
-                // Save destination point to avoid code duplication
-                Vector3 destination = _movePoint;
-                if (followingTarget)
+                if (!_navAgent.pathPending && _navAgent.hasPath)
                 {
-                    destination = _target.getTransform().position;
-                    faceTo(destination);
+                    float dist = _navAgent.remainingDistance;
+
+                    if (dist != Mathf.Infinity && _navAgent.pathStatus == NavMeshPathStatus.PathComplete && _navAgent.remainingDistance == 0)
+                    {
+                        if (!_followingTarget)
+                        {
+                            Debug.Log("fire(Actions.MOVEMENT_END)");
+                            setStatus(EntityStatus.IDLE);
+                            fire(Actions.MOVEMENT_END);
+                        }
+                        else
+                        {
+                            Debug.LogWarning("NavMesh not stopped at attack range... AttackRange = " + currentAttackRange());
+                        }
+                    }
                 }
-
-                // Move toward target destination at fixed steps
-                transform.position = Vector3.MoveTowards(transform.position, destination, Time.fixedDeltaTime * info.unitAttributes.movementRate);
-
-                // HACK: 0.5f is not proven to always work, it is still here beacause NavAgents will be used
-                if (!followingTarget && Vector3.Distance(transform.position, _movePoint) <= 0.5f)
+                
+                // Update destination if we are following
+                if (_followingTarget)
                 {
-                    setStatus(EntityStatus.IDLE);
-                    fire(Actions.MOVEMENT_END);
+                    _navAgent.SetDestination(_target.getTransform().position);
                 }
                 break;
         }
