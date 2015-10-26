@@ -33,7 +33,7 @@ public class Main_Game : MonoBehaviour {
             playerStronghold = Info.get.createBuilding(info.GetPlayerRace(),
                                                        BuildingTypes.STRONGHOLD,
                                                    strongholdTransform.position, strongholdTransform.rotation);
-			user.buildings.createBuilding(playerStronghold);
+			user.addEntityToList(playerStronghold.GetComponent<IGameEntity>());
 			cam.lookGameObject(playerStronghold);
         }
 	}
@@ -46,7 +46,8 @@ public class Main_Game : MonoBehaviour {
             playerHero = Info.get.createUnit(info.GetPlayerRace(),
                                              UnitTypes.HERO, playerHero.transform.position,
                                          playerHero.transform.rotation);
-			user.FillPlayerUnits(playerHero);
+			//user.FillPlayerUnits(playerHero);
+            user.addEntityToList(playerHero.GetComponent<IGameEntity>());
         }
     }
 
