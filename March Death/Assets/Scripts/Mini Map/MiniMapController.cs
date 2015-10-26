@@ -2,19 +2,20 @@
 using System.Collections;
 
 public class MiniMapController : MonoBehaviour
-{
-
-    private const float REFRESH_TIME = 1.0f/50;
-    private float tot_timer = 1f;
-
+{ 
     private Camera _camera;
     private Camera mainCam;
+
+    private RenderTexture rt;
     
     // Minimap Rectangle
     Rect rect_marker;
     Texture2D tex;
+
     private float main_zoom;
     private Vector3 act_pos;
+    private float aspect;
+
     Vector3 cameraOffset;
 	Transform mapContainer;
 
@@ -27,6 +28,7 @@ public class MiniMapController : MonoBehaviour
 
         _camera = this.GetComponent<Camera>();
         _camera.orthographic = true;
+        
         //Assign camera viewport
         _camera.rect = this.recalcViewport();
 
@@ -38,18 +40,28 @@ public class MiniMapController : MonoBehaviour
         if (Terrain.activeTerrain)
         {
             float diagonal = Mathf.Sqrt(Mathf.Pow(Terrain.activeTerrain.terrainData.size.x, 2) + Mathf.Pow(Terrain.activeTerrain.terrainData.size.y, 2));
-            _camera.transform.position = new Vector3(Terrain.activeTerrain.terrainData.size.x * 0.5f, 
-                Terrain.activeTerrain.terrainData.size.x * 0.4f,
-                Terrain.activeTerrain.terrainData.size.z * 0.5f);
+            _camera.transform.position = new Vector3(Terrain.activeTerrain.terrainData.size.x * 0.5f, Terrain.activeTerrain.terrainData.size.x * 0.4f,Terrain.activeTerrain.terrainData.size.z * 0.5f);
             _camera.transform.rotation = Quaternion.Euler(90f, 135f,0); 
             _camera.orthographicSize = diagonal * 0.95f; // a hack
             _camera.farClipPlane = Terrain.activeTerrain.terrainData.size.x * 1.5f;
             _camera.clearFlags = CameraClearFlags.Depth;
             //_camera.backgroundColor = Color.clear; // Set a more fancy background, black
-            _camera.enabled = false; // Disable camera to only render whenever we want.
         }
 
         createMarker();
+
+        rt = new RenderTexture(Screen.width, Screen.height, 2);
+        _camera.targetTexture = rt;
+    }
+
+    /// <summary>
+    /// initialize the params of the camera.
+    /// </summary>
+    private void initializeCameraPars()
+    {
+        main_zoom = mainCam.orthographicSize;
+        act_pos = mainCam.transform.position;
+        aspect = mainCam.aspect;
     }
 
     /// <summary>
@@ -58,21 +70,9 @@ public class MiniMapController : MonoBehaviour
     void OnGUI()
     {
         GUI.depth = 2;
-        if (tot_timer >= REFRESH_TIME)
-        {
-            _camera.Render();
-            tot_timer = 0f;
-        }
-        else
-            tot_timer += Time.deltaTime;
 
+        GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), rt);
         GUI.DrawTexture(rect_marker, tex);
-    }
-
-    private void initializeCameraPars()
-    {
-        main_zoom = mainCam.orthographicSize;
-        act_pos = mainCam.transform.position;
     }
 
     /// <summary>
@@ -102,6 +102,7 @@ public class MiniMapController : MonoBehaviour
             rect_marker.center = v;
             act_pos = mainCam.transform.position;
         }
+        if (mainCam.aspect != aspect) { recalcViewport(); }
     }
 
     // Update is called once per frame
@@ -123,8 +124,8 @@ public class MiniMapController : MonoBehaviour
                 updateMarker();
             }
         }
+
         updateMarker();
-        _camera.rect = recalcViewport();
     }
 
     /// <summary>
@@ -196,9 +197,9 @@ public class MiniMapController : MonoBehaviour
 			viewPortPosY = 0.02f;
 			
 			// The minimap size
-			viewPortW = (1f / (float)Screen.width) * ((float)Screen.width / 5.2701f);
+			viewPortW = (1f / (float)Screen.width) * ((float)Screen.width / 5.6701f);
 			// the height will be the ratio of the hole for the map 140/201
-			viewPortH = (1f / (float)Screen.height) * (((float)Screen.width / 4.1701f) * (140f / 201f));
+			viewPortH = (1f / (float)Screen.height) * (((float)Screen.width / 4.0701f) * (140f / 201f));
 			break;
 		default:
 			viewPortPosX = 0; viewPortPosY = 0;

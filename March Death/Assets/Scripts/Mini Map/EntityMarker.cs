@@ -41,9 +41,11 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
 
     protected virtual void OnGUI()
     {
-        //if(gameObject.GetComponent<FOWEntity>().IsRevealed)
+        if (gameObject.GetComponent<FOWEntity>().IsRevealed)
+        {
             GUI.depth = 1;
             GUI.DrawTexture(marker_rect, box_text);
+        }
     }
 
     private Color getRaceColor(Races r)
