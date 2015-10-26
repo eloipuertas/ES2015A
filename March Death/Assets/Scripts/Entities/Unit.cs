@@ -64,6 +64,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// NavAgent, used fot map navigation
     /// </summary>
     private NavMeshAgent _navAgent;
+    private bool _hasPath = false;
 
     /// <summary>
     /// Can this unit perform ranged attacks?
@@ -250,17 +251,20 @@ public class Unit : GameEntity<Unit.Actions>
     /// Starts moving the unit towards a point on a terrain
     /// </summary>
     /// <param name="movePoint">Point to move to</param>
-    public void moveTo(Vector3 movePoint)
+    public bool moveTo(Vector3 movePoint)
     {
-        _followingTarget = false;
-        _movePoint = movePoint;
         if (!_navAgent.SetDestination(movePoint))
         {
-            Debug.LogWarning("Can not move!");
+            return false;
         }
-
+        
+        _followingTarget = false;
+        _hasPath = false;
+        _movePoint = movePoint;
         setStatus(EntityStatus.MOVING);
         fire(Actions.MOVEMENT_START);
+
+        return true;
     }
 
     /// <summary>
@@ -366,22 +370,36 @@ public class Unit : GameEntity<Unit.Actions>
                 // If we are already in range, start attacking
                 // Must be called before MoveTowards because it uses _distanceToTarget, which
                 // would be otherwise outdated
-                if (_followingTarget && _distanceToTarget <= currentAttackRange())
+                if (_followingTarget)
                 {
-                    _navAgent.Stop();
-                    setStatus(EntityStatus.ATTACKING);
-                    return;
+                    // Update destination only if target has moved
+                    Vector3 destination = _target.getTransform().position;
+                    if (destination != _movePoint)
+                    {
+                        _hasPath = false;
+                        _navAgent.SetDestination(destination);
+                        _movePoint = destination;
+                    }
+
+                    // If we are already close enough, stop and attack
+                    if (_distanceToTarget <= currentAttackRange())
+                    {
+                        _navAgent.ResetPath();
+                        setStatus(EntityStatus.ATTACKING);
+                        return;
+                    }
                 }
 
-                if (!_navAgent.pathPending && _navAgent.hasPath)
+                if (!_navAgent.pathPending && (_hasPath || _navAgent.hasPath))
                 {
+                    _hasPath = true;
                     float dist = _navAgent.remainingDistance;
 
-                    if (dist != Mathf.Infinity && _navAgent.pathStatus == NavMeshPathStatus.PathComplete && _navAgent.remainingDistance == 0)
+                    // TODO: Stop condition is quite large, maybe it could be simplified
+                    if (dist != Mathf.Infinity && _navAgent.velocity.sqrMagnitude == 0f && _navAgent.pathStatus == NavMeshPathStatus.PathComplete && _navAgent.remainingDistance <= _navAgent.stoppingDistance)
                     {
                         if (!_followingTarget)
                         {
-                            Debug.Log("fire(Actions.MOVEMENT_END)");
                             setStatus(EntityStatus.IDLE);
                             fire(Actions.MOVEMENT_END);
                         }
@@ -392,11 +410,6 @@ public class Unit : GameEntity<Unit.Actions>
                     }
                 }
                 
-                // Update destination if we are following
-                if (_followingTarget)
-                {
-                    _navAgent.SetDestination(_target.getTransform().position);
-                }
                 break;
         }
     }
