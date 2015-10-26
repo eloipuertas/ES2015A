@@ -216,7 +216,8 @@ public class Unit : GameEntity<Unit.Actions>
             return true;
         }
 
-        return false;
+        // TODO: Hack to get AI working
+        return true;
     }
 
     /// <summary>
