@@ -76,17 +76,20 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 
         // Call GameEntity start
         base.Awake();
-
-        // Set the status
-        setStatus(EntityStatus.BUILDING_PHASE_1);
     }
 
     /// <summary>
     /// Object initialization
     /// </summary>
-    public void Start()
+    public override void Start()
     {
+        // Setup base
+        base.Start();
+
         activateFOWEntity();
+
+        // Set the status
+        setStatus(EntityStatus.BUILDING_PHASE_1);
     }
 
     /// <summary>

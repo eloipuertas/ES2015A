@@ -279,18 +279,22 @@ public class Unit : GameEntity<Unit.Actions>
 
         // Call GameEntity awake
         base.Awake();
-
-        // Set the status
-        setStatus(EntityStatus.IDLE);
     }
 
     /// <summary>
     /// Object initialization
     /// </summary>
-    public void Start()
+    public override void Start()
     {
+        // Setup base
+        base.Start();
+
+        // Set the status
+        setStatus(EntityStatus.IDLE);
+
         activateFOWEntity();
 
+        // Get NagMeshAgent and set basic variables
         _navAgent = GetComponent<NavMeshAgent>();
         _navAgent.speed = _info.unitAttributes.movementRate;
         _navAgent.acceleration = info.unitAttributes.movementRate * 2.5f;

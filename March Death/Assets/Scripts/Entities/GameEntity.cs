@@ -226,12 +226,16 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public override void Awake()
     {
         base.Awake();
-        setupAbilities();
 
 #if !DISABLE_ANIMATOR
         // Get the Animator
         _animator = gameObject.GetComponent<Animator>();
 #endif
+    }
+
+    public virtual void Start()
+    {
+        setupAbilities();
     }
 
     public override void Update()
