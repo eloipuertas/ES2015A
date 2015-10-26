@@ -11,6 +11,7 @@ export project="MarchWars"
 
 echo "Home: $HOME"
 echo "UnityRoot: $UNITY_ROOT"
+echo "User: $USER"
 
 # Variables
 BUILD_LINUX=-1
@@ -21,7 +22,9 @@ BUILD_OSX=-1
 mkdir -p Assets
 
 # Monkey-patch ProjectSettings
+echo "Monkey-patching ProjectSettings and AudioManager assets"
 sed -i 's/displayResolutionDialog: 1/displayResolutionDialog: 0/g' March\ Death/ProjectSettings/ProjectSettings.asset
+sed -i 's/m_DisableAudio: 0/m_DisableAudio: 1/g'  March\ Death/ProjectSettings/AudioManager.asset
 
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then
 
@@ -80,8 +83,11 @@ else
     # OSX can't be built from linux
     BUILD_OSX=0
 
+    echo "Attempting to start dummy audio driver"
+    sudo modprobe snd-dummy
+
     echo "Attempting to build $project for Linux"
-    $UNITY_ROOT/Editor/Unity \
+    sudo -E xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' $UNITY_ROOT/Editor/Unity \
       -batchmode \
       -nographics \
       -silent-crashes \
@@ -96,9 +102,8 @@ else
 
         ln -s $BUILD_DIR/linux/$project.x86_64 $BUILD_DIR/linux/$project
 
-        echo -e "\n\n-------------------------\n\n"
         echo "Attempting to build $project for Windows"
-        $UNITY_ROOT/Editor/Unity \
+        sudo -E xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' $UNITY_ROOT/Editor/Unity \
           -batchmode \
           -nographics \
           -silent-crashes \
