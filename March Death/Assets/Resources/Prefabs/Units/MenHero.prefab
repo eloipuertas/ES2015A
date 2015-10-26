@@ -467,6 +467,7 @@ GameObject:
   - 65: {fileID: 6554124}
   - 114: {fileID: 11448092}
   - 114: {fileID: 11496614}
+  - 195: {fileID: 19568974}
   m_Layer: 0
   m_Name: MenHero
   m_TagString: Untagged
@@ -2801,6 +2802,26 @@ SkinnedMeshRenderer:
     m_Center: {x: -7.32279441e-05, y: .00842854939, z: 6.95788767e-05}
     m_Extent: {x: .000352009927, y: .0136705469, z: .00207479321}
   m_DirtyAABB: 0
+--- !u!195 &19568974
+NavMeshAgent:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 133624}
+  m_Enabled: 1
+  m_Radius: .5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2.5
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

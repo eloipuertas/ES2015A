@@ -715,6 +715,7 @@ GameObject:
   - 65: {fileID: 6548642}
   - 54: {fileID: 5478168}
   - 114: {fileID: 11414336}
+  - 195: {fileID: 19598808}
   m_Layer: 0
   m_Name: human_civil_female
   m_TagString: Untagged
@@ -2718,6 +2719,26 @@ SkinnedMeshRenderer:
     m_Center: {x: -1.40585471e-05, y: -.00239946321, z: -.000388816465}
     m_Extent: {x: .00601912197, y: .0165640116, z: .00514425989}
   m_DirtyAABB: 0
+--- !u!195 &19598808
+NavMeshAgent:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 164098}
+  m_Enabled: 1
+  m_Radius: .5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 3
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

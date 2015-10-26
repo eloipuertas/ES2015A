@@ -504,6 +504,7 @@ GameObject:
   - 114: {fileID: 11426218}
   - 114: {fileID: 11405404}
   - 114: {fileID: 11443174}
+  - 195: {fileID: 19580018}
   m_Layer: 0
   m_Name: elf_civil_male
   m_TagString: Untagged
@@ -2906,6 +2907,26 @@ SkinnedMeshRenderer:
     m_Center: {x: .0047833072, y: .0026082308, z: .00861251354}
     m_Extent: {x: .00581100583, y: .00463564089, z: .00565565657}
   m_DirtyAABB: 0
+--- !u!195 &19580018
+NavMeshAgent:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 137418}
+  m_Enabled: 1
+  m_Radius: .5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 3
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
