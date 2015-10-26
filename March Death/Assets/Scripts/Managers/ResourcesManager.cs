@@ -35,7 +35,6 @@ namespace Managers
             }
         }
 
-
         public void EmptyDeposits()
         {
             foreach (var deposit in _deposits.Values)
@@ -100,6 +99,32 @@ namespace Managers
         public void AddAmount(Type type, float amount)
         {
             AddAmount(new WorldResources.Resource(type, amount));
+        }
+
+        // -- Ferran --
+        /// <summary>
+        /// When resource building ability creates civilian unit we must 
+        /// substract cost of this unit.
+        /// </summary>
+        /// <param name="race"></param>
+        /// <param name="type"></param>
+        public void payCivilUnit(Storage.Races race, Storage.UnitTypes type)
+        {
+            // TODO: compute civilian cost. Unit is created at Entities.Resource.cs 
+            
+            Unit unit = new Unit();
+            unit.type = Storage.UnitTypes.CIVIL;
+             
+            var food = unit.info.resources.food;
+            var metal = unit.info.resources.metal;
+            var wood = unit.info.resources.wood;
+            //var gold = unit.info.resources.gold;
+
+            SubstractAmount(Type.FOOD, food);
+            SubstractAmount(Type.METAL, metal);
+            SubstractAmount(Type.WOOD, wood);
+            //SubstractAmount(Type.GOLD, gold);
+             
         }
 
     }

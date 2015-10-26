@@ -197,12 +197,11 @@ public class Resource : Building<Resource.Actions>
         // TODO set desired rotation, now unit rotation equals building rotation!!
         // TODO  ---create gameobject meetingPointInside and meetingPointOutside
         // attached to resource building design---
-        
+
         //---unComment next two lines when meeting point objects are created---
         //GameObject meetingPointInside = this.GetComponent(meetingPointInside);
         //GameObject meetingPointOutside = this.GetComponent(meetingPointOutside);
 
-        
         if (harvestUnits < info.resourceAttributes.maxUnits)
         {
             // TODO get inside meeting point and calculate position
@@ -216,7 +215,7 @@ public class Resource : Building<Resource.Actions>
             
 
             
-            // Method createUnit form Info returns GameObject Instance;
+            // Method createUnit from Info returns GameObject Instance;
             GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
 
             Unit civil = gob.GetComponent<Unit>();
