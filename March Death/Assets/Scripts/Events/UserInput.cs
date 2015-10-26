@@ -6,6 +6,9 @@ using Managers;
 
 public class UserInput : MonoBehaviour
 {
+	private enum action {NONE, LEFT_CLICK, RIGHT_CLICK, DRAG}
+	private action currentAction;
+
     private Player player;
     private UnitsManager uManager { get { return player.units; } }
 
@@ -13,15 +16,13 @@ public class UserInput : MonoBehaviour
     public Vector3 invalidPosition { get{ return new Vector3(-99999, -99999, -99999); } }
 
 	//range in which a mouse down and mouse up event will be treated as "the same location" on the map.
-	private int mouseButtonReleaseRange = 20;
+	private int mouseButtonReleaseRange = 30;
 
 	//boolean to know if the left mouse button is down
 	private bool leftButtonIsDown = false;
 
-	//the mouse position when the user move it ("bottom right" corner of the rect if you start from left to right and from top to bottom)
 	private Vector2 mouseButtonDownPoint;
-	//the mouse position where the user first click ("top left" corner of the rect if you start from left to right and from top to bottom)
-	private Vector2 mouseButtonUpPoint;
+	private Vector2 mouseButtonCurrentPoint;
 
 	//position of the 4 corners on selected area
 	private Vector3 topLeft;
@@ -30,83 +31,197 @@ public class UserInput : MonoBehaviour
 	private Vector3 bottomRight;
 
 	//width and height of the selectionTexture
-	private float width() { return mouseButtonUpPoint.x - mouseButtonDownPoint.x; }
-	private float height() { return (Screen.height - mouseButtonUpPoint.y) - (Screen.height - mouseButtonDownPoint.y); }
+	private float width() { return mouseButtonCurrentPoint.x - mouseButtonDownPoint.x; }
+	private float height() { return (Screen.height - mouseButtonCurrentPoint.y) - (Screen.height - mouseButtonDownPoint.y); }
 
 	Texture2D selectionTexture;
+	Texture2D cursorAttack;
 
 	private RaycastHit hit = new RaycastHit();
+	private Ray ray;
 
 	CameraController camera;
 
     public LayerMask TerrainLayerMask;
 
+
+	Rect rectActions;
+	Rect rectInformation;
+
     // Use this for initialization
     void Start()
     {
         player = GetComponent<Player>();
-		selectionTexture = (Texture2D)Resources.Load("SelectionTexture");	
+		selectionTexture = (Texture2D)Resources.Load ("SelectionTexture");
+		cursorAttack = (Texture2D)Resources.Load("cursor_attack");
 		camera = GameObject.Find("Main Camera").GetComponent ("CameraController") as CameraController;
-    }
+
+		//Get hud components rect
+		RectTransform actions = GameObject.Find("actions").GetComponent<RectTransform>();
+		RectTransform info = GameObject.Find("Information").GetComponent<RectTransform>();
+		rectActions = new Rect (actions.position.x - actions.rect.position.x - actions.rect.width, actions.position.y - actions.rect.position.y - actions.rect.height, actions.rect.width, actions.rect.height);
+		rectInformation = new Rect (info.position.x - info.rect.position.x - info.rect.width, info.position.y - info.rect.position.y - info.rect.height, info.rect.width, info.rect.height);
+
+	}
 
 	void OnGUI() {
 
-		//draw selection texture if mouse is dragging
-		if (leftButtonIsDown) {
-			Rect rect = new Rect(mouseButtonDownPoint.x, Screen.height - mouseButtonDownPoint.y, width(), height());
+		//Draw selection texture if mouse is dragging
+		if (currentAction == action.DRAG) {
+			Rect rect = new Rect (mouseButtonDownPoint.x, Screen.height - mouseButtonDownPoint.y, width (), height ());
 			GUI.DrawTexture (rect, selectionTexture, ScaleMode.StretchToFill, true); 
 		}
+	
 	}
 
     void Update()
     {
 
-        MouseActivity();
-
+		currentAction = GetMouseAction();
+		// FIXME: add HUD colliders
+		if (rectActions.Contains (Input.mousePosition) || rectInformation.Contains (Input.mousePosition)) {
+			return;
+		}
+		if (currentAction == action.NONE) {
+			//DO NOTHING
+		} else if (currentAction == action.LEFT_CLICK) {
+			LeftClick ();
+		} else if (currentAction == action.RIGHT_CLICK) {
+			RightClick ();
+		} else if (currentAction == action.DRAG) {
+			Drag();
+		}
     }
+
+	private void LeftClick() 
+	{
+		if (player.isCurrently (Player.status.IDLE)) {
+			Select ();
+		} else if (player.isCurrently (Player.status.SELECTED_UNTIS)) {
+			Deselect ();
+			Select ();
+		} else if (player.isCurrently (Player.status.PLACING_BUILDING)) {
+			PlaceBuilding ();
+		}
+	}
+
+	private void RightClick() 
+	{
+		if (player.isCurrently (Player.status.IDLE)) {
+			//Do nothing
+		} else if (player.isCurrently (Player.status.SELECTED_UNTIS)) {
+
+			GameObject hitObject = FindHitObject();
+			if (!hitObject) // out of bounds click
+			{
+				Debug.Log("The click is out of bounds?");
+			}
+			else if (hitObject.name == "Terrain") // if it is the terrain, let's go there
+			{
+				uManager.MoveTo(FindHitPoint());
+			} else // let's find what it is, check if is own unit or rival
+			{
+				IGameEntity entity = hitObject.GetComponent<IGameEntity>();
+				
+				if (entity.info.race != player.race) // If it is another race, we'll attack, but if it's the same race?
+				{
+					//TODO: we have to move the unit to the rival to attack
+					uManager.AttackTo(entity);
+				}
+			}
+
+		} else if (player.isCurrently (Player.status.PLACING_BUILDING)) {
+			GetComponent<BuildingsManager>().cancelPlacing();
+		}
+	}
+
+	private void Drag() {
+		if (player.isCurrently (Player.status.IDLE)) {
+			SelectUnitsInArea();
+		} else if (player.isCurrently (Player.status.SELECTED_UNTIS)) {
+			SelectUnitsInArea();
+		} else if (player.isCurrently (Player.status.PLACING_BUILDING)) {
+			//Do nothing
+		}
+	}
+
+	private void Select() {
+
+		//Select if exists unit
+		GameObject hitObject = FindHitObject ();
+		if (hitObject) {		
+			Selectable selectedObject = hitObject.GetComponent<Selectable> ();
+			// We just be sure that is a selectable object
+			if (selectedObject) {
+				//TODO: use only one select method
+				selectedObject.SelectUnique ();
+				player.setCurrently (Player.status.SELECTED_UNTIS);
+			} 
+		}
+	}
+
+	private void Deselect() {
+		
+		//Deselect all
+		for (int i = player.SelectedObjects.Count - 1; i >= 0; i--)
+		{
+			Selectable selectedObject = (Selectable)player.SelectedObjects[i];
+			selectedObject.Deselect();
+		}
+		player.setCurrently(Player.status.IDLE);
+	}
+
+	private void PlaceBuilding() {
+
+		//Place building if position is correct
+		if (!EventSystem.current.IsPointerOverGameObject()) {
+			if (GetComponent<BuildingsManager>().placeBuilding()) {
+				player.setCurrently (Player.status.SELECTED_UNTIS);
+			} else {
+				player.setCurrently (Player.status.PLACING_BUILDING);
+			}
+		}
+	}
 
     /// <summary>
     /// Checks if there has been activity with the mouse buttons
     /// </summary>
-    private void MouseActivity()
+    private action GetMouseAction()
     {
-
-
 		// TODO : (Devel_c) Check positions with the HUD
-        if (Input.GetMouseButtonDown (0)) {
+		mouseButtonCurrentPoint = Input.mousePosition;
+
+		if (Input.GetMouseButtonDown (0)) {
 			camera.disableManualControl();
 			leftButtonIsDown = true;
-			mouseButtonUpPoint = Input.mousePosition;    
-			topLeft = GetScreenRaycastPoint(mouseButtonUpPoint);
+			GameObject hitObject = FindHitObject();
+			string name = hitObject.name;
+			mouseButtonDownPoint = mouseButtonCurrentPoint;
+			topLeft = GetScreenRaycastPoint(mouseButtonDownPoint);
 
 		} else if (Input.GetMouseButtonUp (0)) {
 			camera.enableManualControl();
 			leftButtonIsDown = false;
 
 			//Check if is a simple click or dragging if the range is not big enough
-			if (IsSimpleClick (mouseButtonDownPoint, mouseButtonUpPoint))
+			if (IsSimpleClick (mouseButtonDownPoint, mouseButtonCurrentPoint))
 			{
-				LeftMouseClick ();
+				return action.LEFT_CLICK;
 			} else {
-				SelectUnitsInArea();
+				return action.NONE;
 			}
-
 		} else if (Input.GetMouseButtonDown (1)) {
 			leftButtonIsDown = false;
-			topLeft = GetScreenRaycastPoint(mouseButtonDownPoint);
-			RightMouseClick ();
+			return action.RIGHT_CLICK;
 		}
 
-		//if the left button is down and the mouse is moving, start dragging
-		if(leftButtonIsDown)
-		{
-			mouseButtonDownPoint = Input.mousePosition;
-
-			bottomRight = GetScreenRaycastPoint(mouseButtonDownPoint);
-			bottomLeft  = GetScreenRaycastPoint(new Vector2( mouseButtonDownPoint.x+width(), mouseButtonDownPoint.y));
-			topRight    = GetScreenRaycastPoint(new Vector2( mouseButtonDownPoint.x, mouseButtonDownPoint.y-height()));
-
-			//SelectUnitsInArea();
+		if (leftButtonIsDown && !IsSimpleClick (mouseButtonDownPoint, mouseButtonCurrentPoint)) {
+			bottomRight = GetScreenRaycastPoint (mouseButtonCurrentPoint);
+			bottomLeft = GetScreenRaycastPoint (new Vector2 (mouseButtonDownPoint.x + width (), mouseButtonDownPoint.y));
+			topRight = GetScreenRaycastPoint (new Vector2 (mouseButtonDownPoint.x, mouseButtonDownPoint.y - height ()));
+			return action.DRAG;
+		} else {
+			return action.NONE;
 		}
     }
 
@@ -130,9 +245,7 @@ public class UserInput : MonoBehaviour
 			Vector3 unitPosition = unit.transform.position;
 			Selectable selectedObject = unit.GetComponent<Selectable>();
 			if (AreaContainsObject(selectedArea, unitPosition)) {
-				if (!player.SelectedObjects.Contains(selectedObject)) selectedObject.Select();
-                
-                // move units doesn't work if the code below is uncommented	
+				if (!player.SelectedObjects.Contains(selectedObject)) selectedObject.Select();	
 			} else {  
 				if (player.SelectedObjects.Contains(selectedObject)) selectedObject.Deselect();
 			}
@@ -155,89 +268,6 @@ public class UserInput : MonoBehaviour
 		}
 		return inArea;
 	}
-
-    /// <summary>
-    /// Controls the left mouse click events
-    /// </summary>
-
-    private void LeftMouseClick()
-    {
-
-		if (player.isCurrently(Player.status.IDLE)) 
-        {
-            GameObject hitObject = FindHitObject();
-            if (hitObject)
-            {
-
-                Selectable selectedObject = hitObject.GetComponent<Selectable>();
-                // We just be sure that is a selectable object
-                if (selectedObject)
-                {
-                    selectedObject.SelectUnique();
-                    player.setCurrently(Player.status.SELECTED_UNTIS);
-                }
-            }
-        }
-        else if (player.isCurrently(Player.status.PLACING_BUILDING) && !EventSystem.current.IsPointerOverGameObject())
-        {   // HACK : (Hermetico)
-            // Check if the player is placing the building but is not over game objetct. 
-            // This is needed because just after clicking in a button to place the building, the onMouseUp event is triggered
-            GetComponent<BuildingsManager>().placeBuilding();
-        }
-		else if (player.isCurrently(Player.status.SELECTED_UNTIS)) // There are people selected what should we do?
-        {
-            GameObject hitObject = FindHitObject();
-
-            if (!hitObject) // out of bounds click
-            {
-                Debug.Log("The click is out of bounds?");
-            }
-            else if (hitObject.name == "Terrain") // if it is the terrain, let's go there
-            {
-                uManager.MoveTo(FindHitPoint());
-            }
-            else // let's find what it is
-            {
-                IGameEntity entity = hitObject.GetComponent<IGameEntity>();
-
-                if (entity.info.race != player.race) // If it is another race, we'll attack, but if it's the same race?
-                {
-                    uManager.AttackTo(entity);
-                }
-                else // it is our own race, but we have units selected, we should deselect them first
-                {
-                    // TODO: (hermetico) deselect units first
-                    //Vector3 hitPoint = FindHitPoint();
-
-                    if (hitObject)
-                    {
-
-                        //maybe, if we are sure that the hit object is not a enemy race it will be
-                        // our race, so that it will be selectable too. Prior to delete de check below
-                        // double check that the reasoning is correct
-
-                        Selectable selectedObject = hitObject.GetComponent<Selectable>();
-                        // We just be sure that is a selectable object
-                        if (selectedObject)
-                        {
-                            // the rest of the units will be deselected
-                            selectedObject.SelectUnique();
-                            player.setCurrently(Player.status.SELECTED_UNTIS);
-                        }
-                    }
-                    //else if (hitPoint != this.invalidPosition)
-                    //{
-                    /* TODO check if click is not out of bounds ( perhaps the click is in the HUD ) */
-
-                    // }
-                    //else
-                    //{
-                    //TODO where is the hit???
-                    //}
-                }
-            }
-        }
-    }
 
     /// <summary>
     /// Returns the object where the mouse hits
@@ -276,26 +306,6 @@ public class UserInput : MonoBehaviour
             return this.invalidPosition;
     }
 
-
-    /// <summary>
-    /// Controls the right mouse click events
-    /// </summary>
-    private void RightMouseClick()
-    {
-        if (player.isCurrently(Player.status.PLACING_BUILDING))
-        {
-            GetComponent<BuildingsManager>().cancelPlacing();
-        }
-        else if (player.isCurrently(Player.status.SELECTED_UNTIS))
-        {
-            for (int i = player.SelectedObjects.Count - 1; i >= 0; i--)
-            {
-                Selectable selectedObject = (Selectable)player.SelectedObjects[i];
-                selectedObject.Deselect();
-            }
-            player.setCurrently(Player.status.IDLE);
-        }
-    }
 	private bool IsSimpleClick(Vector2 v1, Vector2 v2) 
 	{
 		if (Vector2.Distance (v1, v2) < mouseButtonReleaseRange) return true;

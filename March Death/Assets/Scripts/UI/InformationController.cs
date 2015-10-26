@@ -4,10 +4,13 @@ using System.Collections;
 using System;
 using Storage;
 using Utils;
+using System.IO;
 
 public class InformationController : MonoBehaviour {
 
 	private Player player;
+
+	private const string IMAGES_PATH = "InformationImages";
 
 	//objects for one unit information
 	private Text txtActorName;
@@ -63,7 +66,6 @@ public class InformationController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-	
 	}
 
 	private void ShowInformation(GameObject gameObject) 
@@ -76,13 +78,15 @@ public class InformationController : MonoBehaviour {
 		txtActorRace.enabled = true;
 		txtActorHealth.text = entity.healthPercentage.ToString () + "/100";
 		txtActorHealth.enabled = true;	
-		/* Ready for next sprint
-		Texture2D actorTexture = (Texture2D)Resources.Load ("SelectionTexture");
-		Sprite image = Sprite.Create(actorTexture, new Rect(0, 0, actorTexture.width, actorTexture.height), new Vector2(0.5f, 0.5f));
-		//imgActorDetail.color = new Color (0, 0, 1, 1);
-		imgActorDetail.enabled = true;
-		imgActorDetail.sprite = image;
-		*/
+
+		char separator = Path.DirectorySeparatorChar;
+		string path = IMAGES_PATH + separator + entity.getRace () + "_" + entity.info.name;
+		Texture2D texture = (Texture2D)Resources.Load (path);
+		if (texture) {
+			imgActorDetail.enabled = true;
+			imgActorDetail.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+		}
+
 		sliderActorHealth.value = entity.healthPercentage;
 		sliderActorHealth.enabled = true;
 		Transform sliderBackground = sliderActorHealth.transform.FindChild ("Background");
@@ -223,6 +227,12 @@ public class InformationController : MonoBehaviour {
     public void onUnitDied(System.Object obj)
 	{
 		HideInformation ();
+	}
+
+	public void Clear()
+	{
+		Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.SELECTED, onUnitSelected);
+		Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.DESELECTED, onUnitDeselected);
 	}
 		
 }
