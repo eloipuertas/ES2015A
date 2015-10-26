@@ -61,8 +61,8 @@ public class FOWManager : MonoBehaviour
     {
         if(Terrain)
         { 
-            int width = Mathf.RoundToInt(Terrain.terrainData.size.x* Quality);
-            int height = Mathf.RoundToInt(Terrain.terrainData.size.z * Quality);
+            int width = Mathf.RoundToInt(Terrain.terrainData.size.x* Quality)+50;
+            int height = Mathf.RoundToInt(Terrain.terrainData.size.z * Quality)+50;
 
             //Let's make sure we aren't going to generate a huge texture
             if (width*height>4000000) 

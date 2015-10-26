@@ -268,9 +268,12 @@ public class Unit : GameEntity<Unit.Actions>
 
         // Set the status
         setStatus(EntityStatus.IDLE);
-        activateFOWEntity();
     }
 
+    public void Start()
+    {
+        activateFOWEntity();
+    }
     /// <summary>
     /// Called once a frame to update the object
     /// </summary>
