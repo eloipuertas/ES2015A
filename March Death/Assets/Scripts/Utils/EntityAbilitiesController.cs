@@ -53,7 +53,9 @@ public class EntityAbilitiesController : MonoBehaviour
         if (!actionPanel) return;
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
         var rectTransform = actionPanel.GetComponent<RectTransform>();
-        var extents = 0.9f * rectTransform.sizeDelta / 2.0f;
+        var size = rectTransform.sizeDelta;
+        var globalScaleXY = new Vector2(rectTransform.lossyScale.x, rectTransform.lossyScale.y);
+        var extents = Vector2.Scale(size, globalScaleXY) / 2.0f;
         var buttonExtents = new Vector2(extents.x / Button_Columns, extents.y / Button_Rows);
         var position = rectTransform.position;
         var point = new Vector2(position.x - extents.x, position.y + extents.y);
@@ -129,7 +131,7 @@ public class EntityAbilitiesController : MonoBehaviour
         Debug.Log("Hello everybody!");
     }
 
-    Sprite CreateSprite(String ability)
+    Sprite CreateSprite2(String ability)
     {
         char separator = Path.DirectorySeparatorChar;
         Sprite newImg = null;
@@ -149,4 +151,23 @@ public class EntityAbilitiesController : MonoBehaviour
         }
         return newImg;
     }
+
+
+    Sprite CreateSprite(String ability)
+    {
+        Sprite newImg = null;
+        char separator = Path.AltDirectorySeparatorChar;
+
+        Texture2D text;
+
+        String file = "ActionButtons" + separator + ability.Replace(" ", "_");
+        text = Resources.Load(file) as Texture2D;
+        if (text)
+        {
+            newImg = Sprite.Create(text, new Rect(0, 0, text.width, text.height), new Vector2(0.5f, 0.5f));
+        }
+
+        return newImg;
+    }
+
 }
