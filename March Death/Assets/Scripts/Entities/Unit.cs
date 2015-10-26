@@ -254,7 +254,10 @@ public class Unit : GameEntity<Unit.Actions>
     {
         _followingTarget = false;
         _movePoint = movePoint;
-        _navAgent.SetDestination(movePoint);
+        if (!_navAgent.SetDestination(movePoint))
+        {
+            Debug.LogWarning("Can not move!");
+        }
 
         setStatus(EntityStatus.MOVING);
         fire(Actions.MOVEMENT_START);

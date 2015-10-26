@@ -12,7 +12,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 	private Player player;
     private Rect selectedRect = new Rect();
     private Texture2D selectedBox;
-    bool currentlySelected { get; set; }
+    public bool currentlySelected { get; set; }
     private float healthRatio = 1f;
     private bool updateHealthRatio = true;
     private bool entityMoving = true;
@@ -27,8 +27,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         base.Awake();
 
 		GameObject gameObject = GameObject.Find("GameController");
-		player = gameObject.GetComponent ("Player") as Player;
-		player.FillPlayerUnits (this.gameObject);
+        player = gameObject.GetComponent<Player>();
 
         //Pendiente
         //gameEntity = this.GetComponent<IGameEntity>();

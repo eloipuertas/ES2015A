@@ -10,9 +10,14 @@ public class Main_Game : MonoBehaviour {
 	public GameObject playerStronghold;
     public GameObject playerHero;
 
-	// Use this for initialization
-	void Start () {
-		strongholdTransform = GameObject.Find("PlayerStronghold").transform;
+    private Player player;
+
+    // Use this for initialization
+    void Start () {
+        GameObject gameController = GameObject.FindGameObjectWithTag("GameController");
+        player = gameController.GetComponent<Player>();
+
+        strongholdTransform = GameObject.Find("PlayerStronghold").transform;
         playerHero = GameObject.Find("PlayerHero");
         if(GameObject.Find("GameInformationObject"))
 		    info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
@@ -29,6 +34,9 @@ public class Main_Game : MonoBehaviour {
             playerStronghold = Info.get.createBuilding(info.GetPlayerRace(),
                                                        BuildingTypes.STRONGHOLD,
                                                    strongholdTransform.position, strongholdTransform.rotation);
+
+            IGameEntity entity = playerStronghold.GetComponent<IGameEntity>();
+            player.addEntity(entity);
         }
 	}
 
@@ -40,6 +48,9 @@ public class Main_Game : MonoBehaviour {
             playerHero = Info.get.createUnit(info.GetPlayerRace(),
                                              UnitTypes.HERO, playerHero.transform.position,
                                          playerHero.transform.rotation);
+
+            IGameEntity entity = playerHero.GetComponent<IGameEntity>();
+            player.addEntity(entity);
         }
     }
 }

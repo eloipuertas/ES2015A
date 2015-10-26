@@ -240,6 +240,25 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         {
             ability.Update();
         }
+
+        if (status == EntityStatus.DEAD || status == EntityStatus.DESTROYED)
+        {
+            // TODO: Should this be automatically handled with events?
+            FOWManager.Instance.removeEntity(this.GetComponent<FOWEntity>());
+
+            // TODO: Should this be automatically handled with events?
+            Selectable selectable = GetComponent<Selectable>();
+            if (selectable.currentlySelected)
+            {
+                selectable.Deselect();
+            }
+
+            // TODO: Should this be automatically handled with events?
+            BasePlayer.getOwner(this).removeEntity(this);
+
+            // Destroy us
+            Destroy(this.gameObject);
+        }
     }
 
     /// <summary>

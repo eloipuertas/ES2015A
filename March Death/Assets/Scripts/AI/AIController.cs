@@ -33,7 +33,7 @@ namespace Assets.Scripts.AI
         /// <summary>
         /// Just a basic way to keep track of what the enemy has more
         /// </summary>
-        public Dictionary<UnitTypes,int> UnitsFound { get; set; }
+        public Dictionary<UnitTypes, int> UnitsFound { get; set; }
 
         Vector3 buildPosition;
         public Vector3 rootBasePosition;
@@ -92,28 +92,56 @@ namespace Assets.Scripts.AI
                 }
             }
         }
+        void OnEnemyDied(System.Object obj)
+        {
+            IGameEntity g = ((GameObject)obj).GetComponent<IGameEntity>();
+            if (g.info.isUnit)
+            {
+                EnemyUnits.Remove((Unit)g);
+            }
+            else if (g.info.isBuilding)
+            {
+                EnemyBuildings.Remove(g);
+            }
+        }
         void OnEntityFound(System.Object obj)
         {
             IGameEntity g = ((GameObject)obj).GetComponent<IGameEntity>();
             if (g.info.isUnit)
-                if (!EnemyUnits.Contains((Unit)g)) 
+            {
+                if (!EnemyUnits.Contains((Unit)g))
+                {
+                    g.registerFatalWounds(OnEnemyDied);
                     EnemyUnits.Add((Unit)g);
+                }
+            }
             else if (g.info.isBuilding)
-                    if (!EnemyBuildings.Contains(g))
-                        EnemyBuildings.Add(g);
+            {
+                if (!EnemyBuildings.Contains(g))
+                {
+                    g.registerFatalWounds(OnEnemyDied);
+                    EnemyBuildings.Add(g);
+                }
+            }
         }
         void OnEntityLost(System.Object obj)
         {
             IGameEntity g = ((GameObject)obj).GetComponent<IGameEntity>();
             if (g.info.isUnit)
+            {
+                g.unregisterFatalWounds(OnEnemyDied);
                 EnemyUnits.Remove((Unit)g);
+            }
             else if (g.info.isBuilding)
+            {
+                g.unregisterFatalWounds(OnEnemyDied);
                 EnemyBuildings.Remove(g);
+            }
         }
         public void CreateBuilding(BuildingTypes btype)
         {
-            GameObject g = Info.get.createBuilding(_selfRace, btype, buildPosition, Quaternion.Euler(0,0,0));
-            buildPosition += new Vector3(0, 0,20);
+            GameObject g = Info.get.createBuilding(_selfRace, btype, buildPosition, Quaternion.Euler(0, 0, 0));
+            buildPosition += new Vector3(0, 0, 20);
             Resource build = (Resource)g.GetComponent<IGameEntity>();
             build.register(Resource.Actions.CREATE_UNIT, OnCivilCreated);
             build.register(Resource.Actions.DESTROYED, OnBuildingDestroyed);
@@ -140,6 +168,10 @@ namespace Assets.Scripts.AI
             if (Army.Contains(u))
                 Army.Remove(u);
         }
+
+        // TODO: Should it be handled with events??
+        public override void removeEntity(IGameEntity entity) { }
+        public override void addEntity(IGameEntity newEntity) { }
     }
     struct AIModule
     {

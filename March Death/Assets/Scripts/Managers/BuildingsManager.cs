@@ -161,7 +161,7 @@ namespace Managers
                 newBuilding.transform.position = toLocation;
                 this.newBuilding.GetComponent<Rigidbody>().detectCollisions = false;
                 IGameEntity destination = (IGameEntity)newBuilding.GetComponent<Unit>();
-                player.addEntityToList(destination);
+                player.addEntity(destination);
                 
                 // remaining operations
                 _finishPlacing();
