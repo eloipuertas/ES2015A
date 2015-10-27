@@ -13,8 +13,11 @@ namespace Assets.Scripts.AI
 {
     public class AIController : BasePlayer
     {
+        public const bool AI_DEBUG_ENABLED = true;
+
         public MacroManager Macro { get; set; }
         public MicroManager Micro { get; set; }
+        public AIDebugSystem aiDebug;
 
         /// <summary>
         /// Will be used to calculate the lvl of the AI
@@ -43,18 +46,14 @@ namespace Assets.Scripts.AI
 
             _selfRace = info.GetPlayerRace() == Races.MEN ? Races.ELVES : Races.MEN;
 
-            if (_selfRace == Races.ELVES) Army.Add(GameObject.Find("elf_hero").gameObject.GetComponent<Unit>());
-            else Army.Add(GameObject.Find("MenHero").gameObject.GetComponent<Unit>());
-        }
-        
-        void Awake()
-        {
             //Init lists
             EnemyUnits = new List<Unit>();
             EnemyBuildings = new List<IGameEntity>();
             OwnBuildings = new List<IGameEntity>();
             modules = new List<AIModule>();
             Army = new List<Unit>();
+            rootBasePosition = new Vector3(706, 80, 765);
+            Army.Add(Info.get.createUnit(_selfRace, UnitTypes.HERO, rootBasePosition,Quaternion.Euler(0,0,0)).GetComponent<Unit>());
             Workers = new List<Unit>();
             Macro = new MacroManager(this);
             Micro = new MicroManager(this);
@@ -74,6 +73,12 @@ namespace Assets.Scripts.AI
             };
             Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.DISCOVERED, OnEntityFound, selector);
             Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.HIDDEN, OnEntityLost, selector);
+
+            if (AI_DEBUG_ENABLED)
+            {
+                aiDebug = AIDebugSystem.CreateComponent(gameObject, this);
+            }
+
         }
         void Update()
         {
@@ -128,8 +133,9 @@ namespace Assets.Scripts.AI
         }
         void OnUnitDead(System.Object obj)
         {
-            Unit u = (Unit)obj;
-            if(Workers.Contains(u))
+            GameObject g = (GameObject)obj;
+            Unit u = g.GetComponent<Unit>();
+            if (Workers.Contains(u))
                 Workers.Remove(u);
             if (Army.Contains(u))
                 Army.Remove(u);

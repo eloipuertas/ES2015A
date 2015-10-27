@@ -19,15 +19,15 @@ namespace Assets.Scripts.AI
         /// <summary>
         /// Commite of agents who will each vote at what to do with every squad
         /// </summary>
-        List<BaseAgent> agents;
+        public List<BaseAgent> agents;
         public MicroManager(AIController ai)
         {
             agents = new List<BaseAgent>();
             this.ai = ai;
-            agents.Add(new ExplorerAgent(ai));
-            AttackAgent aA = new AttackAgent(ai);
+            agents.Add(new ExplorerAgent(ai, "Explorer"));
+            AttackAgent aA = new AttackAgent(ai, "Atack");
             agents.Add(aA);
-            agents.Add(new RetreatAgent(ai, aA));
+            agents.Add(new RetreatAgent(ai, aA, "Retreat"));
         }
         /// <summary>
         /// Called pretty fast, it's just like Update()
@@ -42,12 +42,20 @@ namespace Assets.Scripts.AI
                 foreach(BaseAgent a in agents)
                 {
                     val = a.getConfidence(lu) * a.modifier + getError();
+                    if(AIController.AI_DEBUG_ENABLED) ai.aiDebug.setAgentConfidence(a.agentName, val);
                     if (val > bVal)
                     {
                         bVal = val;
                         bAgent = a;
                     }
                 }
+
+                if(AIController.AI_DEBUG_ENABLED)
+                {
+                    ai.aiDebug.controllingAgent = bAgent.agentName;
+                    ai.aiDebug.confidence = bVal;
+                }
+
                 bAgent.controlUnits(lu);
             }
         }

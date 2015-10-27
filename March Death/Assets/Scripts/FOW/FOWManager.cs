@@ -24,11 +24,17 @@ public class FOWManager : MonoBehaviour
     /// Rate at which the uncovered areas darken up after not being lit anymore.
     /// </summary>
     [Range(0,400)]
-    public float FadeRate=200;
-
+    float fadeRate;
+    /// <summary>
+    /// Activates 1 frame of X.
+    /// if frames = 1 FOWManager will activate every frame
+    /// if frames = 3 FOWManager will activate once every 3 frames
+    /// </summary>
+    int frames;
+    int cFrame;
     public bool Enabled;
 
-    List<FOWEntity> entities = new List<FOWEntity>();
+    List<FOWEntity> entities;
     Texture2D fowTex;
     Color32[] pixels;
 
@@ -38,10 +44,14 @@ public class FOWManager : MonoBehaviour
     /// </summary>
     public visible[] aiVision { get; set; }
 
-    void Start()
+    void Awake()
     {
+        frames = 1;
+        cFrame = 0;
+        fadeRate=200;
         if (Application.isPlaying)
             InitializeTexture();
+        entities= new List<FOWEntity>();
     }
     /// <summary>
     /// Creates a new texture the size of terrain
@@ -51,8 +61,8 @@ public class FOWManager : MonoBehaviour
     {
         if(Terrain)
         { 
-            int width = Mathf.RoundToInt(Terrain.terrainData.size.x* Quality);
-            int height = Mathf.RoundToInt(Terrain.terrainData.size.z * Quality);
+            int width = Mathf.RoundToInt(Terrain.terrainData.size.x* Quality)+50;
+            int height = Mathf.RoundToInt(Terrain.terrainData.size.z * Quality)+50;
 
             //Let's make sure we aren't going to generate a huge texture
             if (width*height>4000000) 
@@ -68,7 +78,7 @@ public class FOWManager : MonoBehaviour
             aiVision = new visible[width * height];
             
             //Paint it all black
-            Color cc = NotFullyOpaque? new Color(0, 1, 0, 255): Color.black;
+            Color cc = NotFullyOpaque? new Color(0, 255, 0): Color.black;
             for (int i = 0; i < pixels.Length; i++)
             {
                 pixels[i] = cc;
@@ -93,39 +103,47 @@ public class FOWManager : MonoBehaviour
     
     void Update()
     {
+        if (cFrame == frames)
+        { 
 #if UNITY_EDITOR
-        //Don't show fog on the editor or if not enabled.
-        if (!Application.isPlaying || !Enabled)
-        {
-            Shader.SetGlobalTexture("_FOWTex", UnityEditor.EditorGUIUtility.whiteTexture);
-            if (fowTex != null)
-                DestroyImmediate(fowTex);
-            fowTex = null;
-        }
+            //Don't show fog on the editor or if not enabled.
+            if (!Application.isPlaying || !Enabled)
+            {
+                Shader.SetGlobalTexture("_FOWTex", UnityEditor.EditorGUIUtility.whiteTexture);
+                if (fowTex != null)
+                    DestroyImmediate(fowTex);
+                fowTex = null;
+            }
 #endif
-        if (fowTex)
-        {
-            int fade = Mathf.RoundToInt(Time.deltaTime * FadeRate);
+            if (fowTex)
+            {
+                int fade = Mathf.RoundToInt(Time.deltaTime * fadeRate);
 
-            //Fade all the map
-            for (int i = 0; i < pixels.Length; i++)
-            {
-                if (pixels[i].b > 0)
-                    pixels[i].b = (byte)Mathf.Max(pixels[i].b - fade, 0);
-                aiVision[i] &= ~visible.visible; //Remove the visible flag
-            }
-            //Reveal the area around the revealer entities
-            foreach (FOWEntity e in entities)
-            {
-                if (e.IsRevealer)
-                    reveal(e);
-            }
-            //Hide or show the other entities
-            foreach (FOWEntity e in entities)
-                e.changeVisible(isThereinRect(e.Bounds,visible.visible,!e.IsOwnedByPlayer));
+                //Fade all the map
+                for (int i = 0; i < pixels.Length; i++)
+                {
+                    if (pixels[i].b > 0)
+                        pixels[i].b = (byte)Mathf.Max(pixels[i].b - fade, 0);
+                    aiVision[i] &= ~visible.visible; //Remove the visible flag
+                }
+                //Reveal the area around the revealer entities
+                foreach (FOWEntity e in entities)
+                {
+                    if (e.IsRevealer)
+                        reveal(e);
+                }
+                //Hide or show the other entities
+                foreach (FOWEntity e in entities)
+                    e.changeVisible(isThereinRect(e.Bounds,visible.visible,!e.IsOwnedByPlayer));
             
-            fowTex.SetPixels32(pixels);
-            fowTex.Apply();
+                fowTex.SetPixels32(pixels);
+                fowTex.Apply();
+            }
+            cFrame = 0;
+        }
+        else
+        {
+            cFrame++;
         }
     }
     /// <summary>
@@ -137,24 +155,29 @@ public class FOWManager : MonoBehaviour
         Rect rect = entity.Bounds;
         int xMin, xMax, yMin, yMax;
         getBounds(rect, Mathf.RoundToInt(entity.Range * Quality), out xMin, out xMax, out yMin, out yMax);
+        //Initialize variables to optimize
+        int texWidth = fowTex.width;
+        float halfRange = (entity.Range / 2);
+        float doubleRange = entity.Range * entity.Range;
+        Vector2 pos, intlPos;
         for (int y = yMin; y <= yMax; y++)
         {
             float yIntl = Mathf.Clamp(y, rect.yMin, rect.yMax - 1);
             for (int x = xMin; x <= xMax; x++)
             {
-                Vector2 pos = new Vector2(x, y) / Quality;
-                Vector2 intlPos = new Vector2(Mathf.Clamp(pos.x, rect.xMin, rect.xMax - 1), yIntl);
+                pos = new Vector2(x, y) / Quality;
+                intlPos = new Vector2(Mathf.Clamp(pos.x, rect.xMin, rect.xMax - 1), yIntl);
 
                 float dist = (intlPos - pos).sqrMagnitude;
                 //Check if it's out of range
-                if (dist > entity.Range * entity.Range)
+                if (dist > doubleRange)
                     continue;
-                int n = x + y * fowTex.width;
-                if (n <= pixels.Length)
+                int n = x + y * texWidth;
+                if (n < pixels.Length)
                 {
                     float fade = 1;
-                    if (dist > entity.Range)
-                        fade = Mathf.Clamp01((entity.Range - Mathf.Sqrt(dist)) / (entity.Range / 2));
+                    if (dist > entity.Range+2)
+                        fade = Mathf.Clamp01((entity.Range - Mathf.Sqrt(dist)) / halfRange);
                     if (entity.IsOwnedByPlayer)
                     {
                         pixels[n].g = (byte)Mathf.Max(pixels[n].g, 255 * fade);
@@ -189,7 +212,7 @@ public class FOWManager : MonoBehaviour
                     if (askForPlayer)
                     {
                         if ((vis == visible.explored && pixels[p].g > 0) ||
-                           (vis == visible.visible && pixels[p].b > 127 || (NotFullyOpaque && pixels[p].g > 0)) ||
+                           (vis == visible.visible && pixels[p].b > 200) ||
                            (vis == visible.unexplored && pixels[p].g == 0))
                             return true;
                     }else if ((vis & aiVision[p]) == vis)
@@ -219,16 +242,15 @@ public class FOWManager : MonoBehaviour
         if (xMax < xMin) xMax = xMin;
         if (yMax < yMin) yMax = yMin;
     }
-    public static void addEntity(FOWEntity e)
+    public void addEntity(FOWEntity e)
     {
-        if (Instance && !Instance.entities.Contains(e))
-            Instance.entities.Add(e);
+        if (!entities.Contains(e))
+            entities.Add(e);
     }
-
-    public static void removeEntity(FOWEntity e)
+    public void removeEntity(FOWEntity e)
     {
-        if (Instance && Instance.entities.Contains(e))
-            Instance.entities.Remove(e);
+        if (entities.Contains(e))
+            entities.Remove(e);
     }
     public Vector2 getGridSize()
     {

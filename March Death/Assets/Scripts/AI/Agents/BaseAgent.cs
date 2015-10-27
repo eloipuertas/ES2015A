@@ -13,11 +13,13 @@ namespace Assets.Scripts.AI.Agents
         int baseConfidence { get; set; }
         protected AIController ai;
         public float modifier { get; set; }
-        public BaseAgent(AIController ai)
+        public string agentName;
+        public BaseAgent(AIController ai, String name)
         {
             this.ai = ai;
             baseConfidence = 0;
             modifier = 1;
+            agentName = name;
         }
         public abstract int getConfidence(List<Unit> units);
         public abstract void controlUnits(List<Unit> units);

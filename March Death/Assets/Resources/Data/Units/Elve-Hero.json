@@ -11,7 +11,8 @@
         "wounds": 3,
 
         "attackRate": 0.3,
-        "movementRate": 1.2
+        "movementRate": 1.2,
+        "sightRange": 50
     },
 
     "resources": {
@@ -22,6 +23,7 @@
 
     "abilities": [{
         "name": "Habilitat 1",
-        "weaponAbilityModifier": 1
+        "weaponAbilityModifier": 1,
+        "tooltip": "ASD ((weaponAbilityModifier)) BSD [[attributes.weaponAbility]]"
     }]
 }

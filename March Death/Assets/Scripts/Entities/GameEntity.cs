@@ -243,6 +243,14 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     }
 
     /// <summary>
+    /// Based on distance and target type computes how ranged ability is modified
+    /// </summary>
+    public virtual int computeRangedModifiers()
+    {
+        return 0;
+    }
+
+    /// <summary>
     /// Returns true in case an attack will land on this unit
     /// </summary>
     /// <param name="from">Unit which attacked</param>
@@ -254,9 +262,10 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 
         if (isRanged)
         {
-            // TODO: Specil units (ie gigants) and distance!
+            // TODO: Specil units (ie gigants)
             int projectileAbility = from.info.unitAttributes.projectileAbility +
-                from.accumulatedModifier<UnitAbility>().projectileAbilityModifier;
+                from.accumulatedModifier<UnitAbility>().projectileAbilityModifier +
+                from.computeRangedModifiers();
 
             return dice > 1 && (projectileAbility + dice >= 7);
         }
@@ -333,6 +342,9 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         {
             _status = info.isUnit ? EntityStatus.DEAD : EntityStatus.DESTROYED;
             onFatalWounds();
+
+            // TODO: When killed it should be destroyed (previously animated and so on..)
+            //Destroy(this);
         }
 
         // If we are a unit and doing nothing, attack back
@@ -360,7 +372,13 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 
 #if !DISABLE_ANIMATOR
         //TODO: Hack to get this working for the sprint, why is _animator
-        GetComponent<Animator>().SetInteger("animation_state", (int)status);
+        _animator.SetInteger("animation_state", (int)status);
 #endif
+    }
+    protected void activateFOWEntity()
+    {
+        FOWEntity fe = gameObject.AddComponent<FOWEntity>() as FOWEntity;
+        fe.Range = info.attributes.sightRange;
+        fe.Activate(info.race);
     }
 }
