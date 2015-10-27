@@ -1262,6 +1262,7 @@ GameObject:
   - 114: {fileID: 11499442}
   - 114: {fileID: 11473934}
   - 114: {fileID: 11470110}
+  - 208: {fileID: 20884706}
   m_Layer: 0
   m_Name: Elf-Sawmill
   m_TagString: Untagged
@@ -2199,7 +2200,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 116880}
-  m_LocalRotation: {x: .207251549, y: .0823451504, z: .561577082, w: .796804488}
+  m_LocalRotation: {x: .207251519, y: .082345143, z: .561577022, w: .796804368}
   m_LocalPosition: {x: 3.16649679e-10, y: .000632171868, z: 5.58793532e-11}
   m_LocalScale: {x: 1, y: 1.00000048, z: 1}
   m_Children:
@@ -5061,6 +5062,21 @@ Cloth:
     collisionSphereDistance: 3.40282347e+38
   m_CapsuleColliders: []
   m_SphereColliders: []
+--- !u!208 &20884706
+NavMeshObstacle:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 174826}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 8.5, y: .5, z: 7.5}
+  m_MoveThreshold: .100000001
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: .5
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -5123,6 +5139,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Size.y
       value: .25
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Extents.x
+      value: 8.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Extents.z
+      value: 7.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
