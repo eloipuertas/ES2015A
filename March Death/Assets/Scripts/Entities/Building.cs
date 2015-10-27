@@ -102,21 +102,21 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
         switch (status)
         {
             case EntityStatus.BUILDING_PHASE_1:
-                if (buildTime1 >= 3000)
+                if (buildTime1 >= 3)
                     setStatus(EntityStatus.BUILDING_PHASE_2);
                 else
                     buildTime1 += Time.deltaTime;
                 break;
 
             case EntityStatus.BUILDING_PHASE_2:
-                if (buildTime2 >= 10000)
+                if (buildTime2 >= 10)
                     setStatus(EntityStatus.BUILDING_PHASE_3);
                 else
                     buildTime2 += Time.deltaTime;
                 break;
 
             case EntityStatus.BUILDING_PHASE_3:
-                if (buildTime3 >= 3000)
+                if (buildTime3 >= 3)
                     setStatus(EntityStatus.IDLE);
                 else
                     buildTime3 += Time.deltaTime;
