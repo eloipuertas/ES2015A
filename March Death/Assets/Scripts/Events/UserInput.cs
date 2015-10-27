@@ -195,10 +195,12 @@ public class UserInput : MonoBehaviour
 			camera.disableManualControl();
 			leftButtonIsDown = true;
 			GameObject hitObject = FindHitObject();
-			string name = hitObject.name;
-			mouseButtonDownPoint = mouseButtonCurrentPoint;
-			topLeft = GetScreenRaycastPoint(mouseButtonDownPoint);
-
+            if (hitObject != null)
+            {
+                string name = hitObject.name;
+                mouseButtonDownPoint = mouseButtonCurrentPoint;
+                topLeft = GetScreenRaycastPoint(mouseButtonDownPoint);
+            }
 		} else if (Input.GetMouseButtonUp (0)) {
 			camera.enableManualControl();
 			leftButtonIsDown = false;
