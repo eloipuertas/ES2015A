@@ -2,6 +2,7 @@
 using Assets.Scripts.AI;
 using System.Collections.Generic;
 using Assets.Scripts.AI.Agents;
+using System;
 
 public class AIDebugSystem : MonoBehaviour {
 
@@ -94,11 +95,18 @@ public class AIDebugSystem : MonoBehaviour {
 
     public void showAIInfoOverUnits()
     {
-        
+        Debug.Log(registeredUnits.Count);
         foreach(KeyValuePair<int, Unit> u in registeredUnits)
         {
-            Vector3 infoPosition = Camera.main.WorldToScreenPoint(u.Value.transform.position);
-            GUI.Label(new Rect((infoPosition.x), (Screen.height - infoPosition.y), 100, 50), individualUnitInfo[u.Key]);
+            try
+            {
+                Vector3 infoPosition = Camera.main.WorldToScreenPoint(u.Value.transform.position);
+                GUI.Label(new Rect((infoPosition.x), (Screen.height - infoPosition.y), 100, 50), individualUnitInfo[u.Key]);
+            }
+            catch (Exception ex)
+            {
+                registeredUnits.Remove(u.Key);
+            }
         }        
     }
 
