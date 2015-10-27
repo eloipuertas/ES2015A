@@ -5,20 +5,10 @@ using System;
 
 public class ConstructionGrid : MonoBehaviour {
 
-    private Vector2 dimensions;
-    private ArrayList reservedPositions;
-    private const float DIFERENCE_OF_HEIGHTS_TOLERANCE = 3f;
-
-    void Start () {
-        dimensions = new Vector2(15f, 15f);
-        reservedPositions = new ArrayList();
-    }
-
-    void Update()
-    {
+    private Vector2 dimensions = new Vector2(15f, 15f);
+    private ArrayList reservedPositions = new ArrayList();
+    private const float DIFERENCE_OF_HEIGHTS_TOLERANCE = 0.4f;
         
-    }
-	
     /// <summary>
     /// Returns the center of a row of the grid where the building will be placed
     /// </summary>
