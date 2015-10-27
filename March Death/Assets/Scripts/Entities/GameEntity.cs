@@ -342,9 +342,6 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         {
             _status = info.isUnit ? EntityStatus.DEAD : EntityStatus.DESTROYED;
             onFatalWounds();
-
-            // TODO: When killed it should be destroyed (previously animated and so on..)
-            //Destroy(this);
         }
 
         // If we are a unit and doing nothing, attack back
