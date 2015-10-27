@@ -60,6 +60,11 @@ public class AIDebugSystem : MonoBehaviour {
         showAIInfoOverUnits();
     }
 
+    /// <summary>
+    /// A window which can be moved intended to contain the confidence values of our agents
+    /// Very important to see what's going on inside the AI System.
+    /// </summary>
+    /// <param name="windowID"></param>
     void DoMyWindow(int windowID)
     {
         resetLines();
@@ -76,6 +81,10 @@ public class AIDebugSystem : MonoBehaviour {
         GUI.DragWindow();
     }
 
+    /// <summary>
+    /// Used to show all the confidences of non winner agents to contrast them with the 
+    /// winner Angent
+    /// </summary>
     public void showConfidences()
     {
         foreach(KeyValuePair<string, float> agent in agentsConfidence)
@@ -93,6 +102,9 @@ public class AIDebugSystem : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Used to show the debug info under every unit of the map controlled by the AI
+    /// </summary>
     public void showAIInfoOverUnits()
     {
         foreach(KeyValuePair<int, Unit> u in registeredUnits)
@@ -109,6 +121,11 @@ public class AIDebugSystem : MonoBehaviour {
         }        
     }
 
+    /// <summary>
+    /// Used by the agents to explain what units are they controlling
+    /// </summary>
+    /// <param name="unit"></param>
+    /// <param name="info"></param>
     public void registerDebugInfoAboutUnit(Unit unit, string info)
     {
         if(registeredUnits.ContainsKey(unit.GetInstanceID()))
@@ -122,16 +139,28 @@ public class AIDebugSystem : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Used to register the confidence of an AI agent in a certain moment
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="conf"></param>
     public void setAgentConfidence(string name, float conf)
     {
         agentsConfidence[name] = conf;
     }
 
+    /// <summary>
+    /// Used to move the "GUI Cursor" to the first line of the window
+    /// </summary>
     public void resetLines()
     {
         nextLine = 0;
     }
 
+    /// <summary>
+    /// Used to make a <br> or \n in the GUI.
+    /// </summary>
+    /// <returns></returns>
     public int getNextLine()
     {
         nextLine += lineHeight;
