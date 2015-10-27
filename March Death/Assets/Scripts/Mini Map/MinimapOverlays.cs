@@ -46,6 +46,7 @@ public static class MinimapOverlays
     public static Rect CalculateBoxFromCntr(Vector3 cntr, Camera cam, int pix)
     {
         Rect box = new Rect();
+        return box;
 
         Vector3 actor_cntr = cam.WorldToViewportPoint(cntr);
         actor_cntr = cam.ViewportToScreenPoint(actor_cntr);
