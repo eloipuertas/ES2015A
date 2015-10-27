@@ -44,10 +44,13 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
 
     protected virtual void OnGUI()
     {
-        if (fe.IsRevealed || fe.IsOwnedByPlayer)
+        if (fe)
         {
-            GUI.depth = 1;
-            GUI.DrawTexture(marker_rect, box_text);
+            if (fe.IsRevealed || fe.IsOwnedByPlayer)
+            {
+                GUI.depth = 1;
+                GUI.DrawTexture(marker_rect, box_text);
+            }
         }
     }
 
