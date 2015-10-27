@@ -191,13 +191,15 @@ public class UserInput : MonoBehaviour
 		// TODO : (Devel_c) Check positions with the HUD
 		mouseButtonCurrentPoint = Input.mousePosition;
 
-		if (Input.GetMouseButtonDown (0)) {
-			camera.disableManualControl();
-			leftButtonIsDown = true;
-			GameObject hitObject = FindHitObject();
-			string name = hitObject.name;
-			mouseButtonDownPoint = mouseButtonCurrentPoint;
-			topLeft = GetScreenRaycastPoint(mouseButtonDownPoint);
+        if (Input.GetMouseButtonDown(0)) {
+            camera.disableManualControl();
+            leftButtonIsDown = true;
+            GameObject hitObject = FindHitObject();
+            if (hitObject != null) { 
+                string name = hitObject.name;
+                mouseButtonDownPoint = mouseButtonCurrentPoint;
+                topLeft = GetScreenRaycastPoint(mouseButtonDownPoint);
+            }
 
 		} else if (Input.GetMouseButtonUp (0)) {
 			camera.enableManualControl();

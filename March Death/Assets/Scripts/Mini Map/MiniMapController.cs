@@ -40,12 +40,12 @@ public class MiniMapController : MonoBehaviour
         if (Terrain.activeTerrain)
         {
             float diagonal = Mathf.Sqrt(Mathf.Pow(Terrain.activeTerrain.terrainData.size.x, 2) + Mathf.Pow(Terrain.activeTerrain.terrainData.size.y, 2));
-            _camera.transform.position = new Vector3(Terrain.activeTerrain.terrainData.size.x * 0.5f, Terrain.activeTerrain.terrainData.size.x * 0.4f,Terrain.activeTerrain.terrainData.size.z * 0.5f);
+            _camera.transform.position = new Vector3(Terrain.activeTerrain.terrainData.size.x * 0.5f, Terrain.activeTerrain.terrainData.size.x * 0.6f,Terrain.activeTerrain.terrainData.size.z * 0.5f);
             _camera.transform.rotation = Quaternion.Euler(90f, 135f,0); 
             _camera.orthographicSize = diagonal * 0.95f; // a hack
             _camera.farClipPlane = Terrain.activeTerrain.terrainData.size.x * 1.5f;
             _camera.clearFlags = CameraClearFlags.Depth;
-            //_camera.backgroundColor = Color.clear; // Set a more fancy background, black
+            instatiateMask();
         }
 
         createMarker();
@@ -82,6 +82,18 @@ public class MiniMapController : MonoBehaviour
     {
         rect_marker = getCameraRect();
         tex = MinimapOverlays.CreateTextureMarker(Color.red);
+    }
+
+    private void instatiateMask()
+    {
+        GameObject mask = (GameObject)Resources.Load("plane_minimap");
+        mask.transform.position = new Vector3(_camera.transform.position.x+0,
+                                              _camera.transform.position.y-50, 
+                                              _camera.transform.position.z+0);
+        mask.transform.localScale = new Vector3(580,1,580);
+        mask.GetComponent<MeshRenderer>().sharedMaterial.shader = Shader.Find("Masked/Mask");
+        SetRenderQueue srq = mask.AddComponent<SetRenderQueue>();
+        Instantiate(mask);
     }
 
     /// <summary>
