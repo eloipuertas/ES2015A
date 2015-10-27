@@ -7,14 +7,14 @@ public class MainMenuLogic : MonoBehaviour {
 	static readonly Color DOWN_CLICK = new Color(0.0f, 0.0f, 0.0f, 0.6f); // GREY
 	static readonly Color ENTER_OVER = new Color(0.8f, 1.0f, 0.0f, 0.6f); // YELLOW - GREEN
 	static readonly Color EXIT_OVER = new Color(1.0f, 1.0f, 1.0f, 0.6f); // WHITE
-	static readonly Color YELLOW = new Color(1.0f, 0.92f, 0.016f, 1f); //YELLOW 
+	static readonly Color YELLOW = new Color(1.0f, 0.92f, 0.016f, 1f); //YELLOW
 
 	bool bStillInside = false;
 
 	// Use this for initialization
 	void Start () {
-
 		Cursor.visible = true;
+		TestEnvironment.Instance.Init();
 	}
 
 	/* MOUSE OVER */
