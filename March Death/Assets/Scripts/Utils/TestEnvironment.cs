@@ -4,9 +4,11 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using System.Reflection;
 
 using Storage;
 using Utils;
+using Utils.UnitTests;
 
 class TestEnvironment : SingletonMono<TestEnvironment>
 {
@@ -91,6 +93,20 @@ class TestEnvironment : SingletonMono<TestEnvironment>
                     break;
 
                 case States.KILLING:
+                    // Run all unit tests
+                    var results = from type in Assembly.GetExecutingAssembly().GetTypes()
+                                  where typeof(IUnitTest).IsAssignableFrom(type)
+                                  select type;
+
+                    // Execute one by one
+                    foreach (Type test in results)
+                    {
+                        IUnitTest testObj = (IUnitTest)Activator.CreateInstance(test);
+
+                        Debug.Log("Running test " + testObj.name);
+                        testObj.run(errorLogs);
+                    }
+
                     StringBuilder output = new StringBuilder();
                     foreach (Tuple<String, String> error in errorLogs)
                     {
