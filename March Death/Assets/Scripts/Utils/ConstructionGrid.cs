@@ -7,7 +7,7 @@ public class ConstructionGrid : MonoBehaviour {
 
     private Vector2 dimensions = new Vector2(15f, 15f);
     private ArrayList reservedPositions = new ArrayList();
-    private const float DIFERENCE_OF_HEIGHTS_TOLERANCE = 0.4f;
+    private const float DIFERENCE_OF_HEIGHTS_TOLERANCE = 1.5f;
         
     /// <summary>
     /// Returns the center of a row of the grid where the building will be placed

@@ -225,8 +225,16 @@ namespace Managers
 
         private void PackToMoveBuilding()
         {
-            this.newBuilding.GetComponent<FOWEntity>().IsRevealer = false;
-            this.newBuilding.GetComponent<Rigidbody>().detectCollisions = false;
+            if (this.newBuilding)
+            { //FIXME : (hermetico) randome errors
+                FOWEntity fw = this.newBuilding.GetComponent<FOWEntity>();
+                Rigidbody rb = this.newBuilding.GetComponent<Rigidbody>();
+                if (fw && rb)
+                {
+                    fw.IsRevealer = false;
+                    rb.detectCollisions = false;
+                }
+            }
 
 
         }

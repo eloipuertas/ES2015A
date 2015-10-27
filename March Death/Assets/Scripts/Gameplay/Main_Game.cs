@@ -42,9 +42,9 @@ public class Main_Game : MonoBehaviour {
                 BuildingTypes.STRONGHOLD, strongholdTransform.position, strongholdTransform.rotation);
 
             // adding the building to the construction grid
-            //if(!grid) grid = gameController.GetComponent<ConstructionGrid>();
-            //Vector3 position = grid.discretizeMapCoords(strongholdTransform.position);
-            //grid.reservePosition(position);
+            if(!grid) grid = gameController.GetComponent<ConstructionGrid>();
+            Vector3 position = grid.discretizeMapCoords(strongholdTransform.position);
+            grid.reservePosition(position);
 
 			user.addEntity(playerStronghold.GetComponent<IGameEntity>());
 			cam.lookGameObject(playerStronghold);
