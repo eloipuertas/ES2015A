@@ -95,7 +95,10 @@ public class Resource : Building<Resource.Actions>
     /// current player
     /// </summary>
     private Player player;
-
+    /// <summary>
+    /// check if starter unit was created. We need wait until resource is build
+    /// </summary>
+    private bool firstUnit;
     private readonly object syncLock = new object();
     bool hasCreatedCivil = false;
     List<GameObject> pendingProducers = new List<GameObject>();
@@ -164,11 +167,18 @@ public class Resource : Building<Resource.Actions>
     }
 
     /// <summary>
-    /// new goods produced are sent to player.
+    /// New goods produced are sent to player.
     /// Method triger an event sending object goods with amount of materials 
     /// transferred. gold production is sent too.
     /// </summary>
-    /// <param name="amount"></param>
+    /// <param name="amount">materials amount produced</param>
+    /// 
+    /// TODO: now we are using two diferent ways to increase player resources
+    /// 1- Create classe goods and send it to player using event.
+    /// 2- Direct use of addAmount method.
+    /// 
+    /// we must change this behaviour, only one way will be the right one.
+
     private void sendResource(float amount)
     {
         if (amount  > 0.0)
@@ -178,13 +188,19 @@ public class Resource : Building<Resource.Actions>
 
             if (type.Equals(BuildingTypes.FARM))
             {
+                BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.FOOD, amount);
                 goods.type = Goods.GoodsType.FOOD;
             }
             else if(type.Equals(BuildingTypes.MINE))
             {
+                BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.METAL, amount);
                 goods.type = Goods.GoodsType.METAL;
             }
-            else{ goods.type = Goods.GoodsType.WOOD; }
+            else
+            {
+                BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.WOOD, amount);
+                goods.type = Goods.GoodsType.WOOD;
+            }
             fire(Actions.COLLECTION, goods);
         }         
     }
@@ -223,8 +239,7 @@ public class Resource : Building<Resource.Actions>
             GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
 
             Unit civil = gob.GetComponent<Unit>();
-            civil.role = Unit.Roles.PRODUCING;
-
+            civil.role = Unit.Roles.PRODUCING;            
             BasePlayer.getOwner(this).addEntity(civil);
             fire(Actions.CREATE_UNIT, civil);
 
@@ -357,7 +372,8 @@ public class Resource : Building<Resource.Actions>
         _yDisplacement = 0;
         _info = Info.get.of(race, type);
         totalUnits = 0;
-        _unitRotation = transform.rotation;         
+        _unitRotation = transform.rotation;
+        firstUnit = false;        
         
         // Call Building start
         base.Awake();
@@ -383,9 +399,17 @@ public class Resource : Building<Resource.Actions>
 
         if (Time.time > _nextUpdate)
         {
-            _nextUpdate = Time.time + info.resourceAttributes.updateInterval;  
+            _nextUpdate = Time.time + info.resourceAttributes.updateInterval;
+            if (!firstUnit)
+            {
+                if (status.Equals(EntityStatus.IDLE))
+                {
+                    firstUnit = true;
+                    createCivilian();
+                }
+            }  
             collect();
-            produce();            
+            produce();          
         }
     }
 }
