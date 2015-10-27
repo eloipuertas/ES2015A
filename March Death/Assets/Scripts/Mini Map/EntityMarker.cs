@@ -9,6 +9,8 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
     private const float REFRESH_TIME = 1.0f;
     private float tot_timer = 1f;
 
+    private FOWEntity fe;
+
     private GameObject plane;
     private Camera minimap_cam, mainCam;
 
@@ -24,6 +26,7 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
         if (GameObject.FindGameObjectWithTag("minimap_cam"))
             mainCam = GameObject.FindGameObjectWithTag("minimap_cam").GetComponent<Camera>();
         else Debug.LogWarning("There is no minimap camera!");
+        fe = gameObject.GetComponent<FOWEntity>();
         box_text = null;
     }
 
@@ -41,7 +44,7 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
 
     protected virtual void OnGUI()
     {
-        if (gameObject.GetComponent<FOWEntity>().IsRevealed)
+        if (fe.IsRevealed || fe.IsOwnedByPlayer)
         {
             GUI.depth = 1;
             GUI.DrawTexture(marker_rect, box_text);
