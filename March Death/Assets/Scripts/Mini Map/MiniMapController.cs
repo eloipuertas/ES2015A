@@ -84,15 +84,17 @@ public class MiniMapController : MonoBehaviour
         tex = MinimapOverlays.CreateTextureMarker(Color.red);
     }
 
+    /// <summary>
+    /// Instantiates the mask which makes invisible part of the minimap viewport.
+    /// </summary>
     private void instatiateMask()
     {
-        GameObject mask = (GameObject)Resources.Load("plane_minimap");
+        GameObject mask = (GameObject)Resources.Load("minimap_plane");
         mask.transform.position = new Vector3(_camera.transform.position.x+0,
                                               _camera.transform.position.y-50, 
                                               _camera.transform.position.z+0);
-        mask.transform.localScale = new Vector3(580,1,580);
+        mask.transform.localScale = new Vector3(350,1,350);
         mask.GetComponent<MeshRenderer>().sharedMaterial.shader = Shader.Find("Masked/Mask");
-        SetRenderQueue srq = mask.AddComponent<SetRenderQueue>();
         Instantiate(mask);
     }
 
@@ -114,7 +116,11 @@ public class MiniMapController : MonoBehaviour
             rect_marker.center = v;
             act_pos = mainCam.transform.position;
         }
-        if (mainCam.aspect != aspect) { recalcViewport(); }
+        if (mainCam.aspect != aspect) {
+            recalcViewport();
+            rt = new RenderTexture(Screen.width, Screen.height, 2);
+            _camera.targetTexture = rt;
+        }
     }
 
     // Update is called once per frame
