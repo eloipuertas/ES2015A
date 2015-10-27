@@ -95,7 +95,6 @@ public class AIDebugSystem : MonoBehaviour {
 
     public void showAIInfoOverUnits()
     {
-        Debug.Log(registeredUnits.Count);
         foreach(KeyValuePair<int, Unit> u in registeredUnits)
         {
             try
