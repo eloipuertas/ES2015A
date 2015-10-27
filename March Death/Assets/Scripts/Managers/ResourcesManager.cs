@@ -35,7 +35,6 @@ namespace Managers
             }
         }
 
-
         public void EmptyDeposits()
         {
             foreach (var deposit in _deposits.Values)
