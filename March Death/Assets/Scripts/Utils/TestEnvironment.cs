@@ -31,7 +31,6 @@ class TestEnvironment : SingletonMono<TestEnvironment>
         playerRace = Races.MEN;
 
         String[] arguments = Environment.GetCommandLineArgs();
-        Debug.Log("GetCommandLineArgs: " + String.Join(", ", arguments));
 
         foreach (String arg in (new List<String>(arguments)).Skip(1))
         {
