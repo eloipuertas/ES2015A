@@ -2,7 +2,7 @@
 using System.Collections;
 using Assets.Scripts.AI;
 
-public class BasePlayer : Utils.SingletonMono<BasePlayer> {
+public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
 
     protected BasePlayer() {}
 
@@ -45,6 +45,9 @@ public class BasePlayer : Utils.SingletonMono<BasePlayer> {
         player = gameController.GetComponent<Player>();
         ia = gameController.GetComponent<AIController>();
     }
+
+    public abstract void removeEntity(IGameEntity entity);
+    public abstract void addEntity(IGameEntity newEntity);
 
     public static BasePlayer getOwner(IGameEntity entity)
     {

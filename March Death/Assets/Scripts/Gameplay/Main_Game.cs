@@ -11,9 +11,14 @@ public class Main_Game : MonoBehaviour {
 	Transform strongholdTransform;
 	GameObject playerHero;
 
-	// Use this for initialization
-	void Start () {
-		strongholdTransform = GameObject.Find("PlayerStronghold").transform;
+    private Player player;
+
+    // Use this for initialization
+    void Start () {
+        GameObject gameController = GameObject.FindGameObjectWithTag("GameController");
+        player = gameController.GetComponent<Player>();
+
+        strongholdTransform = GameObject.Find("PlayerStronghold").transform;
         playerHero = GameObject.Find("PlayerHero");
         if(GameObject.Find("GameInformationObject"))
 		    info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
@@ -31,9 +36,9 @@ public class Main_Game : MonoBehaviour {
         if (info)
         {
             playerStronghold = Info.get.createBuilding(info.GetPlayerRace(),
-                                                       BuildingTypes.STRONGHOLD,
-                                                   strongholdTransform.position, strongholdTransform.rotation);
-			user.addEntityToList(playerStronghold.GetComponent<IGameEntity>());
+                BuildingTypes.STRONGHOLD, strongholdTransform.position, strongholdTransform.rotation);
+
+			user.addEntity(playerStronghold.GetComponent<IGameEntity>());
 			cam.lookGameObject(playerStronghold);
         }
 	}
@@ -44,9 +49,9 @@ public class Main_Game : MonoBehaviour {
         {
             // TODO Must be able to load other kinds of units (both civilian and military)
             playerHero = Info.get.createUnit(info.GetPlayerRace(),
-                                             UnitTypes.HERO, playerHero.transform.position,
-                                         playerHero.transform.rotation);
-            user.addEntityToList(playerHero.GetComponent<IGameEntity>());
+                UnitTypes.HERO, playerHero.transform.position, playerHero.transform.rotation);
+
+            user.addEntity(playerHero.GetComponent<IGameEntity>());
         }
     }
 

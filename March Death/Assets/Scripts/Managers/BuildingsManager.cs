@@ -145,8 +145,9 @@ namespace Managers
                 grid.reservePosition(newDestination);
                 newBuilding.transform.position = newDestination;
                 IGameEntity destination = (IGameEntity)newBuilding.GetComponent<Unit>();
-                player.addEntityToList(destination);
+                player.addEntity(destination);
                 PackToPlaceBuilding();
+
                 // remaining operations
                 _finishPlacing();
 

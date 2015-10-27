@@ -81,8 +81,6 @@ namespace Assets.Scripts.AI.Agents
                     return Mathf.RoundToInt(nval * 8);
                 }
             }
-
-            Debug.Log("Attack Agent Heuristic: " + Mathf.RoundToInt(val * 8));               
             return Mathf.RoundToInt(val*8);
         }
     }

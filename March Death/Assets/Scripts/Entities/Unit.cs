@@ -64,6 +64,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// NavAgent, used fot map navigation
     /// </summary>
     private NavMeshAgent _navAgent;
+    private bool _hasPath = false;
 
     /// <summary>
     /// Can this unit perform ranged attacks?
@@ -215,7 +216,8 @@ public class Unit : GameEntity<Unit.Actions>
             return true;
         }
 
-        return false;
+        // TODO: Hack to get AI working
+        return true;
     }
 
     /// <summary>
@@ -250,14 +252,21 @@ public class Unit : GameEntity<Unit.Actions>
     /// Starts moving the unit towards a point on a terrain
     /// </summary>
     /// <param name="movePoint">Point to move to</param>
-    public void moveTo(Vector3 movePoint)
+    public bool moveTo(Vector3 movePoint)
     {
+        if (!_navAgent.SetDestination(movePoint))
+        {
+            return false;
+        }
+        
         _followingTarget = false;
+        _target = null;
+        _hasPath = false;
         _movePoint = movePoint;
-        _navAgent.SetDestination(movePoint);
-
         setStatus(EntityStatus.MOVING);
         fire(Actions.MOVEMENT_START);
+
+        return true;
     }
 
     /// <summary>
@@ -270,18 +279,22 @@ public class Unit : GameEntity<Unit.Actions>
 
         // Call GameEntity awake
         base.Awake();
-
-        // Set the status
-        setStatus(EntityStatus.IDLE);
     }
 
     /// <summary>
     /// Object initialization
     /// </summary>
-    public void Start()
+    public override void Start()
     {
+        // Setup base
+        base.Start();
+
+        // Set the status
+        setStatus(EntityStatus.IDLE);
+
         activateFOWEntity();
 
+        // Get NagMeshAgent and set basic variables
         _navAgent = GetComponent<NavMeshAgent>();
         _navAgent.speed = _info.unitAttributes.movementRate;
         _navAgent.acceleration = info.unitAttributes.movementRate * 2.5f;
@@ -363,22 +376,36 @@ public class Unit : GameEntity<Unit.Actions>
                 // If we are already in range, start attacking
                 // Must be called before MoveTowards because it uses _distanceToTarget, which
                 // would be otherwise outdated
-                if (_followingTarget && _distanceToTarget <= currentAttackRange())
+                if (_followingTarget)
                 {
-                    _navAgent.Stop();
-                    setStatus(EntityStatus.ATTACKING);
-                    return;
+                    // Update destination only if target has moved
+                    Vector3 destination = _target.getTransform().position;
+                    if (destination != _movePoint)
+                    {
+                        _hasPath = false;
+                        _navAgent.SetDestination(destination);
+                        _movePoint = destination;
+                    }
+
+                    // If we are already close enough, stop and attack
+                    if (_distanceToTarget <= currentAttackRange())
+                    {
+                        _navAgent.ResetPath();
+                        setStatus(EntityStatus.ATTACKING);
+                        return;
+                    }
                 }
 
-                if (!_navAgent.pathPending && _navAgent.hasPath)
+                if (!_navAgent.pathPending && (_hasPath || _navAgent.hasPath))
                 {
+                    _hasPath = true;
                     float dist = _navAgent.remainingDistance;
 
-                    if (dist != Mathf.Infinity && _navAgent.pathStatus == NavMeshPathStatus.PathComplete && _navAgent.remainingDistance == 0)
+                    // TODO: Stop condition is quite large, maybe it could be simplified
+                    if (dist != Mathf.Infinity && _navAgent.velocity.sqrMagnitude == 0f && _navAgent.pathStatus == NavMeshPathStatus.PathComplete && _navAgent.remainingDistance <= _navAgent.stoppingDistance)
                     {
                         if (!_followingTarget)
                         {
-                            Debug.Log("fire(Actions.MOVEMENT_END)");
                             setStatus(EntityStatus.IDLE);
                             fire(Actions.MOVEMENT_END);
                         }
@@ -389,11 +416,6 @@ public class Unit : GameEntity<Unit.Actions>
                     }
                 }
                 
-                // Update destination if we are following
-                if (_followingTarget)
-                {
-                    _navAgent.SetDestination(_target.getTransform().position);
-                }
                 break;
         }
     }

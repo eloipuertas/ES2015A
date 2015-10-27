@@ -355,8 +355,11 @@ public class Resource : Building<Resource.Actions>
         base.Awake();
     }
 
-    public virtual void Start()
+    public override void Start()
     {
+        // Setup base
+        base.Start();
+
         createCivilian();
     }
 

@@ -226,7 +226,6 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public override void Awake()
     {
         base.Awake();
-        setupAbilities();
 
 #if !DISABLE_ANIMATOR
         // Get the Animator
@@ -234,11 +233,35 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 #endif
     }
 
+    public virtual void Start()
+    {
+        setupAbilities();
+    }
+
     public override void Update()
     {
         foreach (Ability ability in _abilities)
         {
             ability.Update();
+        }
+
+        if (status == EntityStatus.DEAD || status == EntityStatus.DESTROYED)
+        {
+            // TODO: Should this be automatically handled with events?
+            FOWManager.Instance.removeEntity(this.GetComponent<FOWEntity>());
+
+            // TODO: Should this be automatically handled with events?
+            Selectable selectable = GetComponent<Selectable>();
+            if (selectable.currentlySelected)
+            {
+                selectable.Deselect();
+            }
+
+            // TODO: Should this be automatically handled with events?
+            BasePlayer.getOwner(this).removeEntity(this);
+
+            // Destroy us
+            Destroy(this.gameObject);
         }
     }
 
@@ -372,9 +395,10 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         _animator.SetInteger("animation_state", (int)status);
 #endif
     }
+
     protected void activateFOWEntity()
     {
-        FOWEntity fe = gameObject.AddComponent<FOWEntity>() as FOWEntity;
+        FOWEntity fe = gameObject.AddComponent<FOWEntity>();
         fe.Range = info.attributes.sightRange;
         fe.Activate(info.race);
     }
