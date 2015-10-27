@@ -331,6 +331,7 @@ GameObject:
   - 114: {fileID: 11452822}
   - 114: {fileID: 11431044}
   - 114: {fileID: 11463988}
+  - 208: {fileID: 20813488}
   m_Layer: 0
   m_Name: Elf-Stronghold
   m_TagString: Untagged
@@ -555,7 +556,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 154094}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 456.503906, y: 78.956604, z: 694.50769}
+  m_LocalPosition: {x: 233.239212, y: 0, z: 233.837448}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 412240}
@@ -1836,8 +1837,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -.00115644932, y: .00198459625, z: 1.62124634e-05}
-    m_Extent: {x: .0163536891, y: .0170721244, z: 8.56593196e-09}
+    m_Center: {x: -.00115647912, y: .00198435783, z: 1.62124634e-05}
+    m_Extent: {x: .0163537227, y: .0170721244, z: 8.56593196e-09}
   m_DirtyAABB: 0
 --- !u!183 &18346620
 Cloth:
@@ -2026,6 +2027,21 @@ Cloth:
     collisionSphereDistance: 3.40282347e+38
   m_CapsuleColliders: []
   m_SphereColliders: []
+--- !u!208 &20813488
+NavMeshObstacle:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 154094}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 9, y: .5, z: 12.5}
+  m_MoveThreshold: .100000001
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: .5
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -2064,6 +2080,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Size.z
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Extents.x
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Extents.z
+      value: 12.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
