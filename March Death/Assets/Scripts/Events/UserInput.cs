@@ -243,7 +243,8 @@ public class UserInput : MonoBehaviour
 		selectedArea[2] = bottomRight;
 		selectedArea[3] = bottomLeft;
 
-		foreach (GameObject unit in player.currentUnits) {
+		foreach (IGameEntity entity in player.activeEntities) {
+            GameObject unit = entity.getGameObject();
 			Vector3 unitPosition = unit.transform.position;
 			Selectable selectedObject = unit.GetComponent<Selectable>();
 			if (AreaContainsObject(selectedArea, unitPosition)) {

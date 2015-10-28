@@ -15,7 +15,9 @@ public class Player : BasePlayer
     /// Information regarding the entities of the player
     /// </summary>
     private List<IGameEntity> _activeEntities = new List<IGameEntity>();
-
+    public List<IGameEntity> activeEntities {
+        get { return new List<IGameEntity>(_activeEntities); }
+    }
     
 	//the list of player units in the scene
 	public ArrayList currentUnits = new ArrayList ();
