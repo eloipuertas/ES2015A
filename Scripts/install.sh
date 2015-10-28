@@ -26,8 +26,13 @@ else
     $(pwd)/Scripts/axel -q -n 10 -o Unity.sh http://download.unity3d.com/download_unity/unity-editor-installer-5.1.0f3+2015082501.sh
 
     echo 'Background downloading cache'
-    sudo -E rsync -a ${CACHE_HOST}Temp $HOME/ES2015A/March\ Death &
-    sudo -E rsync -a ${CACHE_HOST}Build $HOME &
+    # Use ; and not && to actually do all of them, even if one doesn't succeed
+    (touch $HOME/.RSYNC_LOCK; \
+        sudo -E rsync -a ${CACHE_HOST}Temp    $HOME/ES2015A/March\ Death/; \
+        sudo -E rsync -a ${CACHE_HOST}Obj     $HOME/ES2015A/March\ Death/; \
+        sudo -E rsync -a ${CACHE_HOST}Library $HOME/ES2015A/March\ Death/; \
+        sudo -E rsync -a ${CACHE_HOST}Build   $HOME/; \
+    rm $HOME/.RSYNC_LOCK) &
 
     echo 'Monkey-patching installer for non sudo execution and no input'
     sed -i '41,44d;49,50d' ./Unity.sh
@@ -42,5 +47,11 @@ else
     echo 'Creating cache and local'
     mkdir -p $HOME/.cache/unity3d
     mkdir -p $HOME/.local/share/unity3d/Unity
+
+    echo -n "Waiting for cache to end downloading."
+    while [ -f "$HOME/.RSYNC_LOCK" ]
+    do
+        sleep 2
+    done
 
 fi
