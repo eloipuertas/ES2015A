@@ -52,7 +52,7 @@ class TestEnvironment : SingletonMono<TestEnvironment>
 
         if (!testingEnabled)
         {
-            Destroy(this);
+            Destroy(this.gameObject);
         }
         else
         {
