@@ -52,7 +52,7 @@ class TestEnvironment : SingletonMono<TestEnvironment>
 
         if (!testingEnabled)
         {
-            Destroy(this);
+            Destroy(this.gameObject);
         }
         else
         {
@@ -100,10 +100,11 @@ class TestEnvironment : SingletonMono<TestEnvironment>
                     // Execute one by one
                     foreach (Type test in results)
                     {
-                        IUnitTest testObj = (IUnitTest)Activator.CreateInstance(test);
-
-                        Debug.Log("Running test " + testObj.name);
-                        testObj.run(errorLogs);
+                        if (!test.IsInterface)
+                        {
+                            IUnitTest testObj = (IUnitTest)Activator.CreateInstance(test);
+                            testObj.run(errorLogs);
+                        }
                     }
 
                     StringBuilder output = new StringBuilder();
