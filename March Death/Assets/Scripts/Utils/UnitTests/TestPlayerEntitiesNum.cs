@@ -17,7 +17,7 @@ namespace Utils.UnitTests
 
         public void run(List<Tuple<string, string>> errorLogs)
         {
-            if (BasePlayer.player.currentUnits.Count != 2)
+            if (BasePlayer.player.activeEntities.Count != 2)
             {
                 errorLogs.Add(new Tuple<string, string>("Player has more than 2 initial entities", BasePlayer.player.currentUnits.Count.ToString()));
             }

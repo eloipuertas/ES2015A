@@ -10,8 +10,20 @@ touch $(pwd)/elves.out
 MEN_ERRORS=-1
 ELVES_ERRORS=-1
 
-$BUILD_DIR/$project -nographics -batchmode --test=$(pwd)/men.out --player-race=MEN --test-time=15000 && \
-    $BUILD_DIR/$project -nographics -batchmode --test=$(pwd)/elves.out --player-race=ELVES --test-time=15000
+if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+
+    $BUILD_DIR/$project -nographics -batchmode --test=$(pwd)/men.out --player-race=MEN --test-time=15000 && \
+        $BUILD_DIR/$project -nographics -batchmode --test=$(pwd)/elves.out --player-race=ELVES --test-time=15000
+
+else
+
+    sudo -E xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' \
+        $BUILD_DIR/$project -batchmode --test=$(pwd)/men.out --player-race=MEN --test-time=15000 \
+    && \
+    sudo -E xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' \
+        $BUILD_DIR/$project -batchmode --test=$(pwd)/elves.out --player-race=ELVES --test-time=15000
+
+fi
 
 if [ $? == 0 ]; then
 
