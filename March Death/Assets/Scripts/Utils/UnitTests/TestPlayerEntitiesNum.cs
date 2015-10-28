@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Utils.UnitTests
 {
-    class TestPlayerEntitiesNum : IUnitTest
+    class TestPlayerEntitiesNum : UnitTest
     {
         public string name
         {
@@ -19,7 +19,7 @@ namespace Utils.UnitTests
         {
             if (BasePlayer.player.activeEntities.Count != 2)
             {
-                errorLogs.Add(new Tuple<string, string>("Player has more than 2 initial entities", BasePlayer.player.currentUnits.Count.ToString()));
+                LogError("Player has more than 2 initial entities", BasePlayer.player.currentUnits.Count.ToString());
             }
         }
     }

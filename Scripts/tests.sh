@@ -10,6 +10,8 @@ touch $(pwd)/elves.out
 MEN_ERRORS=-1
 ELVES_ERRORS=-1
 
+echo -e "\n\033[32;1mRunning tests\033[0m\n"
+
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then
 
     $BUILD_DIR/$project -nographics -batchmode --test=$(pwd)/men.out --player-race=MEN --test-time=15000 && \
@@ -33,7 +35,6 @@ if [ $? == 0 ]; then
     if [ $MEN_ERRORS == 0 ] && [ $ELVES_ERRORS == 0 ]; then
 
         echo -e "\n\033[32;1mTests Completed Successfully\033[0m\n"
-
         exit 0
 
     fi

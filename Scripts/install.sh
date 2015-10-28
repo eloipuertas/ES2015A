@@ -17,44 +17,23 @@ else
     sudo -E apt-get -yq update
     sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install build-essential debconf gconf-service lib32gcc1 lib32stdc++6 libasound2 libc6 libc6-i386 libcairo2 libcap2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libfreetype6 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libgl1-mesa-glx libglib2.0-0 libglu1-mesa libgtk2.0-0 libnspr4 libnss3 libpango1.0-0 libstdc++6 libx11-6 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxtst6 zlib1g libpng12-0 xvfb
 
-    ##### LINUX BASED #####
-    export INSTALLER_BASED=1
     export HOME=$(dirname `pwd`)
     export UNITY_ROOT=$HOME
 
     source $(dirname $0)/travis_wait.sh
 
-    echo "Cached Unity: `if [ -f "$UNITY_ROOT/unity-editor-5.1.0f3/Editor/Unity" ]; then echo "True"; else echo "False"; fi`"
+    echo 'Downloading from http://download.unity3d.com/download_unity/unity-editor-installer-5.1.0f3+2015091501.sh'
+    $(pwd)/Scripts/axel -q -n 10 -o Unity.sh http://download.unity3d.com/download_unity/unity-editor-installer-5.1.0f3+2015082501.sh
 
-    if [ $INSTALLER_BASED == 1 ]; then
+    echo 'Monkey-patching installer for non sudo execution and no input'
+    sed -i '41,44d;49,50d' ./Unity.sh
 
-        echo 'Downloading from http://download.unity3d.com/download_unity/unity-editor-installer-5.1.0f3+2015091501.sh'
-        $(pwd)/Scripts/axel -q -n 10 -o Unity.sh http://download.unity3d.com/download_unity/unity-editor-installer-5.1.0f3+2015082501.sh
+    echo 'Extracting Unity from monkey-patched Unity.sh'
+    chmod +x ./Unity.sh
+    ./Unity.sh -o $UNITY_ROOT
 
-        echo 'Monkey-patching installer for non sudo execution and no input'
-        sed -i '41,44d;49,50d' ./Unity.sh
-
-        echo 'Extracting Unity from monkey-patched Unity.sh'
-        chmod +x ./Unity.sh
-        ./Unity.sh -o $UNITY_ROOT
-
-        echo "Install Working Dir: `pwd`"
-        echo "Installed to: ${UNITY_ROOT}"
-
-    else
-
-        # Fake UNITY_ROOT
-        export UNITY_ROOT=$UNITY_ROOT/unity-editor-5.1.0f3
-
-        echo 'Downloading from http://download.unity3d.com/download_unity/unity-editor-5.1.0f3+2015091501_amd64.deb'
-        $(pwd)/Scripts/axel -q -n 10 -o Unity.deb http://download.unity3d.com/download_unity/unity-editor-5.1.0f3+2015091501_amd64.deb
-
-        echo 'Unpacking Unity3D'
-        mkdir -p $UNITY_ROOT
-        ar -x Unity.deb
-        tar xzf data.tar.gz -C $UNITY_ROOT
-
-    fi
+    echo "Install Working Dir: `pwd`"
+    echo "Installed to: ${UNITY_ROOT}"
 
     echo 'Creating cache and local'
     mkdir -p $HOME/.cache/unity3d

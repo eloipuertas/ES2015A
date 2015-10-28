@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Utils.UnitTests
 {
-    class TestEntityYCoord : IUnitTest
+    class TestEntityYCoord : UnitTest
     {
         public string name
         {
@@ -22,7 +22,7 @@ namespace Utils.UnitTests
             {
                 if (unit.transform.position.y < 0)
                 {
-                    errorLogs.Add(new Tuple<string, string>("Unit Y coordinate < 0", unit.ToString()));
+                    LogError("Unit Y coordinate < 0", unit.ToString());
                 }
             }
         }
