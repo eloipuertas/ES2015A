@@ -5,7 +5,6 @@ using UnityEngine;
 
 class CreateCivil : Ability
 {
-    private bool _enabled = false;
     private IGameEntity _entity;
     private UnitInfo _unitInfo;
     public Resource res;
@@ -23,7 +22,7 @@ class CreateCivil : Ability
     {
         get
         {
-            return _enabled;
+            return false;
         }
     }
 
@@ -44,13 +43,11 @@ class CreateCivil : Ability
     }
     public override void disable()
     {
-        _enabled = false;
         base.disable();
     }
 
     public override void enable()
     {
-        _enabled = true;
         base.enable(); 
         res.createCivilian(); 
 
