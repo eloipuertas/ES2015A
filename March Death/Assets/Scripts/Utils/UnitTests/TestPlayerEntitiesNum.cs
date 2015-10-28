@@ -7,7 +7,7 @@ namespace Utils.UnitTests
 {
     class TestPlayerEntitiesNum : UnitTest
     {
-        public string name
+        public override string name
         {
             get
             {
@@ -15,7 +15,7 @@ namespace Utils.UnitTests
             }
         }
 
-        public void run(List<Tuple<string, string>> errorLogs)
+        public override void run()
         {
             if (BasePlayer.player.activeEntities.Count != 2)
             {

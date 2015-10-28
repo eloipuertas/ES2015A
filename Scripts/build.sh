@@ -117,7 +117,7 @@ else
 
 fi
 
-if [ "$TRAVIS_BRANCH" == "devel-travis_cache"  && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+if [ "$TRAVIS_BRANCH" == "devel-travis_cache" ]  && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     echo -e "\n\033[32;1mUpload to cache server\033[0m\n"
     sudo -E rsync -a $HOME/ES2015A/March\ Death/Temp ${CACHE_HOST}
     sudo -E rsync -a $BUILD_DIR ${CACHE_HOST}
