@@ -195,10 +195,12 @@ public class UserInput : MonoBehaviour
 			camera.disableManualControl();
 			leftButtonIsDown = true;
 			GameObject hitObject = FindHitObject();
-			string name = hitObject.name;
-			mouseButtonDownPoint = mouseButtonCurrentPoint;
-			topLeft = GetScreenRaycastPoint(mouseButtonDownPoint);
-
+            if (hitObject != null)
+            {
+                string name = hitObject.name;
+                mouseButtonDownPoint = mouseButtonCurrentPoint;
+                topLeft = GetScreenRaycastPoint(mouseButtonDownPoint);
+            }
 		} else if (Input.GetMouseButtonUp (0)) {
 			camera.enableManualControl();
 			leftButtonIsDown = false;
@@ -241,7 +243,8 @@ public class UserInput : MonoBehaviour
 		selectedArea[2] = bottomRight;
 		selectedArea[3] = bottomLeft;
 
-		foreach (GameObject unit in player.currentUnits) {
+		foreach (IGameEntity entity in player.activeEntities) {
+            GameObject unit = entity.getGameObject();
 			Vector3 unitPosition = unit.transform.position;
 			Selectable selectedObject = unit.GetComponent<Selectable>();
 			if (AreaContainsObject(selectedArea, unitPosition)) {

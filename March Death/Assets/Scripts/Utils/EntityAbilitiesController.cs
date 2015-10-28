@@ -66,8 +66,10 @@ public class EntityAbilitiesController : MonoBehaviour
         {
             String ability = abilities[i].name;
             Ability abilityObj = entity.getAbility(ability);
+
             if (abilityObj.isUsable)
             {
+                // HACK: When this is fired, the button status should be updated! abilityObj.isActive might have changed...
                 UnityAction actionMethod = new UnityAction(() =>
                 {
                     Debug.Log(abilityObj);

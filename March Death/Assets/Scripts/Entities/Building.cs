@@ -62,7 +62,6 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
         ConstructionGrid grid = GameObject.FindGameObjectWithTag("GameController").GetComponent<ConstructionGrid>();
         Vector3 disc_pos = grid.discretizeMapCoords(gameObject.transform.position);
         grid.liberatePosition(disc_pos);
-
         base.OnDestroy();
     }
 
