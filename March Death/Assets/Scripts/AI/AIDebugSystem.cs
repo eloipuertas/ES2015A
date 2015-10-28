@@ -28,7 +28,6 @@ public class AIDebugSystem : MonoBehaviour {
     Dictionary<int, string> individualUnitInfo = new Dictionary<int, string>();
 
     int numAgents = 0;//How much agents does we have
-    int times_registered = 0;
 
     private long timesCalled = 0;//How much times has an agent been called
 
@@ -46,6 +45,7 @@ public class AIDebugSystem : MonoBehaviour {
         foreach(BaseAgent agent in controller.Micro.agents)
         {
             agentsConfidence.Add(agent.agentName, 0);
+            timesCalledAgents.Add(agent.agentName, 0);
             numAgents++;
         }
     }
@@ -99,8 +99,9 @@ public class AIDebugSystem : MonoBehaviour {
     {
         foreach(KeyValuePair<string, int> agentstat in timesCalledAgents)
         {
-            GUI.Label(new Rect(windowRect2.x + marginLeft, getNextLine(), textWidth, textHeight), agentstat.Key);
-            GUI.Label(new Rect(windowRect2.x + marginLeft * 2 + textWidth, nextLine, textWidth, textHeight), ((float)agentstat.Value / timesCalled).ToString()+"%");
+            GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), agentstat.Key);
+            GUI.Label(new Rect(marginLeft + textWidth, nextLine, textWidth, textHeight), ((double)agentstat.Value / (double)timesCalled * 100).ToString()+"%");
+            Debug.Log("Agent:" + agentstat.Value.ToString());
         }
     }
 
@@ -123,6 +124,14 @@ public class AIDebugSystem : MonoBehaviour {
             GUI.contentColor = Color.yellow;
             GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), agent.Value.ToString());            
         }
+    }
+
+    public void setControllingAgent(string angent, float value)
+    {
+        controllingAgent = angent;
+        confidence = value;
+        this.timesCalledAgents[angent]++;
+        timesCalled++;
     }
 
     /// <summary>
@@ -171,14 +180,6 @@ public class AIDebugSystem : MonoBehaviour {
     {
         agentsConfidence[name] = conf;
 
-        //Need to count how much times an agent has taken desitions in order to show som stats about this fact
-        times_registered++;
-        if(timesCalled % numAgents == 0)
-        {
-            timesCalled++;
-            times_registered = 0;
-            timesCalledAgents[controllingAgent]++;
-        }
     }
 
     /// <summary>
