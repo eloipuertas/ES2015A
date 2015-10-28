@@ -152,7 +152,6 @@ public class UserInput : MonoBehaviour
 			Selectable selectedObject = hitObject.GetComponent<Selectable> ();
 			// We just be sure that is a selectable object
 			if (selectedObject) {
-				//TODO: use only one select method
 				selectedObject.SelectUnique ();
 				player.setCurrently (Player.status.SELECTED_UNTIS);
 			} 
@@ -162,9 +161,10 @@ public class UserInput : MonoBehaviour
 	private void Deselect() {
 		
 		//Deselect all
-		for (int i = player.SelectedObjects.Count - 1; i >= 0; i--)
+		ArrayList selectedObjects = player.getSelectedObjects();
+		for (int i = selectedObjects.Count - 1; i >= 0; i--)
 		{
-			Selectable selectedObject = (Selectable)player.SelectedObjects[i];
+			Selectable selectedObject = (Selectable)selectedObjects[i];
 			selectedObject.Deselect();
 		}
 		player.setCurrently(Player.status.IDLE);
