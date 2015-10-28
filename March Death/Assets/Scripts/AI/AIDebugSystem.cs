@@ -10,6 +10,7 @@ public class AIDebugSystem : MonoBehaviour {
 
     bool showInfo { get; set; }
     public Rect windowRect = new Rect(20, 20, 200, 80);
+    public Rect windowRect2 = new Rect(20 + 200 + 10, 20, 400, 90);
 
     private const int WINDOW_HEIGHT_OFFSET_TOLERANCE = 20;
 
@@ -21,9 +22,16 @@ public class AIDebugSystem : MonoBehaviour {
     private int textWidth = 100;
     private int textHeight = 20;
 
-    Dictionary<string, float> agentsConfidence;
-    Dictionary<int, Unit> registeredUnits;
-    Dictionary<int, string> individualUnitInfo;
+    Dictionary<string, float> agentsConfidence = new Dictionary<string, float>();
+    Dictionary<string, int> timesCalledAgents = new Dictionary<String, int>();
+    Dictionary<string, float> maxRegisteredValue = new Dictionary<String, float>();
+    Dictionary<string, float> minRegisteredValue = new Dictionary<String, float>();
+    Dictionary<int, Unit> registeredUnits = new Dictionary<int, Unit>();
+    Dictionary<int, string> individualUnitInfo = new Dictionary<int, string>();
+
+    int numAgents = 0;//How much agents does we have
+
+    private long timesCalled = 0;//How much times has an agent been called
 
     public static AIDebugSystem CreateComponent(GameObject parent, AIController controller)
     {
@@ -35,13 +43,13 @@ public class AIDebugSystem : MonoBehaviour {
     
     void Start()
     {
-        agentsConfidence = new Dictionary<string, float>();
-        individualUnitInfo = new Dictionary<int, string>();
-        registeredUnits = new Dictionary<int, Unit>();
-
         foreach(BaseAgent agent in controller.Micro.agents)
         {
             agentsConfidence.Add(agent.agentName, 0);
+            timesCalledAgents.Add(agent.agentName, 0);
+            maxRegisteredValue.Add(agent.agentName, -Mathf.Infinity);
+            minRegisteredValue.Add(agent.agentName, Mathf.Infinity);
+            numAgents++;
         }
     }
 
@@ -49,7 +57,6 @@ public class AIDebugSystem : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.F9))
         {
             showInfo = !showInfo;
-            Debug.Log("AIDebugger:" + showInfo);
         }
 	}
 
@@ -57,6 +64,7 @@ public class AIDebugSystem : MonoBehaviour {
     {
         if (!showInfo) return;
         windowRect = GUI.Window(0, windowRect, DoMyWindow, "AI Debug");
+        windowRect2 = GUI.Window(1, windowRect2, DoMyWindow2, "AI Stats");
         showAIInfoOverUnits();
     }
 
@@ -81,6 +89,33 @@ public class AIDebugSystem : MonoBehaviour {
         GUI.DragWindow();
     }
 
+    void DoMyWindow2(int windowID)
+    {
+        resetLines();
+        GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), "Agent");
+        GUI.Label(new Rect(marginLeft + textWidth, nextLine, textWidth, textHeight), "Usage %");
+        GUI.Label(new Rect(marginLeft * 2 + textWidth * 2, nextLine, textWidth, textHeight), "Min Value");
+        GUI.Label(new Rect(marginLeft * 3+ textWidth * 3, nextLine, textWidth, textHeight), "Max Value");
+        showAgentsStats();
+        GUI.DragWindow();
+    }
+
+    void showAgentsStats()
+    {
+        foreach (KeyValuePair<string, int> agentstat in timesCalledAgents)
+        {
+            GUI.contentColor = Color.white;
+            GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), agentstat.Key);
+            GUI.contentColor = Color.yellow;
+            GUI.Label(new Rect(marginLeft + textWidth, nextLine, textWidth, textHeight), Convert.ToString(Math.Round((double)agentstat.Value / (double)timesCalled * 100, 2)) + "%");
+            GUI.contentColor = Color.red;
+            GUI.Label(new Rect(marginLeft * 2 + textWidth * 2, nextLine, textWidth, textHeight), minRegisteredValue[agentstat.Key].ToString());
+            GUI.contentColor = Color.green;
+            GUI.Label(new Rect(marginLeft * 3 + textWidth * 3, nextLine, textWidth, textHeight), maxRegisteredValue[agentstat.Key].ToString());
+        }
+        
+    }
+
     /// <summary>
     /// Used to show all the confidences of non winner agents to contrast them with the 
     /// winner Angent
@@ -100,6 +135,15 @@ public class AIDebugSystem : MonoBehaviour {
             GUI.contentColor = Color.yellow;
             GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), agent.Value.ToString());            
         }
+    }
+
+    public void setControllingAgent(string angent, float value)
+    {
+        controllingAgent = angent;
+        confidence = value;
+        //Used to count how much this agent has been dominating and how mutch times agents has done their work
+        this.timesCalledAgents[angent]++;
+        timesCalled++;
     }
 
     /// <summary>
@@ -147,6 +191,15 @@ public class AIDebugSystem : MonoBehaviour {
     public void setAgentConfidence(string name, float conf)
     {
         agentsConfidence[name] = conf;
+        if(conf > maxRegisteredValue[name])
+        {
+            maxRegisteredValue[name] = conf;
+        }
+
+        if(conf < minRegisteredValue[name])
+        {
+            minRegisteredValue[name] = conf;
+        }
     }
 
     /// <summary>
