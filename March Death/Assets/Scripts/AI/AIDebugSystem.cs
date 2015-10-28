@@ -10,7 +10,7 @@ public class AIDebugSystem : MonoBehaviour {
 
     bool showInfo { get; set; }
     public Rect windowRect = new Rect(20, 20, 200, 80);
-    public Rect windowRect2 = new Rect(20 + 200 + 10, 20, 400, 100);
+    public Rect windowRect2 = new Rect(20 + 200 + 10, 20, 400, 90);
 
     private const int WINDOW_HEIGHT_OFFSET_TOLERANCE = 20;
 
@@ -93,19 +93,27 @@ public class AIDebugSystem : MonoBehaviour {
     {
         resetLines();
         GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), "Agent");
-        GUI.Label(new Rect(marginLeft + textWidth + 10, nextLine, textWidth, textHeight), "Usage %");
+        GUI.Label(new Rect(marginLeft + textWidth, nextLine, textWidth, textHeight), "Usage %");
+        GUI.Label(new Rect(marginLeft * 2 + textWidth * 2, nextLine, textWidth, textHeight), "Min Value");
+        GUI.Label(new Rect(marginLeft * 3+ textWidth * 3, nextLine, textWidth, textHeight), "Max Value");
         showAgentsStats();
         GUI.DragWindow();
     }
 
     void showAgentsStats()
     {
-        foreach(KeyValuePair<string, int> agentstat in timesCalledAgents)
+        foreach (KeyValuePair<string, int> agentstat in timesCalledAgents)
         {
+            GUI.contentColor = Color.white;
             GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), agentstat.Key);
-            GUI.Label(new Rect(marginLeft + textWidth, nextLine, textWidth, textHeight), ((double)agentstat.Value / (double)timesCalled * 100).ToString()+"%");
-            Debug.Log("Agent:" + agentstat.Value.ToString());
+            GUI.contentColor = Color.yellow;
+            GUI.Label(new Rect(marginLeft + textWidth, nextLine, textWidth, textHeight), Convert.ToString(Math.Round((double)agentstat.Value / (double)timesCalled * 100, 2)) + "%");
+            GUI.contentColor = Color.red;
+            GUI.Label(new Rect(marginLeft * 2 + textWidth * 2, nextLine, textWidth, textHeight), minRegisteredValue[agentstat.Key].ToString());
+            GUI.contentColor = Color.green;
+            GUI.Label(new Rect(marginLeft * 3 + textWidth * 3, nextLine, textWidth, textHeight), maxRegisteredValue[agentstat.Key].ToString());
         }
+        
     }
 
     /// <summary>
