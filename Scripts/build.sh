@@ -103,7 +103,7 @@ else
 
     if [ $BUILD_LINUX == 0 ]; then
 
-        ln -s $BUILD_DIR/linux/$project.x86_64 $BUILD_DIR/linux/$project
+        sudo -E ln -s $BUILD_DIR/linux/$project.x86_64 $BUILD_DIR/linux/$project
 
     fi
 
