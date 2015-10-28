@@ -105,9 +105,9 @@ public class MiniMapController : MonoBehaviour
     {
         if (main_zoom != mainCam.orthographicSize) // if the zoom has changed
         {
-            float diff = (mainCam.orthographicSize - main_zoom) / 1.5f;
-            rect_marker.width += diff; rect_marker.height += diff / 2.0f;
-            rect_marker.center -= new Vector2(diff / 2, diff / (2 * 2.0f));
+            float diff = (mainCam.orthographicSize - main_zoom) / 6.0f; // to reduce the zoom vel increment value (hack)
+            rect_marker.width += diff; rect_marker.height += diff;
+            rect_marker.center -= new Vector2(diff/2, diff/2);
             main_zoom = mainCam.orthographicSize;
         }
         if (!act_pos.Equals(mainCam.transform.position)) // if the camera has moved
@@ -120,6 +120,7 @@ public class MiniMapController : MonoBehaviour
             recalcViewport();
             rt = new RenderTexture(Screen.width, Screen.height, 2);
             _camera.targetTexture = rt;
+            aspect = mainCam.aspect;
         }
     }
 
@@ -166,10 +167,10 @@ public class MiniMapController : MonoBehaviour
 
         Rect r = new Rect();
 
-        r.xMax = corners_minimap[1].x + 10;
-        r.xMin = corners_minimap[0].x - 10;
-        r.yMax = Screen.height - corners_minimap[1].y + 12;
-        r.yMin = Screen.height - corners_minimap[0].y - 12;
+        r.xMax = corners_minimap[1].x + 5; // 10 10 12 12
+        r.xMin = corners_minimap[0].x - 5;
+        r.yMax = Screen.height - corners_minimap[1].y + 7;
+        r.yMin = Screen.height - corners_minimap[0].y - 7;
 
         Vector3 v = _camera.WorldToScreenPoint(mainCam.transform.position - mainCam.GetComponent<CameraController>().getCameraOffset);
         v.y = Screen.height - v.y;
