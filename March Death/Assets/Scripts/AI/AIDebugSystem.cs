@@ -10,7 +10,7 @@ public class AIDebugSystem : MonoBehaviour {
 
     bool showInfo { get; set; }
     public Rect windowRect = new Rect(20, 20, 200, 80);
-    public Rect windowRect2 = new Rect(20 + 200 + 10, 20, 400, 400);
+    public Rect windowRect2 = new Rect(20 + 200 + 10, 20, 400, 100);
 
     private const int WINDOW_HEIGHT_OFFSET_TOLERANCE = 20;
 
@@ -24,13 +24,14 @@ public class AIDebugSystem : MonoBehaviour {
 
     Dictionary<string, float> agentsConfidence = new Dictionary<string, float>();
     Dictionary<string, int> timesCalledAgents = new Dictionary<String, int>();
+    Dictionary<string, float> maxRegisteredValue = new Dictionary<String, float>();
+    Dictionary<string, float> minRegisteredValue = new Dictionary<String, float>();
     Dictionary<int, Unit> registeredUnits = new Dictionary<int, Unit>();
     Dictionary<int, string> individualUnitInfo = new Dictionary<int, string>();
 
     int numAgents = 0;//How much agents does we have
 
     private long timesCalled = 0;//How much times has an agent been called
-
 
     public static AIDebugSystem CreateComponent(GameObject parent, AIController controller)
     {
@@ -46,6 +47,8 @@ public class AIDebugSystem : MonoBehaviour {
         {
             agentsConfidence.Add(agent.agentName, 0);
             timesCalledAgents.Add(agent.agentName, 0);
+            maxRegisteredValue.Add(agent.agentName, -Mathf.Infinity);
+            minRegisteredValue.Add(agent.agentName, Mathf.Infinity);
             numAgents++;
         }
     }
@@ -130,6 +133,7 @@ public class AIDebugSystem : MonoBehaviour {
     {
         controllingAgent = angent;
         confidence = value;
+        //Used to count how much this agent has been dominating and how mutch times agents has done their work
         this.timesCalledAgents[angent]++;
         timesCalled++;
     }
@@ -179,7 +183,15 @@ public class AIDebugSystem : MonoBehaviour {
     public void setAgentConfidence(string name, float conf)
     {
         agentsConfidence[name] = conf;
+        if(conf > maxRegisteredValue[name])
+        {
+            maxRegisteredValue[name] = conf;
+        }
 
+        if(conf < minRegisteredValue[name])
+        {
+            minRegisteredValue[name] = conf;
+        }
     }
 
     /// <summary>
