@@ -51,7 +51,10 @@ else
     echo -n "Waiting for cache to end downloading."
     while [ -f "$HOME/.RSYNC_LOCK" ]
     do
+        echo -n "."
         sleep 2
     done
+
+    echo -e "\n\033[32;1mDone installing\033[0m\n"
 
 fi
