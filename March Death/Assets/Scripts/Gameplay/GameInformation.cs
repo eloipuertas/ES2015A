@@ -26,7 +26,8 @@ public class GameInformation : MonoBehaviour {
 
     public void LoadHUD()
     {
-        if (currentHud) Destroy(currentHud);
+        // TODO: reload different hud while playing
+        //if (currentHud) Destroy(currentHud);
         switch (playerRace)
         {
         case Races.ELVES:
