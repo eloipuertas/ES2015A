@@ -10,6 +10,7 @@ public class AIDebugSystem : MonoBehaviour {
 
     bool showInfo { get; set; }
     public Rect windowRect = new Rect(20, 20, 200, 80);
+    public Rect windowRect2 = new Rect(20 + 200 + 10, 20, 400, 400);
 
     private const int WINDOW_HEIGHT_OFFSET_TOLERANCE = 20;
 
@@ -21,9 +22,16 @@ public class AIDebugSystem : MonoBehaviour {
     private int textWidth = 100;
     private int textHeight = 20;
 
-    Dictionary<string, float> agentsConfidence;
-    Dictionary<int, Unit> registeredUnits;
-    Dictionary<int, string> individualUnitInfo;
+    Dictionary<string, float> agentsConfidence = new Dictionary<string, float>();
+    Dictionary<string, int> timesCalledAgents = new Dictionary<String, int>();
+    Dictionary<int, Unit> registeredUnits = new Dictionary<int, Unit>();
+    Dictionary<int, string> individualUnitInfo = new Dictionary<int, string>();
+
+    int numAgents = 0;//How much agents does we have
+    int times_registered = 0;
+
+    private long timesCalled = 0;//How much times has an agent been called
+
 
     public static AIDebugSystem CreateComponent(GameObject parent, AIController controller)
     {
@@ -35,13 +43,10 @@ public class AIDebugSystem : MonoBehaviour {
     
     void Start()
     {
-        agentsConfidence = new Dictionary<string, float>();
-        individualUnitInfo = new Dictionary<int, string>();
-        registeredUnits = new Dictionary<int, Unit>();
-
         foreach(BaseAgent agent in controller.Micro.agents)
         {
             agentsConfidence.Add(agent.agentName, 0);
+            numAgents++;
         }
     }
 
@@ -49,7 +54,6 @@ public class AIDebugSystem : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.F9))
         {
             showInfo = !showInfo;
-            Debug.Log("AIDebugger:" + showInfo);
         }
 	}
 
@@ -57,6 +61,7 @@ public class AIDebugSystem : MonoBehaviour {
     {
         if (!showInfo) return;
         windowRect = GUI.Window(0, windowRect, DoMyWindow, "AI Debug");
+        windowRect2 = GUI.Window(1, windowRect2, DoMyWindow2, "AI Stats");
         showAIInfoOverUnits();
     }
 
@@ -79,6 +84,24 @@ public class AIDebugSystem : MonoBehaviour {
         GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), "Other Agents Confidence:");
         showConfidences();
         GUI.DragWindow();
+    }
+
+    void DoMyWindow2(int windowID)
+    {
+        resetLines();
+        GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), "Agent");
+        GUI.Label(new Rect(marginLeft + textWidth + 10, nextLine, textWidth, textHeight), "Usage %");
+        showAgentsStats();
+        GUI.DragWindow();
+    }
+
+    void showAgentsStats()
+    {
+        foreach(KeyValuePair<string, int> agentstat in timesCalledAgents)
+        {
+            GUI.Label(new Rect(windowRect2.x + marginLeft, getNextLine(), textWidth, textHeight), agentstat.Key);
+            GUI.Label(new Rect(windowRect2.x + marginLeft * 2 + textWidth, nextLine, textWidth, textHeight), ((float)agentstat.Value / timesCalled).ToString()+"%");
+        }
     }
 
     /// <summary>
@@ -147,6 +170,15 @@ public class AIDebugSystem : MonoBehaviour {
     public void setAgentConfidence(string name, float conf)
     {
         agentsConfidence[name] = conf;
+
+        //Need to count how much times an agent has taken desitions in order to show som stats about this fact
+        times_registered++;
+        if(timesCalled % numAgents == 0)
+        {
+            timesCalled++;
+            times_registered = 0;
+            timesCalledAgents[controllingAgent]++;
+        }
     }
 
     /// <summary>
