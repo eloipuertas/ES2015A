@@ -111,10 +111,10 @@ fi
 
 if [ "$TRAVIS_BRANCH" == "devel-travis_cache" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     echo -e "\n\033[32;1mUpload to cache server\033[0m\n"
-    sudo -E rsync -a "$HOME/ES2015A/March Death/Temp" ${CACHE_HOST}
-    sudo -E rsync -a "$HOME/ES2015A/March Death/Obj" ${CACHE_HOST}
-    sudo -E rsync -a "$HOME/ES2015A/March Death/Library" ${CACHE_HOST}
-    sudo -E rsync -a $BUILD_DIR ${CACHE_HOST}
+    sudo -E rsync -rlptgD --delete-after "$HOME/ES2015A/March Death/Temp" ${CACHE_HOST}
+    sudo -E rsync -rlptgD --delete-after "$HOME/ES2015A/March Death/Obj" ${CACHE_HOST}
+    sudo -E rsync -rlptgD --delete-after "$HOME/ES2015A/March Death/Library" ${CACHE_HOST}
+    sudo -E rsync -rlptgD --delete-after $BUILD_DIR ${CACHE_HOST}
 fi
 
 if [ $BUILD_WIN == 0 ] && [ $BUILD_LINUX == 0 ] && [ $BUILD_OSX == 0 ]; then

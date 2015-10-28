@@ -28,10 +28,10 @@ else
     echo 'Background downloading cache'
     # Use ; and not && to actually do all of them, even if one doesn't succeed
     (touch $HOME/.RSYNC_LOCK; \
-        sudo -E rsync -a ${CACHE_HOST}Temp    $HOME/ES2015A/March\ Death/; \
-        sudo -E rsync -a ${CACHE_HOST}Obj     $HOME/ES2015A/March\ Death/; \
-        sudo -E rsync -a ${CACHE_HOST}Library $HOME/ES2015A/March\ Death/; \
-        sudo -E rsync -a ${CACHE_HOST}Build   $HOME/; \
+        sudo -E rsync -rlptgD ${CACHE_HOST}Temp    $HOME/ES2015A/March\ Death/; \
+        sudo -E rsync -rlptgD ${CACHE_HOST}Obj     $HOME/ES2015A/March\ Death/; \
+        sudo -E rsync -rlptgD ${CACHE_HOST}Library $HOME/ES2015A/March\ Death/; \
+        sudo -E rsync -rlptgD ${CACHE_HOST}Build   $HOME/; \
     rm $HOME/.RSYNC_LOCK) &
 
     echo 'Monkey-patching installer for non sudo execution and no input'
