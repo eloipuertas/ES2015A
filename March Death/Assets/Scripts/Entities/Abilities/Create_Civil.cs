@@ -31,15 +31,20 @@ class CreateCivil : Ability
     {
         get
         {
-            // DEBUGGING 
-            return true;
-            /*
-            // we need to check if player has enough materials to spend in building construction
-            return BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, _unitInfo.resources.food) &&
-                   BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, _unitInfo.resources.wood) &&
-                   //BasePlayer..getOwner(_entity).resources.IsEnough(WorldResources.Type.GOL, _unitInfo.resources.wood) &&
-                   BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, _unitInfo.resources.metal);
-             */
+
+            // Ability must be disabled if player hasn't enough materials to 
+            // spend in unit construction or build is under construction.
+            // Best way to check if building is finished is to check if it 
+            // has the default unit, which is created just when building 
+            // becomes usable.
+             
+            return 
+                
+            BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, _unitInfo.resources.food) &&
+            BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, _unitInfo.resources.wood) &&
+          //BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.GOL, _unitInfo.resources.wood) &&
+            BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, _unitInfo.resources.metal)&&
+            res.hasDefaultUnit;       
         }
     }
     public override void disable()

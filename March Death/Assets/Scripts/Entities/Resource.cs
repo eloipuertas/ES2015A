@@ -98,7 +98,7 @@ public class Resource : Building<Resource.Actions>
     /// <summary>
     /// check if starter unit was created. We need wait until resource is build
     /// </summary>
-    private bool firstUnit;
+    public bool hasDefaultUnit {get; private set;}
     private readonly object syncLock = new object();
     bool hasCreatedCivil = false;
     List<GameObject> pendingProducers = new List<GameObject>();
@@ -330,9 +330,28 @@ public class Resource : Building<Resource.Actions>
         }
     }
 
+    /// <summary>
+    /// If unit inside building is attacked and killed we must recalculate 
+    /// collection rate and current harvestUnits. No harvestUnits means no
+   ///  production or collection so IDLE status.
+    /// </summary>
+    /// <param name="other"></param>
     void OnTriggerStay(Collider other)
     {
-        ;
+
+        IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
+        if ((entity.info.isUnit)&&(entity.info.isCivil))
+        {
+            if (entity.status == EntityStatus.DEAD)
+            {
+                _collectionRate -= entity.info.attributes.capacity;
+                harvestUnits--;
+                if (harvestUnits == 0)
+                {
+                    setStatus(EntityStatus.IDLE);
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -358,7 +377,10 @@ public class Resource : Building<Resource.Actions>
             }  
         }
     }
-    
+    private void onUnitDestroy(Unit unit)
+    {
+        
+    }
     /// <summary>
     /// Object initialization
     /// </summary>
@@ -373,7 +395,7 @@ public class Resource : Building<Resource.Actions>
         _info = Info.get.of(race, type);
         totalUnits = 0;
         _unitRotation = transform.rotation;
-        firstUnit = false;        
+        hasDefaultUnit = false;        
         
         // Call Building start
         base.Awake();
@@ -397,19 +419,30 @@ public class Resource : Building<Resource.Actions>
     {
         base.Update();
 
-        if (Time.time > _nextUpdate)
+        switch (status)
         {
-            _nextUpdate = Time.time + info.resourceAttributes.updateInterval;
-            if (!firstUnit)
-            {
-                if (status.Equals(EntityStatus.IDLE))
+
+            case EntityStatus.IDLE:
+
+                if (!hasDefaultUnit)
                 {
-                    firstUnit = true;
                     createCivilian();
+                    hasDefaultUnit = true;
                 }
-            }  
-            collect();
-            produce();          
+                break;
+
+            case EntityStatus.WORKING:
+
+                if (Time.time > _nextUpdate)
+                {
+                    _nextUpdate = Time.time + info.resourceAttributes.updateInterval;
+                    collect();
+                    produce();          
+                }
+                break;
         }
+
+
+        
     }
 }
