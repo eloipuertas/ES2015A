@@ -238,16 +238,28 @@ public class UserInput : MonoBehaviour
 		GameObject unit;
 		Vector3 unitPosition;
 		Selectable selectedObject;
-		
 		foreach (IGameEntity entity in player.activeEntities) {
+			if (entity == null) {
+				continue;
+			}
+
+			//Check if is unit
 			unit = entity.getGameObject();
-			unitPosition = unit.transform.position;
+			if (entity.info.isBuilding){
+				continue;
+			}
+
+			//Check if is selectable
 			selectedObject = unit.GetComponent<Selectable>();
-			
+			if (selectedObject == null) {
+				continue;
+			}
+
+			unitPosition = unit.transform.position;
 			if (AreaContainsObject(selectedArea, unitPosition)) {
-				if (!player.SelectedObjects.Contains(selectedObject)) selectedObject.Select();	
+				selectedObject.Select();	
 			} else {  
-				if (player.SelectedObjects.Contains(selectedObject)) selectedObject.Deselect();
+				selectedObject.Deselect();
 			}
 		}
 		
