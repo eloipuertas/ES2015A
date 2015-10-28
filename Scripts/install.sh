@@ -25,6 +25,10 @@ else
     echo 'Downloading from http://download.unity3d.com/download_unity/unity-editor-installer-5.1.0f3+2015091501.sh'
     $(pwd)/Scripts/axel -q -n 10 -o Unity.sh http://download.unity3d.com/download_unity/unity-editor-installer-5.1.0f3+2015082501.sh
 
+    echo 'Background downloading cache'
+    sudo -E rsync -a ${CACHE_HOST}Temp $HOME/ES2015A/March\ Death &
+    sudo -E rsync -a ${CACHE_HOST}Build $HOME &
+
     echo 'Monkey-patching installer for non sudo execution and no input'
     sed -i '41,44d;49,50d' ./Unity.sh
 

@@ -88,7 +88,15 @@ else
     echo "Attempting to start dummy audio driver"
     sudo modprobe snd-dummy
 
-    echo "Attempting to build $project for Linux"
+    echo -n "Waiting for cache to end downloading."
+    for pid in $(pgrep rsync); do
+        while kill -0 "$pid"; do
+            sleep 10s
+            echo -n "."
+        done
+    done
+
+    echo -e "\nAttempting to build $project for Linux"
     sudo -E xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' \
         $UNITY_ROOT/Editor/Unity \
           -batchmode \
@@ -107,6 +115,12 @@ else
 
     fi
 
+fi
+
+if [ "$TRAVIS_BRANCH" == "devel-travis_cache"  && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+    echo -e "\n\033[32;1mUpload to cache server\033[0m\n"
+    sudo -E rsync -a $HOME/ES2015A/March\ Death/Temp ${CACHE_HOST}
+    sudo -E rsync -a $BUILD_DIR ${CACHE_HOST}
 fi
 
 if [ $BUILD_WIN == 0 ] && [ $BUILD_LINUX == 0 ] && [ $BUILD_OSX == 0 ]; then
