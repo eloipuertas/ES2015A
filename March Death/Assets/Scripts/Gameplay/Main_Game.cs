@@ -10,12 +10,14 @@ public class Main_Game : MonoBehaviour {
 
 	Transform strongholdTransform;
 	GameObject playerHero;
+    ConstructionGrid grid;
+    GameObject gameController;
 
     private Player player;
 
     // Use this for initialization
     void Start () {
-        GameObject gameController = GameObject.FindGameObjectWithTag("GameController");
+        gameController = GameObject.FindGameObjectWithTag("GameController");
         player = gameController.GetComponent<Player>();
 
         strongholdTransform = GameObject.Find("PlayerStronghold").transform;
@@ -28,6 +30,7 @@ public class Main_Game : MonoBehaviour {
         if(info) info.LoadHUD();
         LoadPlayerStronghold();
         LoadPlayerUnits();
+        grid = gameController.GetComponent<ConstructionGrid>();
 	}
 
 	private void LoadPlayerStronghold()
@@ -37,6 +40,11 @@ public class Main_Game : MonoBehaviour {
         {
             playerStronghold = Info.get.createBuilding(info.GetPlayerRace(),
                 BuildingTypes.STRONGHOLD, strongholdTransform.position, strongholdTransform.rotation);
+
+            // adding the building to the construction grid
+            if(!grid) grid = gameController.GetComponent<ConstructionGrid>();
+            Vector3 position = grid.discretizeMapCoords(strongholdTransform.position);
+            grid.reservePosition(position);
 
 			user.addEntity(playerStronghold.GetComponent<IGameEntity>());
 			cam.lookGameObject(playerStronghold);
