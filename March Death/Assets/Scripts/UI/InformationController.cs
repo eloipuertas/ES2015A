@@ -6,6 +6,7 @@ using Storage;
 using Utils;
 using System.IO;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 public class InformationController : MonoBehaviour {
 
@@ -143,10 +144,16 @@ public class InformationController : MonoBehaviour {
 
 	private GameObject CreateButton(Vector2 buttonCenter, Selectable selectable) {
 		IGameEntity entity = selectable.GetComponent<IGameEntity>();
-		return CreateButton(buttonCenter, entity.info.race.ToString());
+
+		UnityAction actionMethod = new UnityAction(() =>
+		{
+			selectable.SelectUnique();
+		});
+
+		return CreateButton(buttonCenter, entity.info.race.ToString(), actionMethod);
 	}
 	
-	private GameObject CreateButton(Vector2 center, String text) 
+	private GameObject CreateButton(Vector2 center, String text, UnityAction actionMethod) 
 	{
 		GameObject canvasObject = new GameObject(text);
 		Canvas canvas = canvasObject.AddComponent<Canvas>();
@@ -162,6 +169,7 @@ public class InformationController : MonoBehaviour {
 		image.color = new Color(1f, .3f, .3f, .5f);
 		
 		Button button = buttonObject.AddComponent<Button>();
+		button.onClick.AddListener(() => actionMethod());
 		button.targetGraphic = image;
 		
 		GameObject textObject = new GameObject("MultiSelectionText");
