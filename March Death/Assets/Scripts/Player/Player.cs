@@ -9,7 +9,7 @@ public class Player : BasePlayer
     /// Information regarding the current status of the player
     /// </summary>
     private status _currently;
-    public enum status {IDLE, PLACING_BUILDING, SELECTING_UNITS, SELECTED_UNTIS /*...*/}
+    public enum status {IDLE, PLACING_BUILDING, SELECTED_UNITS /*...*/}
 
     /// <summary>
     /// Information regarding the entities of the player

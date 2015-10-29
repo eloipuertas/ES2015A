@@ -96,7 +96,7 @@ public class UserInput : MonoBehaviour
 	{
 		if (player.isCurrently (Player.status.IDLE)) {
 			Select ();
-		} else if (player.isCurrently (Player.status.SELECTED_UNTIS)) {
+		} else if (player.isCurrently (Player.status.SELECTED_UNITS)) {
 			Deselect ();
 			Select ();
 		} else if (player.isCurrently (Player.status.PLACING_BUILDING)) {
@@ -108,7 +108,7 @@ public class UserInput : MonoBehaviour
 	{
 		if (player.isCurrently (Player.status.IDLE)) {
 			//Do nothing
-		} else if (player.isCurrently (Player.status.SELECTED_UNTIS)) {
+		} else if (player.isCurrently (Player.status.SELECTED_UNITS)) {
 			
 			GameObject hitObject = FindHitObject();
 			if (!hitObject) // out of bounds click
@@ -137,7 +137,7 @@ public class UserInput : MonoBehaviour
 	private void Drag() {
 		if (player.isCurrently (Player.status.IDLE)) {
 			SelectUnitsInArea();
-		} else if (player.isCurrently (Player.status.SELECTED_UNTIS)) {
+		} else if (player.isCurrently (Player.status.SELECTED_UNITS)) {
 			SelectUnitsInArea();
 		} else if (player.isCurrently (Player.status.PLACING_BUILDING)) {
 			//Do nothing
@@ -153,7 +153,7 @@ public class UserInput : MonoBehaviour
 			// We just be sure that is a selectable object
 			if (selectedObject) {
 				selectedObject.SelectUnique ();
-				player.setCurrently (Player.status.SELECTED_UNTIS);
+				player.setCurrently (Player.status.SELECTED_UNITS);
 			} 
 		}
 	}
@@ -175,7 +175,7 @@ public class UserInput : MonoBehaviour
 		//Place building if position is correct
 		if (!EventSystem.current.IsPointerOverGameObject()) {
 			if (GetComponent<BuildingsManager>().placeBuilding()) {
-				player.setCurrently (Player.status.SELECTED_UNTIS);
+				player.setCurrently (Player.status.SELECTED_UNITS);
 			} else {
 				player.setCurrently (Player.status.PLACING_BUILDING);
 			}
@@ -230,7 +230,7 @@ public class UserInput : MonoBehaviour
 		ArrayList selectedUnits = player.getSelectedObjects ();
 		foreach (Selectable selectedObject in selectedUnits) {
 
-			//Check if is unit
+			//Check if is building
 			IGameEntity entity = selectedObject.GetComponent<IGameEntity>();
 			if (entity.info.isBuilding){
 				selectedObject.Deselect();
@@ -276,7 +276,7 @@ public class UserInput : MonoBehaviour
 			}
 		}
 		
-		Player.status currentAction = player.SelectedObjects.Count > 0 ? Player.status.SELECTED_UNTIS : Player.status.IDLE;
+		Player.status currentAction = player.SelectedObjects.Count > 0 ? Player.status.SELECTED_UNITS : Player.status.IDLE;
 		player.setCurrently (currentAction);
 	}
 	
