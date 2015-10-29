@@ -56,15 +56,15 @@ else
     mkdir -p $HOME/.cache/unity3d
     mkdir -p $HOME/.local/share/unity3d/Unity
 
+    echo "Fixing timestamps"
+    $HOME/ES2015A/Scripts/deploy.sh
+
     echo -n "Waiting for cache to end downloading."
     while [ -f "$HOME/.RSYNC_LOCK" ]
     do
         echo -n "."
         sleep 2
     done
-
-    echo "Fixing timestamps"
-    $HOME/ES2015A/Scripts/deploy.sh
 
     echo -e "\n\033[32;1mDone installing\033[0m\n"
 
