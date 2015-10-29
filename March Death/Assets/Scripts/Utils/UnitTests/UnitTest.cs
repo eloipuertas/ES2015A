@@ -7,14 +7,14 @@ namespace Utils.UnitTests
 {
     abstract class UnitTest : IUnitTest
     {
-        List<Tuple<string, string>> errorLogger { get; set; };
+        public List<Tuple<string, string>> errorLogger { get; set; }
 
         protected void LogError(string title, string message)
         {
             errorLogger.Add(new Tuple<string, string>(title, message));
         }
 
-        abstract string name { get; }
-        abstract void run();
+        public abstract string name { get; }
+        public abstract void run();
     }
 }

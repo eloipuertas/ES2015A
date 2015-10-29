@@ -27,7 +27,23 @@ else
 
 fi
 
-if [ $? == 0 ]; then
+# Save test results
+TESTS_RESULT=$?
+
+# Wait for cache upload if appliable
+if [ "$TRAVIS_BRANCH" == "devel-travis_cache" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+
+    echo -n "Waiting for cache to end uploading."
+    while [ -f "$HOME/.RSYNC_LOCK" ]
+    do
+        echo -n "."
+        sleep 2
+    done
+
+fi
+
+# Exit or show errors
+if [ $TESTS_RESULT == 0 ]; then
 
     MEN_ERRORS=`cat $(pwd)/men.out | tail -n1`
     ELVES_ERRORS=`cat $(pwd)/men.out | tail -n1`
