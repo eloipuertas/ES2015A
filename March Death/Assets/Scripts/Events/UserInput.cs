@@ -151,7 +151,8 @@ public class UserInput : MonoBehaviour
 		if (hitObject) {		
 			Selectable selectedObject = hitObject.GetComponent<Selectable> ();
 			// We just be sure that is a selectable object
-			if (selectedObject) {
+			IGameEntity entity = selectedObject.GetComponent<IGameEntity>();
+			if (selectedObject && entity.getRace() == player.race) {
 				selectedObject.SelectUnique ();
 				player.setCurrently (Player.status.SELECTED_UNITS);
 			} 
