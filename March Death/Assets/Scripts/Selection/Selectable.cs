@@ -105,7 +105,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 			player.SelectedObjects.Remove(this);
 		}
 
-        currentlySelected = false;
+        this.currentlySelected = false;
 		fire (Actions.DESELECTED);
     }
 

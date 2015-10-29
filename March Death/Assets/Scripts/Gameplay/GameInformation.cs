@@ -5,6 +5,7 @@ using Storage;
 public class GameInformation : MonoBehaviour {
 
     private Races playerRace;
+    private GameObject currentHud = null;
 
     private static string pauseMenuPrefab;
 
@@ -25,6 +26,8 @@ public class GameInformation : MonoBehaviour {
 
     public void LoadHUD()
     {
+        // TODO: reload different hud while playing
+        //if (currentHud) Destroy(currentHud);
         switch (playerRace)
         {
         case Races.ELVES:
@@ -38,13 +41,16 @@ public class GameInformation : MonoBehaviour {
 
     private void LoadElfHUD()
     {
-        Instantiate((GameObject)Resources.Load ("HUD-Elf")).name = "HUD";
+
+        currentHud = Instantiate((GameObject)Resources.Load ("HUD-Elf"));
+        currentHud.name = "HUD";
         Instantiate((GameObject)Resources.Load ("HUD_EventSystem")).name = "HUD_EventSystem";
     }
 
     private void LoadHumanHUD()
     {
-        Instantiate((GameObject)Resources.Load ("HUD-Human")).name = "HUD";
+        currentHud = Instantiate((GameObject)Resources.Load("HUD-Human"));
+        currentHud.name = "HUD";
         //Application.LoadLevelAdditive("globalHUDHuman");
         Instantiate((GameObject)Resources.Load ("HUD_EventSystem")).name = "HUD_EventSystem";
     }

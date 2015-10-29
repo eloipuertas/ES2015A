@@ -5,6 +5,8 @@ using System;
 using Storage;
 using Utils;
 using System.IO;
+using System.Collections.Generic;
+using UnityEngine.Events;
 
 public class InformationController : MonoBehaviour {
 
@@ -24,6 +26,8 @@ public class InformationController : MonoBehaviour {
 	int rows = 2;
 	Vector2 buttonSize;
 	Vector2 initialPoint;
+	
+	Dictionary<Selectable, GameObject> multiselectionButtons = new Dictionary<Selectable, GameObject>();
 	
 	// Use this for initialization
 	void Start () 
@@ -53,7 +57,7 @@ public class InformationController : MonoBehaviour {
 		sliderActorHealth = information.transform.FindChild ("ActorHealthSlider").gameObject.GetComponent<Slider>();
 
 		//Precalculate objects used for show info for multiple units
-		RectTransform rectTransform = GameObject.Find("Information").GetComponent<RectTransform>();
+		RectTransform rectTransform = GameObject.Find("Information").transform.FindChild ("background").GetComponent<RectTransform>();
 		Vector2 panelSize = rectTransform.sizeDelta;
 		Vector2 center = rectTransform.position;
 		buttonSize = new Vector2(panelSize.x / columns, panelSize.y / rows);
@@ -79,32 +83,16 @@ public class InformationController : MonoBehaviour {
 		txtActorHealth.text = entity.healthPercentage.ToString () + "/100";
 		txtActorHealth.enabled = true;	
 
-		char separator = Path.DirectorySeparatorChar;
-		string path = IMAGES_PATH + separator + entity.getRace () + "_" + entity.info.name;
-		Texture2D texture = (Texture2D)Resources.Load (path);
-		if (texture) {
-			imgActorDetail.enabled = true;
-			imgActorDetail.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-		}
-
 		sliderActorHealth.value = entity.healthPercentage;
 		sliderActorHealth.enabled = true;
 		Transform sliderBackground = sliderActorHealth.transform.FindChild ("Background");
 		sliderBackground.GetComponent<Image>().enabled = true;
-	}
 
-	private void ShowMultipleInformation() {
-
-		/*
-		 * Ready for next Sprint
-		HideInformation ();
-
-		for (int i = 0; i < player.SelectedObjects.Count && i < columns * rows; i++)
-		{
-			Selectable selectable = (Selectable)player.SelectedObjects [i];
-			CreateButton(i, selectable);
+		Sprite image = GetImageForEntity (entity);
+		if (image) {
+			imgActorDetail.enabled = true;
+			imgActorDetail.sprite = image;
 		}
-		*/
 	}
 
 	private void HideInformation() 
@@ -119,50 +107,112 @@ public class InformationController : MonoBehaviour {
 		sliderBackground.GetComponent<Image>().enabled = false;
 	}
 
-	private void CreateButton(int i, Selectable selectable) {
+	private void ShowMultipleInformation() 
+	{
+		ArrayList selectedObjects = player.getSelectedObjects();
+		for (int i = 0; i < selectedObjects.Count && i < columns * rows; i++)
+		{
+			double lineDivision = (double)(i / columns);
+			int line = (int)Math.Ceiling(lineDivision) + 1;
+			
+			Vector2 buttonCenter = new Vector2();
+			buttonCenter.x = initialPoint.x + buttonSize.x / 2 + (buttonSize.x * (i % columns));
+			buttonCenter.y = initialPoint.y + (buttonSize.y / 2) - buttonSize.y * line;
 
-		int line = 1;
-		if (i >= 10) line = 2;
+			Selectable selectable = (Selectable)selectedObjects[i];
 
-		Vector2 buttonCenter = new Vector2();
-		buttonCenter.x = initialPoint.x + buttonSize.x / 2 + (buttonSize.x * (i % columns));
-		buttonCenter.y = initialPoint.y + (buttonSize.y / 2) - buttonSize.y * line;
+			//Reuse buttons to avoid create and destroy
+			if (multiselectionButtons.ContainsKey(selectable)) {
+				GameObject button = multiselectionButtons[selectable];
+				modifyButton(button, buttonCenter);
+			} else {
+				GameObject button = CreateButton(buttonCenter, selectable);
+				multiselectionButtons.Add(selectable, button);
+			}
+		}
+	}
 
+	private void modifyButton(GameObject buttonCanvas, Vector2 center) {
+		GameObject button = buttonCanvas.transform.Find ("Button").gameObject;
+		Image image = button.GetComponent<Image> ();
+		image.rectTransform.position = center;
+		Text text = button.transform.FindChild ("MultiSelectionText").GetComponent<Text> ();
+		text.rectTransform.position = center;
+	}
+
+	private GameObject CreateButton(Vector2 buttonCenter, Selectable selectable) {
 		IGameEntity entity = selectable.GetComponent<IGameEntity>();
-		CreateButton(buttonCenter, buttonSize, entity.info.race.ToString());
+
+		UnityAction actionMethod = new UnityAction(() =>
+		{
+			selectable.SelectUnique();
+		});
+
+		return CreateButton(buttonCenter, entity, actionMethod);
 	}
 	
-	void CreateButton(Vector2 center, Vector2 size, String text)
+	private GameObject CreateButton(Vector2 center, IGameEntity entity, UnityAction actionMethod) 
 	{
-		var canvasObject = new GameObject(text);
-		var canvas = canvasObject.AddComponent<Canvas>();
-		canvas.tag = "ActionButton";
+		String text = entity.info.name.ToString ();
+		GameObject canvasObject = new GameObject(text);
+		Canvas canvas = canvasObject.AddComponent<Canvas>();
+		canvas.tag = "MultiSelectionButton";
 		canvasObject.AddComponent<GraphicRaycaster>();
 		canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 		
-		var buttonObject = new GameObject("Button");
+		GameObject buttonObject = new GameObject("Button");
 		var image = buttonObject.AddComponent<Image>();
 		image.transform.parent = canvas.transform;
-		image.rectTransform.sizeDelta = size * 0.9f;
+		image.rectTransform.sizeDelta = buttonSize * 0.9f;
 		image.rectTransform.position = center;
-		image.color = new Color(1f, .3f, .3f, .5f);
+		Sprite entityImage = GetImageForEntity (entity);
+		if (entityImage) {
+			image.sprite = entityImage;
+		} else {
+			image.color = new Color(1f, .3f, .3f, .5f);
+		}	
 		
-		var button = buttonObject.AddComponent<Button>();
+		Button button = buttonObject.AddComponent<Button>();
+		button.onClick.AddListener(() => actionMethod());
 		button.targetGraphic = image;
 		
-		var textObject = new GameObject("ActionText");
+		GameObject textObject = new GameObject("MultiSelectionText");
 		textObject.transform.parent = buttonObject.transform;
-		var lblText = textObject.AddComponent<Text>();
-		lblText.rectTransform.sizeDelta = size * 0.9f;
+		Text lblText = textObject.AddComponent<Text>();
+		lblText.rectTransform.sizeDelta = buttonSize * 0.9f;
 		lblText.rectTransform.position = center;
 		lblText.text = text;
 		lblText.font = Resources.FindObjectsOfTypeAll<Font>()[0];
 		lblText.fontSize = 10;
 		lblText.color = Color.white;
 		lblText.alignment = TextAnchor.MiddleCenter;
+		return canvasObject;
 	}
 
+	void DestroyButtons()
+	{
+		multiselectionButtons.Clear ();
+		GameObject[] buttons = GameObject.FindGameObjectsWithTag("MultiSelectionButton");
+		if (buttons != null)
+		{
+			foreach (GameObject button in buttons)
+			{
+				Destroy(button);
+			}
+		}
+	}
 
+	private Sprite GetImageForEntity(IGameEntity entity) {
+		char separator = Path.DirectorySeparatorChar;
+		string path = IMAGES_PATH + separator + entity.getRace () + "_" + entity.info.name;
+		Texture2D texture = (Texture2D)Resources.Load (path);
+		if (texture) {
+			return Sprite.Create (texture, new Rect (0, 0, texture.width, texture.height), new Vector2 (0.5f, 0.5f));
+		} else {
+			return null;
+		}
+	}
+	
 	public void onUnitSelected(System.Object obj)
 	{
         GameObject gameObject = (GameObject) obj;
@@ -175,10 +225,9 @@ public class InformationController : MonoBehaviour {
 
 		} else
 		{
+			DestroyButtons();
 			ShowInformation(gameObject);
 		}
-		//TODO: parse actor type (building / unit)
-
 
 		//Register for unit events
 		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
@@ -201,9 +250,11 @@ public class InformationController : MonoBehaviour {
 
         } else if (player.SelectedObjects.Count == 1)
         {
+			DestroyButtons();
             ShowInformation(gameObject);
         } else
         {
+			DestroyButtons();
             HideInformation();
         }
 
