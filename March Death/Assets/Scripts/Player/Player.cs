@@ -15,7 +15,9 @@ public class Player : BasePlayer
     /// Information regarding the entities of the player
     /// </summary>
     private List<IGameEntity> _activeEntities = new List<IGameEntity>();
-
+    public List<IGameEntity> activeEntities {
+        get { return new List<IGameEntity>(_activeEntities); }
+    }
     
 	//the list of player units in the scene
 	public ArrayList currentUnits = new ArrayList ();
@@ -35,13 +37,18 @@ public class Player : BasePlayer
 
     // Update is called once per frame
     void Update() { }
-    
+
+    public override void removeEntity(IGameEntity entity)
+    {
+        _activeEntities.Remove(entity);
+    }
+
     /// <summary>
     /// Add a IGameEntity to the list
     /// Player has a list with all the entities associated to him
     /// </summary>
     /// <param name="newEntity"></param>
-    public void addEntityToList(IGameEntity newEntity)
+    public override void addEntity(IGameEntity newEntity)
     {
         _activeEntities.Add(newEntity);
         Debug.Log(_activeEntities.Count + " entities");

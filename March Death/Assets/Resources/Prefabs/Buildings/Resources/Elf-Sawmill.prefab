@@ -1261,8 +1261,8 @@ GameObject:
   - 65: {fileID: 6562478}
   - 114: {fileID: 11499442}
   - 114: {fileID: 11473934}
-  - 114: {fileID: 11407974}
   - 114: {fileID: 11470110}
+  - 208: {fileID: 20884706}
   m_Layer: 0
   m_Name: Elf-Sawmill
   m_TagString: Untagged
@@ -2581,7 +2581,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 174826}
   m_LocalRotation: {x: 0, y: .707106829, z: 0, w: .707106709}
-  m_LocalPosition: {x: 339.912476, y: 79.0026245, z: 781.051147}
+  m_LocalPosition: {x: 371.191498, y: 79.0026245, z: 777.385437}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 475154}
@@ -4288,19 +4288,6 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &11407974
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 174826}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: caa19c7f960625f4b83094529589a1c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  IsRevealer: 1
-  Range: 40
 --- !u!114 &11470110
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4469,8 +4456,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: .00284695625, y: 6.68168068e-05, z: 0}
-    m_Extent: {x: .00696778391, y: .0100000016, z: .00873299409}
+    m_Center: {x: .00284695625, y: 6.68168068e-05, z: 4.76837158e-07}
+    m_Extent: {x: .00696778297, y: .0100000016, z: .00873299222}
   m_DirtyAABB: 0
 --- !u!183 &18337796
 Cloth:
@@ -5075,6 +5062,21 @@ Cloth:
     collisionSphereDistance: 3.40282347e+38
   m_CapsuleColliders: []
   m_SphereColliders: []
+--- !u!208 &20884706
+NavMeshObstacle:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 174826}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 8.5, y: .5, z: 7.5}
+  m_MoveThreshold: .100000001
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: .5
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -5137,6 +5139,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Size.y
       value: .25
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Extents.x
+      value: 8.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Extents.z
+      value: 7.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

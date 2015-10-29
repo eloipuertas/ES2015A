@@ -56,6 +56,12 @@ namespace Storage
                     EntityInfo entityInfo = JsonConvert.DeserializeObject<JSONType>(json.text);
                     entityInfo.entityType = entityType;
 
+                    foreach (EntityAbility ability in entityInfo.abilities)
+                    {
+                        ability.tooltip = ability.tooltip.FormatWith(entityInfo, @"\[\[", @"\]\]");
+                        ability.tooltip = ability.tooltip.FormatWith(ability, @"\(\(", @"\)\)");
+                    }
+
                     Tuple<Races, EnumType> key = new Tuple<Races, EnumType>(entityInfo.race, entityInfo.getType<EnumType>());
 
                     if (store.ContainsKey(key))

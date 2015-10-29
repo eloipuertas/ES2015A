@@ -8,6 +8,7 @@ namespace Managers
 
         Player player;
         UserInput inputs;
+        CursorManager cursor;
         private ConstructionGrid grid;
         private bool _placing = false;
         private GameObject newBuilding;
@@ -20,6 +21,7 @@ namespace Managers
             player = GetComponent<Player>();
             inputs = GetComponent<UserInput>();
             grid = GetComponent<ConstructionGrid>();
+            cursor = CursorManager.Instance;
 
         }
 
@@ -104,9 +106,7 @@ namespace Managers
                 this.newBuilding = newBuilding;
 
                 this.newBuilding.GetComponent<Rigidbody>().detectCollisions = false;
-                //newBuilding.GetComponent<Collider>().isTrigger = true; //HACK : (hermetico) controlar colision objeto con resto
                 _placing = true;
-                //Cursor.visible = false;
                 player.setCurrently(Player.status.PLACING_BUILDING);
             }
         }
@@ -145,8 +145,9 @@ namespace Managers
                 grid.reservePosition(newDestination);
                 newBuilding.transform.position = newDestination;
                 IGameEntity destination = (IGameEntity)newBuilding.GetComponent<Unit>();
-                player.addEntityToList(destination);
+                player.addEntity(destination);
                 PackToPlaceBuilding();
+
                 // remaining operations
                 _finishPlacing();
 
@@ -211,10 +212,12 @@ namespace Managers
             if (checkLocation(newDestination))
             {
                 _drawState(Color.green);
+                cursor.setCursor(CursorManager.cursor.DEFAULT);
             }
             else
             {
                 _drawState(Color.red);
+                cursor.setCursor(CursorManager.cursor.NO_BUILDING_IN);
             }
 
         }
@@ -222,8 +225,16 @@ namespace Managers
 
         private void PackToMoveBuilding()
         {
-            this.newBuilding.GetComponent<FOWEntity>().IsRevealer = false;
-            this.newBuilding.GetComponent<Rigidbody>().detectCollisions = false;
+            if (this.newBuilding)
+            { //FIXME : (hermetico) randome errors
+                FOWEntity fw = this.newBuilding.GetComponent<FOWEntity>();
+                Rigidbody rb = this.newBuilding.GetComponent<Rigidbody>();
+                if (fw && rb)
+                {
+                    fw.IsRevealer = false;
+                    rb.detectCollisions = false;
+                }
+            }
 
 
         }

@@ -30,21 +30,13 @@
 		float2 uv_MainTex;
 		float3 worldPos;
 	};
-	void GrayBrightFromFOW(half4 fow, out half lightness, out half grayscale) {
-		grayscale = fow.b;
-		fow.rg = saturate(fow.rg * 5 - 2);
-		lightness = (fow.r + fow.g * (1 + fow.b)) / 3;
-	}
-
-	half4 TransformColourFOW(half4 c, half4 fow) {
-		half lightness, grayscale;
-		GrayBrightFromFOW(fow, lightness, grayscale);
-		half3 t = c.rgb * lightness;
-		return half4(lerp(dot(t, half3(0.5f, 0.4f, 0.1f)).rrr, t.rgb, grayscale), c.a);
+	half4 TransformColourFOW(half4 c, half3 fow) {
+		half3 t = c.rgb * ((saturate(fow.g * 5 - 2)* (1 + fow.b)) / 3);
+		return half4(lerp(dot(t, half3(0.5f, 0.4f, 0.1f)).rrr, t.rgb, fow.b), c.a);
 	}
 	void surf(Input IN, inout SurfaceOutput o) {
 		half4 c = tex2D(_MainTex, IN.uv_MainTex);
-		half4 fow = tex2D(_FOWTex, TRANSFORM_TEX(IN.worldPos.xz, _FOWTex));
+		half3 fow = tex2D(_FOWTex, TRANSFORM_TEX(IN.worldPos.xz, _FOWTex));
 		half4 t = TransformColourFOW(c, fow);
 
 		o.Albedo = t.rgb;

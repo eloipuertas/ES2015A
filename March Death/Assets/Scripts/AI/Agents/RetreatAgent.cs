@@ -30,7 +30,7 @@ namespace Assets.Scripts.AI.Agents
 
         bool isHeroInDanger;
 
-        public RetreatAgent(AIController ai, AttackAgent aA) : base(ai)
+        public RetreatAgent(AIController ai, AttackAgent aA, string name) : base(ai, name)
         {
             attackAgent = aA;
             enemySquadBoundingBox = new Rect();
@@ -84,6 +84,10 @@ namespace Assets.Scripts.AI.Agents
                         }
                     }
 
+                    if (AIController.AI_DEBUG_ENABLED)
+                    {
+                        ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
+                    }
                 }
                 
                 if(isHeroInDanger) attackAgent.controlUnits(squadToAtackManager);
@@ -99,6 +103,11 @@ namespace Assets.Scripts.AI.Agents
             minDistanceBetweenHeroAndNearestEnemy = 0;
             
             //Calculate the min distance between enemies and our hero
+
+            if(hero == null)
+            {
+                return 0;
+            }
 
             foreach (Unit u in ai.EnemyUnits)
             {
