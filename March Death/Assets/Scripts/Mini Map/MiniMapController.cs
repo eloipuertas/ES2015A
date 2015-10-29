@@ -127,8 +127,7 @@ public class MiniMapController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // GetMouseButton(0) if we want to move the camera by clicking & dragging around the minimap
-        if (Input.GetMouseButtonDown(0)) 
+        if (Input.GetMouseButton(0))  // GetMouseButton(0) to remove dragging.
         {
             RaycastHit hit;
 
