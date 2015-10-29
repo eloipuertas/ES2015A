@@ -63,6 +63,9 @@ else
         sleep 2
     done
 
+    echo "Fixing timestamps"
+    $HOME/ES2015A/Scripts/deploy.sh
+
     echo -e "\n\033[32;1mDone installing\033[0m\n"
 
 fi
