@@ -15,7 +15,7 @@ if [ "$TRAVIS_OS_NAME" == "osx" ]; then
 else
 
     sudo -E apt-get -yq update
-    sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install build-essential debconf gconf-service lib32gcc1 lib32stdc++6 libasound2 libc6 libc6-i386 libcairo2 libcap2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libfreetype6 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libgl1-mesa-glx libglib2.0-0 libglu1-mesa libgtk2.0-0 libnspr4 libnss3 libpango1.0-0 libstdc++6 libx11-6 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxtst6 zlib1g libpng12-0 xvfb
+    sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install build-essential debconf gconf-service lib32gcc1 lib32stdc++6 libasound2 libc6 libc6-i386 libcairo2 libcap2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libfreetype6 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libgl1-mesa-glx libglib2.0-0 libglu1-mesa libgtk2.0-0 libnspr4 libnss3 libpango1.0-0 libstdc++6 libx11-6 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxtst6 zlib1g libpng12-0 xvfb rsync
 
     export HOME=$(dirname `pwd`)
     export UNITY_ROOT=$HOME
@@ -28,10 +28,18 @@ else
     echo 'Background downloading cache'
     # Use ; and not && to actually do all of them, even if one doesn't succeed
     (touch $HOME/.RSYNC_LOCK; \
-        echo -e "\t> Temp"    && sudo -E rsync -a ${CACHE_HOST}Temp    $HOME/ES2015A/March\ Death/; \
-        echo -e "\t> Obj"     && sudo -E rsync -a ${CACHE_HOST}Obj     $HOME/ES2015A/March\ Death/; \
-        echo -e "\t> Library" && sudo -E rsync -a ${CACHE_HOST}Library $HOME/ES2015A/March\ Death/; \
-        echo -e "\t> Build"   && sudo -E rsync -a ${CACHE_HOST}Build   $HOME/; \
+        echo -e "\t> Temp"    && \
+            sudo -E rsync -a ${CACHE_HOST}Temp.tar.gz     $(pwd)/ && \
+            tar -xzf $(pwd)/Temp.tar.gz -C /; \
+        echo -e "\t> Obj"     && \
+            sudo -E rsync -az ${CACHE_HOST}Obj.tar.gz     $(pwd)/ && \
+            tar -xzf $(pwd)/Obj.tar.gz -C /; \
+        echo -e "\t> Library" && \
+            sudo -E rsync -az ${CACHE_HOST}Library.tar.gz $(pwd)/ && \
+            tar -xzf $(pwd)/Library.tar.gz -C /; \
+        echo -e "\t> Build"   && \
+            sudo -E rsync -az ${CACHE_HOST}Build.tar.gz   $(pwd)/ && \
+            tar -xzf $(pwd)/Build.tar.gz -C /; \
     rm $HOME/.RSYNC_LOCK) &
 
     echo 'Monkey-patching installer for non sudo execution and no input'

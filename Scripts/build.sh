@@ -111,10 +111,20 @@ fi
 
 if [ "$TRAVIS_BRANCH" == "devel-travis_cache" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     echo -e "\n\033[32;1mUpload to cache server\033[0m\n"
-    echo -e "\t> Temp"    && sudo -E rsync -a --delete-after "$HOME/ES2015A/March Death/Temp" ${CACHE_HOST}
-    echo -e "\t> Obj"     && sudo -E rsync -a --delete-after "$HOME/ES2015A/March Death/Obj" ${CACHE_HOST}
-    echo -e "\t> Library" && sudo -E rsync -a --delete-after "$HOME/ES2015A/March Death/Library" ${CACHE_HOST}
-    echo -e "\t> Build"   && sudo -E rsync -a --delete-after "$BUILD_DIR" ${CACHE_HOST}
+    (touch $HOME/.RSYNC_LOCK; \
+        echo -e "\t> Temp"    && \
+            sudo -E tar -zcf "$(pwd)/Temp.tar.gz" "$HOME/ES2015A/March Death/Temp"       && \
+            sudo -E rsync -a --delete-after "$(pwd)/Temp.tar.gz"    ${CACHE_HOST}; \
+        echo -e "\t> Obj"     && \
+            sudo -E tar -zcf "$(pwd)/Obj.tar.gz" "$HOME/ES2015A/March Death/Obj"         && \
+            sudo -E rsync -a --delete-after "$(pwd)/Obj.tar.gz"     ${CACHE_HOST}; \
+        echo -e "\t> Library" && \
+            sudo -E tar -zcf "$(pwd)/Library.tar.gz" "$HOME/ES2015A/March Death/Library" && \
+            sudo -E rsync -a --delete-after "$(pwd)/Library.tar.gz" ${CACHE_HOST}; \
+        echo -e "\t> Build"   && \
+            sudo -E tar -zcf "$(pwd)/Build.tar.gz" "$BUILD_DIR"                          && \
+            sudo -E rsync -a --delete-after "$(pwd)/Build.tar.gz"   ${CACHE_HOST}; \
+    rm $HOME/.RSYNC_LOCK) &
 fi
 
 if [ $BUILD_WIN == 0 ] && [ $BUILD_LINUX == 0 ] && [ $BUILD_OSX == 0 ]; then
