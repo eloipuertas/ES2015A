@@ -111,10 +111,10 @@ fi
 
 if [ "$TRAVIS_BRANCH" == "devel-travis_cache" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     echo -e "\n\033[32;1mUpload to cache server\033[0m\n"
-    echo -e "\t> Temp"    && sudo -E rsync -rlptgD --delete-after "$HOME/ES2015A/March Death/Temp" ${CACHE_HOST}
-    echo -e "\t> Obj"     && sudo -E rsync -rlptgD --delete-after "$HOME/ES2015A/March Death/Obj" ${CACHE_HOST}
-    echo -e "\t> Library" && sudo -E rsync -rlptgD --delete-after "$HOME/ES2015A/March Death/Library" ${CACHE_HOST}
-    echo -e "\t> Build"   && sudo -E rsync -rlptgD --delete-after $BUILD_DIR ${CACHE_HOST}
+    echo -e "\t> Temp"    && sudo -E rsync -a --delete-after "$HOME/ES2015A/March Death/Temp" ${CACHE_HOST}
+    echo -e "\t> Obj"     && sudo -E rsync -a --delete-after "$HOME/ES2015A/March Death/Obj" ${CACHE_HOST}
+    echo -e "\t> Library" && sudo -E rsync -a --delete-after "$HOME/ES2015A/March Death/Library" ${CACHE_HOST}
+    echo -e "\t> Build"   && sudo -E rsync -a --delete-after $BUILD_DIR ${CACHE_HOST}
 fi
 
 if [ $BUILD_WIN == 0 ] && [ $BUILD_LINUX == 0 ] && [ $BUILD_OSX == 0 ]; then
