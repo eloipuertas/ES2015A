@@ -225,8 +225,21 @@ public class UserInput : MonoBehaviour
 		Physics.Raycast(Camera.main.ScreenPointToRay(screenPosition), out hit, Mathf.Infinity);  
 		return hit.point;
 	}
-	
+
+	private void DeselectBuildings() {
+		ArrayList selectedUnits = player.getSelectedObjects ();
+		foreach (Selectable selectedObject in selectedUnits) {
+
+			//Check if is unit
+			IGameEntity entity = selectedObject.GetComponent<IGameEntity>();
+			if (entity.info.isBuilding){
+				selectedObject.Deselect();
+			}
+		}
+	}
+
 	private void SelectUnitsInArea() {
+		DeselectBuildings();
 		Vector3[] selectedArea = new Vector3[4];
 		
 		//set the array with the 4 points of the polygon
@@ -244,12 +257,12 @@ public class UserInput : MonoBehaviour
 			}
 
 			//Check if is unit
-			unit = entity.getGameObject();
 			if (entity.info.isBuilding){
 				continue;
 			}
 
 			//Check if is selectable
+			unit = entity.getGameObject();
 			selectedObject = unit.GetComponent<Selectable>();
 			if (selectedObject == null) {
 				continue;
