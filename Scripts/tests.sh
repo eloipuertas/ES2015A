@@ -10,6 +10,8 @@ touch $(pwd)/elves.out
 MEN_ERRORS=-1
 ELVES_ERRORS=-1
 
+echo -e "\n\033[32;1mRunning tests\033[0m\n"
+
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then
 
     $BUILD_DIR/$project -nographics -batchmode --test=$(pwd)/men.out --player-race=MEN --test-time=15000 && \
@@ -25,7 +27,23 @@ else
 
 fi
 
-if [ $? == 0 ]; then
+# Save test results
+TESTS_RESULT=$?
+
+# Wait for cache upload if appliable
+if [ "$TRAVIS_BRANCH" == "devel-travis_cache" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+
+    echo -n "Waiting for cache to end uploading."
+    while [ -f "$HOME/.RSYNC_LOCK" ]
+    do
+        echo -n "."
+        sleep 2
+    done
+
+fi
+
+# Exit or show errors
+if [ $TESTS_RESULT == 0 ]; then
 
     MEN_ERRORS=`cat $(pwd)/men.out | tail -n1`
     ELVES_ERRORS=`cat $(pwd)/men.out | tail -n1`
@@ -33,7 +51,6 @@ if [ $? == 0 ]; then
     if [ $MEN_ERRORS == 0 ] && [ $ELVES_ERRORS == 0 ]; then
 
         echo -e "\n\033[32;1mTests Completed Successfully\033[0m\n"
-
         exit 0
 
     fi

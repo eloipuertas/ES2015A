@@ -1,25 +1,13 @@
-#os:
-#  - osx
-#language: objective-c
-#osx_image: xcode61
-#install:
-#  - ./Scripts/install.sh
-#script:
-#  - ./Scripts/build.sh && ./Scripts/tests.sh
-
-#---
-
 os:
-  - linux
+- linux
 sudo: required
 dist: trusty
 language: generic
 install:
-  - ./Scripts/install.sh
+- ./Scripts/install.sh
 script:
-  - ./Scripts/build.sh && ./Scripts/tests.sh
-cache:
-  directories:
-    - /home/travis/build/gpascualg/Build
-    - /home/travis/build/gpascualg/ES2015A/March Death/Temp
-    - /home/travis/build/gpascualg/unity-editor-5.1.0f3
+- ./Scripts/build.sh && ./Scripts/tests.sh
+env:
+  global:
+  - secure: X8MyRyzLprI0P3xv1yzoGdWTaoti/xp3Lf5+cdI5GZaGpp//tIgiGmaC4TMu3ahvcuzVCRfsWAcxu2M40nAW+mTgs7fObUYnu3+cxzRc7RwvyOjpbYlbUoLGV8JXxeKfNU4Uds1pru267CAcTiTpLZb6nJOhX+RJX+Zv+HeQshBo5VsESrX07eODkBsdfu98uSYhh0Kff1d3Oa3bd/2PI6Qcblcl0Au6NGFTKeXDFvmtL3iZwHw+JjCq42ABUfVT9tKXUqBOC9AKdAQEkIIzQMyioKsVVSpsTBhXsfrNWtArioQLGOpiB249TB4AZT8y2hHguHEBatrQf0fngzAQ+FYB1uYZTw5MFLU+kKp5OAPYm5owDKwozsvPn0u6BDZn1W8bZa0Bd0HJPWhywuqKLxCfM6HyaiPK/2KUPAsd6mLX7WH11naHLk94FIq7/Lt1HVAWDclB146ax1VgwIAbgckAFfcyy8R7cUFHEYZdDD3oUf8FX/PM4LfixlCYMDOinhhE4Uz6CapydjK2Sp2ZXPABAySbbxUE0ZzxwhQ/KuXcUdLQoVn1fBl/rsOi619IeJ5cIGccivqWmEI05Bza3InW4lodMDJbDTGMoMd0lCsHiGEzujNZusaRUz/ZLxk+wr8/yl8xiWnfp4f/ZUoNucW9VvzzlbEGi5ik+fJ4jvY=
+  - secure: KprWip7DEU0ieMVp8RbR8GgOZCiRKPnDedwILVxfKNqjmVESYFHSI7qs40NtpnyWHL3rDljJSlmPB9z0nFNRNj+7PDRUzHN4QByuQ/HZmFEX9sUqTYtTTg69SZfrlU228Gu0SbaM8bG0vQ5u/dLadLq+E2/K0rmCnb8z+YLihycEzEON4Nd6BIfehIRHbm/75rFTzC7IWgQ3VVsyokx8tuR/LPajabGw6Y7gklH/OQv2nAiwrH9z4cZbWlUm0KRZPUvhUa4AuqhiyCqtt3wwwzV1tFLZZZPPh6qDzfHn8kmY7xuAglxfBUAPTpSfHmkvbqlotQChqHc4ttPgbOHeLL8ncmDJzejPEnfI8jxS+Agh2LssGS2XFCUL/q+JQ5Q/fFDLAwbwEu+sWuKFskqShDaMCNJaieFYgSn2aKDioiX8j01CIqnKTtrn9BTrP3bdopnoIcOW93PAbOAOYm9RmeG4n1eAaMu5hwCx19brZ2h7qlwRyorrSeDmrK+745czjaANlRJuvQ9BtpELfKE7oiy/T65D/CUct1saEDa27NHJRdPChs7PXhIIzDDKYMDUuFFbCfL6gkDHwpgvgAjf7Tnsf/OZXYvIVZbtTkR8uvnWlH+u1lRcV34u9xJrnn4uMzDTqgmeyKFQBmK/nOF6VGnr4H68NlssG72QmmMRc3c=

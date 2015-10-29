@@ -17,10 +17,10 @@ class TestEnvironment : SingletonMono<TestEnvironment>
     public float testTime { get; set; }
     public Races playerRace { get; set; }
 
-    public enum States { IN_MENU, IN_RACES_SELECT, IN_GAME, KILLING }
+    public enum States { IN_MENU, IN_RACES_SELECT, IN_GAME, UNIT_TESTS, KILLING }
     public States state { get; set; }
 
-    private List<Tuple<String, String>> errorLogs = new List<Tuple<String, String>>();
+    private List<Tuple<String, String>> errorLogger = new List<Tuple<String, String>>();
     private float _elapsedTime;
 
     public void Init()
@@ -86,12 +86,11 @@ class TestEnvironment : SingletonMono<TestEnvironment>
 
                     if (_elapsedTime >= testTime)
                     {
-                        OnDisable(); // Force unregister
-                        state = States.KILLING;
+                        state = States.UNIT_TESTS;
                     }
                     break;
 
-                case States.KILLING:
+                case States.UNIT_TESTS:
                     // Run all unit tests
                     var results = from type in Assembly.GetExecutingAssembly().GetTypes()
                                   where typeof(IUnitTest).IsAssignableFrom(type)
@@ -100,15 +99,22 @@ class TestEnvironment : SingletonMono<TestEnvironment>
                     // Execute one by one
                     foreach (Type test in results)
                     {
-                        if (!test.IsInterface)
+                        if (!test.IsInterface && !test.IsAbstract)
                         {
                             IUnitTest testObj = (IUnitTest)Activator.CreateInstance(test);
-                            testObj.run(errorLogs);
+                            testObj.errorLogger = errorLogger;
+                            testObj.run();
                         }
                     }
 
+                    // Kill game
+                    state = States.KILLING;
+                    OnDisable(); // Force unregister
+                    break;
+
+                case States.KILLING:
                     StringBuilder output = new StringBuilder();
-                    foreach (Tuple<String, String> error in errorLogs)
+                    foreach (Tuple<String, String> error in errorLogger)
                     {
                         output.Append(error.Key0);
                         output.Append("\n");
@@ -116,11 +122,10 @@ class TestEnvironment : SingletonMono<TestEnvironment>
                         output.Append("\n----------------------\n\n");
                     }
 
-                    output.Append(errorLogs.Count);
+                    output.Append(errorLogger.Count);
                     System.IO.File.WriteAllText(testFile, output.ToString());
 
                     Application.Quit();
-
                     break;
             }
         }
@@ -140,7 +145,7 @@ class TestEnvironment : SingletonMono<TestEnvironment>
     {
         if (type == LogType.Exception)
         {
-            errorLogs.Add(new Tuple<String, String>(logString, stackTrace));
+            errorLogger.Add(new Tuple<String, String>(logString, stackTrace));
         }
     }
 }
