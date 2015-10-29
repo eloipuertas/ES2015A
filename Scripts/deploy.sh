@@ -6,7 +6,7 @@ gittouch() {
     touch -ch -d "$NEWDATE" "$1"
 }
 
-OLDDATE=$(date)
+OLDDATE="$(date +"%Y%m%d %H:%M:%S")"
 
 git ls-files |
     while IFS= read -r file; do
