@@ -9,7 +9,7 @@ namespace Assets.Scripts.AI.Agents
     public class AttackAgent : BaseAgent
     {
         float valOfCitizen;
-        public AttackAgent(AIController ai) : base(ai)
+        public AttackAgent(AIController ai, string name) : base(ai, name)
         {
             valOfCitizen = 1f;
         }
@@ -40,8 +40,17 @@ namespace Assets.Scripts.AI.Agents
                 }
 
                 foreach(Unit u in units)
+                {
                     if (u.status != EntityStatus.DEAD && !u.attackTarget(bTar))
+                    {
                         u.moveTo(bTar.transform.position);
+                        if(AIController.AI_DEBUG_ENABLED)
+                        {
+                            ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
+                        }
+                    }     
+                }
+                    
             }
         }
         float valOfUnit(Unit u)
@@ -72,8 +81,6 @@ namespace Assets.Scripts.AI.Agents
                     return Mathf.RoundToInt(nval * 8);
                 }
             }
-
-            Debug.Log("Attack Agent Heuristic: " + Mathf.RoundToInt(val * 8));               
             return Mathf.RoundToInt(val*8);
         }
     }

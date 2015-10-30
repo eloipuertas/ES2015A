@@ -10,10 +10,12 @@ namespace Utils
 
         public BareActor()
         {
+#if UNITY_EDITOR
             if (!typeof(T).IsEnum)
             {
                 throw new ArgumentException("T must be an enumerated type");
             }
+#endif
 
             foreach (T action in Enum.GetValues(typeof(T)))
             {

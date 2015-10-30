@@ -941,8 +941,8 @@ GameObject:
   - 65: {fileID: 6534816}
   - 114: {fileID: 11436064}
   - 114: {fileID: 11438102}
-  - 114: {fileID: 11492194}
   - 114: {fileID: 11412356}
+  - 208: {fileID: 20844988}
   m_Layer: 0
   m_Name: Men-Sawmill
   m_TagString: Untagged
@@ -2377,7 +2377,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 138794}
   m_LocalRotation: {x: 0, y: .707106829, z: 0, w: .707106709}
-  m_LocalPosition: {x: 368.910492, y: 79.0026245, z: 775.480652}
+  m_LocalPosition: {x: 302.469879, y: 79.0026245, z: 773.23877}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 464800}
@@ -3032,7 +3032,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 102172}
   m_LocalRotation: {x: .433779478, y: .558422208, z: .558422148, w: -.433779567}
-  m_LocalPosition: {x: 1.90616608, y: 5.93931103, z: 2.96277189}
+  m_LocalPosition: {x: 1.90616608, y: 5.0999999, z: 2.96277189}
   m_LocalScale: {x: -3.85017633, y: -3.85017657, z: -196.814651}
   m_Children: []
   m_Father: {fileID: 408374}
@@ -3412,8 +3412,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 168732}
   m_LocalRotation: {x: .613456964, y: -1.11750346e-07, z: .789728224, w: 1.10452895e-07}
-  m_LocalPosition: {x: 2.38469958, y: 7.00656605, z: 1.11449838}
-  m_LocalScale: {x: 171.664734, y: 100, z: 100}
+  m_LocalPosition: {x: 2.25, y: 6.5, z: 1.62699997}
+  m_LocalScale: {x: 121.705963, y: 70.8974762, z: 70.8974762}
   m_Children: []
   m_Father: {fileID: 408374}
   m_RootOrder: 17
@@ -4886,19 +4886,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8fedea892f030418970e7ce2a2bc2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &11492194
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 138794}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: caa19c7f960625f4b83094529589a1c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  IsRevealer: 1
-  Range: 40
 --- !u!137 &13746264
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
@@ -5063,8 +5050,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: .00313210487, y: 7.34329224e-05, z: 1.43051147e-06}
-    m_Extent: {x: .00766450213, y: .0109999897, z: .00630648341}
+    m_Center: {x: .00313186646, y: 7.34329224e-05, z: 9.53674316e-07}
+    m_Extent: {x: .00766454125, y: .0109999608, z: .00630630367}
   m_DirtyAABB: 0
 --- !u!183 &18353106
 Cloth:
@@ -5669,6 +5656,21 @@ Cloth:
     collisionSphereDistance: 3.40282347e+38
   m_CapsuleColliders: []
   m_SphereColliders: []
+--- !u!208 &20844988
+NavMeshObstacle:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 138794}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 8, y: .5, z: 8}
+  m_MoveThreshold: .100000001
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: .5
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -5711,6 +5713,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Center.x
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Extents.x
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Extents.z
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

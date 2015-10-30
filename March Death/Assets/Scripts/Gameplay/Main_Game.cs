@@ -12,9 +12,9 @@ public class Main_Game : MonoBehaviour {
 	Transform strongholdTransform;
 	GameObject playerHero;
 
-	// Use this for initialization
-	void Start () {
-		strongholdTransform = GameObject.Find("PlayerStronghold").transform;
+    // Use this for initialization
+    void Start () {
+        strongholdTransform = GameObject.Find("PlayerStronghold").transform;
         playerHero = GameObject.Find("PlayerHero");
         if(GameObject.Find("GameInformationObject"))
 		    info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
@@ -24,6 +24,7 @@ public class Main_Game : MonoBehaviour {
         if(info) info.LoadHUD();
         LoadPlayerStronghold();
         LoadPlayerUnits();
+        grid = gameController.GetComponent<ConstructionGrid>();
 	}
 
 	private void LoadPlayerStronghold()
