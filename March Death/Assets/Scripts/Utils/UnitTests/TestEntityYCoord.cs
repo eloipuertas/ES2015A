@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Utils.UnitTests
 {
-    class TestEntityYCoord : IUnitTest
+    class TestEntityYCoord : UnitTest
     {
-        public string name
+        public override string name
         {
             get
             {
@@ -15,14 +15,14 @@ namespace Utils.UnitTests
             }
         }
 
-        public void run(List<Tuple<string, string>> errorLogs)
+        public override void run()
         {
             Unit[] entities = UnityEngine.GameObject.FindObjectsOfType<Unit>();
             foreach (Unit unit in entities)
             {
                 if (unit.transform.position.y < 0)
                 {
-                    errorLogs.Add(new Tuple<string, string>("Unit Y coordinate < 0", unit.ToString()));
+                    LogError("Unit Y coordinate < 0", unit.ToString());
                 }
             }
         }

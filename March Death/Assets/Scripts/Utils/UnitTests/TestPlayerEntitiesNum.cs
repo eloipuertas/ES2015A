@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Utils.UnitTests
 {
-    class TestPlayerEntitiesNum : IUnitTest
+    class TestPlayerEntitiesNum : UnitTest
     {
-        public string name
+        public override string name
         {
             get
             {
@@ -15,11 +15,11 @@ namespace Utils.UnitTests
             }
         }
 
-        public void run(List<Tuple<string, string>> errorLogs)
+        public override void run()
         {
-            if (BasePlayer.player.currentUnits.Count != 2)
+            if (BasePlayer.player.activeEntities.Count != 2)
             {
-                errorLogs.Add(new Tuple<string, string>("Player has more than 2 initial entities", BasePlayer.player.currentUnits.Count.ToString()));
+                LogError("Player has more than 2 initial entities", BasePlayer.player.currentUnits.Count.ToString());
             }
         }
     }

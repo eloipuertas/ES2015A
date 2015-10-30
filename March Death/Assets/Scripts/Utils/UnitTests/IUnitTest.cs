@@ -7,7 +7,9 @@ namespace Utils.UnitTests
 {
     interface IUnitTest
     {
+        List<Tuple<string, string>> errorLogger { get; set; }
+
         string name { get; }
-        void run(List<Tuple<String, String>> errorLogs);
+        void run();
     }
 }

@@ -6,6 +6,7 @@ using Storage;
 using Utils;
 using System.IO;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 public class InformationController : MonoBehaviour {
 
@@ -82,18 +83,16 @@ public class InformationController : MonoBehaviour {
 		txtActorHealth.text = entity.healthPercentage.ToString () + "/100";
 		txtActorHealth.enabled = true;	
 
-		char separator = Path.DirectorySeparatorChar;
-		string path = IMAGES_PATH + separator + entity.getRace () + "_" + entity.info.name;
-		Texture2D texture = (Texture2D)Resources.Load (path);
-		if (texture) {
-			imgActorDetail.enabled = true;
-			imgActorDetail.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-		}
-
 		sliderActorHealth.value = entity.healthPercentage;
 		sliderActorHealth.enabled = true;
 		Transform sliderBackground = sliderActorHealth.transform.FindChild ("Background");
 		sliderBackground.GetComponent<Image>().enabled = true;
+
+		Sprite image = GetImageForEntity (entity);
+		if (image) {
+			imgActorDetail.enabled = true;
+			imgActorDetail.sprite = image;
+		}
 	}
 
 	private void HideInformation() 
@@ -143,11 +142,18 @@ public class InformationController : MonoBehaviour {
 
 	private GameObject CreateButton(Vector2 buttonCenter, Selectable selectable) {
 		IGameEntity entity = selectable.GetComponent<IGameEntity>();
-		return CreateButton(buttonCenter, entity.info.race.ToString());
+
+		UnityAction actionMethod = new UnityAction(() =>
+		{
+			selectable.SelectUnique();
+		});
+
+		return CreateButton(buttonCenter, entity, actionMethod);
 	}
 	
-	private GameObject CreateButton(Vector2 center, String text) 
+	private GameObject CreateButton(Vector2 center, IGameEntity entity, UnityAction actionMethod) 
 	{
+		String text = entity.info.name.ToString ();
 		GameObject canvasObject = new GameObject(text);
 		Canvas canvas = canvasObject.AddComponent<Canvas>();
 		canvas.tag = "MultiSelectionButton";
@@ -159,9 +165,15 @@ public class InformationController : MonoBehaviour {
 		image.transform.parent = canvas.transform;
 		image.rectTransform.sizeDelta = buttonSize * 0.9f;
 		image.rectTransform.position = center;
-		image.color = new Color(1f, .3f, .3f, .5f);
+		Sprite entityImage = GetImageForEntity (entity);
+		if (entityImage) {
+			image.sprite = entityImage;
+		} else {
+			image.color = new Color(1f, .3f, .3f, .5f);
+		}	
 		
 		Button button = buttonObject.AddComponent<Button>();
+		button.onClick.AddListener(() => actionMethod());
 		button.targetGraphic = image;
 		
 		GameObject textObject = new GameObject("MultiSelectionText");
@@ -187,6 +199,17 @@ public class InformationController : MonoBehaviour {
 			{
 				Destroy(button);
 			}
+		}
+	}
+
+	private Sprite GetImageForEntity(IGameEntity entity) {
+		char separator = Path.DirectorySeparatorChar;
+		string path = IMAGES_PATH + separator + entity.getRace () + "_" + entity.info.name;
+		Texture2D texture = (Texture2D)Resources.Load (path);
+		if (texture) {
+			return Sprite.Create (texture, new Rect (0, 0, texture.width, texture.height), new Vector2 (0.5f, 0.5f));
+		} else {
+			return null;
 		}
 	}
 	
