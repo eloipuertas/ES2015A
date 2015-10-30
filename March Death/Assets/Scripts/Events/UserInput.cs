@@ -151,7 +151,7 @@ public class UserInput : MonoBehaviour
 		if (hitObject) {		
 			Selectable selectedObject = hitObject.GetComponent<Selectable> ();
 			// We just be sure that is a selectable object
-			IGameEntity entity = selectedObject.GetComponent<IGameEntity>();
+			IGameEntity entity = hitObject.GetComponent<IGameEntity>();
 			if (selectedObject && entity.getRace() == player.race) {
 				selectedObject.SelectUnique ();
 				player.setCurrently (Player.status.SELECTED_UNITS);
@@ -195,7 +195,7 @@ public class UserInput : MonoBehaviour
 			camera.enableManualControl();
 			
 			//Check if is a simple click or dragging if the range is not big enough
-			if (IsSimpleClick (mouseButtonDownPoint, mouseButtonCurrentPoint))
+			if (IsSimpleClick (mouseButtonDownPoint, mouseButtonCurrentPoint) && !EventSystem.current.IsPointerOverGameObject())
 			{
 				return action.LEFT_CLICK;
 			} else {
