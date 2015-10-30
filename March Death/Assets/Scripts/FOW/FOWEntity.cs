@@ -14,7 +14,7 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
     /// <summary>
     /// the range around this unit which will be revealed (only used if IsRevealer=True).
     /// </summary>
-    public float Range;
+    public int Range;
     /// <summary>
     /// Size of the object.
     /// !ALERTS!
@@ -30,11 +30,11 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
     /// Warning: this marks if an unit is being revealed to the opposite player.
     /// That means even if the player is seeing this unit this may not be true because the AI isn't seeing it
     /// </summary>
-    public bool isRevealed { get; set; }
+    public bool IsRevealed { get; set; }
     public bool IsOwnedByPlayer { get; set; }
-    public bool IsRevealed { get { return isRevealed; } }
     private bool activated;
     private bool notFullyOpaque;
+    
     public override void Start()
     {
         base.Start();
@@ -58,12 +58,12 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
     /// <param name="isVisible">The new visibilty state</param>
     public void changeVisible(bool isVisible)
     {
-        if (isRevealed != isVisible)
+        if (IsRevealed != isVisible)
         {
             fire((isVisible) ? Actions.DISCOVERED : Actions.HIDDEN);
             if (!IsOwnedByPlayer)
                 changeRenders(isVisible);
-            isRevealed = isVisible;
+            IsRevealed = isVisible;
         }
     }
     /// <summary>
@@ -122,13 +122,13 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
         {
             fow.addEntity(this);
             if(fow.Enabled)
-                isRevealed = fow.isThereinRect(Bounds, FOWManager.visible.visible, !IsOwnedByPlayer);
+                IsRevealed = fow.isThereinRect(Bounds, FOWManager.visible.visible, !IsOwnedByPlayer);
             notFullyOpaque = fow.NotFullyOpaque;
             if (!IsOwnedByPlayer)
-                changeRenders(isRevealed);
+                changeRenders(IsRevealed);
             //If the entity gets created in a visible zone it's still "discovered".
             //If it gets created deep in the FOW it doesn't count as "hidden"-
-            if (isRevealed)
+            if (IsRevealed)
             {
                 fire(Actions.DISCOVERED);
             }
