@@ -13,26 +13,25 @@ namespace SceneLoader
 
         void Start()
         {
-            LoadRequiredComponents();
-            LoadSceneContext();
+            if(LoadRequiredComponents())LoadSceneContext();
         }
 
         /// <summary>
         /// Retrieve or instantiate the required components
         /// </summary>
-        private void LoadRequiredComponents()
+        private bool LoadRequiredComponents()
         {
             if (!informationObject)
             {
                 informationObject = GameObject.Find("GameInformationObject");
-                if (!informationObject)
-                {
-                    informationObject = new GameObject("GameInformationObject");
-                    informationObject.AddComponent<GameInformation>();
-                }
+                if (informationObject) return false;
+              
+                informationObject = new GameObject("GameInformationObject");
+                informationObject.AddComponent<GameInformation>();
                 gameInfo = informationObject.GetComponent<GameInformation>();
             }
 
+            return true;
         }
 
         /// <summary>

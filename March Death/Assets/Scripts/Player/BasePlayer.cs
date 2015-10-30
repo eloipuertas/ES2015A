@@ -25,11 +25,15 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     public Managers.BuildingsManager buildings { get { return _buildings; } }
 
 
+
     /// <summary>
-    /// The units manager
+    /// The selection Manager
     /// </summary>
-    protected Managers.UnitsManager _units;
-    public Managers.UnitsManager units { get { return _units; } }
+    protected Managers.SelectionManager _selection;
+    public Managers.SelectionManager selection { get { return _selection; } }
+     
+
+
 
     protected static GameInformation _info = null;
     protected static BasePlayer _player = null;

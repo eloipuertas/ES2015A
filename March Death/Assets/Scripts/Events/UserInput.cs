@@ -10,10 +10,10 @@ public class UserInput : MonoBehaviour
 	private action currentAction;
 	
 	private Player player;
-	private UnitsManager uManager { get { return player.units; } }
-	
-	//Should be better to create a constants class or structure
-	public Vector3 invalidPosition { get{ return new Vector3(-99999, -99999, -99999); } }
+    private SelectionManager sManager { get { return player.selection; } }
+
+    //Should be better to create a constants class or structure
+    public Vector3 invalidPosition { get{ return new Vector3(-99999, -99999, -99999); } }
 	
 	//range in which a mouse down and mouse up event will be treated as "the same location" on the map.
 	private int mouseButtonReleaseRange = 20;
@@ -92,18 +92,29 @@ public class UserInput : MonoBehaviour
 		}
 	}
 	
+
+
 	private void LeftClick() 
 	{
-		if (player.isCurrently (Player.status.IDLE)) {
-			Select ();
-		} else if (player.isCurrently (Player.status.SELECTED_UNITS)) {
-			Deselect ();
-			Select ();
-		} else if (player.isCurrently (Player.status.PLACING_BUILDING)) {
-			PlaceBuilding ();
-		}
+        switch (player.currently)
+        {
+            case Player.status.IDLE:
+                Select();
+                break;
+            case Player.status.SELECTED_UNITS:
+                Deselect();
+                Select();
+                break;
+            case Player.status.PLACING_BUILDING:
+                PlaceBuilding();
+                break;
+
+        }
+
 	}
 	
+
+
 	private void RightClick() 
 	{
 		if (player.isCurrently (Player.status.IDLE)) {
@@ -117,7 +128,7 @@ public class UserInput : MonoBehaviour
 			}
 			else if (hitObject.name == "Terrain") // if it is the terrain, let's go there
 			{
-				uManager.MoveTo(FindHitPoint());
+				sManager.MoveTo(FindHitPoint());
 			} 
 			else // let's find what it is, check if is own unit or rival
 			{
@@ -125,7 +136,7 @@ public class UserInput : MonoBehaviour
 				
 				if (entity.info.race != player.race) // If it is another race, we'll attack, but if it's the same race?
 				{
-					uManager.AttackTo(entity);
+					sManager.AttackTo(entity);
 				}
 			}
 		} else if (player.isCurrently (Player.status.PLACING_BUILDING))
@@ -134,13 +145,17 @@ public class UserInput : MonoBehaviour
 		}
 	}
 	
+
+    /// <summary>
+    /// Performs operations while dragging mouse
+    /// </summary>
 	private void Drag() {
-		if (player.isCurrently (Player.status.IDLE)) {
-			SelectUnitsInArea();
-		} else if (player.isCurrently (Player.status.SELECTED_UNITS)) {
-			SelectUnitsInArea();
-		} else if (player.isCurrently (Player.status.PLACING_BUILDING)) {
-			//Do nothing
+        switch (player.currently)
+        {
+            case Player.status.IDLE:
+            case Player.status.SELECTED_UNITS:
+			    SelectUnitsInArea();
+                break;
 		}
 	}
 	
@@ -150,23 +165,19 @@ public class UserInput : MonoBehaviour
 		GameObject hitObject = FindHitObject ();
 		if (hitObject) {		
 			Selectable selectedObject = hitObject.GetComponent<Selectable> ();
+            
 			// We just be sure that is a selectable object
 			if (selectedObject) {
-				selectedObject.SelectUnique ();
-				player.setCurrently (Player.status.SELECTED_UNITS);
+                sManager.SelectUnique(selectedObject);
+                player.setCurrently (Player.status.SELECTED_UNITS);
 			} 
 		}
 	}
 	
 	private void Deselect() {
-		
-		//Deselect all
-		ArrayList selectedObjects = player.getSelectedObjects();
-		for (int i = selectedObjects.Count - 1; i >= 0; i--)
-		{
-			Selectable selectedObject = (Selectable)selectedObjects[i];
-			selectedObject.Deselect();
-		}
+
+        //Deselect all
+        sManager.EmptySelection();
 		player.setCurrently(Player.status.IDLE);
 	}
 	
@@ -226,16 +237,9 @@ public class UserInput : MonoBehaviour
 		return hit.point;
 	}
 
-	private void DeselectBuildings() {
-		ArrayList selectedUnits = player.getSelectedObjects ();
-		foreach (Selectable selectedObject in selectedUnits) {
-
-			//Check if is building
-			IGameEntity entity = selectedObject.GetComponent<IGameEntity>();
-			if (entity.info.isBuilding){
-				selectedObject.Deselect();
-			}
-		}
+	private void DeselectBuildings()
+    {
+        sManager.RemoveBuildinds();
 	}
 
 	private void SelectUnitsInArea() {
@@ -270,10 +274,10 @@ public class UserInput : MonoBehaviour
 
 			unitPosition = unit.transform.position;
 			if (AreaContainsObject(selectedArea, unitPosition)) {
-				selectedObject.Select();	
+                sManager.Select(selectedObject);
 			} else {  
-				selectedObject.Deselect();
-			}
+                sManager.Deselect(selectedObject);
+            }
 		}
 		
 		Player.status currentAction = player.SelectedObjects.Count > 0 ? Player.status.SELECTED_UNITS : Player.status.IDLE;
