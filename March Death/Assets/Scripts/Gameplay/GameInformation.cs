@@ -6,6 +6,9 @@ public class GameInformation : MonoBehaviour {
 
     private Races playerRace;
 
+    public enum GameMode {CAMPAIGN, SKIRMISH};
+    private GameMode gameMode;
+
     private static string pauseMenuPrefab;
 
     // Use this for initialization
@@ -85,5 +88,15 @@ public class GameInformation : MonoBehaviour {
     public string GetPauseMenuPrefabPath()
     {
         return pauseMenuPrefab;
+    }
+
+    public void setGameMode(GameMode mode)
+    {
+        gameMode = mode;
+    }
+
+    public GameMode getGameMode()
+    {
+        return gameMode;
     }
 }

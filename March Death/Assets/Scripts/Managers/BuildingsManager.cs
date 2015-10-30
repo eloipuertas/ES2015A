@@ -111,6 +111,29 @@ namespace Managers
             }
         }
 
+        /// <summary>
+        /// Creates a building in the given position.
+        /// </summary>
+        /// <returns>The building, if the position is available for 
+        /// construction, or <code>null</code>.</returns>
+        /// 
+        /// <param name="position">The position of the building.</param>
+        /// <param name="rotation">The rotation of the building.</param>
+        /// <param name="type">The type of building.</param>
+        /// <param name="race">The race this building belongs to.</param>
+        public GameObject createBuilding(Vector3 position, Quaternion rotation,
+                                         Storage.BuildingTypes type, Storage.Races race)
+        {
+            GameObject obj = null;
+            position = grid.discretizeMapCoords(position);
+            if (grid.isNewPositionAbleForConstrucction(position))
+            {
+                obj = Storage.Info.get.createBuilding(race, type, position, rotation);
+                grid.reservePosition(position);
+            }
+            return obj;
+        }
+
 
 
         /// <summary>

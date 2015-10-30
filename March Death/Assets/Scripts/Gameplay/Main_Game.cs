@@ -7,6 +7,7 @@ public class Main_Game : MonoBehaviour {
 	private GameInformation info;
 	private CameraController cam;
 	private Player user;
+    Managers.BuildingsManager bm;
 
 	Transform strongholdTransform;
 	GameObject playerHero;
@@ -19,7 +20,7 @@ public class Main_Game : MonoBehaviour {
 		    info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
 		user = GameObject.Find("GameController").GetComponent("Player") as Player;
 		cam = GameObject.FindWithTag("MainCamera").GetComponent<CameraController>();
-		if (cam == null) Debug.Log("WARNING: No CAM");
+        bm = GameObject.Find("GameController").GetComponent<Managers.BuildingsManager>();
         if(info) info.LoadHUD();
         LoadPlayerStronghold();
         LoadPlayerUnits();
@@ -30,9 +31,12 @@ public class Main_Game : MonoBehaviour {
 		GameObject playerStronghold;
         if (info)
         {
-            playerStronghold = Info.get.createBuilding(info.GetPlayerRace(),
+            /*playerStronghold = Info.get.createBuilding(info.GetPlayerRace(),
                                                        BuildingTypes.STRONGHOLD,
-                                                   strongholdTransform.position, strongholdTransform.rotation);
+                                                   strongholdTransform.position, strongholdTransform.rotation);*/
+            playerStronghold = bm.createBuilding(strongholdTransform.position, 
+                              strongholdTransform.rotation, 
+                              BuildingTypes.STRONGHOLD, info.GetPlayerRace());
 			user.addEntityToList(playerStronghold.GetComponent<IGameEntity>());
 			cam.lookGameObject(playerStronghold);
         }
@@ -54,6 +58,23 @@ public class Main_Game : MonoBehaviour {
     public GameInformation GetGameInformationObject()
     {
 		return info;
+    }
+
+    public void StartGame()
+    {
+        switch (info.getGameMode())
+        {
+            case GameInformation.GameMode.CAMPAIGN:
+                LoadCampaign();
+                break;
+            case GameInformation.GameMode.SKIRMISH:
+                break;
+        }
+    }
+
+    private void LoadCampaign()
+    {
+        // TODO Set players
     }
 
     public void ClearGame()
