@@ -54,7 +54,6 @@ public class GameInformation : MonoBehaviour {
     {
         currentHud = Instantiate((GameObject)Resources.Load("HUD-Human"));
         currentHud.name = "HUD";
-        //Application.LoadLevelAdditive("globalHUDHuman");
         Instantiate((GameObject)Resources.Load ("HUD_EventSystem")).name = "HUD_EventSystem";
     }
 

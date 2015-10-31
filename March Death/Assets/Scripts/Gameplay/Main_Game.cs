@@ -24,7 +24,6 @@ public class Main_Game : MonoBehaviour {
         if(info) info.LoadHUD();
         LoadPlayerStronghold();
         LoadPlayerUnits();
-        grid = gameController.GetComponent<ConstructionGrid>();
 	}
 
 	private void LoadPlayerStronghold()
@@ -38,7 +37,7 @@ public class Main_Game : MonoBehaviour {
             playerStronghold = bm.createBuilding(strongholdTransform.position, 
                               strongholdTransform.rotation, 
                               BuildingTypes.STRONGHOLD, info.GetPlayerRace());
-			user.addEntityToList(playerStronghold.GetComponent<IGameEntity>());
+			user.addEntity(playerStronghold.GetComponent<IGameEntity>());
 			cam.lookGameObject(playerStronghold);
         }
 	}
@@ -52,7 +51,7 @@ public class Main_Game : MonoBehaviour {
                                              UnitTypes.HERO, playerHero.transform.position,
                                          playerHero.transform.rotation);
 			//user.FillPlayerUnits(playerHero);
-            user.addEntityToList(playerHero.GetComponent<IGameEntity>());
+            user.addEntity(playerHero.GetComponent<IGameEntity>());
         }
     }
 
