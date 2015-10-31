@@ -6,8 +6,8 @@ namespace SceneLoader
 {
     public class GameSceneDefaultLoader : MonoBehaviour
     {
-        public Storage.Races _playerRace;
-        public Storage.Races _iaRace;
+        public Storage.Races _playerRace = Storage.Races.ELVES;
+        public Storage.Races _iaRace = Storage.Races.MEN;
         private GameObject informationObject = null;
         private GameInformation gameInfo;
 
