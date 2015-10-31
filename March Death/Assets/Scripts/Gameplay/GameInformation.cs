@@ -10,6 +10,8 @@ public class GameInformation : MonoBehaviour {
     public enum GameMode {CAMPAIGN, SKIRMISH};
     private GameMode gameMode;
 
+    private Battle game;
+
     private static string pauseMenuPrefab;
 
     // Use this for initialization
@@ -103,5 +105,15 @@ public class GameInformation : MonoBehaviour {
     public GameMode getGameMode()
     {
         return gameMode;
+    }
+
+    public void SetBattle(Battle battle)
+    {
+        game = battle;
+    }
+
+    public Battle GetBattle()
+    {
+        return game;
     }
 }

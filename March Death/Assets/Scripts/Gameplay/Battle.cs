@@ -18,7 +18,7 @@ public class Battle
     public struct PlayableEntity
     {
         [StructLayout(LayoutKind.Explicit)]
-        struct EntityTypeUnion
+        public struct EntityTypeUnion
         {
             [FieldOffset(0)]
             public Storage.BuildingTypes building;
@@ -26,12 +26,15 @@ public class Battle
             public Storage.UnitTypes unit;
         }
 
-        struct EntityPosition
+        public struct EntityPosition
         {
             public float X { get; set; }
             public float Y { get; set; }
         }
 
+        /// <summary>
+        /// The type of building or unit this entity represents.
+        /// </summary>
         public EntityTypeUnion entityType;
         public EntityPosition position;
     }
@@ -43,11 +46,6 @@ public class Battle
 
     public struct MissionDefinition
     {
-        public enum Target
-        {
-            UNIT, BUILDING, RESOURCE
-        }
-
         [StructLayout(LayoutKind.Explicit)] public struct TargetType
         {
             [FieldOffset(0)] public Storage.BuildingTypes building;
@@ -60,7 +58,7 @@ public class Battle
         /// </summary>
         public MissionType purpose;
         public uint amount;
-        public Target target;
+        public Storage.EntityType target;
         public TargetType targetType;
         public uint priority;
         public bool main;
@@ -184,7 +182,7 @@ public class Battle
     /// <param name="isMain">If set to <c>false</c> it is a secondary mission.</param>
     /// <param name="information">Additional information for this mission (such as a description).</param>
     public void AddMission(MissionType action, uint quantity,
-                           MissionDefinition.Target what,
+                           Storage.EntityType what,
                            MissionDefinition.TargetType type, uint priority,
                            bool isMain, string information)
     {
