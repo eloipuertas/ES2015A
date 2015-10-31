@@ -95,10 +95,13 @@ public class Resource : Building<Resource.Actions>
     /// current player
     /// </summary>
     private Player player;
+    
     /// <summary>
-    /// check if starter unit was created. We need wait until resource is build
+    /// check if starter unit was created. We need wait until resource is built
     /// </summary>
     public bool hasDefaultUnit {get; private set;}
+
+
     private readonly object syncLock = new object();
     bool hasCreatedCivil = false;
     List<GameObject> pendingProducers = new List<GameObject>();
@@ -441,8 +444,6 @@ public class Resource : Building<Resource.Actions>
                 }
                 break;
         }
-
-
-        
+    
     }
 }
