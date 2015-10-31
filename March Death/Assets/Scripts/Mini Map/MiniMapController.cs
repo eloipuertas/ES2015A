@@ -45,7 +45,7 @@ public class MiniMapController : MonoBehaviour
             _camera.orthographicSize = diagonal * 0.95f; // a hack
             _camera.farClipPlane = Terrain.activeTerrain.terrainData.size.x * 1.5f;
             _camera.clearFlags = CameraClearFlags.Depth;
-            instatiateMask();
+            instantiateMask();
         }
 
         createMarker();
@@ -70,7 +70,6 @@ public class MiniMapController : MonoBehaviour
     void OnGUI()
     {
         GUI.depth = 2;
-
         GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), rt);
         GUI.DrawTexture(rect_marker, tex);
     }
@@ -87,7 +86,7 @@ public class MiniMapController : MonoBehaviour
     /// <summary>
     /// Instantiates the mask which makes invisible part of the minimap viewport.
     /// </summary>
-    private void instatiateMask()
+    private void instantiateMask()
     {
         GameObject mask = (GameObject)Resources.Load("minimap_plane");
         mask.transform.position = new Vector3(_camera.transform.position.x+0,
@@ -127,8 +126,7 @@ public class MiniMapController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // GetMouseButton(0) if we want to move the camera by clicking & dragging around the minimap
-        if (Input.GetMouseButtonDown(0)) 
+        if (Input.GetMouseButton(0))  // GetMouseButton(0) to remove dragging.
         {
             RaycastHit hit;
 
