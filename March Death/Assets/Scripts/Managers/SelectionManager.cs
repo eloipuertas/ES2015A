@@ -9,9 +9,17 @@ namespace Managers
         private List<Selectable> _selectedEntities;
         private Storage.Races _ownRace;
 
-        public SelectionManager( Storage.Races race)
+        public SelectionManager()
         {
             _selectedEntities = new List<Selectable>();
+        }
+
+        /// <summary>
+        /// Setter for the race
+        /// </summary>
+        /// <param name="race"></param>
+        public void SetRace(Storage.Races race)
+        {
             _ownRace = race;
         }
 
@@ -39,9 +47,14 @@ namespace Managers
         /// <param name="selectable">The entity that is going to be selected </param>
         public void Select(Selectable selectable)
         {
-            // Add the entity to the list selects the selectable component
-            _selectedEntities.Add(selectable);
-            selectable.SelectEntity();
+            
+            // do not select two times the same element
+            if (!_selectedEntities.Contains(selectable))
+            {
+                // Add the entity to the list selects the selectable component
+                _selectedEntities.Add(selectable);
+                selectable.SelectEntity();
+            }
         }
 
 

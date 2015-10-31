@@ -18,11 +18,10 @@ namespace Managers
         // Use this for initialization
         void Start()
         {
-            player = GetComponent<Player>();
+            player = GetComponent<Player>(); 
             inputs = GetComponent<UserInput>();
             grid = GetComponent<ConstructionGrid>();
             cursor = CursorManager.Instance;
-
         }
 
         // Update is called once per frame

@@ -11,6 +11,7 @@ public class UserInput : MonoBehaviour
 	
 	private Player player;
     private SelectionManager sManager { get { return player.selection; } }
+    private BuildingsManager bManager { get { return player.buildings; } }
 
     //Should be better to create a constants class or structure
     public Vector3 invalidPosition { get{ return new Vector3(-99999, -99999, -99999); } }
@@ -50,7 +51,7 @@ public class UserInput : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
-		player = GetComponent<Player>();
+        player = GetComponent<Player>();
 		selectionTexture = (Texture2D)Resources.Load ("SelectionTexture");
 		cursorAttack = (Texture2D)Resources.Load("cursor_attack");
 		camera = GameObject.Find("Main Camera").GetComponent ("CameraController") as CameraController;
@@ -141,7 +142,7 @@ public class UserInput : MonoBehaviour
 			}
 		} else if (player.isCurrently (Player.status.PLACING_BUILDING))
 		{
-			GetComponent<BuildingsManager>().cancelPlacing();
+			bManager.cancelPlacing();
 		}
 	}
 	
@@ -185,7 +186,7 @@ public class UserInput : MonoBehaviour
 		
 		//Place building if position is correct
 		if (!EventSystem.current.IsPointerOverGameObject()) {
-			if (GetComponent<BuildingsManager>().placeBuilding()) {
+			if (bManager.placeBuilding()) {
 				player.setCurrently (Player.status.SELECTED_UNITS);
 			} else {
 				player.setCurrently (Player.status.PLACING_BUILDING);

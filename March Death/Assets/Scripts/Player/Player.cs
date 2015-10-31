@@ -31,11 +31,11 @@ public class Player : BasePlayer
     public override void Start()
     {   
         base.Start();
-
+        _buildings = GetComponent<Managers.BuildingsManager>();
         //request the race of the player
         _selfRace = info.GetPlayerRace();
-        _resources = new Managers.ResourcesManager();
-        _selection = new Managers.SelectionManager(race);
+        _selection.SetRace(race);
+        
     }
 
     // Update is called once per frame
