@@ -97,7 +97,7 @@ public class Resource : Building<Resource.Actions>
     private Player player;
     
     /// <summary>
-    /// check if starter unit was created. We need wait until resource is built
+    /// check if starter unit was created. We need to wait until resource is built
     /// </summary>
     public bool hasDefaultUnit {get; private set;}
 
@@ -219,13 +219,17 @@ public class Resource : Building<Resource.Actions>
     {
         // TODO set desired rotation, now unit rotation equals building rotation!!
         // TODO  ---create gameobject meetingPointInside and meetingPointOutside
-        // attached to resource building design---
+        // attached to resource building design--- just Waiting for designners team.
 
         //---unComment next two lines when meeting point objects are created---
         //GameObject meetingPointInside = this.GetComponent(meetingPointInside);
         //GameObject meetingPointOutside = this.GetComponent(meetingPointOutside);
 
-        if (harvestUnits < info.resourceAttributes.maxUnits)
+        // only one civilian is placed inside building limits until designners team
+        // enabled some space to place units.
+
+        //if (harvestUnits < info.resourceAttributes.maxUnits)
+        if(harvestUnits < 1)
         {
             // TODO get inside meeting point and calculate position
             //unitPosition = this.GetComponent(meetingPointInside).transform.position;
@@ -235,8 +239,6 @@ public class Resource : Building<Resource.Actions>
             _xDisplacement = harvestUnits % 5;
             _yDisplacement = harvestUnits / 5;
             _unitPosition.Set(_center.x + _xDisplacement, _center.y , _center.z + _yDisplacement );
-            
-
             
             // Method createUnit from Info returns GameObject Instance;
             GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
@@ -408,8 +410,6 @@ public class Resource : Building<Resource.Actions>
     {
         // Setup base
         base.Start();
-
-        createCivilian();
     }
 
 

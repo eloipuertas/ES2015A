@@ -7,8 +7,8 @@ class CreateCivil : Ability
 {
     private bool _enabled = false;
     private IGameEntity _entity;
-    private UnitInfo _unitInfo;
     public Resource res;
+    private GameObject civil;
 
     public CreateCivil(EntityAbility info, GameObject gameObject) :
         base(info, gameObject)
@@ -36,13 +36,22 @@ class CreateCivil : Ability
     {
         get
         {
-            return 
-                
-            //BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, _unitInfo.resources.food) &&
-            //BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, _unitInfo.resources.wood) &&
-            //BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.GOL, _unitInfo.resources.wood) &&
-            //BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, _unitInfo.resources.metal)&&
-            res.hasDefaultUnit;       
+
+            UnitInfo unitInfo;
+            unitInfo = Info.get.of(res.race, UnitTypes.CIVIL);
+            //civil = Storage.Info.get.createUnit(res.race, UnitTypes.CIVIL);
+            //IGameEntity civilEntity = civil.gameObject.GetComponent<IGameEntity>();
+
+            Debug.Log("*********   harvestUnits: " + res.harvestUnits);
+            Debug.Log("*********   status: " + res.status.ToString());
+            return
+
+             Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, unitInfo.resources.food) &&
+             Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, unitInfo.resources.metal) &&
+             Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, unitInfo.resources.wood) &&
+             //Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.GOLD, unitInfo.resources.gold) &&
+             res.hasDefaultUnit;
+              
         }
     }
     public override void disable()
