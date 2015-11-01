@@ -10,9 +10,10 @@ public class MainMenuLogic : MonoBehaviour {
 	static readonly Color YELLOW = new Color(1.0f, 0.92f, 0.016f, 1f); //YELLOW
 
 	bool bStillInside = false;
-
+	AudioSource audio;
 	// Use this for initialization
 	void Start () {
+		audio = GetComponent<AudioSource>();
 		Cursor.visible = true;
 		TestEnvironment.Instance.Init();
 	}
@@ -27,6 +28,7 @@ public class MainMenuLogic : MonoBehaviour {
 
 	/* This method changes the color of the object we are over on exiting */
 	void OnMouseExit(){
+		audio.Stop ();
 		GetComponent<Renderer>().material.color = EXIT_OVER;
 		bStillInside = false;
 	}
@@ -35,6 +37,7 @@ public class MainMenuLogic : MonoBehaviour {
 
 	/* This method changes the color of the object we are clicking */
 	void OnMouseDown() {
+		audio.Play ();
 		GetComponent<Renderer>().material.color = DOWN_CLICK;
 	}
 
