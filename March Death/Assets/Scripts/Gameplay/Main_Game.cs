@@ -76,17 +76,23 @@ public class Main_Game : MonoBehaviour
 
     private void LoadCampaign ()
     {
+        GameObject created;
         foreach (Battle.PlayerInformation player in info.GetBattle().GetPlayerInformationList())
         {
             foreach (Battle.PlayableEntity building in player.GetBuildings())
             {
-                // TODO BuildingsManager must create building in the given grid position
-                // IMPORTANT: Take into account all 3 axis positions
+                // TODO Take into account all 3 axis positions with a world map
+                created = bm.createBuilding(new Vector3(building.position.X, 80, building.position.Y),
+                                  Quaternion.Euler(0,0,0), building.entityType.building, player.Race);
+                // TODO Add created GameObject to the appropriate player
             }
             foreach (Battle.PlayableEntity unit in player.GetUnits())
             {
-                // TODO Create the units in the given grid position
-                // IMPORTANT: Take into account all 3 axis positions
+                // TODO Take into account all 3 axis positions with a world map
+                created = Info.get.createUnit(player.Race, unit.entityType.unit,
+                                              new Vector3(unit.position.X, 80, unit.position.Y),
+                                              Quaternion.Euler(0,0,0));
+                // TODO Add created GameObject to the appropriate player
             }
             // TODO Set player's initial resources
         }
