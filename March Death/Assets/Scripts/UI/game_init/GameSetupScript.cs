@@ -76,7 +76,7 @@ public class GameSetupScript : MonoBehaviour {
         if (raceSelected)
         {
             SetGameMode();
-		    Application.LoadLevel("ES2015A");
+		    Application.LoadLevel("Test_Game_Zone");
         }
         else
         {

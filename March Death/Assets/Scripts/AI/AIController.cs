@@ -171,7 +171,20 @@ namespace Assets.Scripts.AI
 
         // TODO: Should it be handled with events??
         public override void removeEntity(IGameEntity entity) { }
-        public override void addEntity(IGameEntity newEntity) { }
+        public override void addEntity(IGameEntity newEntity)
+        {
+            if (newEntity.info.isArmy)
+            {
+                Army.Add((Unit) newEntity);
+            }
+            else if (newEntity.info.isBuilding)
+            {
+                buildPosition = newEntity.getTransform().position + new Vector3(0,0,20);
+                Resource build = (Resource) newEntity;
+                build.register(Resource.Actions.CREATE_UNIT, OnCivilCreated);
+                build.register(Resource.Actions.DESTROYED, OnBuildingDestroyed);
+            }
+        }
     }
     struct AIModule
     {

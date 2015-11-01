@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using Storage;
 
 public class Main_Game : MonoBehaviour
@@ -10,12 +10,15 @@ public class Main_Game : MonoBehaviour
     private Player user;
     Managers.BuildingsManager bm;
 
+    private List<BasePlayer> allPlayers;
+
     Transform strongholdTransform;
     GameObject playerHero;
 
     // Use this for initialization
     void Start ()
     {
+        allPlayers = new List<BasePlayer>(2);
         strongholdTransform = GameObject.Find ("PlayerStronghold").transform;
         playerHero = GameObject.Find ("PlayerHero");
         if (GameObject.Find ("GameInformationObject"))
@@ -25,8 +28,9 @@ public class Main_Game : MonoBehaviour
         bm = GameObject.Find ("GameController").GetComponent<Managers.BuildingsManager> ();
         if (info)
             info.LoadHUD ();
-        LoadPlayerStronghold ();
-        LoadPlayerUnits ();
+        //LoadPlayerStronghold ();
+        //LoadPlayerUnits ();
+        LoadCampaign();
     }
 
     private void LoadPlayerStronghold ()
@@ -34,9 +38,6 @@ public class Main_Game : MonoBehaviour
         GameObject playerStronghold;
         if (info)
         {
-            /*playerStronghold = Info.get.createBuilding(info.GetPlayerRace(),
-                                                       BuildingTypes.STRONGHOLD,
-                                                   strongholdTransform.position, strongholdTransform.rotation);*/
             playerStronghold = bm.createBuilding (strongholdTransform.position, 
                               strongholdTransform.rotation, 
                               BuildingTypes.STRONGHOLD, info.GetPlayerRace ());
@@ -53,7 +54,6 @@ public class Main_Game : MonoBehaviour
             playerHero = Info.get.createUnit (info.GetPlayerRace (),
                                              UnitTypes.HERO, playerHero.transform.position,
                                          playerHero.transform.rotation);
-            //user.FillPlayerUnits(playerHero);
             user.addEntity (playerHero.GetComponent<IGameEntity> ());
         }
     }
@@ -79,12 +79,29 @@ public class Main_Game : MonoBehaviour
         GameObject created;
         foreach (Battle.PlayerInformation player in info.GetBattle().GetPlayerInformationList())
         {
+            BasePlayer basePlayer;
+            // TODO It would be better if it wasn't race dependent
+            if (player.Race != info.GetPlayerRace())
+            {
+                basePlayer = new Assets.Scripts.AI.AIController();
+            }
+            else
+            {
+                basePlayer = new Player();
+                user = (Player) basePlayer;  // HACK Just in case there are compatibility issues
+            }
+            basePlayer.Start();
             foreach (Battle.PlayableEntity building in player.GetBuildings())
             {
                 // TODO Take into account all 3 axis positions with a world map
                 created = bm.createBuilding(new Vector3(building.position.X, 80, building.position.Y),
                                   Quaternion.Euler(0,0,0), building.entityType.building, player.Race);
-                // TODO Add created GameObject to the appropriate player
+                basePlayer.addEntity(created.GetComponent<IGameEntity>());
+                if (building.entityType.building == BuildingTypes.STRONGHOLD &&
+                    info.GetPlayerRace() == basePlayer.race)
+                {
+                    cam.lookGameObject(created);
+                }
             }
             foreach (Battle.PlayableEntity unit in player.GetUnits())
             {
@@ -92,9 +109,10 @@ public class Main_Game : MonoBehaviour
                 created = Info.get.createUnit(player.Race, unit.entityType.unit,
                                               new Vector3(unit.position.X, 80, unit.position.Y),
                                               Quaternion.Euler(0,0,0));
-                // TODO Add created GameObject to the appropriate player
+                basePlayer.addEntity(created.GetComponent<IGameEntity>());
             }
             // TODO Set player's initial resources
+            allPlayers.Add(basePlayer);
         }
         // TODO Set initial resources in the map
     }
