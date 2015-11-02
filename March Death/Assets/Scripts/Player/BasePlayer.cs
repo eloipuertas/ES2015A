@@ -58,8 +58,6 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     public abstract void removeEntity(IGameEntity entity);
     public abstract void addEntity(IGameEntity newEntity);
 
-    public abstract void addGameObject(GameObject go);
-    public abstract void removeGameObject(GameObject go);
 
     public static BasePlayer getOwner(IGameEntity entity)
     {
@@ -72,4 +70,12 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     }
 
     void Update () {}
+
+    public void SetInitialResources(uint wood, uint food, uint metal)
+    {
+        // TODO Consider adding a maximum capacity
+        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.FOOD, food));
+        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.WOOD, wood));
+        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.METAL, metal));
+    }
 }

@@ -96,14 +96,4 @@ public class Player : BasePlayer
     {
         return (ArrayList) SelectedObjects.Clone();
     }
-
-    public override void addGameObject(GameObject go)
-    {
-        addEntity(go.GetComponent<IGameEntity>());
-    }
-
-    public override void removeGameObject(GameObject go)
-    {
-        removeEntity(go.GetComponent<IGameEntity>());
-    }
 }

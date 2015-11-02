@@ -171,15 +171,11 @@ namespace Assets.Scripts.AI
 
         // TODO: Should it be handled with events??
         public override void removeEntity(IGameEntity entity) { }
-        public override void addEntity(IGameEntity newEntity) { }
-
-        public override void addGameObject (GameObject go)
+        public override void addEntity(IGameEntity newEntity)
         {
-            IGameEntity newEntity = go.GetComponent<IGameEntity>();
             if (newEntity.info.isArmy)
             {
-                if (Army == null) Debug.Log("ARMY IS NULL");
-                Army.Add(go.GetComponent<Unit>());
+                Army.Add((Unit) newEntity);
             }
             else if (newEntity.info.isBuilding)
             {
@@ -191,7 +187,7 @@ namespace Assets.Scripts.AI
                                                    newEntity.getGameObject().transform.position.z);
                     buildPosition = new Vector3(rootBasePosition.x, rootBasePosition.y, rootBasePosition.z);
                 }*/
-                buildPosition = go.transform.position + new Vector3(0,0,20);
+                buildPosition = newEntity.getTransform().position + new Vector3(0,0,20);
                 //buildPosition += new Vector3(0, 0, 20);
                 if (newEntity.info.isBarrack)
                 {
@@ -201,11 +197,6 @@ namespace Assets.Scripts.AI
                 build.register(Resource.Actions.CREATE_UNIT, OnCivilCreated);
                 build.register(Resource.Actions.DESTROYED, OnBuildingDestroyed);
             }
-        }
-
-        public override void removeGameObject (GameObject go)
-        {
-            throw new NotImplementedException ();
         }
     }
     struct AIModule

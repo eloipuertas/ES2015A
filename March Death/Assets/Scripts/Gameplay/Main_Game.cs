@@ -100,7 +100,7 @@ public class Main_Game : MonoBehaviour
                 // TODO Take into account all 3 axis positions with a world map
                 created = bm.createBuilding(new Vector3(building.position.X, 80, building.position.Y),
                                   Quaternion.Euler(0,0,0), building.entityType.building, player.Race);
-                basePlayer.addGameObject(created);
+                basePlayer.addEntity(created.GetComponent<IGameEntity>());
                 if (building.entityType.building == BuildingTypes.STRONGHOLD &&
                     info.GetPlayerRace() == basePlayer.race)
                 {
@@ -113,9 +113,11 @@ public class Main_Game : MonoBehaviour
                 created = Info.get.createUnit(player.Race, unit.entityType.unit,
                                               new Vector3(unit.position.X, 80, unit.position.Y),
                                               Quaternion.Euler(0,0,0));
-                basePlayer.addGameObject(created);
+                basePlayer.addEntity(created.GetComponent<IGameEntity>());
             }
-            // TODO Set player's initial resources
+            basePlayer.SetInitialResources(player.GetResources().Wood,
+                                           player.GetResources().Food,
+                                           player.GetResources().Metal);
             allPlayers.Add(basePlayer);
         }
         // TODO Set initial resources in the map
@@ -125,11 +127,11 @@ public class Main_Game : MonoBehaviour
     {
         GameObject obj;
         // Unregisters events in the HUD
-        obj = GameObject.Find ("HUD");
-        obj.GetComponentInChildren<InformationController> ().Clear ();
-        obj.GetComponentInChildren<EntityAbilitiesController> ().Clear ();
+        obj = GameObject.Find("HUD");
+        obj.GetComponentInChildren<InformationController>().Clear();
+        obj.GetComponentInChildren<EntityAbilitiesController>().Clear();
         obj = GameObject.Find ("GameInformationObject").gameObject;
-        Destroy (obj);
+        Destroy(obj);
     }
 
     void Update()
