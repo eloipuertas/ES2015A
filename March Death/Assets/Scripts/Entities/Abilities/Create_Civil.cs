@@ -6,15 +6,15 @@ using UnityEngine;
 class CreateCivil : Ability
 {
     private IGameEntity _entity;
-    private UnitInfo _unitInfo;
     public Resource res;
+    private GameObject civil;
 
     public CreateCivil(EntityAbility info, GameObject gameObject) :
         base(info, gameObject)
     {
         _entity = _gameObject.GetComponent<IGameEntity>();
         
-        res = (Resource)_entity;
+        res = _gameObject.GetComponent<Resource>(); ;
           
     }
 
@@ -25,20 +25,33 @@ class CreateCivil : Ability
             return false;
         }
     }
-
+    /// <summary>
+    /// Ability is not usable if player hasn't enough materials to spend in 
+    /// unit construction or build is under construction.
+    // Best way to check if building is finished is to check if it has the 
+    // default unit, which is created just when building becomes usable.
+    /// </summary>
     public override bool isUsable
     {
         get
         {
-            // DEBUGGING 
-            return true;
-            /*
-            // we need to check if player has enough materials to spend in building construction
-            return BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, _unitInfo.resources.food) &&
-                   BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, _unitInfo.resources.wood) &&
-                   //BasePlayer..getOwner(_entity).resources.IsEnough(WorldResources.Type.GOL, _unitInfo.resources.wood) &&
-                   BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, _unitInfo.resources.metal);
-             */
+
+            UnitInfo unitInfo;
+            unitInfo = Info.get.of(res.race, UnitTypes.CIVIL);
+            //civil = Storage.Info.get.createUnit(res.race, UnitTypes.CIVIL);
+            //IGameEntity civilEntity = civil.gameObject.GetComponent<IGameEntity>();
+
+            Debug.Log("*********   harvestUnits: " + res.harvestUnits);
+            Debug.Log("*********   Building status: " + res.status.ToString());
+            Debug.Log("*********   Create civilian status: " + res.status.ToString());
+            return
+
+             Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, unitInfo.resources.food) &&
+             Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, unitInfo.resources.metal) &&
+             Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, unitInfo.resources.wood) &&
+             //Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.GOLD, unitInfo.resources.gold) &&
+             res.hasDefaultUnit;
+              
         }
     }
     public override void disable()
@@ -47,8 +60,10 @@ class CreateCivil : Ability
     }
 
     public override void enable()
+
     {
-        base.enable(); 
+        _enabled = true;
+        base.enable();
         res.createCivilian(); 
 
     }

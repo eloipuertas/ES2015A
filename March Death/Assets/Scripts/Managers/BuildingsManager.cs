@@ -144,7 +144,7 @@ namespace Managers
                 //TODO : (hermetico) restar recursos necesarios para crear el building
                 grid.reservePosition(newDestination);
                 newBuilding.transform.position = newDestination;
-                IGameEntity destination = (IGameEntity)newBuilding.GetComponent<Unit>();
+                IGameEntity destination = (IGameEntity)newBuilding.GetComponent<Resource>();
                 player.addEntity(destination);
                 PackToPlaceBuilding();
 
