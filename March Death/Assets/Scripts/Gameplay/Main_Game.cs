@@ -94,7 +94,7 @@ public class Main_Game : MonoBehaviour
                 basePlayer = gameObject.AddComponent<Player>();
                 user = (Player) basePlayer;  // HACK Just in case there are compatibility issues
             }
-            //basePlayer.Start();
+            basePlayer.Start();
             foreach (Battle.PlayableEntity building in player.GetBuildings())
             {
                 // TODO Take into account all 3 axis positions with a world map

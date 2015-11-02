@@ -42,7 +42,7 @@ namespace Managers
             green.a = 0.5f;
             InitBuildingStruct();
 
-            Debug.Log("BuildingsBamager has started");}
+        }
 
         private void InitBuildingStruct()
         {

@@ -178,7 +178,8 @@ namespace Assets.Scripts.AI
             IGameEntity newEntity = go.GetComponent<IGameEntity>();
             if (newEntity.info.isArmy)
             {
-                Army.Add((Unit) newEntity);
+                if (Army == null) Debug.Log("ARMY IS NULL");
+                Army.Add(go.GetComponent<Unit>());
             }
             else if (newEntity.info.isBuilding)
             {
@@ -190,9 +191,13 @@ namespace Assets.Scripts.AI
                                                    newEntity.getGameObject().transform.position.z);
                     buildPosition = new Vector3(rootBasePosition.x, rootBasePosition.y, rootBasePosition.z);
                 }*/
-                buildPosition = newEntity.getTransform().position + new Vector3(0,0,20);
+                buildPosition = go.transform.position + new Vector3(0,0,20);
                 //buildPosition += new Vector3(0, 0, 20);
-                Resource build = (Resource)newEntity;
+                if (newEntity.info.isBarrack)
+                {
+                    return;
+                }
+                Resource build = (Resource) newEntity;
                 build.register(Resource.Actions.CREATE_UNIT, OnCivilCreated);
                 build.register(Resource.Actions.DESTROYED, OnBuildingDestroyed);
             }
