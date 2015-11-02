@@ -78,7 +78,7 @@ public class EntityAbilitiesController : MonoBehaviour
 
                 var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
                 buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Rows) + 1));
-                CreateButton(actionPanel, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
+                CreateButton(rectTransform, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
             }
         }
     }
@@ -103,15 +103,20 @@ public class EntityAbilitiesController : MonoBehaviour
     /// <param name="extends">The extents of the button</param>
     /// <param name="action">Actin name</param>
     /// <param name="actionMethod">Method that will be called when we click the button</param>
-    void CreateButton(GameObject panel, Vector2 center, Vector2 extends, String ability, UnityAction actionMethod, Boolean enabled)
+    void CreateButton(RectTransform panelTransform, Vector2 center, Vector2 extends, String ability, UnityAction actionMethod, Boolean enabled)
     {
+        var transform = panelTransform.transform;
+
         var buttonObject = new GameObject(ability);
         buttonObject.tag = "ActionButton";
         buttonObject.layer = 5; // UI Layer
 
         var image = buttonObject.AddComponent<Image>();
-        image.rectTransform.sizeDelta = extends * 1.5f;
-        image.rectTransform.position = center;
+        image.tag = "ActionButton";
+        //image.transform.SetParent(panelTransform);
+        image.transform.localScale = panelTransform.localScale;
+        image.rectTransform.sizeDelta = 1.5f*extends;
+        image.transform.localPosition = center;
         image.sprite = CreateSprite(ability);
 
         var button = buttonObject.AddComponent<Button>();
@@ -172,6 +177,7 @@ public class EntityAbilitiesController : MonoBehaviour
 
         return newImg;
     }
+
 	public void Clear()
 	{
 		Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.SELECTED, onActorSelected);
