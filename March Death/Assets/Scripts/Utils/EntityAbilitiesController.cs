@@ -105,16 +105,11 @@ public class EntityAbilitiesController : MonoBehaviour
     /// <param name="actionMethod">Method that will be called when we click the button</param>
     void CreateButton(GameObject panel, Vector2 center, Vector2 extends, String ability, UnityAction actionMethod, Boolean enabled)
     {
-        var canvasObject = new GameObject(ability);
-        var canvas = canvasObject.AddComponent<Canvas>();
-        canvas.tag = "ActionButton";
-        canvasObject.AddComponent<GraphicRaycaster>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-
-        var buttonObject = new GameObject("Button");
+        var buttonObject = new GameObject(ability);
+        buttonObject.tag = "ActionButton";
+        buttonObject.layer = 5; // UI Layer
 
         var image = buttonObject.AddComponent<Image>();
-        image.transform.SetParent(canvas.transform);
         image.rectTransform.sizeDelta = extends * 1.5f;
         image.rectTransform.position = center;
         image.sprite = CreateSprite(ability);
@@ -122,6 +117,12 @@ public class EntityAbilitiesController : MonoBehaviour
         var button = buttonObject.AddComponent<Button>();
         button.targetGraphic = image;
         button.onClick.AddListener(() => actionMethod());
+
+        button.transform.SetParent(GameObject.Find("HUD/actions").transform); // We assign the parent to actions Canvas from the HUD
+        button.GetComponent<RectTransform>().localPosition = new Vector3(button.GetComponent<RectTransform>().localPosition.x,
+                                                                         button.GetComponent<RectTransform>().localPosition.y,
+                                                                         0f);
+
         button.enabled = enabled;
     }
 
