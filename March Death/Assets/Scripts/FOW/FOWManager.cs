@@ -50,7 +50,7 @@ public class FOWManager : MonoBehaviour
 
     void Awake()
     {
-        frames = 3;
+        frames = 0;
         cFrame = 0;
         fadeRate=200;
         if (Application.isPlaying)
@@ -164,13 +164,16 @@ public class FOWManager : MonoBehaviour
             table = makeTable(entity.Range);
             rangeTables.Add(range, table);
         }
-        Vector2 center = entity.Bounds.center;
-        int xCen = Mathf.RoundToInt(center.x * Quality)-range;
-        int yCen = Mathf.RoundToInt(center.y * Quality) - range;
+        Vector2 center = entity.Bounds.center*Quality;
+        float xOff = center.x - range;
+        float yOff = center.y - range;
+        int xCen = Mathf.RoundToInt(xOff);
+        int yCen = Mathf.RoundToInt(yOff);
         int texWidth = fowTex.width;
         int dRange = range * 2;
         if (entity.IsOwnedByPlayer)
         {
+            Vector2 offset = new Vector2(xOff - xCen, yOff - yCen);
             for (int x = 0; x <= dRange; x++)
             {
                 for (int y = 0; y <= dRange; y++)
@@ -179,8 +182,19 @@ public class FOWManager : MonoBehaviour
                     int n2 = (xCen+x) + (yCen+y) * texWidth;
                     if (n2 < pixels.Length)
                     {
-                        pixels[n2].g = (byte)Mathf.Max(pixels[n2].g, table[n].g);
-                        pixels[n2].b = (byte)Mathf.Max(pixels[n2].b, table[n].b);
+
+                        if (table[n].b > 0)
+                        {
+                            pixels[n2].g = (byte)Mathf.Max(pixels[n2].g, table[n].g, 255);
+                            if (table[n].b == 255)
+                            {
+                                pixels[n2].b = (byte)Mathf.Max(pixels[n2].b, table[n].b);
+                            }
+                            else
+                            {
+                                pixels[n2].b = (byte)Mathf.Max(pixels[n2].b, Mathf.Min(table[n].b + Mathf.RoundToInt(offset.x * (x - range) + offset.y * (y - range)), 255));
+                            }
+                        }
                     }
                 }
             }
