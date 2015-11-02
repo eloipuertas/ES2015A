@@ -45,6 +45,9 @@ GameObject:
   - 54: {fileID: 5479176}
   - 65: {fileID: 6592700}
   - 95: {fileID: 9501994}
+  - 114: {fileID: 11444602}
+  - 114: {fileID: 11454358}
+  - 208: {fileID: 20818460}
   m_Layer: 0
   m_Name: HumanArchery
   m_TagString: Untagged
@@ -629,7 +632,7 @@ Transform:
   m_GameObject: {fileID: 180202}
   m_LocalRotation: {x: -.707106829, y: 0, z: -0, w: .707106709}
   m_LocalPosition: {x: .0271729827, y: .0627652407, z: .136966467}
-  m_LocalScale: {x: 800.26825, y: 800.268311, z: 800.268311}
+  m_LocalScale: {x: 673.598328, y: 673.59845, z: 673.59845}
   m_Children: []
   m_Father: {fileID: 419470}
   m_RootOrder: 25
@@ -688,8 +691,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 112316}
   m_LocalRotation: {x: 0, y: .707106829, z: 0, w: .707106709}
-  m_LocalPosition: {x: 403.475464, y: 79.002121, z: 682.731995}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 301.325073, y: 79.0026245, z: 767.463196}
+  m_LocalScale: {x: 1, y: .899999976, z: 1}
   m_Children:
   - {fileID: 418422}
   - {fileID: 450344}
@@ -2125,6 +2128,28 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11444602
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 112316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed8fedea892f030418970e7ce2a2bc2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &11454358
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 112316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43c34b4ae45e2c94f90ae970db2ad9f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!137 &13734698
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
@@ -2157,8 +2182,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: .00313282013, y: 7.36713409e-05, z: 9.53674316e-07}
-    m_Extent: {x: .00766440388, y: .0109999776, z: .0063065337}
+    m_Center: {x: .00313282013, y: 7.37905502e-05, z: 9.53674316e-07}
+    m_Extent: {x: .00766440388, y: .0110000111, z: .0063065337}
   m_DirtyAABB: 0
 --- !u!183 &18380212
 Cloth:
@@ -2763,6 +2788,21 @@ Cloth:
     collisionSphereDistance: 3.40282347e+38
   m_CapsuleColliders: []
   m_SphereColliders: []
+--- !u!208 &20818460
+NavMeshObstacle:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 112316}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 8.5, y: 9.99999975e-06, z: 7.5}
+  m_MoveThreshold: .100000001
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: .5
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -2777,6 +2817,18 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_LocalRotation.w
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Extents.x
+      value: 8.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Extents.y
+      value: 9.99999975e-06
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Extents.z
+      value: 7.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
