@@ -43,7 +43,8 @@ class CreateCivil : Ability
             //IGameEntity civilEntity = civil.gameObject.GetComponent<IGameEntity>();
 
             Debug.Log("*********   harvestUnits: " + res.harvestUnits);
-            Debug.Log("*********   status: " + res.status.ToString());
+            Debug.Log("*********   Building status: " + res.status.ToString());
+            Debug.Log("*********   Create civilian status: " + res.status.ToString());
             return
 
              Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, unitInfo.resources.food) &&
@@ -63,7 +64,8 @@ class CreateCivil : Ability
     public override void enable()
     {
         _enabled = true;
-        base.enable(); 
+        base.enable();
+
         res.createCivilian(); 
 
     }
