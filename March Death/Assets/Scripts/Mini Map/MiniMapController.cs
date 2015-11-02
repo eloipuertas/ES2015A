@@ -2,7 +2,9 @@
 using System.Collections;
 
 public class MiniMapController : MonoBehaviour
-{ 
+{
+    public int depth;
+
     private Camera _camera;
     private Camera mainCam;
 
@@ -28,6 +30,8 @@ public class MiniMapController : MonoBehaviour
 
         _camera = this.GetComponent<Camera>();
         _camera.orthographic = true;
+
+        depth = 10;
         
         //Assign camera viewport
         _camera.rect = this.recalcViewport();
@@ -50,7 +54,7 @@ public class MiniMapController : MonoBehaviour
 
         createMarker();
 
-        rt = new RenderTexture(Screen.width, Screen.height, 2);
+        rt = new RenderTexture(Screen.width, Screen.height, 3);
         _camera.targetTexture = rt;
     }
 
@@ -69,9 +73,8 @@ public class MiniMapController : MonoBehaviour
     /// </summary>
     void OnGUI()
     {
-        GUI.depth = 2;
-        GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), rt);
-        GUI.DrawTexture(rect_marker, tex);
+            GUI.depth = -1;
+            GUI.DrawTexture(rect_marker, tex);
     }
 
     /// <summary>
@@ -165,7 +168,7 @@ public class MiniMapController : MonoBehaviour
 
         Rect r = new Rect();
 
-        r.xMax = corners_minimap[1].x + 5; // 10 10 12 12
+        r.xMax = corners_minimap[1].x + 5;
         r.xMin = corners_minimap[0].x - 5;
         r.yMax = Screen.height - corners_minimap[1].y + 7;
         r.yMin = Screen.height - corners_minimap[0].y - 7;

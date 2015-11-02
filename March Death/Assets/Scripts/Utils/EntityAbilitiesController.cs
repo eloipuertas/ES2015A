@@ -6,7 +6,7 @@ using UnityEngine.Events;
 using System;
 using Utils;
 using System.IO;
-//anchoredPosition 
+
 public class EntityAbilitiesController : MonoBehaviour
 {
 
@@ -54,8 +54,11 @@ public class EntityAbilitiesController : MonoBehaviour
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
         var rectTransform = actionPanel.GetComponent<RectTransform>();
         var size = rectTransform.sizeDelta;
-        var centerPosition = size / 2.0f;
-        var buttonExtents = new Vector2(centerPosition.x / Button_Columns, centerPosition.y / Button_Rows);
+        var globalScaleXY = new Vector2(rectTransform.lossyScale.x, rectTransform.lossyScale.y);
+        var extents = Vector2.Scale(size, globalScaleXY) / 2.0f;
+        var buttonExtents = new Vector2(extents.x / Button_Columns, extents.y / Button_Rows);
+        var position = rectTransform.position;
+        var point = new Vector2(position.x - extents.x, position.y + extents.y);
         var abilities = entity.info.abilities;
         var nabilities = abilities.Count;
 
@@ -72,8 +75,9 @@ public class EntityAbilitiesController : MonoBehaviour
                     Debug.Log(abilityObj);
                     abilityObj.enable();
                 });
-                var buttonCenter = -(centerPosition - buttonExtents * (2 * (i % Button_Columns) + 1));
-                buttonCenter.y = (centerPosition.y - (buttonExtents.y * (2 * (i / Button_Columns) + 1)));
+
+                var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
+                buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Rows) + 1));
                 CreateButton(rectTransform, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
             }
         }
@@ -104,10 +108,12 @@ public class EntityAbilitiesController : MonoBehaviour
         var transform = panelTransform.transform;
 
         var buttonObject = new GameObject(ability);
+        buttonObject.tag = "ActionButton";
+        buttonObject.layer = 5; // UI Layer
 
         var image = buttonObject.AddComponent<Image>();
         image.tag = "ActionButton";
-        image.transform.SetParent(panelTransform);
+        //image.transform.SetParent(panelTransform);
         image.transform.localScale = panelTransform.localScale;
         image.rectTransform.sizeDelta = 1.5f*extends;
         image.transform.localPosition = center;
@@ -116,6 +122,12 @@ public class EntityAbilitiesController : MonoBehaviour
         var button = buttonObject.AddComponent<Button>();
         button.targetGraphic = image;
         button.onClick.AddListener(() => actionMethod());
+
+        button.transform.SetParent(GameObject.Find("HUD/actions").transform); // We assign the parent to actions Canvas from the HUD
+        button.GetComponent<RectTransform>().localPosition = new Vector3(button.GetComponent<RectTransform>().localPosition.x,
+                                                                         button.GetComponent<RectTransform>().localPosition.y,
+                                                                         0f);
+
         button.enabled = enabled;
     }
 
@@ -126,6 +138,28 @@ public class EntityAbilitiesController : MonoBehaviour
     {
         Debug.Log("Hello everybody!");
     }
+
+    Sprite CreateSprite2(String ability)
+    {
+        char separator = Path.DirectorySeparatorChar;
+        Sprite newImg = null;
+        Texture2D tex = null;
+        byte[] fileData;
+		
+
+        String sPath = Application.dataPath + separator + "Resources" + separator + "ActionButtons" + separator;
+        string sName = sPath + ability.Replace(" ","_") + ".png";
+        if (File.Exists(sName))
+        {
+            fileData = File.ReadAllBytes(sName);
+            tex = new Texture2D(100, 100, TextureFormat.RGB24, false);
+            tex.LoadImage(fileData);
+
+            newImg = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+        }
+        return newImg;
+    }
+
 
     Sprite CreateSprite(String ability)
     {

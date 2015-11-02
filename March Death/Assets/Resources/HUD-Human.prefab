@@ -301,6 +301,7 @@ GameObject:
   - 223: {fileID: 22353614}
   - 114: {fileID: 11411148}
   - 114: {fileID: 11422976}
+  - 114: {fileID: 11444890}
   m_Layer: 5
   m_Name: HUD-Human
   m_TagString: Untagged
@@ -677,6 +678,17 @@ MonoBehaviour:
         m_CallState: 0
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
+--- !u!114 &11444890
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 191786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 457c3d52f0cb5e042afd7246f2864946, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11448700
 MonoBehaviour:
   m_ObjectHideFlags: 1
