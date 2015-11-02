@@ -296,6 +296,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8a76e5350c628745950824a25771a8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerRace: 0
+  _iaRace: 0
 --- !u!4 &792425303
 Transform:
   m_ObjectHideFlags: 0
@@ -322,6 +324,7 @@ GameObject:
   - 114: {fileID: 865109084}
   - 114: {fileID: 865109085}
   - 114: {fileID: 865109086}
+  - 114: {fileID: 865109087}
   m_Layer: 0
   m_Name: GameController
   m_TagString: GameController
@@ -412,6 +415,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   aiDebug: {fileID: 0}
   rootBasePosition: {x: 0, y: 0, z: 0}
+--- !u!114 &865109087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 865109079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7446b39bf8b98c341954314aa5b0ce54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &884767879
 GameObject:
   m_ObjectHideFlags: 0

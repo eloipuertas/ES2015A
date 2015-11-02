@@ -7,7 +7,7 @@ using Utils;
 public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 {
 
-	public enum Actions { SELECTED, DESELECTED };
+	public enum Actions { CREATED, SELECTED, DESELECTED };
 
 	private Player player;
     private Rect selectedRect = new Rect();
@@ -33,6 +33,12 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         //gameEntity = this.GetComponent<IGameEntity>();
         selectedBox = SelectionOverlay.CreateTexture();
         currentlySelected = false;
+    }
+
+    public override void Start()
+    {
+        base.Start();
+        fire(Actions.CREATED, this.gameObject);
     }
 
     public override void Update() { }
