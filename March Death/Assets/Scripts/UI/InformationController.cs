@@ -145,7 +145,7 @@ public class InformationController : MonoBehaviour {
 
 		UnityAction actionMethod = new UnityAction(() =>
 		{
-			selectable.SelectUnique();
+			selectable.SelectOnlyMe();
 		});
 
 		return CreateButton(buttonCenter, entity, actionMethod);

@@ -254,7 +254,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
             Selectable selectable = GetComponent<Selectable>();
             if (selectable.currentlySelected)
             {
-                selectable.Deselect();
+                selectable.DeselectMe();
             }
 
             // TODO: Should this be automatically handled with events?

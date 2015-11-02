@@ -57,7 +57,6 @@ namespace Managers
 
         }
 
-
         /// <summary>
         /// Starts creating a building, required the name of the building ex: 'elf-farm'
         /// </summary>
