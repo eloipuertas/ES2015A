@@ -9,6 +9,7 @@ public class Main_Game : MonoBehaviour
     private CameraController cam;
     private Player user;
     Managers.BuildingsManager bm;
+    public Managers.BuildingsManager BuildingsMgr { get { return bm; } }
 
     private List<BasePlayer> allPlayers;
 
@@ -19,18 +20,21 @@ public class Main_Game : MonoBehaviour
     void Start ()
     {
         allPlayers = new List<BasePlayer>(2);
-        strongholdTransform = GameObject.Find ("PlayerStronghold").transform;
-        playerHero = GameObject.Find ("PlayerHero");
+        //strongholdTransform = GameObject.Find ("PlayerStronghold").transform;
+        //playerHero = GameObject.Find ("PlayerHero");
         if (GameObject.Find ("GameInformationObject"))
             info = (GameInformation)GameObject.Find ("GameInformationObject").GetComponent ("GameInformation");
-        user = GameObject.Find ("GameController").GetComponent ("Player") as Player;
+        //user = GameObject.Find ("GameController").GetComponent ("Player") as Player;
         cam = GameObject.FindWithTag ("MainCamera").GetComponent<CameraController> ();
-        bm = GameObject.Find ("GameController").GetComponent<Managers.BuildingsManager> ();
+        //bm = GameObject.Find ("GameController").GetComponent<Managers.BuildingsManager> ();
+        bm = new Managers.BuildingsManager();
         if (info)
             info.LoadHUD ();
         //LoadPlayerStronghold ();
         //LoadPlayerUnits ();
-        LoadCampaign();
+        StartGame();
+        bm.Player = user;
+        bm.Inputs = gameObject.AddComponent<UserInput>();
     }
 
     private void LoadPlayerStronghold ()
@@ -83,20 +87,20 @@ public class Main_Game : MonoBehaviour
             // TODO It would be better if it wasn't race dependent
             if (player.Race != info.GetPlayerRace())
             {
-                basePlayer = new Assets.Scripts.AI.AIController();
+                basePlayer = gameObject.AddComponent<Assets.Scripts.AI.AIController>();
             }
             else
             {
-                basePlayer = new Player();
+                basePlayer = gameObject.AddComponent<Player>();
                 user = (Player) basePlayer;  // HACK Just in case there are compatibility issues
             }
-            basePlayer.Start();
+            //basePlayer.Start();
             foreach (Battle.PlayableEntity building in player.GetBuildings())
             {
                 // TODO Take into account all 3 axis positions with a world map
                 created = bm.createBuilding(new Vector3(building.position.X, 80, building.position.Y),
                                   Quaternion.Euler(0,0,0), building.entityType.building, player.Race);
-                basePlayer.addEntity(created.GetComponent<IGameEntity>());
+                basePlayer.addGameObject(created);
                 if (building.entityType.building == BuildingTypes.STRONGHOLD &&
                     info.GetPlayerRace() == basePlayer.race)
                 {
@@ -109,7 +113,7 @@ public class Main_Game : MonoBehaviour
                 created = Info.get.createUnit(player.Race, unit.entityType.unit,
                                               new Vector3(unit.position.X, 80, unit.position.Y),
                                               Quaternion.Euler(0,0,0));
-                basePlayer.addEntity(created.GetComponent<IGameEntity>());
+                basePlayer.addGameObject(created);
             }
             // TODO Set player's initial resources
             allPlayers.Add(basePlayer);
@@ -126,5 +130,10 @@ public class Main_Game : MonoBehaviour
         obj.GetComponentInChildren<EntityAbilitiesController> ().Clear ();
         obj = GameObject.Find ("GameInformationObject").gameObject;
         Destroy (obj);
+    }
+
+    void Update()
+    {
+        bm.Update();
     }
 }

@@ -3,16 +3,18 @@ using System.Collections;
 using Utils;
 namespace Managers
 {
-    public class BuildingsManager : MonoBehaviour
+    public class BuildingsManager
     {
 
-        private Player player;
-        private UserInput inputs;
+        private Player _player;
+        private UserInput _inputs;
+        public Player Player { set { _player = value; } }
+        public UserInput Inputs { set { _inputs = value; } }
         private CursorManager cursor;
         private ConstructionGrid grid;
         private Color red = Color.red;
         private Color green = Color.green;
-        private struct NewBuilgind
+        private struct NewBuilding
         {
             public GameObject ghost;
             public GameObject building;
@@ -23,23 +25,24 @@ namespace Managers
 
         }
 
-        private NewBuilgind _newBuilding;
+        private NewBuilding _newBuilding;
         float yoffset = 1f;
 
 
         // Use this for initialization
-        void Start()
+        //void Start()
+        public BuildingsManager()
         {
-            player = GetComponent<Player>();
-            inputs = GetComponent<UserInput>();
-            grid = GetComponent<ConstructionGrid>();
+            //player = GetComponent<Player>();
+            //inputs = etComponent<UserInput>();
+            grid = GameObject.FindWithTag("GameController").GetComponent<ConstructionGrid>();
             cursor = CursorManager.Instance;
             // alpha components for the colors
             red.a = 0.5f;
             green.a = 0.5f;
             InitBuildingStruct();
 
-        }
+            Debug.Log("BuildingsBamager has started");}
 
         private void InitBuildingStruct()
         {
@@ -48,7 +51,7 @@ namespace Managers
         }
 
         // Update is called once per frame
-        void Update()
+        public void Update()
         {
             if (_newBuilding.placing)
             {
@@ -70,7 +73,7 @@ namespace Managers
                 _newBuilding.ghost = CreateGhostBuilding(race, type);
                 _newBuilding.material = _newBuilding.ghost.GetComponent<Renderer>().material;
                 _newBuilding.placing = true;
-                player.setCurrently(Player.status.PLACING_BUILDING);
+                _player.setCurrently(Player.status.PLACING_BUILDING);
             }
 
         }
@@ -85,7 +88,7 @@ namespace Managers
         {
             //TODO : (hermetico) change shared ghost
             GameObject ghost = (GameObject)Resources.Load("Prefabs/Buildings/Resources/GHOST_Elf-Farm", typeof(GameObject));
-            ghost = (GameObject)Instantiate(ghost, new Vector3(0, 0, 0), Quaternion.identity);
+            ghost = (GameObject)GameObject.Instantiate(ghost, new Vector3(0, 0, 0), Quaternion.identity);
             return ghost;
 
         }
@@ -148,7 +151,7 @@ namespace Managers
         {
             Vector3 newDestination = GetNewDestination();
             // if is not a vaild point, the building remains quiet
-            if (newDestination == inputs.invalidPosition) return false;
+            if (newDestination == _inputs.invalidPosition) return false;
 
             if (checkLocation(newDestination))
             {
@@ -160,7 +163,7 @@ namespace Managers
 
                 //TODO : check another way to get the IGameEntity
                 IGameEntity entity = (IGameEntity)finalBuilding.GetComponent<Unit>();
-                player.addEntity(entity);
+                _player.addEntity(entity);
 
                 // remaining operations
                 _finishPlacing();
@@ -191,7 +194,7 @@ namespace Managers
         /// </summary>
         private void _finishPlacing()
         {
-            Destroy(_newBuilding.ghost);
+            GameObject.Destroy(_newBuilding.ghost);
             _newBuilding.placing = false;
 
         }
@@ -204,7 +207,7 @@ namespace Managers
         private Vector3 GetNewDestination()
         {
             // 1. getPoint
-            Vector3 toLocation = inputs.FindTerrainHitPoint();
+            Vector3 toLocation = _inputs.FindTerrainHitPoint();
             // let the buildings not to fall down
             toLocation.y += yoffset;
             // 2. discretize
@@ -220,7 +223,7 @@ namespace Managers
 
             Vector3 newDestination = GetNewDestination();
             // if is not a vaild point, the building remains quiet
-            if (newDestination == inputs.invalidPosition) return;
+            if (newDestination == _inputs.invalidPosition) return;
 
             // 2. check and move alter the color if is not a valid location
             _newBuilding.ghost.transform.position = newDestination;

@@ -52,8 +52,8 @@ namespace Assets.Scripts.AI
             OwnBuildings = new List<IGameEntity>();
             modules = new List<AIModule>();
             Army = new List<Unit>();
-            rootBasePosition = new Vector3(706, 80, 765);
-            Army.Add(Info.get.createUnit(_selfRace, UnitTypes.HERO, rootBasePosition,Quaternion.Euler(0,0,0)).GetComponent<Unit>());
+            //rootBasePosition = new Vector3(706, 80, 765);
+            //Army.Add(Info.get.createUnit(_selfRace, UnitTypes.HERO, rootBasePosition,Quaternion.Euler(0,0,0)).GetComponent<Unit>());
             Workers = new List<Unit>();
             Macro = new MacroManager(this);
             Micro = new MicroManager(this);
@@ -63,8 +63,8 @@ namespace Assets.Scripts.AI
             timers = new float[modules.Count];
             for (int i = 0; i < modules.Count; i++)
                 timers[i] = 0;
-            buildPosition = new Vector3(706, 80, 765);
-            rootBasePosition = new Vector3(706, 80, 765);
+            //buildPosition = new Vector3(706, 80, 765);
+            //rootBasePosition = new Vector3(706, 80, 765);
 
             ActorSelector selector = new ActorSelector()
             {
@@ -171,19 +171,36 @@ namespace Assets.Scripts.AI
 
         // TODO: Should it be handled with events??
         public override void removeEntity(IGameEntity entity) { }
-        public override void addEntity(IGameEntity newEntity)
+        public override void addEntity(IGameEntity newEntity) { }
+
+        public override void addGameObject (GameObject go)
         {
+            IGameEntity newEntity = go.GetComponent<IGameEntity>();
             if (newEntity.info.isArmy)
             {
                 Army.Add((Unit) newEntity);
             }
             else if (newEntity.info.isBuilding)
             {
+                // The next if-block is allways false
+                /*if (rootBasePosition == null)
+                {
+                    rootBasePosition = new Vector3(newEntity.getGameObject().transform.position.x,
+                                                   newEntity.getGameObject().transform.position.y,
+                                                   newEntity.getGameObject().transform.position.z);
+                    buildPosition = new Vector3(rootBasePosition.x, rootBasePosition.y, rootBasePosition.z);
+                }*/
                 buildPosition = newEntity.getTransform().position + new Vector3(0,0,20);
-                Resource build = (Resource) newEntity;
+                //buildPosition += new Vector3(0, 0, 20);
+                Resource build = (Resource)newEntity;
                 build.register(Resource.Actions.CREATE_UNIT, OnCivilCreated);
                 build.register(Resource.Actions.DESTROYED, OnBuildingDestroyed);
             }
+        }
+
+        public override void removeGameObject (GameObject go)
+        {
+            throw new NotImplementedException ();
         }
     }
     struct AIModule

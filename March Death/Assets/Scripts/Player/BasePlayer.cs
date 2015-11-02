@@ -58,6 +58,9 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     public abstract void removeEntity(IGameEntity entity);
     public abstract void addEntity(IGameEntity newEntity);
 
+    public abstract void addGameObject(GameObject go);
+    public abstract void removeGameObject(GameObject go);
+
     public static BasePlayer getOwner(IGameEntity entity)
     {
         if (entity.info.race == info.GetPlayerRace())
