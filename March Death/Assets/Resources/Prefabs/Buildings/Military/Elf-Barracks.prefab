@@ -363,6 +363,7 @@ GameObject:
   - 114: {fileID: 11414046}
   - 114: {fileID: 11496258}
   - 208: {fileID: 20826386}
+  - 114: {fileID: 11412782}
   m_Layer: 0
   m_Name: Elf-Barracks
   m_TagString: Untagged
@@ -1479,7 +1480,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 119298}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 274.609406, y: 79.0026245, z: 808.75415}
+  m_LocalPosition: {x: 294.798187, y: 79.0026245, z: 789.808289}
   m_LocalScale: {x: 1.20000005, y: 1.20000005, z: 1.20000005}
   m_Children:
   - {fileID: 449198}
@@ -3814,6 +3815,19 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11412782
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 119298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3aa7bd748c483ad44a9454c6c5f8639b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 1
+  type: 5
 --- !u!114 &11414046
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4179,6 +4193,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Size.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: type
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

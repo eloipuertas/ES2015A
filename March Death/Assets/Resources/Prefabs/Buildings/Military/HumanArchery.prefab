@@ -48,6 +48,7 @@ GameObject:
   - 114: {fileID: 11444602}
   - 114: {fileID: 11454358}
   - 208: {fileID: 20818460}
+  - 114: {fileID: 11400476}
   m_Layer: 0
   m_Name: HumanArchery
   m_TagString: Untagged
@@ -691,7 +692,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 112316}
   m_LocalRotation: {x: 0, y: .707106829, z: 0, w: .707106709}
-  m_LocalPosition: {x: 402.691833, y: 79.0026245, z: 685.499817}
+  m_LocalPosition: {x: 331.422119, y: 79.0026245, z: 802.407104}
   m_LocalScale: {x: 1, y: .899999976, z: 1}
   m_Children:
   - {fileID: 418422}
@@ -2128,6 +2129,19 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11400476
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 112316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3aa7bd748c483ad44a9454c6c5f8639b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 0
+  type: 4
 --- !u!114 &11444602
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2182,7 +2196,7 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: .00313234329, y: 7.39097595e-05, z: 9.53674316e-07}
+    m_Center: {x: .00313282013, y: 7.37905502e-05, z: 1.90734863e-06}
     m_Extent: {x: .00766440388, y: .0110000111, z: .0063065337}
   m_DirtyAABB: 0
 --- !u!183 &18380212
@@ -2829,6 +2843,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Extents.z
       value: 7.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: type
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
