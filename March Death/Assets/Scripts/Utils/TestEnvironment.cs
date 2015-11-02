@@ -17,11 +17,38 @@ class TestEnvironment : SingletonMono<TestEnvironment>
     public float testTime { get; set; }
     public Races playerRace { get; set; }
 
-    public enum States { IN_MENU, IN_RACES_SELECT, IN_GAME, UNIT_TESTS, KILLING }
+    public enum States { IN_MENU, IN_RACES_SELECT, PRE_GAME_CHECKING, IN_GAME, POST_GAME_CHECKING, KILLING }
     public States state { get; set; }
 
     private List<Tuple<String, String>> errorLogger = new List<Tuple<String, String>>();
     private float _elapsedTime;
+
+    private Dictionary<int, List<UnitTest>> unitTests = new Dictionary<int, List<UnitTest>>();
+
+    public TestEnvironment()
+    {
+        // Read unit tests
+        var results = from type in Assembly.GetExecutingAssembly().GetTypes()
+                      where typeof(IUnitTest).IsAssignableFrom(type)
+                      select type;
+
+        foreach (var state in Enum.GetValues(typeof(States)))
+        {
+            unitTests[(int)state] = new List<UnitTest>();
+        }
+
+        // Load one by one
+        foreach (Type test in results)
+        {
+            if (!test.IsInterface && !test.IsAbstract)
+            {
+                UnitTest testObj = (UnitTest)Activator.CreateInstance(test);
+                testObj.testEnvironment = this;
+                testObj.errorLogger = errorLogger;
+                unitTests[(int)testObj.RunAt].Add(testObj);
+            }
+        }
+    }
 
     public void Init()
     {
@@ -50,6 +77,7 @@ class TestEnvironment : SingletonMono<TestEnvironment>
             }
         }
 
+        // Destroy if not in use
         if (!testingEnabled)
         {
             Destroy(this.gameObject);
@@ -60,6 +88,49 @@ class TestEnvironment : SingletonMono<TestEnvironment>
         }
     }
 
+    private void RunAllTests(States nextState, Action extraDone = null)
+    {
+        int notDone = 0;
+
+        for (int i = 0; i <= (int)state; ++i)
+        {
+            notDone += unitTests[i].Count;
+
+            foreach (var testObj in unitTests[i])
+            {
+                if (testObj.State != UnitTest.ExecutionState.DONE)
+                {
+                    try
+                    {
+                        testObj.Run(Time.deltaTime);
+                        testObj.CheckDone();
+                    }
+                    catch (Exception e)
+                    {
+                        // In case of exception flag as done to avoid looping over the test
+                        testObj.State = UnitTest.ExecutionState.DONE;
+                        throw e;
+                    }
+                }
+
+                if (testObj.State == UnitTest.ExecutionState.DONE)
+                {
+                    --notDone;
+                }
+            }
+        }
+
+        // Change phase if all tests are done
+        if (notDone == 0)
+        {
+            state = nextState;
+            if (extraDone != null)
+            {
+                extraDone();
+            }
+        }
+    }
+
     void Update()
     {
         if (testingEnabled)
@@ -67,49 +138,48 @@ class TestEnvironment : SingletonMono<TestEnvironment>
             switch (state)
             {
                 case States.IN_MENU:
-                    Application.LoadLevel("seleccion personaje");
-                    state = States.IN_RACES_SELECT;
+                    RunAllTests(States.IN_RACES_SELECT, () =>
+                    {
+                        Application.LoadLevel("seleccion personaje");
+                    });
                     break;
 
                 case States.IN_RACES_SELECT:
-                    GameObject.Find("GameInformationObject").
-                        GetComponent<GameInformation>().
-                        SetPlayerRace(playerRace);
+                    RunAllTests(States.PRE_GAME_CHECKING, () =>
+                    {
+                        GameObject.Find("GameInformationObject").
+                            GetComponent<GameInformation>().
+                            SetPlayerRace(playerRace);
 
-                    Application.LoadLevel("ES2015A");
-                    state = States.IN_GAME;
+                        Application.LoadLevel("ES2015A");
+                    });
+                    break;
 
+                case States.PRE_GAME_CHECKING:
+                    // Hack to make camera stop moving
+                    Camera.main.GetComponent<CameraController>().setCameraSpeed(0);
+
+                    RunAllTests(States.IN_GAME);
                     break;
 
                 case States.IN_GAME:
                     _elapsedTime += Time.deltaTime;
 
-                    if (_elapsedTime >= testTime)
+                    // Do not advance until elapsed time has gone by!
+                    RunAllTests(States.IN_GAME, () =>
                     {
-                        state = States.UNIT_TESTS;
-                    }
+                        if (_elapsedTime >= testTime)
+                        {
+                            state = States.POST_GAME_CHECKING;
+                        }
+                    });
                     break;
 
-                case States.UNIT_TESTS:
-                    // Run all unit tests
-                    var results = from type in Assembly.GetExecutingAssembly().GetTypes()
-                                  where typeof(IUnitTest).IsAssignableFrom(type)
-                                  select type;
-
-                    // Execute one by one
-                    foreach (Type test in results)
+                case States.POST_GAME_CHECKING:
+                    RunAllTests(States.KILLING, () =>
                     {
-                        if (!test.IsInterface && !test.IsAbstract)
-                        {
-                            IUnitTest testObj = (IUnitTest)Activator.CreateInstance(test);
-                            testObj.errorLogger = errorLogger;
-                            testObj.run();
-                        }
-                    }
-
-                    // Kill game
-                    state = States.KILLING;
-                    OnDisable(); // Force unregister
+                        OnDisable();
+                    });
                     break;
 
                 case States.KILLING:
