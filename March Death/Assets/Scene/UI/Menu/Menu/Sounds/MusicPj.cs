@@ -8,7 +8,10 @@ public class MusicPj : MonoBehaviour {
 		MainMenuSound mainMenu;
 		mainMenu = MainMenuSound.GetInstance ();
 		GameObject menuMusic = GameObject.Find("MusicPjBackground");
-		menuMusic = mainMenu.gameObject;
+        if (mainMenu)
+            menuMusic = mainMenu.gameObject;
+        else
+            Debug.LogWarning("Expected mainMenu in MusigPj");
 
 	}
 }
