@@ -8,11 +8,7 @@ public class ConstructionGrid : MonoBehaviour {
     private Vector2 dimensions = new Vector2(15f, 15f);
     private ArrayList reservedPositions = new ArrayList();
     private const float DIFERENCE_OF_HEIGHTS_TOLERANCE = 1.5f;
-        
-    /// <summary>
-    /// Returns the center of a row of the grid where the building will be placed
-    /// </summary>
-    /// <param name="position"></param>
+
     /// <returns></returns>
 	public Vector3 discretizeMapCoords(Vector3 position)
     {
@@ -62,7 +58,7 @@ public class ConstructionGrid : MonoBehaviour {
     private float getPointHeight(Vector3 point)
     {
         RaycastHit hit;
-        if (Physics.Raycast(point, Vector3.down, out hit)) return hit.point.y; 
+        if (Physics.Raycast(point, Vector3.down, out hit)) return hit.point.y;
         if (Physics.Raycast(point, Vector3.up, out hit)) return hit.point.y;
         return float.NegativeInfinity;
     }
@@ -84,7 +80,7 @@ public class ConstructionGrid : MonoBehaviour {
         float max_height = heights.Max();
         float min_height = heights.Min();
         float difference = max_height - min_height;
-        
+
         return difference < DIFERENCE_OF_HEIGHTS_TOLERANCE;
     }
 

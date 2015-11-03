@@ -15,7 +15,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     /// <summary>
     /// The resources manager
     /// </summary>
-    protected Managers.ResourcesManager _resources;
+    protected Managers.ResourcesManager _resources = new Managers.ResourcesManager();
     public Managers.IResourcesManager resources { get { return _resources; } }
 
     /// <summary>
@@ -25,11 +25,15 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     public Managers.BuildingsManager buildings { get { return _buildings; } }
 
 
+
     /// <summary>
-    /// The units manager
+    /// The selection Manager
     /// </summary>
-    protected Managers.UnitsManager _units;
-    public Managers.UnitsManager units { get { return _units; } }
+    protected Managers.SelectionManager _selection = new Managers.SelectionManager();
+    public Managers.SelectionManager selection { get { return _selection; } }
+     
+
+
 
     protected static GameInformation _info = null;
     protected static BasePlayer _player = null;
@@ -48,6 +52,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
         _info = gameInformationObject.GetComponent<GameInformation>();
         _player = gameController.GetComponent<Player>();
         _ia = gameController.GetComponent<AIController>();
+        
     }
 
     public abstract void removeEntity(IGameEntity entity);

@@ -9,7 +9,8 @@ public class Player : BasePlayer
     /// Information regarding the current status of the player
     /// </summary>
     private status _currently;
-    public enum status {IDLE, PLACING_BUILDING, SELECTING_UNITS, SELECTED_UNTIS /*...*/}
+    public status currently { get { return _currently; }}
+    public enum status {IDLE, PLACING_BUILDING, SELECTED_UNITS /*...*/}
 
     /// <summary>
     /// Information regarding the entities of the player
@@ -22,17 +23,19 @@ public class Player : BasePlayer
 	//the list of player units in the scene
 	public ArrayList currentUnits = new ArrayList ();
 
-	public ArrayList SelectedObjects = new ArrayList();
-    
+    // i order to mantain InformationController working
+	//public ArrayList SelectedObjects = new ArrayList();
+    public ArrayList SelectedObjects { get { return _selection.ToArrayList(); } }
+
     // Use this for initialization
     public override void Start()
     {   
         base.Start();
-
+        _buildings = GetComponent<Managers.BuildingsManager>();
         //request the race of the player
         _selfRace = info.GetPlayerRace();
-        _resources = new Managers.ResourcesManager();
-        _units = new Managers.UnitsManager(this);
+        _selection.SetRace(race);
+        
     }
 
     // Update is called once per frame
@@ -92,4 +95,9 @@ public class Player : BasePlayer
     {
         return (ArrayList) SelectedObjects.Clone();
     }
+
+    /// <summary>
+    /// Getter for the resources of the player.
+    /// </summary>
+    public Managers.ResourcesManager resources {get { return _resources; } }
 }
