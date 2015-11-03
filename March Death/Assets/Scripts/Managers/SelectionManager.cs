@@ -91,11 +91,14 @@ namespace Managers
         /// </summary>
         public void EmptySelection()
         {
-            foreach (Selectable selected in _selectedEntities)
+            Selectable[] selectedEntities = _selectedEntities.ToArray();
+            _selectedEntities.Clear();
+
+            foreach (Selectable selected in selectedEntities)
             {
                 selected.DeselectEntity();
             }
-            _selectedEntities.Clear();
+           
         }
 
 
