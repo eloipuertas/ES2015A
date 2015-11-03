@@ -34,7 +34,10 @@ public class Main_Game : MonoBehaviour
         //LoadPlayerUnits ();
         StartGame();
         bm.Player = user;
-        bm.Inputs = gameObject.AddComponent<UserInput>();
+        UserInput inputs = gameObject.AddComponent<UserInput>();
+        inputs.TerrainLayerMask = new LayerMask();
+        inputs.TerrainLayerMask.value = LayerMask.NameToLayer("Terrain");
+        bm.Inputs = inputs; 
     }
 
     private void LoadPlayerStronghold ()
@@ -92,12 +95,13 @@ public class Main_Game : MonoBehaviour
             else
             {
                 basePlayer = gameObject.AddComponent<Player>();
-                user = (Player) basePlayer;  // HACK Just in case there are compatibility issues
+                user = (Player) basePlayer;
             }
             basePlayer.Start();
             foreach (Battle.PlayableEntity building in player.GetBuildings())
             {
                 // TODO Take into account all 3 axis positions with a world map
+                // Maybe try for the height either 81.15f or 78.92283f
                 created = bm.createBuilding(new Vector3(building.position.X, 80, building.position.Y),
                                   Quaternion.Euler(0,0,0), building.entityType.building, player.Race);
                 basePlayer.addEntity(created.GetComponent<IGameEntity>());

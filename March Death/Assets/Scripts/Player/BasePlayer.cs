@@ -16,7 +16,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     /// The resources manager
     /// </summary>
     protected Managers.ResourcesManager _resources = new Managers.ResourcesManager();
-    public Managers.IResourcesManager resources { get { return _resources; } }
+    public Managers.ResourcesManager resources { get { return _resources; } }
 
     /// <summary>
     /// The buildings manager
