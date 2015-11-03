@@ -16,11 +16,17 @@ public class MainMenuLogic : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		sounds = GetComponents<AudioSource>();
-		hoverAudio = sounds [0];
-		clickAudio = sounds [1];
+        TestEnvironment.Instance.Init();
+        /*
+        if (!(sounds.Length > 0))
+        {
+            sounds = GetComponents<AudioSource>();
+            hoverAudio = sounds[0];
+            clickAudio = sounds[1];
+        }
+        */
 		Cursor.visible = true;
-		TestEnvironment.Instance.Init();
+
 	}
 
 	/* MOUSE OVER */
