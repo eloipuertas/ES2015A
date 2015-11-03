@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System;
 
@@ -6,14 +6,14 @@ namespace SceneLoader
 {
     public class GameSceneDefaultLoader : MonoBehaviour
     {
-        public Storage.Races _playerRace;
-        public Storage.Races _iaRace;
+        public Storage.Races _playerRace = Storage.Races.ELVES;
+        public Storage.Races _iaRace = Storage.Races.MEN;
         private GameObject informationObject = null;
         private GameInformation gameInfo;
 
         void Start()
         {
-            if(LoadRequiredComponents())LoadSceneContext();
+            if (LoadRequiredComponents()) LoadSceneContext();
         }
 
         /// <summary>
@@ -25,13 +25,14 @@ namespace SceneLoader
             {
                 informationObject = GameObject.Find("GameInformationObject");
                 if (informationObject) return false;
-              
+
                 informationObject = new GameObject("GameInformationObject");
                 informationObject.AddComponent<GameInformation>();
                 gameInfo = informationObject.GetComponent<GameInformation>();
             }
 
             return true;
+
         }
 
         /// <summary>
@@ -51,7 +52,7 @@ namespace SceneLoader
 
             if (_playerRace == _iaRace)
             {
-                throw new Exception("Player and IA can't have the same race. Loading aborted");
+                throw new Exception("Player and IA can't have the same race. Loading will fail");
             }
 
             

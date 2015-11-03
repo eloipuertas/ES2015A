@@ -48,7 +48,7 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
         {
             if (fe.IsRevealed || fe.IsOwnedByPlayer)
             {
-                GUI.depth = 1;
+                GUI.depth = 0;
                 GUI.DrawTexture(marker_rect, box_text);
             }
         }

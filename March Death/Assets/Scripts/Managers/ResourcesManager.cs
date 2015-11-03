@@ -97,6 +97,11 @@ namespace Managers
             AddAmount(new WorldResources.Resource(type, amount));
         }
 
+        public float getAmount(Type type)
+        {
+            return _deposits[type].GetAmount();
+        }
+
     }
 
 }

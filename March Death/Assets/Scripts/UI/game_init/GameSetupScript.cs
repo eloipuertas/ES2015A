@@ -75,8 +75,11 @@ public class GameSetupScript : MonoBehaviour {
     {
         if (raceSelected)
         {
-            SetGameMode();
-		    Application.LoadLevel("Test_Game_Zone");
+            GameObject menuMusic = GameObject.Find("BackgroundMusic");
+            if (menuMusic) {
+            Destroy (menuMusic);
+        }
+        Application.LoadLevel("Test_Game_Zone");
         }
         else
         {

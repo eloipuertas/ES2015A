@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
@@ -10,11 +10,11 @@ public class UserInput : MonoBehaviour
 	private action currentAction;
 	
 	private Player player;
-    private SelectionManager sManager { get { return player.selection; } }
-    private BuildingsManager bManager { get { return player.buildings; } }
+        private SelectionManager sManager { get { return player.selection; } }
+        private BuildingsManager bManager { get { return player.buildings; } }
 
-    //Should be better to create a constants class or structure
-    public Vector3 invalidPosition { get{ return new Vector3(-99999, -99999, -99999); } }
+        //Should be better to create a constants class or structure
+        public Vector3 invalidPosition { get{ return new Vector3(-99999, -99999, -99999); } }
 	
 	//range in which a mouse down and mouse up event will be treated as "the same location" on the map.
 	private int mouseButtonReleaseRange = 20;
@@ -51,7 +51,7 @@ public class UserInput : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
-        player = GetComponent<Player>();
+		player = GetComponent<Player>();
 		selectionTexture = (Texture2D)Resources.Load ("SelectionTexture");
 		cursorAttack = (Texture2D)Resources.Load("cursor_attack");
 		camera = GameObject.Find("Main Camera").GetComponent ("CameraController") as CameraController;
@@ -97,20 +97,20 @@ public class UserInput : MonoBehaviour
 
 	private void LeftClick() 
 	{
-        switch (player.currently)
-        {
-            case Player.status.IDLE:
-                Select();
-                break;
-            case Player.status.SELECTED_UNITS:
-                Deselect();
-                Select();
-                break;
-            case Player.status.PLACING_BUILDING:
-                PlaceBuilding();
-                break;
+            switch (player.currently)
+            {
+                case Player.status.IDLE:
+                    Select();
+                    break;
+                case Player.status.SELECTED_UNITS:
+                    Deselect();
+                    Select();
+                    break;
+                case Player.status.PLACING_BUILDING:
+                    PlaceBuilding();
+                    break;
 
-        }
+            }
 
 	}
 	
@@ -162,24 +162,24 @@ public class UserInput : MonoBehaviour
 	
 	private void Select() {
 		
-		//Select if exists unit
-		GameObject hitObject = FindHitObject ();
-		if (hitObject) {		
-			Selectable selectedObject = hitObject.GetComponent<Selectable> ();
-            
-			// We just be sure that is a selectable object
-			if (selectedObject) {
-                sManager.SelectUnique(selectedObject);
-                player.setCurrently (Player.status.SELECTED_UNITS);
-			} 
-		}
+            //Select if exists unit
+            GameObject hitObject = FindHitObject ();
+            if (hitObject) {		
+                Selectable selectedObject = hitObject.GetComponent<Selectable> ();
+
+                // We just be sure that is a selectable object
+                if (selectedObject) {
+                                sManager.SelectUnique(selectedObject);
+                                player.setCurrently (Player.status.SELECTED_UNITS);
+                } 
+	    }
 	}
 	
 	private void Deselect() {
 
-        //Deselect all
-        sManager.EmptySelection();
-		player.setCurrently(Player.status.IDLE);
+            //Deselect all
+            sManager.EmptySelection();
+	    player.setCurrently(Player.status.IDLE);
 	}
 	
 	private void PlaceBuilding() {
@@ -206,7 +206,7 @@ public class UserInput : MonoBehaviour
 			camera.enableManualControl();
 			
 			//Check if is a simple click or dragging if the range is not big enough
-			if (IsSimpleClick (mouseButtonDownPoint, mouseButtonCurrentPoint))
+			if (IsSimpleClick (mouseButtonDownPoint, mouseButtonCurrentPoint) /*&& !EventSystem.current.IsPointerOverGameObject()*/)
 			{
 				return action.LEFT_CLICK;
 			} else {
@@ -239,8 +239,8 @@ public class UserInput : MonoBehaviour
 	}
 
 	private void DeselectBuildings()
-    {
-        sManager.RemoveBuildinds();
+        {
+            sManager.RemoveBuildinds();
 	}
 
 	private void SelectUnitsInArea() {
@@ -275,10 +275,10 @@ public class UserInput : MonoBehaviour
 
 			unitPosition = unit.transform.position;
 			if (AreaContainsObject(selectedArea, unitPosition)) {
-                sManager.Select(selectedObject);
+                            sManager.Select(selectedObject);
 			} else {  
-                sManager.Deselect(selectedObject);
-            }
+                            sManager.Deselect(selectedObject);
+                        }
 		}
 		
 		Player.status currentAction = player.SelectedObjects.Count > 0 ? Player.status.SELECTED_UNITS : Player.status.IDLE;

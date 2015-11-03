@@ -7,7 +7,7 @@ using Utils;
 public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 {
 
-    public enum Actions { SELECTED, DESELECTED };
+	public enum Actions { CREATED, SELECTED, DESELECTED };
 
     private Player player;
     private Rect selectedRect = new Rect();
@@ -41,6 +41,13 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         selectedRect = SelectionOverlay.CalculateBox(_collider);
     }
 
+    public override void Start()
+    {
+        base.Start();
+        fire(Actions.CREATED, this.gameObject);
+    }
+
+    public override void Update() { }
 
     protected virtual void LateUpdate()
     {
