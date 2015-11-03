@@ -108,7 +108,7 @@ namespace Managers
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        private bool CanBeSelected(Selectable selectable)
+        public bool CanBeSelected(Selectable selectable)
         {
             return _ownRace == selectable.entity.getRace();
         }

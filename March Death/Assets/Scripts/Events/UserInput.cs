@@ -6,15 +6,16 @@ using Managers;
 
 public class UserInput : MonoBehaviour
 {
-	private enum action {NONE, LEFT_CLICK, RIGHT_CLICK, DRAG}
+	public enum action {NONE, LEFT_CLICK, RIGHT_CLICK, DRAG}
 	private action currentAction;
 	
 	private Player player;
-        private SelectionManager sManager { get { return player.selection; } }
-        private BuildingsManager bManager { get { return player.buildings; } }
+    private SelectionManager sManager { get { return player.selection; } }
+    private BuildingsManager bManager { get { return player.buildings; } }
+    private CursorManager cursor;
 
-        //Should be better to create a constants class or structure
-        public Vector3 invalidPosition { get{ return new Vector3(-99999, -99999, -99999); } }
+    //Should be better to create a constants class or structure
+    public Vector3 invalidPosition { get{ return new Vector3(-99999, -99999, -99999); } }
 	
 	//range in which a mouse down and mouse up event will be treated as "the same location" on the map.
 	private int mouseButtonReleaseRange = 20;
@@ -52,7 +53,10 @@ public class UserInput : MonoBehaviour
 	void Start()
 	{
 		player = GetComponent<Player>();
-		selectionTexture = (Texture2D)Resources.Load ("SelectionTexture");
+        cursor = CursorManager.Instance;
+        cursor.SetPlayer(player);
+        cursor.SetInputs(this);
+        selectionTexture = (Texture2D)Resources.Load ("SelectionTexture");
 		cursorAttack = (Texture2D)Resources.Load("cursor_attack");
 		camera = GameObject.Find("Main Camera").GetComponent ("CameraController") as CameraController;
 		
@@ -143,7 +147,8 @@ public class UserInput : MonoBehaviour
 		} else if (player.isCurrently (Player.status.PLACING_BUILDING))
 		{
 			bManager.cancelPlacing();
-		}
+            player.setCurrently(Player.status.SELECTED_UNITS);
+        }
 	}
 	
 
@@ -162,17 +167,24 @@ public class UserInput : MonoBehaviour
 	
 	private void Select() {
 		
-            //Select if exists unit
-            GameObject hitObject = FindHitObject ();
-            if (hitObject) {		
-                Selectable selectedObject = hitObject.GetComponent<Selectable> ();
+        //Select if exists unit
+        GameObject hitObject = FindHitObject ();
+        if (hitObject) {		
+            Selectable selectedObject = hitObject.GetComponent<Selectable> ();
 
-                // We just be sure that is a selectable object
-                if (selectedObject) {
-                                sManager.SelectUnique(selectedObject);
-                                player.setCurrently (Player.status.SELECTED_UNITS);
-                } 
-	    }
+            // We just be sure that is a selectable object
+            if (selectedObject) {
+                if (sManager.CanBeSelected(selectedObject))
+                {
+                    sManager.SelectUnique(selectedObject);
+                    player.setCurrently(Player.status.SELECTED_UNITS);
+                }
+                else
+                    player.setCurrently(Player.status.IDLE);
+            } 
+            else
+                player.setCurrently(Player.status.IDLE);
+        }
 	}
 	
 	private void Deselect() {
@@ -341,4 +353,28 @@ public class UserInput : MonoBehaviour
 		if (Vector2.Distance (v1, v2) < mouseButtonReleaseRange) return true;
 		return false;
 	}
+
+    public action GetCurrentAction()
+    {
+        return currentAction;
+    }
+
+    /// <summary>
+    /// Returns the object where the mouse hits if is not the terrain
+    /// </summary>
+    /// <returns></returns>
+    public GameObject FindHitEntity()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit))
+        {
+            if (hit.collider.gameObject.name != "Terrain")
+            {
+
+                return hit.collider.gameObject;
+            }
+        }
+        return null;
+    }
 }

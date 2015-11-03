@@ -5,7 +5,9 @@ namespace Managers
 {
     public class BuildingsManager : MonoBehaviour
     {
-
+        public enum Place { ABLE, NOT_ABLE }
+        private Place _currentPlace = Place.ABLE;
+        public Place currentPlace { get { return _currentPlace; } }
         private Player player;
         private UserInput inputs;
         private CursorManager cursor;
@@ -205,12 +207,12 @@ namespace Managers
             _newBuilding.ghost.transform.position = newDestination;
             if (checkLocation(newDestination))
             {
-                cursor.setCursor(CursorManager.cursor.DEFAULT);
+                _currentPlace = Place.ABLE;
                 _newBuilding.material.color = green;
             }
             else
             {
-                cursor.setCursor(CursorManager.cursor.NO_BUILDING_IN);
+                _currentPlace = Place.NOT_ABLE;
                 _newBuilding.material.color = red;
             }
 
