@@ -26,7 +26,6 @@ namespace Managers
         private NewBuilgind _newBuilding;
         float yoffset = 1f;
 
-
         // Use this for initialization
         void Start()
         {
@@ -75,6 +74,7 @@ namespace Managers
             }
 
         }
+
 
         /// <summary>
         /// Returns the ghost building of the specified type
@@ -128,6 +128,7 @@ namespace Managers
             // if is not a vaild point, the building remains quiet
             if (newDestination == inputs.invalidPosition) return false;
 
+            // alter the color if is not a valid location
             if (checkLocation(newDestination))
             {
 

@@ -9,15 +9,22 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 
 	public enum Actions { CREATED, SELECTED, DESELECTED };
 
-	private Player player;
+    private Player player;
     private Rect selectedRect = new Rect();
     private Texture2D selectedBox;
+    public IGameEntity entity;
+    public Collider _collider;
+    private GameObject controller;
+
     public bool currentlySelected { get; set; }
     private float healthRatio = 1f;
-    private bool updateHealthRatio = true;
+    private float _lastHealth = 0f;
     private bool entityMoving = true;
-
-	public Selectable() { }
+    public Storage.Races race {
+        get { return player.race; }
+    }
+    
+    public Selectable() { }
 
     //Pendiente
     //IGameEntity gameEntity;
@@ -25,14 +32,13 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public override void Awake()
     {
         base.Awake();
-
-		GameObject gameObject = GameObject.Find("GameController");
-        player = gameObject.GetComponent<Player>();
-
-        //Pendiente
-        //gameEntity = this.GetComponent<IGameEntity>();
-        selectedBox = SelectionOverlay.CreateTexture();
         currentlySelected = false;
+        controller = GameObject.Find("GameController");
+        player = controller.GetComponent<Player>();
+        selectedBox = SelectionOverlay.CreateTexture();
+        entity = GetComponent<IGameEntity>();
+        _collider = GetComponent<Collider>();
+        selectedRect = SelectionOverlay.CalculateBox(_collider);
     }
 
     public override void Start()
@@ -45,27 +51,17 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 
     protected virtual void LateUpdate()
     {
-        bool updateSomething = false;
-
-        // the GameEntity is moving
-        if(entityMoving)
+        if (currentlySelected)
         {
-            // calculates the box
-            selectedRect = SelectionOverlay.CalculateBox(GetComponent<Collider>());
-            updateSomething = true;
+            selectedRect = SelectionOverlay.CalculateBox(_collider);
+            // only updates the texture if there's been a change in the healthy -> improves quite a lot the results in the profiler inspector
+            if (_lastHealth != entity.healthPercentage)
+            {
+                _lastHealth = entity.healthPercentage;
+                healthRatio = _lastHealth / 100f;
+                SelectionOverlay.UpdateTexture(selectedBox, healthRatio);
+            }
         }
-
-        if (updateHealthRatio)
-        {
-            //Pendiente
-			IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-			healthRatio = entity.healthPercentage / 100f;
-            updateSomething = true;
-            // doesn't update until gets the callback
-            updateHealthRatio = false;
-        }
-
-        if(updateSomething) SelectionOverlay.UpdateTexture(selectedBox, healthRatio);
     }
 
     protected virtual void OnGUI()
@@ -76,44 +72,44 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         }
     }
 
-    public virtual void SelectUnique()
-    {
-		//Deselect other selected objects
-        //TODO : We could move this operation inside the player object
-		ArrayList selectedUnits = player.getSelectedObjects ();
-		foreach (Selectable selectedObject in selectedUnits) {
-			if (selectedObject == this) continue;
-			selectedObject.Deselect();
-		}
 
-		if (!player.SelectedObjects.Contains(this)) {
-			player.SelectedObjects.Add (this);
-		}
+
+    /// <summary>
+    /// Individual operation for the current selectable object. Selects only the object
+    /// </summary>
+    public virtual void SelectOnlyMe()
+    {
+        player.selection.SelectUnique(this);
+
+    }
+
+    /// <summary>
+    /// Individual operation for the current selectable object. Deselects the object from the selection
+    /// </summary>
+	public virtual void DeselectMe()
+    {
+        player.selection.Deselect(this);
+    }
+
+
+    /// <summary>
+    /// Sets the selectable entity to selected and triggers selected event
+    /// </summary>
+    public virtual void SelectEntity()
+    {
         this.currentlySelected = true;
-		fire (Actions.SELECTED);
-
+        fire(Actions.SELECTED);
     }
 
-	public virtual void Select()
-	{
-		if (!player.SelectedObjects.Contains(this)) {
-			player.SelectedObjects.Add (this);
-		}
-
-		this.currentlySelected = true;
-		fire (Actions.SELECTED);
-	}
-
-	public virtual void Deselect()
+    /// <summary>
+    /// Sets the selectable entity to not selected and triggers deselected event
+    /// </summary>
+    public virtual void DeselectEntity()
     {
-
-		if (player.SelectedObjects.Contains(this)) {
-			player.SelectedObjects.Remove(this);
-		}
-
         this.currentlySelected = false;
-		fire (Actions.DESELECTED);
+        fire(Actions.DESELECTED);
     }
+
 
     private void DrawSelection()
     {
