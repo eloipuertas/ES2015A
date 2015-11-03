@@ -8,9 +8,33 @@ using Storage;
 public class Resource : Building<Resource.Actions>
 {
     public enum Actions { DAMAGED, DESTROYED, COLLECTION, CREATE_UNIT };
+
+    /// <summary>
+    /// civilian creation waste some time. When units are being created status
+    /// changes to RUN. Process can only be started while IDLE status.
+    /// </summary>
+    public enum createCivilStatus { IDLE, RUN, DISABLED };
+
     // Constructor
     public Resource() { }
 
+    private createCivilStatus _createStatus;
+
+    /// <summary>
+    /// status of the create civilian option. 
+    /// RUN when civilian unit is being created
+    /// IDLE when option is availabe.
+    /// DISABLE when option is disabled.
+    /// </summary>
+    /// 
+    public createCivilStatus newCivilStatus
+    {
+        get
+        {
+            return _createStatus;
+        }
+    }
+        
     /// <summary>
     ///  Next update time
     /// </summary>
@@ -31,9 +55,64 @@ public class Resource : Building<Resource.Actions>
     private float _collectionRate { get; set; }
 
     /// <summary>
-    ///  units collecting this resource
-    /// </summary> 
+    ///  units currently working and collecting this resource
+    /// </summary>
+    /// 
     public int harvestUnits { get; private set; }
+
+    /// <summary>
+    /// info of civilian units
+    /// </summary>
+    private UnitInfo civilInfo;
+
+    /// <summary>
+    /// list of civilian units working at this resource
+    /// </summary>
+    List<Unit> workersList = new List<Unit>();
+
+    /// <summary>
+    /// HUD, get current civilian units working here
+    /// </summary>
+    public int HUD_currentWorkers
+    {
+        get
+        {
+            return harvestUnits;
+        } 
+   }
+
+    /// <summary>
+    /// HUD, max production rate for this resource building and level.
+    /// </summary>
+    public int HUD_productionRate
+    {
+        get
+        {
+            return info.resourceAttributes.productionRate;
+        }
+    }
+
+    /// <summary>
+    /// HUD, max production rate for this resource building and level.
+    /// </summary>
+    public int HUD_currentProductionRate
+    {
+        get
+        {
+            return civilInfo.attributes.capacity * harvestUnits;
+        }
+    }
+
+    /// <summary>
+    /// HUD, max storing capacity for this level and resource building type
+    /// </summary>
+    public int HUD_storeSize
+    {
+        get
+        {
+            return info.resourceAttributes.storeSize;
+        }
+    }
 
     /// <summary>
     /// number of units created by this building. dead or alive
@@ -95,6 +174,12 @@ public class Resource : Building<Resource.Actions>
     /// current player
     /// </summary>
     private Player player;
+    
+    /// <summary>
+    /// check if starter unit was created. We need to wait until resource is built
+    /// </summary>
+    public bool hasDefaultUnit {get; private set;}
+
 
     private readonly object syncLock = new object();
     bool hasCreatedCivil = false;
@@ -164,11 +249,18 @@ public class Resource : Building<Resource.Actions>
     }
 
     /// <summary>
-    /// new goods produced are sent to player.
+    /// New goods produced are sent to player.
     /// Method triger an event sending object goods with amount of materials 
     /// transferred. gold production is sent too.
     /// </summary>
-    /// <param name="amount"></param>
+    /// <param name="amount">materials amount produced</param>
+    /// 
+    /// TODO: now we are using two diferent ways to increase player resources
+    /// 1- Create classe goods and send it to player using event.
+    /// 2- Direct use of addAmount method.
+    /// 
+    /// we must change this behaviour, only one way will be the right one.
+
     private void sendResource(float amount)
     {
         if (amount  > 0.0)
@@ -178,13 +270,19 @@ public class Resource : Building<Resource.Actions>
 
             if (type.Equals(BuildingTypes.FARM))
             {
+                BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.FOOD, amount);
                 goods.type = Goods.GoodsType.FOOD;
             }
             else if(type.Equals(BuildingTypes.MINE))
             {
+                BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.METAL, amount);
                 goods.type = Goods.GoodsType.METAL;
             }
-            else{ goods.type = Goods.GoodsType.WOOD; }
+            else
+            {
+                BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.WOOD, amount);
+                goods.type = Goods.GoodsType.WOOD;
+            }
             fire(Actions.COLLECTION, goods);
         }         
     }
@@ -195,18 +293,22 @@ public class Resource : Building<Resource.Actions>
     /// just at desired meeting Point.
     /// civilian sex is randomly selected(last parameter of createUnit method).
     /// </summary>
-    /// <returns>civilian Gameobect</returns>
+    /// <returns>civilian GameObject</returns>
     public void createCivilian()
     {
         // TODO set desired rotation, now unit rotation equals building rotation!!
         // TODO  ---create gameobject meetingPointInside and meetingPointOutside
-        // attached to resource building design---
+        // attached to resource building design--- just Waiting for designners team.
 
         //---unComment next two lines when meeting point objects are created---
         //GameObject meetingPointInside = this.GetComponent(meetingPointInside);
         //GameObject meetingPointOutside = this.GetComponent(meetingPointOutside);
 
-        if (harvestUnits < info.resourceAttributes.maxUnits)
+        // only one civilian is placed inside building limits until designners team
+        // enabled some space to place units.
+
+        //if (harvestUnits < info.resourceAttributes.maxUnits)
+        if(harvestUnits < 1)
         {
             // TODO get inside meeting point and calculate position
             //unitPosition = this.GetComponent(meetingPointInside).transform.position;
@@ -217,19 +319,18 @@ public class Resource : Building<Resource.Actions>
             _yDisplacement = harvestUnits / 5;
             _unitPosition.Set(_center.x + _xDisplacement, _center.y , _center.z + _yDisplacement );
             
-
-            
             // Method createUnit from Info returns GameObject Instance;
             GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
 
             Unit civil = gob.GetComponent<Unit>();
-            civil.role = Unit.Roles.PRODUCING;
-
+            civil.role = Unit.Roles.PRODUCING;            
             BasePlayer.getOwner(this).addEntity(civil);
             fire(Actions.CREATE_UNIT, civil);
 
             totalUnits++;
             harvestUnits++;
+            workersList.Add(civil);
+
             _collectionRate += Info.get.of(race, UnitTypes.CIVIL).attributes.capacity;
         }
         else
@@ -247,9 +348,8 @@ public class Resource : Building<Resource.Actions>
             fire(Actions.CREATE_UNIT, civil);
 
             totalUnits++;
-            
+
         }
-        
 
     }
 
@@ -265,6 +365,7 @@ public class Resource : Building<Resource.Actions>
             harvestUnits--;
 
             worker.role = Unit.Roles.WANDERING;
+            workersList.Remove(worker);
         }
 
         // No workers
@@ -286,8 +387,9 @@ public class Resource : Building<Resource.Actions>
             harvestUnits++;
 
             explorer.role = Unit.Roles.PRODUCING;
+            workersList.Add(explorer);
         }
-        // TODO: Some alert message if you try to recruit worker and building has no vacancy
+        Debug.Log(" You are trying to recruit worker but building capacity is full"); 
     }
 
     /// <summary>
@@ -315,9 +417,28 @@ public class Resource : Building<Resource.Actions>
         }
     }
 
+    /// <summary>
+    /// If unit inside building is attacked and killed we must recalculate 
+    /// collection rate and current harvestUnits. No harvestUnits means no
+   ///  production or collection so IDLE status.
+    /// </summary>
+    /// <param name="other"></param>
     void OnTriggerStay(Collider other)
     {
-        ;
+
+        IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
+        if ((entity.info.isUnit)&&(entity.info.isCivil))
+        {
+            if (entity.status == EntityStatus.DEAD)
+            {
+                _collectionRate -= entity.info.attributes.capacity;
+                harvestUnits--;
+                if (harvestUnits == 0)
+                {
+                    setStatus(EntityStatus.IDLE);
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -343,7 +464,30 @@ public class Resource : Building<Resource.Actions>
             }  
         }
     }
-    
+
+    /// <summary>
+    /// Workers can be attacked inside buildings???. waiting for design decission
+    /// </summary>
+    /// <param name="unit"></param>
+    private void onUnitDestroy(Unit unit)
+    {
+        
+    }
+
+
+    /// <summary>
+    /// When building is destroyed civilian workers turns into explorers
+    /// </summary>
+    public override void OnDestroy()
+    {        
+        foreach (Unit unit in workersList)
+        {
+            unit.role = Unit.Roles.WANDERING;
+            harvestUnits--;
+        }
+            base.OnDestroy();
+    }
+
     /// <summary>
     /// Object initialization
     /// </summary>
@@ -357,18 +501,18 @@ public class Resource : Building<Resource.Actions>
         _yDisplacement = 0;
         _info = Info.get.of(race, type);
         totalUnits = 0;
-        _unitRotation = transform.rotation;         
-        
+        _unitRotation = transform.rotation;
+        hasDefaultUnit = false;
+        civilInfo = Info.get.of(this.race, UnitTypes.CIVIL);
+
         // Call Building start
         base.Awake();
     }
 
-    public override void Start()
+    override public void Start()
     {
         // Setup base
         base.Start();
-
-        createCivilian();
     }
 
 
@@ -381,11 +525,28 @@ public class Resource : Building<Resource.Actions>
     {
         base.Update();
 
-        if (Time.time > _nextUpdate)
+        switch (status)
         {
-            _nextUpdate = Time.time + info.resourceAttributes.updateInterval;  
-            collect();
-            produce();            
+
+            case EntityStatus.IDLE:
+
+                if (!hasDefaultUnit)
+                {
+                    createCivilian();
+                    hasDefaultUnit = true;
+                }
+                break;
+
+            case EntityStatus.WORKING:
+
+                if (Time.time > _nextUpdate)
+                {
+                    _nextUpdate = Time.time + info.resourceAttributes.updateInterval;
+                    collect();
+                    produce();          
+                }
+                break;
         }
+    
     }
 }
