@@ -144,7 +144,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
 --- !u!1 &1245282688
 GameObject:
   m_ObjectHideFlags: 0
@@ -329,6 +329,38 @@ Prefab:
     - target: {fileID: 22460666, guid: 1828c0d84d94bc24faee8254b6f0a33f, type: 2}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22477862, guid: 1828c0d84d94bc24faee8254b6f0a33f, type: 2}
+      propertyPath: m_AnchorMax.x
+      value: .597000003
+      objectReference: {fileID: 0}
+    - target: {fileID: 22477862, guid: 1828c0d84d94bc24faee8254b6f0a33f, type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 22458450, guid: 1828c0d84d94bc24faee8254b6f0a33f, type: 2}
+      propertyPath: m_AnchorMin.x
+      value: .597000003
+      objectReference: {fileID: 0}
+    - target: {fileID: 22458450, guid: 1828c0d84d94bc24faee8254b6f0a33f, type: 2}
+      propertyPath: m_AnchorMax.x
+      value: .597000003
+      objectReference: {fileID: 0}
+    - target: {fileID: 22458450, guid: 1828c0d84d94bc24faee8254b6f0a33f, type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 22406940, guid: 1828c0d84d94bc24faee8254b6f0a33f, type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: -21
+      objectReference: {fileID: 0}
+    - target: {fileID: 22406940, guid: 1828c0d84d94bc24faee8254b6f0a33f, type: 2}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 22406940, guid: 1828c0d84d94bc24faee8254b6f0a33f, type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 1828c0d84d94bc24faee8254b6f0a33f, type: 2}
