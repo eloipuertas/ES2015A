@@ -151,7 +151,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4294967007
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -417,6 +417,7 @@ GameObject:
   - 114: {fileID: 865109084}
   - 114: {fileID: 865109085}
   - 114: {fileID: 865109086}
+  - 114: {fileID: 865109087}
   m_Layer: 0
   m_Name: GameController
   m_TagString: GameController
@@ -507,6 +508,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   aiDebug: {fileID: 0}
   rootBasePosition: {x: 0, y: 0, z: 0}
+--- !u!114 &865109087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 865109079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7446b39bf8b98c341954314aa5b0ce54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &884767879
 GameObject:
   m_ObjectHideFlags: 0
@@ -811,7 +823,7 @@ Camera:
   field of view: 60
   orthographic: 1
   orthographic size: 698.586975
-  m_Depth: 0
+  m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -847,6 +859,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7eccb09ebcea2ba43b22efeb5d0128eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  depth: 0
 --- !u!1 &1528029084
 GameObject:
   m_ObjectHideFlags: 0
