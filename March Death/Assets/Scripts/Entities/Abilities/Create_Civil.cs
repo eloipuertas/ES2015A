@@ -12,10 +12,8 @@ class CreateCivil : Ability
     public CreateCivil(EntityAbility info, GameObject gameObject) :
         base(info, gameObject)
     {
-        _entity = _gameObject.GetComponent<IGameEntity>();
-        
-        res = _gameObject.GetComponent<Resource>(); ;
-          
+        _entity = _gameObject.GetComponent<IGameEntity>();       
+        res = _gameObject.GetComponent<Resource>(); ;        
     }
 
     public override bool isActive
@@ -38,19 +36,18 @@ class CreateCivil : Ability
 
             UnitInfo unitInfo;
             unitInfo = Info.get.of(res.race, UnitTypes.CIVIL);
-            //civil = Storage.Info.get.createUnit(res.race, UnitTypes.CIVIL);
-            //IGameEntity civilEntity = civil.gameObject.GetComponent<IGameEntity>();
 
-            Debug.Log("*********   harvestUnits: " + res.harvestUnits);
-            Debug.Log("*********   Building status: " + res.status.ToString());
-            Debug.Log("*********   Create civilian status: " + res.status.ToString());
-            return
+            //Debug.Log("*********   harvestUnits: " + res.harvestUnits);
+            //Debug.Log("*********   Building status: " + res.status.ToString());
+            //Debug.Log("*********   Create civilian status: " + res.status.ToString());
 
-             Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, unitInfo.resources.food) &&
-             Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, unitInfo.resources.metal) &&
-             Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, unitInfo.resources.wood) &&
+            return 
+
+            Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, unitInfo.resources.food) &&
+            Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, unitInfo.resources.metal) &&
+            Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, unitInfo.resources.wood) &&
              //Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.GOLD, unitInfo.resources.gold) &&
-             res.hasDefaultUnit;
+            res.hasDefaultUnit;
               
         }
     }
@@ -62,9 +59,22 @@ class CreateCivil : Ability
     public override void enable()
 
     {
-        _enabled = true;
+        
         base.enable();
-        res.createCivilian(); 
+
+        if (res.buttonCivilStatus == Resource.createCivilStatus.IDLE)
+        {
+            res.createCivilian();
+        }
+        else if (res.buttonCivilStatus == Resource.createCivilStatus.IDLE)
+        {
+            Debug.Log("Wait please, assembling CIVIL unit");
+        }
+        else if (res.buttonCivilStatus == Resource.createCivilStatus.DISABLED)
+        {
+            Debug.Log(" OPTION IS DISABLED ");
+        }
+
 
     }
 }
