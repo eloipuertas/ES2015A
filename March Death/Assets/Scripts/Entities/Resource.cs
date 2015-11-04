@@ -295,9 +295,7 @@ public class Resource : Building<Resource.Actions>
         if (amount  > 0.0)
         {
             Goods goods = new Goods();
-            Debug.Log("amount: " + amount);
             goods.amount = amount;
-
 
             // TODO: 
             // BUG: Null reference when we try to add material amount to player.
