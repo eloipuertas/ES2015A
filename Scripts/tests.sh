@@ -66,8 +66,8 @@ if [ $TESTS_RESULT == 0 ]; then
     # Notify on github
     COMMIT_AUTHOR=`git log -1 | grep -Po "(?<=Author: ).*(?= <)"`
     curl -i -X POST -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/json" \
-        https://api.github.com/repos/eloipuertas/ES2015A/issues \
-        -d "{\"title\":\"Travis tests failed on ${TRAVIS_BRANCH} - ${TRAVIS_COMMIT}\", \"body\":\"Commit by: @${COMMIT_AUTHOR}\nDetailed log: https://travis-ci.org/eloipuertas/ES2015A/builds/${TRAVIS_BUILD_ID}\"}"
+        https://api.github.com/repos/eloipuertas/ES2015A/issues/193/comments \
+        -d "{\"body\":\"Commit by: @${COMMIT_AUTHOR}\nBranch: ${TRAVIS_BRANCH}\nCommit hash: ${TRAVIS_COMMIT}\nDetailed log: https://travis-ci.org/eloipuertas/ES2015A/builds/${TRAVIS_BUILD_ID}\"}"
 
 fi
 
