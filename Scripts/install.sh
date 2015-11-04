@@ -29,14 +29,17 @@ else
     # Use ; and not && to actually do all of them, even if one doesn't succeed
     (touch $HOME/.RSYNC_LOCK; \
         echo -e "\t> Temp"    && \
-            axel -q -n 10 ${CACHE_HOST}Temp.tar.gz    && \
+            sudo -E rsync -a ${CACHE_HOST}Temp.tar.gz     $(pwd)/ && \
             tar -xzf $(pwd)/Temp.tar.gz -C /; \
         echo -e "\t> Obj"     && \
-            axel -q -n 10 ${CACHE_HOST}Obj.tar.gz     && \
+            sudo -E rsync -az ${CACHE_HOST}Obj.tar.gz     $(pwd)/ && \
             tar -xzf $(pwd)/Obj.tar.gz -C /; \
         echo -e "\t> Library" && \
-            axel -q -n 10 ${CACHE_HOST}Library.tar.gz && \
+            sudo -E rsync -az ${CACHE_HOST}Library.tar.gz $(pwd)/ && \
             tar -xzf $(pwd)/Library.tar.gz -C /; \
+        echo -e "\t> Build"   && \
+            sudo -E rsync -az ${CACHE_HOST}Build.tar.gz   $(pwd)/ && \
+            tar -xzf $(pwd)/Build.tar.gz -C /; \
     rm $HOME/.RSYNC_LOCK) &
 
     # Downloading build might not be necessary

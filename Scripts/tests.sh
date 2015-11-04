@@ -63,6 +63,12 @@ if [ $TESTS_RESULT == 0 ]; then
     echo -e "\n\033[31;1mElves execution - Exception log\033[0m\n"
     cat $(pwd)/elves.out
 
+    # Notify on github
+    COMMIT_AUTHOR=`git log -1 | grep -Po "(?<=Author: ).*(?= <)"`
+    curl -i -X POST -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/json" \
+        https://api.github.com/repos/eloipuertas/ES2015A/issues \
+        -d "{\"title\":\"Travis tests failed on ${TRAVIS_BRANCH} - ${TRAVIS_COMMIT}\", \"body\":\"Commit by: @${COMMIT_AUTHOR}\nDetailed log: https://travis-ci.org/eloipuertas/ES2015A/builds/${TRAVIS_BUILD_ID}\"}"
+
 fi
 
 exit $(($MEN_ERRORS+$ELVES_ERRORS))
