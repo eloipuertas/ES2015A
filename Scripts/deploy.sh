@@ -2,7 +2,7 @@
 
 gittouch() {
     NEWDATE="$(git log -1 --format=%ci "$1")"
-    sudo -E date --set="$NEWDATE"
+    sudo -E date --set="$NEWDATE" &>/dev/null
     touch -ch -d "$NEWDATE" "$1"
 }
 
@@ -13,4 +13,4 @@ git ls-files |
         gittouch "$file"
     done
 
-sudo -E date --set="$OLDDATE"
+sudo -E date --set="$OLDDATE" &>/dev/null

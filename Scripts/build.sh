@@ -121,10 +121,12 @@ if [ "$TRAVIS_BRANCH" == "devel-travis_cache" ] && [ "$TRAVIS_PULL_REQUEST" == "
         echo -e "\t> Library" && \
             sudo -E tar -zcf "$(pwd)/Library.tar.gz" "$HOME/ES2015A/March Death/Library" && \
             sudo -E rsync -a --delete-after "$(pwd)/Library.tar.gz" ${CACHE_HOST}; \
-        echo -e "\t> Build"   && \
-            sudo -E tar -zcf "$(pwd)/Build.tar.gz" "$BUILD_DIR"                          && \
-            sudo -E rsync -a --delete-after "$(pwd)/Build.tar.gz"   ${CACHE_HOST}; \
     rm $HOME/.RSYNC_LOCK) &
+
+    # Uploading Build might not be necessary
+    #    echo -e "\t> Build"   && \
+    #        sudo -E tar -zcf "$(pwd)/Build.tar.gz" "$BUILD_DIR"                          && \
+    #        sudo -E rsync -a --delete-after "$(pwd)/Build.tar.gz"   ${CACHE_HOST}; \
 fi
 
 if [ $BUILD_WIN == 0 ] && [ $BUILD_LINUX == 0 ] && [ $BUILD_OSX == 0 ]; then
@@ -136,5 +138,11 @@ echo -e "\n\033[31;1mBuild Failed\033[0m\n"
 echo -e "\tWindows: ${BUILD_WIN}\n"
 echo -e "\tOS X: ${BUILD_OSX}\n"
 echo -e "\tLinux: ${BUILD_LINUX}\n"
+
+# Notify on github
+COMMIT_AUTHOR=`git log -1 | grep -Po "(?<=Author: ).*(?= <)"`
+curl -i -X POST -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/json" \
+    https://api.github.com/repos/eloipuertas/ES2015A/issues \
+    -d "{\"title\":\"Travis build failed on ${TRAVIS_BRANCH} - ${TRAVIS_COMMIT}\", \"body\":\"Commit by: @${COMMIT_AUTHOR}\nDetailed log: https://travis-ci.org/eloipuertas/ES2015A/builds/${TRAVIS_BUILD_ID}\"}"
 
 exit 1
