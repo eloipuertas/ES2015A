@@ -5,6 +5,7 @@ using Storage;
 public class GameInformation : MonoBehaviour {
 
     private Races playerRace;
+    private GameObject currentHud = null;
 
     private static string pauseMenuPrefab;
 
@@ -20,15 +21,17 @@ public class GameInformation : MonoBehaviour {
 
     void Awake()
     {
-        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(this);
     }
 
     public void LoadHUD()
     {
+        // TODO: reload different hud while playing
+        //if (currentHud) Destroy(currentHud);
         switch (playerRace)
         {
         case Races.ELVES:
-            LoadElfHUD();;
+            LoadElfHUD();
             break;
         case Races.MEN:
             LoadHumanHUD();
@@ -36,17 +39,18 @@ public class GameInformation : MonoBehaviour {
         }
     }
 
-    // TODO Modify to use the actual HUD for each civilization
-
-    private static void LoadElfHUD()
+    private void LoadElfHUD()
     {
-        Instantiate((GameObject)Resources.Load ("HUD_ELF2")).name = "HUD";
+
+        currentHud = Instantiate((GameObject)Resources.Load ("HUD-Elf"));
+        currentHud.name = "HUD";
         Instantiate((GameObject)Resources.Load ("HUD_EventSystem")).name = "HUD_EventSystem";
     }
 
-    private static void LoadHumanHUD()
+    private void LoadHumanHUD()
     {
-        Instantiate((GameObject)Resources.Load ("HUD-Human")).name = "HUD";
+        currentHud = Instantiate((GameObject)Resources.Load("HUD-Human"));
+        currentHud.name = "HUD";
         //Application.LoadLevelAdditive("globalHUDHuman");
         Instantiate((GameObject)Resources.Load ("HUD_EventSystem")).name = "HUD_EventSystem";
     }

@@ -53,7 +53,9 @@ public class EntityAbilitiesController : MonoBehaviour
         if (!actionPanel) return;
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
         var rectTransform = actionPanel.GetComponent<RectTransform>();
-        var extents = 0.9f * rectTransform.sizeDelta / 2.0f;
+        var size = rectTransform.sizeDelta;
+        var globalScaleXY = new Vector2(rectTransform.lossyScale.x, rectTransform.lossyScale.y);
+        var extents = Vector2.Scale(size, globalScaleXY) / 2.0f;
         var buttonExtents = new Vector2(extents.x / Button_Columns, extents.y / Button_Rows);
         var position = rectTransform.position;
         var point = new Vector2(position.x - extents.x, position.y + extents.y);
@@ -64,8 +66,10 @@ public class EntityAbilitiesController : MonoBehaviour
         {
             String ability = abilities[i].name;
             Ability abilityObj = entity.getAbility(ability);
+
             if (abilityObj.isUsable)
             {
+                // HACK: When this is fired, the button status should be updated! abilityObj.isActive might have changed...
                 UnityAction actionMethod = new UnityAction(() =>
                 {
                     Debug.Log(abilityObj);
@@ -74,7 +78,7 @@ public class EntityAbilitiesController : MonoBehaviour
 
                 var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
                 buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Rows) + 1));
-                CreateButton(actionPanel, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
+                CreateButton(rectTransform, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
             }
         }
     }
@@ -99,25 +103,31 @@ public class EntityAbilitiesController : MonoBehaviour
     /// <param name="extends">The extents of the button</param>
     /// <param name="action">Actin name</param>
     /// <param name="actionMethod">Method that will be called when we click the button</param>
-    void CreateButton(GameObject panel, Vector2 center, Vector2 extends, String ability, UnityAction actionMethod, Boolean enabled)
+    void CreateButton(RectTransform panelTransform, Vector2 center, Vector2 extends, String ability, UnityAction actionMethod, Boolean enabled)
     {
-        var canvasObject = new GameObject(ability);
-        var canvas = canvasObject.AddComponent<Canvas>();
-        canvas.tag = "ActionButton";
-        canvasObject.AddComponent<GraphicRaycaster>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        var transform = panelTransform.transform;
 
-        var buttonObject = new GameObject("Button");
+        var buttonObject = new GameObject(ability);
+        buttonObject.tag = "ActionButton";
+        buttonObject.layer = 5; // UI Layer
 
         var image = buttonObject.AddComponent<Image>();
-        image.transform.SetParent(canvas.transform);
-        image.rectTransform.sizeDelta = extends * 1.5f;
-        image.rectTransform.position = center;
+        image.tag = "ActionButton";
+        //image.transform.SetParent(panelTransform);
+        image.transform.localScale = panelTransform.localScale;
+        image.rectTransform.sizeDelta = 1.5f*extends;
+        image.transform.localPosition = center;
         image.sprite = CreateSprite(ability);
 
         var button = buttonObject.AddComponent<Button>();
         button.targetGraphic = image;
         button.onClick.AddListener(() => actionMethod());
+
+        button.transform.SetParent(GameObject.Find("HUD/actions").transform); // We assign the parent to actions Canvas from the HUD
+        button.GetComponent<RectTransform>().localPosition = new Vector3(button.GetComponent<RectTransform>().localPosition.x,
+                                                                         button.GetComponent<RectTransform>().localPosition.y,
+                                                                         0f);
+
         button.enabled = enabled;
     }
 
@@ -129,16 +139,16 @@ public class EntityAbilitiesController : MonoBehaviour
         Debug.Log("Hello everybody!");
     }
 
-    Sprite CreateSprite(String ability)
+    Sprite CreateSprite2(String ability)
     {
         char separator = Path.DirectorySeparatorChar;
         Sprite newImg = null;
         Texture2D tex = null;
         byte[] fileData;
+		
 
         String sPath = Application.dataPath + separator + "Resources" + separator + "ActionButtons" + separator;
-        string sName = sPath + ability + ".png";
-
+        string sName = sPath + ability.Replace(" ","_") + ".png";
         if (File.Exists(sName))
         {
             fileData = File.ReadAllBytes(sName);
@@ -149,4 +159,29 @@ public class EntityAbilitiesController : MonoBehaviour
         }
         return newImg;
     }
+
+
+    Sprite CreateSprite(String ability)
+    {
+        Sprite newImg = null;
+        char separator = Path.AltDirectorySeparatorChar;
+
+        Texture2D text;
+
+        String file = "ActionButtons" + separator + ability.Replace(" ", "_");
+        text = Resources.Load(file) as Texture2D;
+        if (text)
+        {
+            newImg = Sprite.Create(text, new Rect(0, 0, text.width, text.height), new Vector2(0.5f, 0.5f));
+        }
+
+        return newImg;
+    }
+
+	public void Clear()
+	{
+		Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.SELECTED, onActorSelected);
+		Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.DESELECTED, onActorDeselected);
+	}
+
 }

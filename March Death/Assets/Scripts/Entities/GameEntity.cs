@@ -19,6 +19,11 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public Races getRace() { return race; }
     public abstract E getType<E>() where E : struct, IConvertible;
 
+    /// <summary>
+    /// Called when Start has been called
+    /// </summary>
+    public Action<GameObject> onStartDone = null;
+
     protected EntityInfo _info;
     public EntityInfo info
     {
@@ -218,15 +223,19 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         }
     }
 
-    public override void Start()
+    public override void Awake()
     {
-        base.Start();
-        setupAbilities();
+        base.Awake();
 
 #if !DISABLE_ANIMATOR
         // Get the Animator
         _animator = gameObject.GetComponent<Animator>();
 #endif
+    }
+
+    public virtual void Start()
+    {
+        setupAbilities();
     }
 
     public override void Update()
@@ -235,6 +244,33 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         {
             ability.Update();
         }
+
+        if (status == EntityStatus.DEAD || status == EntityStatus.DESTROYED)
+        {
+            // TODO: Should this be automatically handled with events?
+            FOWManager.Instance.removeEntity(this.GetComponent<FOWEntity>());
+
+            // TODO: Should this be automatically handled with events?
+            Selectable selectable = GetComponent<Selectable>();
+            if (selectable.currentlySelected)
+            {
+                selectable.DeselectMe();
+            }
+
+            // TODO: Should this be automatically handled with events?
+            BasePlayer.getOwner(this).removeEntity(this);
+
+            // Destroy us
+            Destroy(this.gameObject);
+        }
+    }
+
+    /// <summary>
+    /// Based on distance and target type computes how ranged ability is modified
+    /// </summary>
+    public virtual int computeRangedModifiers()
+    {
+        return 0;
     }
 
     /// <summary>
@@ -249,9 +285,10 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 
         if (isRanged)
         {
-            // TODO: Specil units (ie gigants) and distance!
+            // TODO: Specil units (ie gigants)
             int projectileAbility = from.info.unitAttributes.projectileAbility +
-                from.accumulatedModifier<UnitAbility>().projectileAbilityModifier;
+                from.accumulatedModifier<UnitAbility>().projectileAbilityModifier +
+                from.computeRangedModifiers();
 
             return dice > 1 && (projectileAbility + dice >= 7);
         }
@@ -355,7 +392,14 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 
 #if !DISABLE_ANIMATOR
         //TODO: Hack to get this working for the sprint, why is _animator
-        GetComponent<Animator>().SetInteger("animation_state", (int)status);
+        _animator.SetInteger("animation_state", (int)status);
 #endif
+    }
+
+    protected void activateFOWEntity()
+    {
+        FOWEntity fe = gameObject.AddComponent<FOWEntity>();
+        fe.Range = info.attributes.sightRange;
+        fe.Activate(info.race);
     }
 }

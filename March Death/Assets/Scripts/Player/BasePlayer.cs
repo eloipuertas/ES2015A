@@ -2,9 +2,9 @@
 using System.Collections;
 using Assets.Scripts.AI;
 
-public class BasePlayer : Utils.SingletonMono<BasePlayer> {
+public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
 
-    protected BasePlayer() {}
+    protected BasePlayer() { }
 
     /// <summary>
     /// The race of the player
@@ -15,25 +15,33 @@ public class BasePlayer : Utils.SingletonMono<BasePlayer> {
     /// <summary>
     /// The resources manager
     /// </summary>
-    protected Managers.ResourcesManager _resources;
+    protected Managers.ResourcesManager _resources = new Managers.ResourcesManager();
     public Managers.IResourcesManager resources { get { return _resources; } }
 
     /// <summary>
     /// The buildings manager
     /// </summary>
     protected Managers.BuildingsManager _buildings;
-    public Managers.BuildingsManager buildings { get { return _buildings;  } }
+    public Managers.BuildingsManager buildings { get { return _buildings; } }
+
 
 
     /// <summary>
-    /// The units manager
+    /// The selection Manager
     /// </summary>
-    protected Managers.UnitsManager _units;
-    public Managers.UnitsManager units { get { return _units;  } }
+    protected Managers.SelectionManager _selection = new Managers.SelectionManager();
+    public Managers.SelectionManager selection { get { return _selection; } }
+     
 
-    protected static GameInformation info = null;
-    protected static BasePlayer player = null;
-    protected static BasePlayer ia = null;
+
+
+    protected static GameInformation _info = null;
+    protected static BasePlayer _player = null;
+    protected static BasePlayer _ia = null;
+
+    public static GameInformation info { get { return _info; } }
+    public static Player player { get { return (Player)_player; } }
+    public static AIController ia { get { return (AIController)_ia; } }
 
 
     public virtual void Start ()
@@ -41,10 +49,14 @@ public class BasePlayer : Utils.SingletonMono<BasePlayer> {
         GameObject gameController = GameObject.FindGameObjectWithTag("GameController");
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
 
-        info = gameInformationObject.GetComponent<GameInformation>();
-        player = gameController.GetComponent<Player>();
-        ia = gameController.GetComponent<AIController>();
+        _info = gameInformationObject.GetComponent<GameInformation>();
+        _player = gameController.GetComponent<Player>();
+        _ia = gameController.GetComponent<AIController>();
+        
     }
+
+    public abstract void removeEntity(IGameEntity entity);
+    public abstract void addEntity(IGameEntity newEntity);
 
     public static BasePlayer getOwner(IGameEntity entity)
     {

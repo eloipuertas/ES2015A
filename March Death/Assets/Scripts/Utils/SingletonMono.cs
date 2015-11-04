@@ -49,10 +49,6 @@ namespace Utils
                             singleton.name = "(singleton) " + typeof(T).ToString();
 
                             DontDestroyOnLoad(singleton);
-
-                            Debug.Log("[Singleton] An instance of " + typeof(T) +
-                                " is needed in the scene, so '" + singleton +
-                                "' was created with DontDestroyOnLoad.");
                         }
                         else
                         {

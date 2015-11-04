@@ -6,7 +6,6 @@ using UnityEngine;
 
 abstract class Create : Ability
 {
-    private bool _enabled = false;
 	private IGameEntity _entity;
 	private BuildingInfo _info_tobuild;
     
@@ -17,7 +16,7 @@ abstract class Create : Ability
     {
         get
         {
-            return _enabled;
+            return false;
         }
     }
 
@@ -39,15 +38,12 @@ abstract class Create : Ability
 
     public override void disable()
     {
-        _enabled = false;
         base.disable();
     }
 
     public override void enable()
     {
 		GameObject.Find("GameController").GetComponent<BuildingsManager>().createBuilding(_entity.info.race, _type);
-     
-        _enabled = true;
         base.enable();
     }
 }

@@ -3,24 +3,36 @@ using System.Collections;
 
 public class MiniMapController : MonoBehaviour
 {
+    public int depth;
 
     private Camera _camera;
     private Camera mainCam;
+
+    private RenderTexture rt;
     
     // Minimap Rectangle
     Rect rect_marker;
     Texture2D tex;
+
     private float main_zoom;
     private Vector3 act_pos;
+    private float aspect;
+
     Vector3 cameraOffset;
+	Transform mapContainer;
 
     // Use this for initialization
     void Start()
     {
         this.GetComponent<AudioListener>().enabled = false;
 
+		mapContainer = GameObject.Find ("HUD").transform.FindChild ("Map");
+
         _camera = this.GetComponent<Camera>();
         _camera.orthographic = true;
+
+        depth = 10;
+        
         //Assign camera viewport
         _camera.rect = this.recalcViewport();
 
@@ -32,15 +44,28 @@ public class MiniMapController : MonoBehaviour
         if (Terrain.activeTerrain)
         {
             float diagonal = Mathf.Sqrt(Mathf.Pow(Terrain.activeTerrain.terrainData.size.x, 2) + Mathf.Pow(Terrain.activeTerrain.terrainData.size.y, 2));
-            _camera.transform.position = new Vector3(Terrain.activeTerrain.terrainData.size.x * 0.5f, Terrain.activeTerrain.terrainData.size.x * 0.4f, Terrain.activeTerrain.terrainData.size.z * 0.5f);
+            _camera.transform.position = new Vector3(Terrain.activeTerrain.terrainData.size.x * 0.5f, Terrain.activeTerrain.terrainData.size.x * 0.6f,Terrain.activeTerrain.terrainData.size.z * 0.5f);
             _camera.transform.rotation = Quaternion.Euler(90f, 135f,0); 
             _camera.orthographicSize = diagonal * 0.95f; // a hack
             _camera.farClipPlane = Terrain.activeTerrain.terrainData.size.x * 1.5f;
-            _camera.clearFlags = CameraClearFlags.Color;
-            _camera.backgroundColor = Color.clear; // Set a more fancy background, black
+            _camera.clearFlags = CameraClearFlags.Depth;
+            instantiateMask();
         }
 
         createMarker();
+
+        rt = new RenderTexture(Screen.width, Screen.height, 3);
+        _camera.targetTexture = rt;
+    }
+
+    /// <summary>
+    /// initialize the params of the camera.
+    /// </summary>
+    private void initializeCameraPars()
+    {
+        main_zoom = mainCam.orthographicSize;
+        act_pos = mainCam.transform.position;
+        aspect = mainCam.aspect;
     }
 
     /// <summary>
@@ -48,14 +73,8 @@ public class MiniMapController : MonoBehaviour
     /// </summary>
     void OnGUI()
     {
-        GUI.DrawTexture(rect_marker, tex);
-    }
-
-    private void initializeCameraPars()
-    {
-        main_zoom = mainCam.orthographicSize;
-        act_pos = mainCam.transform.position;
-        cameraOffset = new Vector3(252.8f, 0f, 252.8f);
+            GUI.depth = -1;
+            GUI.DrawTexture(rect_marker, tex);
     }
 
     /// <summary>
@@ -68,15 +87,29 @@ public class MiniMapController : MonoBehaviour
     }
 
     /// <summary>
+    /// Instantiates the mask which makes invisible part of the minimap viewport.
+    /// </summary>
+    private void instantiateMask()
+    {
+        GameObject mask = (GameObject)Resources.Load("minimap_plane");
+        mask.transform.position = new Vector3(_camera.transform.position.x+0,
+                                              _camera.transform.position.y-50, 
+                                              _camera.transform.position.z+0);
+        mask.transform.localScale = new Vector3(350,1,350);
+        mask.GetComponent<MeshRenderer>().sharedMaterial.shader = Shader.Find("Masked/Mask");
+        Instantiate(mask);
+    }
+
+    /// <summary>
     /// Updates the position and the size of the marker.
     /// </summary>
     private void updateMarker()
     {
         if (main_zoom != mainCam.orthographicSize) // if the zoom has changed
         {
-            float diff = (mainCam.orthographicSize - main_zoom) / 1.5f;
-            rect_marker.width += diff; rect_marker.height += diff / 2.0f;
-            rect_marker.center -= new Vector2(diff / 2, diff / (2 * 2.0f));
+            float diff = (mainCam.orthographicSize - main_zoom) / 6.0f; // to reduce the zoom vel increment value (hack)
+            rect_marker.width += diff; rect_marker.height += diff;
+            rect_marker.center -= new Vector2(diff/2, diff/2);
             main_zoom = mainCam.orthographicSize;
         }
         if (!act_pos.Equals(mainCam.transform.position)) // if the camera has moved
@@ -85,13 +118,18 @@ public class MiniMapController : MonoBehaviour
             rect_marker.center = v;
             act_pos = mainCam.transform.position;
         }
+        if (mainCam.aspect != aspect) {
+            recalcViewport();
+            rt = new RenderTexture(Screen.width, Screen.height, 2);
+            _camera.targetTexture = rt;
+            aspect = mainCam.aspect;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        // GetMouseButton(0) if we want to move the camera by clicking & dragging around the minimap
-        if (Input.GetMouseButtonDown(0)) 
+        if (Input.GetMouseButton(0))  // GetMouseButton(0) to remove dragging.
         {
             RaycastHit hit;
 
@@ -106,8 +144,8 @@ public class MiniMapController : MonoBehaviour
                 updateMarker();
             }
         }
+
         updateMarker();
-        _camera.rect = recalcViewport();
     }
 
     /// <summary>
@@ -130,10 +168,10 @@ public class MiniMapController : MonoBehaviour
 
         Rect r = new Rect();
 
-        r.xMax = corners_minimap[1].x + 10;
-        r.xMin = corners_minimap[0].x - 10;
-        r.yMax = Screen.height - corners_minimap[1].y + 12;
-        r.yMin = Screen.height - corners_minimap[0].y - 12;
+        r.xMax = corners_minimap[1].x + 5;
+        r.xMin = corners_minimap[0].x - 5;
+        r.yMax = Screen.height - corners_minimap[1].y + 7;
+        r.yMin = Screen.height - corners_minimap[0].y - 7;
 
         Vector3 v = _camera.WorldToScreenPoint(mainCam.transform.position - mainCam.GetComponent<CameraController>().getCameraOffset);
         v.y = Screen.height - v.y;
@@ -158,38 +196,38 @@ public class MiniMapController : MonoBehaviour
     }
 
 
-    private Rect recalcViewport()
-    {
-        GameInformation info = (GameInformation)GameObject.Find("GameInformationObject").GetComponent("GameInformation");
-        float viewPortPosX, viewPortPosY;
-        float viewPortW, viewPortH;
-
-        switch (info.GetPlayerRace()) {
-            case Storage.Races.MEN:
-                viewPortPosX = 0.018f;
-                viewPortPosY = 0.02f; // _prev = 0.007f
-
-                // The minimap size
-                viewPortW = (1f / (float)Screen.width) * ((float)Screen.width / 4.9701f);  // _prev = 3.9701f
-                // the height will be the ratio of the hole for the map 140/201
-                viewPortH = (1f / (float)Screen.height) * (((float)Screen.width / 3.6701f) * (140f / 201f));
-                break;
-            case Storage.Races.ELVES:
-                viewPortPosX = 0.004f;
-                viewPortPosY = 0.00f;
-
-                // The minimap size
-                viewPortW = (1f / (float)Screen.width) * ((float)Screen.width / 5.2701f);
-                // the height will be the ratio of the hole for the map 140/201
-                viewPortH = (1f / (float)Screen.height) * (((float)Screen.width / 5.1701f) * (140f / 201f));
-                break;
-            default:
-                viewPortPosX = 0; viewPortPosY = 0;
-                viewPortW = 0; viewPortH = 0;
-                break;
-        }
-        //Assign camera viewport
-        return new Rect(viewPortPosX, viewPortPosY, viewPortW, viewPortH);
-
-    }
+	private Rect recalcViewport()
+	{
+		GameInformation info = (GameInformation)GameObject.Find("GameInformationObject").GetComponent("GameInformation");
+		float viewPortPosX, viewPortPosY;
+		float viewPortW, viewPortH;
+		
+		switch (info.GetPlayerRace()) {
+		case Storage.Races.MEN:
+			viewPortPosX = 0.018f;
+			viewPortPosY = 0.02f; // _prev = 0.007f
+			
+			// The minimap size
+			viewPortW = (1f / (float)Screen.width) * ((float)Screen.width / 4.9701f);  // _prev = 3.9701f
+			// the height will be the ratio of the hole for the map 140/201
+			viewPortH = (1f / (float)Screen.height) * (((float)Screen.width / 3.6701f) * (140f / 201f));
+			break;
+		case Storage.Races.ELVES:
+			viewPortPosX = 0.018f;
+			viewPortPosY = 0.02f;
+			
+			// The minimap size
+			viewPortW = (1f / (float)Screen.width) * ((float)Screen.width / 5.6701f);
+			// the height will be the ratio of the hole for the map 140/201
+			viewPortH = (1f / (float)Screen.height) * (((float)Screen.width / 4.0701f) * (140f / 201f));
+			break;
+		default:
+			viewPortPosX = 0; viewPortPosY = 0;
+			viewPortW = 0; viewPortH = 0;
+			break;
+		}
+		//Assign camera viewport
+		return new Rect(viewPortPosX, viewPortPosY, viewPortW, viewPortH);
+		
+	}
 }

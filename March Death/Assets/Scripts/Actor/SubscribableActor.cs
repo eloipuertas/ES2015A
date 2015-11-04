@@ -10,7 +10,12 @@ namespace Utils
     {
         public SubscribableActor() { }
 
-        public override void Start()
+        public override void Awake()
+        {
+            base.Awake();
+        }
+
+        public virtual void Start()
         {
             Subscriber<T, S>.get.onActorStart(this);
         }

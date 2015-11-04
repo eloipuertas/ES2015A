@@ -1,9 +1,30 @@
 #! /bin/bash
 
-project="unity"
+# Import script
+source $(dirname $0)/travis_wait.sh
+
+# Export vars
+export HOME=$(dirname `pwd`)
+export UNITY_ROOT=$HOME/unity-editor-5.1.0f3
+export BUILD_DIR=$HOME/Build
+export project="MarchWars"
+
+echo "Home: $HOME"
+echo "UnityRoot: $UNITY_ROOT"
+echo "User: $USER"
+
+# Variables
+BUILD_LINUX=-1
+BUILD_WIN=-1
+BUILD_OSX=-1
+
+# Create folder if it does not exist
 mkdir -p Assets
 
-source $(dirname $0)/travis_wait.sh
+# Monkey-patch ProjectSettings
+echo "Monkey-patching ProjectSettings and AudioManager assets"
+sed -i 's/displayResolutionDialog: 1/displayResolutionDialog: 0/g' March\ Death/ProjectSettings/ProjectSettings.asset
+sed -i 's/m_DisableAudio: 0/m_DisableAudio: 1/g'  March\ Death/ProjectSettings/AudioManager.asset
 
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then
 
@@ -13,92 +34,100 @@ if [ "$TRAVIS_OS_NAME" == "osx" ]; then
       -nographics \
       -silent-crashes \
       -logFile $(pwd)/unity.log \
-      -projectPath $(pwd) \
-      -buildWindowsPlayer "$(pwd)/Build/windows/$project.exe" \
+      -projectPath "$(pwd)/March Death" \
+      -buildWindowsPlayer "$BUILD_DIR/windows/$project" \
       -quit
 
     BUILD_WIN=$?
 
-    echo "Attempting to build $project for OS X"
-    travis_wait /Applications/Unity/Unity.app/Contents/MacOS/Unity \
-      -batchmode \
-      -nographics \
-      -silent-crashes \
-      -logFile $(pwd)/unity.log \
-      -projectPath $(pwd) \
-      -buildOSXUniversalPlayer "$(pwd)/Build/osx/$project.app" \
-      -quit
+    if [ $BUILD_WIN == 0 ]; then
 
-    BUILD_OSX=$?
+        echo "Attempting to build $project for OS X"
+        travis_wait /Applications/Unity/Unity.app/Contents/MacOS/Unity \
+          -batchmode \
+          -nographics \
+          -silent-crashes \
+          -logFile $(pwd)/unity.log \
+          -projectPath "$(pwd)/March Death" \
+          -buildOSXUniversalPlayer "$BUILD_DIR/osx/$project" \
+          -quit
 
-    echo "Attempting to build $project for Linux"
-    travis_wait /Applications/Unity/Unity.app/Contents/MacOS/Unity \
-      -batchmode \
-      -nographics \
-      -silent-crashes \
-      -logFile $(pwd)/unity.log \
-      -projectPath $(pwd) \
-      -buildLinuxUniversalPlayer "$(pwd)/Build/linux/$project" \
-      -quit
+        BUILD_OSX=$?
 
-    BUILD_LINUX=$?
+        if [ $BUILD_OSX == 0 ]; then
+
+            echo "Attempting to build $project for Linux"
+            travis_wait /Applications/Unity/Unity.app/Contents/MacOS/Unity \
+              -batchmode \
+              -nographics \
+              -silent-crashes \
+              -logFile $(pwd)/unity.log \
+              -projectPath "$(pwd)/March Death" \
+              -buildLinuxUniversalPlayer "$BUILD_DIR/linux/$project" \
+              -quit
+
+            BUILD_LINUX=$?
+
+            if [ $BUILD_LINUX == 0 ]; then
+
+              ln -s $BUILD_DIR/linux/$project.x86_64 $BUILD_DIR/linux/$project
+
+            fi
+
+        fi
+
+    fi
 
 else
 
-    # Hacks which should not be necessary
-    #alias g++='g++ -fnon-call-exceptions'
-    #alias gcc='gcc -fnon-call-exceptions'
-    #CC="gcc -fnon-call-exceptions"
+    # OSX can't be built from linux
+    BUILD_OSX=0
+    # Takes too much time
+    BUILD_WIN=0
 
-    export HOME=$(dirname `pwd`)
-    export UNITY_ROOT=$HOME/unity-editor-5.1.0f3
+    echo "Attempting to start dummy audio driver"
+    sudo modprobe snd-dummy
 
-    echo "Home: $HOME"
-    echo "UnityRoot: $UNITY_ROOT"
-
-    #echo "Attempting to start a virtual X Server"
-    #Xvfb :99 &
-    #export DISPLAY=:99
-
-    echo "Attempting to build $project for Linux"
-    xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' $UNITY_ROOT/Editor/Unity \
-      -batchmode \
-      -nographics \
-      -silent-crashes \
-      -logFile /dev/stdout \
-      -projectPath $(pwd) \
-      -buildLinuxUniversalPlayer "$HOME/Build/linux/$project" \
-      -quit
+    echo -e "\nAttempting to build $project for Linux"
+    sudo -E xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' \
+        $UNITY_ROOT/Editor/Unity \
+          -batchmode \
+          -nographics \
+          -silent-crashes \
+          -logFile /dev/stdout \
+          -projectPath "$HOME/ES2015A/March Death" \
+          -buildLinuxUniversalPlayer "$BUILD_DIR/linux/$project" \
+          -quit
 
     BUILD_LINUX=$?
 
     if [ $BUILD_LINUX == 0 ]; then
 
-        echo -e "\n\n-------------------------\n\n"
-        echo "Attempting to build $project for Windows"
-        xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' $UNITY_ROOT/Editor/Unity \
-          -batchmode \
-          -nographics \
-          -silent-crashes \
-          -logFile /dev/stdout \
-          -projectPath $(pwd) \
-          -buildWindowsPlayer "$HOME/Build/windows/$project.exe" \
-          -quit
-
-        BUILD_WIN=$?
-
-    else
-
-        BUILD_WIN=-1
+        sudo -E ln -s $BUILD_DIR/linux/$project.x86_64 $BUILD_DIR/linux/$project
 
     fi
 
-    BUILD_OSX=0
+fi
 
+if [ "$TRAVIS_BRANCH" == "devel-travis_cache" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+    echo -e "\n\033[32;1mUpload to cache server\033[0m\n"
+    (touch $HOME/.RSYNC_LOCK; \
+        echo -e "\t> Temp"    && \
+            sudo -E tar -zcf "$(pwd)/Temp.tar.gz" "$HOME/ES2015A/March Death/Temp"       && \
+            sudo -E rsync -a --delete-after "$(pwd)/Temp.tar.gz"    ${CACHE_HOST}; \
+        echo -e "\t> Obj"     && \
+            sudo -E tar -zcf "$(pwd)/Obj.tar.gz" "$HOME/ES2015A/March Death/Obj"         && \
+            sudo -E rsync -a --delete-after "$(pwd)/Obj.tar.gz"     ${CACHE_HOST}; \
+        echo -e "\t> Library" && \
+            sudo -E tar -zcf "$(pwd)/Library.tar.gz" "$HOME/ES2015A/March Death/Library" && \
+            sudo -E rsync -a --delete-after "$(pwd)/Library.tar.gz" ${CACHE_HOST}; \
+        echo -e "\t> Build"   && \
+            sudo -E tar -zcf "$(pwd)/Build.tar.gz" "$BUILD_DIR"                          && \
+            sudo -E rsync -a --delete-after "$(pwd)/Build.tar.gz"   ${CACHE_HOST}; \
+    rm $HOME/.RSYNC_LOCK) &
 fi
 
 if [ $BUILD_WIN == 0 ] && [ $BUILD_LINUX == 0 ] && [ $BUILD_OSX == 0 ]; then
-    sleep 5
     echo -e "\n\033[32;1mBuild Completed Successfully\033[0m\n"
     exit 0
 fi

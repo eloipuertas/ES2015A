@@ -13,8 +13,11 @@ namespace Assets.Scripts.AI
 {
     public class AIController : BasePlayer
     {
+        public const bool AI_DEBUG_ENABLED = true;
+
         public MacroManager Macro { get; set; }
         public MicroManager Micro { get; set; }
+        public AIDebugSystem aiDebug;
 
         /// <summary>
         /// Will be used to calculate the lvl of the AI
@@ -30,7 +33,7 @@ namespace Assets.Scripts.AI
         /// <summary>
         /// Just a basic way to keep track of what the enemy has more
         /// </summary>
-        public Dictionary<UnitTypes,int> UnitsFound { get; set; }
+        public Dictionary<UnitTypes, int> UnitsFound { get; set; }
 
         Vector3 buildPosition;
         public Vector3 rootBasePosition;
@@ -43,18 +46,14 @@ namespace Assets.Scripts.AI
 
             _selfRace = info.GetPlayerRace() == Races.MEN ? Races.ELVES : Races.MEN;
 
-            if (_selfRace == Races.ELVES) Army.Add(GameObject.Find("elf_hero").gameObject.GetComponent<Unit>());
-            else Army.Add(GameObject.Find("MenHero").gameObject.GetComponent<Unit>());
-        }
-        
-        void Awake()
-        {
             //Init lists
             EnemyUnits = new List<Unit>();
             EnemyBuildings = new List<IGameEntity>();
             OwnBuildings = new List<IGameEntity>();
             modules = new List<AIModule>();
             Army = new List<Unit>();
+            rootBasePosition = new Vector3(706, 80, 765);
+            Army.Add(Info.get.createUnit(_selfRace, UnitTypes.HERO, rootBasePosition,Quaternion.Euler(0,0,0)).GetComponent<Unit>());
             Workers = new List<Unit>();
             Macro = new MacroManager(this);
             Micro = new MicroManager(this);
@@ -74,10 +73,15 @@ namespace Assets.Scripts.AI
             };
             Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.DISCOVERED, OnEntityFound, selector);
             Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.HIDDEN, OnEntityLost, selector);
+
+            if (AI_DEBUG_ENABLED)
+            {
+                aiDebug = AIDebugSystem.CreateComponent(gameObject, this);
+            }
+
         }
         void Update()
         {
-            Debug.Log(_selfRace);
             for (int i = 0; i < modules.Count; i++)
             {
                 timers[i] += Time.deltaTime;
@@ -88,28 +92,56 @@ namespace Assets.Scripts.AI
                 }
             }
         }
+        void OnEnemyDied(System.Object obj)
+        {
+            IGameEntity g = ((GameObject)obj).GetComponent<IGameEntity>();
+            if (g.info.isUnit)
+            {
+                EnemyUnits.Remove((Unit)g);
+            }
+            else if (g.info.isBuilding)
+            {
+                EnemyBuildings.Remove(g);
+            }
+        }
         void OnEntityFound(System.Object obj)
         {
             IGameEntity g = ((GameObject)obj).GetComponent<IGameEntity>();
             if (g.info.isUnit)
-                if (!EnemyUnits.Contains((Unit)g)) 
+            {
+                if (!EnemyUnits.Contains((Unit)g))
+                {
+                    g.registerFatalWounds(OnEnemyDied);
                     EnemyUnits.Add((Unit)g);
+                }
+            }
             else if (g.info.isBuilding)
-                    if (!EnemyBuildings.Contains(g))
-                        EnemyBuildings.Add(g);
+            {
+                if (!EnemyBuildings.Contains(g))
+                {
+                    g.registerFatalWounds(OnEnemyDied);
+                    EnemyBuildings.Add(g);
+                }
+            }
         }
         void OnEntityLost(System.Object obj)
         {
             IGameEntity g = ((GameObject)obj).GetComponent<IGameEntity>();
             if (g.info.isUnit)
+            {
+                g.unregisterFatalWounds(OnEnemyDied);
                 EnemyUnits.Remove((Unit)g);
+            }
             else if (g.info.isBuilding)
+            {
+                g.unregisterFatalWounds(OnEnemyDied);
                 EnemyBuildings.Remove(g);
+            }
         }
         public void CreateBuilding(BuildingTypes btype)
         {
-            GameObject g = Info.get.createBuilding(_selfRace, btype, buildPosition, Quaternion.Euler(0,0,0));
-            buildPosition += new Vector3(0, 0,20);
+            GameObject g = Info.get.createBuilding(_selfRace, btype, buildPosition, Quaternion.Euler(0, 0, 0));
+            buildPosition += new Vector3(0, 0, 20);
             Resource build = (Resource)g.GetComponent<IGameEntity>();
             build.register(Resource.Actions.CREATE_UNIT, OnCivilCreated);
             build.register(Resource.Actions.DESTROYED, OnBuildingDestroyed);
@@ -129,12 +161,17 @@ namespace Assets.Scripts.AI
         }
         void OnUnitDead(System.Object obj)
         {
-            Unit u = (Unit)obj;
-            if(Workers.Contains(u))
+            GameObject g = (GameObject)obj;
+            Unit u = g.GetComponent<Unit>();
+            if (Workers.Contains(u))
                 Workers.Remove(u);
             if (Army.Contains(u))
                 Army.Remove(u);
         }
+
+        // TODO: Should it be handled with events??
+        public override void removeEntity(IGameEntity entity) { }
+        public override void addEntity(IGameEntity newEntity) { }
     }
     struct AIModule
     {

@@ -35,7 +35,6 @@ namespace Managers
             }
         }
 
-
         public void EmptyDeposits()
         {
             foreach (var deposit in _deposits.Values)
@@ -100,6 +99,11 @@ namespace Managers
         public void AddAmount(Type type, float amount)
         {
             AddAmount(new WorldResources.Resource(type, amount));
+        }
+
+        public float getAmount(Type type)
+        {
+            return _deposits[type].GetAmount();
         }
 
     }

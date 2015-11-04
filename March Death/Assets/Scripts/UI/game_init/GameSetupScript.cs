@@ -67,8 +67,13 @@ public class GameSetupScript : MonoBehaviour {
 
     public void StartGame()
     {
-        if (raceSelected)
+
+		if (raceSelected)
         {
+			GameObject menuMusic = GameObject.Find("BackgroundMusic");
+			if (menuMusic) {
+				Destroy (menuMusic);
+			}
 		    Application.LoadLevel("ES2015A");
         }
         else
@@ -81,4 +86,8 @@ public class GameSetupScript : MonoBehaviour {
     {
 		Application.LoadLevel(0);
     }
+
+	void OnMouseEnter(){
+
+	}
 }
