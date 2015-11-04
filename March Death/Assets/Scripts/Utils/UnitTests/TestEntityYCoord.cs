@@ -15,7 +15,15 @@ namespace Utils.UnitTests
             }
         }
 
-        public override void run()
+        public override TestEnvironment.States RunAt
+        {
+            get
+            {
+                return TestEnvironment.States.POST_GAME_CHECKING;
+            }
+        }
+
+        public override void Run(float deltaTime)
         {
             Unit[] entities = UnityEngine.GameObject.FindObjectsOfType<Unit>();
             foreach (Unit unit in entities)

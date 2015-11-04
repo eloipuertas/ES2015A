@@ -409,13 +409,12 @@ public class UserInput : MonoBehaviour
     /// <returns></returns>
     public GameObject FindHitEntity()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray ray = Camera.main.ScreenPointToRay(topLeft);
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit))
         {
             if (hit.collider.gameObject.name != "Terrain")
             {
-
                 return hit.collider.gameObject;
             }
         }
