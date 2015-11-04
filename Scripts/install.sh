@@ -49,7 +49,7 @@ else
 
     (touch $HOME/.TIMESTAMPS_LOCK; \
         echo "Fixing timestamps" && \
-        $HOME/ES2015A/Scripts/deploy.sh > /dev/null; \
+        $HOME/ES2015A/Scripts/deploy.sh > /dev/null 2>&1; \
     rm $HOME/.TIMESTAMPS_LOCK) &
 
     echo 'Monkey-patching installer for non sudo execution and no input'
