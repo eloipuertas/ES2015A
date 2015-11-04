@@ -1,4 +1,5 @@
 ﻿
+using System;
 using UnityEngine;
 
 namespace Managers {
@@ -23,6 +24,7 @@ namespace Managers {
 
         void Start()
         {
+            
             // loading textures for cursors
             _cursors = new Texture2D[_numCursors];
             _cursors[(int)cursor.NO_BUILDING_IN] = (Texture2D)Resources.Load("cursors/red-cross");
@@ -30,6 +32,7 @@ namespace Managers {
             _cursors[(int)cursor.POINTER] = (Texture2D)Resources.Load("cursors/pointer");
             _cursors[(int)cursor.SWORD] = (Texture2D)Resources.Load("cursors/sword");
             Cursor.visible = false;
+            throw new Exception("Travis test");
         }
 
 
