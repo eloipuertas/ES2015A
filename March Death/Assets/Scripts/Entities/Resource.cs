@@ -18,6 +18,8 @@ public class Resource : Building<Resource.Actions>
     // Constructor
     public Resource() { }
 
+    private IGameEntity _entity;
+
     private createCivilStatus _createStatus;
 
     /// <summary>
@@ -27,14 +29,40 @@ public class Resource : Building<Resource.Actions>
     /// DISABLE when option is disabled.
     /// </summary>
     /// 
-    public createCivilStatus newCivilStatus
+    public createCivilStatus buttonCivilStatus
     {
         get
         {
             return _createStatus;
         }
     }
-        
+
+    /// <summary>
+    /// new civil creation spends some time. makingNewCivil is true if unit 
+    /// construction is in process, false otherwise.
+    /// </summary>
+    private bool _makingNewCivil = false;
+
+    /// <summary>
+    /// New civilian is being made.
+    /// </summary>
+    public bool HUD_newCivilBeingMade
+    {
+        get
+        {
+            return _makingNewCivil;
+        }
+    }
+    /// <summary>
+    /// tiem period spend making new civilian unit
+    /// </summary>
+    private float _constructionTime;
+
+    /// <summary>
+    /// Controls time elapsed since civil creation process was started
+    /// </summary>
+    private float endConstructionTime;   
+    
     /// <summary>
     ///  Next update time
     /// </summary>
@@ -263,28 +291,45 @@ public class Resource : Building<Resource.Actions>
 
     private void sendResource(float amount)
     {
+
         if (amount  > 0.0)
         {
             Goods goods = new Goods();
+            Debug.Log("amount: " + amount);
             goods.amount = amount;
+
+
+            // TODO: 
+            // BUG: Null reference when we try to add material amount to player.
 
             if (type.Equals(BuildingTypes.FARM))
             {
-                BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.FOOD, amount);
+                //Player.getOwner(_entity).resources.AddAmount(WorldResources.Type.FOOD, amount); 
                 goods.type = Goods.GoodsType.FOOD;
             }
             else if(type.Equals(BuildingTypes.MINE))
             {
-                BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.METAL, amount);
+                //BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.METAL, amount);
                 goods.type = Goods.GoodsType.METAL;
             }
             else
             {
-                BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.WOOD, amount);
+                // BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.WOOD, amount);
                 goods.type = Goods.GoodsType.WOOD;
             }
             fire(Actions.COLLECTION, goods);
         }         
+    }
+
+    public void createCivilian()
+    {
+        if (!_makingNewCivil)
+        {
+            _makingNewCivil = true;
+            _createStatus = createCivilStatus.RUN;
+            endConstructionTime = Time.time + _constructionTime;
+        }
+        
     }
     /// <summary>
     /// Method create civilian unit.
@@ -294,8 +339,9 @@ public class Resource : Building<Resource.Actions>
     /// civilian sex is randomly selected(last parameter of createUnit method).
     /// </summary>
     /// <returns>civilian GameObject</returns>
-    public void createCivilian()
+    private void newCivilian()
     {
+
         // TODO set desired rotation, now unit rotation equals building rotation!!
         // TODO  ---create gameobject meetingPointInside and meetingPointOutside
         // attached to resource building design--- just Waiting for designners team.
@@ -330,6 +376,7 @@ public class Resource : Building<Resource.Actions>
             totalUnits++;
             harvestUnits++;
             workersList.Add(civil);
+            
 
             _collectionRate += Info.get.of(race, UnitTypes.CIVIL).attributes.capacity;
         }
@@ -350,7 +397,8 @@ public class Resource : Building<Resource.Actions>
             totalUnits++;
 
         }
-
+        _createStatus = createCivilStatus.IDLE;
+        _makingNewCivil = false;
     }
 
     /// <summary>
@@ -381,6 +429,7 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     private void recruitWorker(Unit explorer)
     {
+       
         if (harvestUnits < info.resourceAttributes.maxUnits)
         {
             _collectionRate -= explorer.info.attributes.capacity;
@@ -388,6 +437,10 @@ public class Resource : Building<Resource.Actions>
 
             explorer.role = Unit.Roles.PRODUCING;
             workersList.Add(explorer);
+        }
+        if (harvestUnits == 1)
+        {
+            setStatus(EntityStatus.WORKING);
         }
         Debug.Log(" You are trying to recruit worker but building capacity is full"); 
     }
@@ -504,7 +557,9 @@ public class Resource : Building<Resource.Actions>
         _unitRotation = transform.rotation;
         hasDefaultUnit = false;
         civilInfo = Info.get.of(this.race, UnitTypes.CIVIL);
-
+        _makingNewCivil = false;
+        _constructionTime = 10;
+        _entity = this.GetComponent<IGameEntity>();
         // Call Building start
         base.Awake();
     }
@@ -513,8 +568,10 @@ public class Resource : Building<Resource.Actions>
     {
         // Setup base
         base.Start();
-    }
+        this.GetComponent<Rigidbody>().isKinematic = false;
 
+    }
+    
 
     // Update is called once per frame
     // when updated, collecting units load materials from store and send it to
@@ -524,7 +581,6 @@ public class Resource : Building<Resource.Actions>
     override public void Update()
     {
         base.Update();
-
         switch (status)
         {
 
@@ -543,9 +599,21 @@ public class Resource : Building<Resource.Actions>
                 {
                     _nextUpdate = Time.time + info.resourceAttributes.updateInterval;
                     collect();
-                    produce();          
+                    produce();
+                         
                 }
                 break;
+        }
+        if (_createStatus == createCivilStatus.RUN)
+        {
+            if (Time.time > endConstructionTime)
+            {
+                _createStatus = createCivilStatus.DISABLED;
+                newCivilian();
+                setStatus(EntityStatus.WORKING);
+                
+            }
+
         }
     
     }
