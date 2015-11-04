@@ -5,7 +5,6 @@ using UnityEngine;
 
 class CreateCivil : Ability
 {
-<<<<<<< HEAD
     private bool _enabled = false;
     private IGameEntity _entity;
     public Resource res;
@@ -18,17 +17,6 @@ class CreateCivil : Ability
 
         res = _gameObject.GetComponent<Resource>(); ;
 
-=======
-    private IGameEntity _entity;
-    public Resource res;
-    private GameObject civil;
-
-    public CreateCivil(EntityAbility info, GameObject gameObject) :
-        base(info, gameObject)
-    {
-        _entity = _gameObject.GetComponent<IGameEntity>();       
-        res = _gameObject.GetComponent<Resource>(); ;        
->>>>>>> devel_d
     }
 
     public override bool isActive
