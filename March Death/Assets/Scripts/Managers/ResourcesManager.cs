@@ -14,6 +14,10 @@ namespace Managers
         public ResourcesManager()
         {
             _deposits = new Dictionary<Type, Deposit>();
+
+            InitDeposit(new WorldResources.Resource(Type.FOOD, 2000));
+            InitDeposit(new WorldResources.Resource(Type.METAL, 2000));
+            InitDeposit(new WorldResources.Resource(Type.WOOD, 2000));
         }
 
 
