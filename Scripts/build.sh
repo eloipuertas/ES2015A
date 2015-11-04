@@ -121,10 +121,12 @@ if [ "$TRAVIS_BRANCH" == "devel-travis_cache" ] && [ "$TRAVIS_PULL_REQUEST" == "
         echo -e "\t> Library" && \
             sudo -E tar -zcf "$(pwd)/Library.tar.gz" "$HOME/ES2015A/March Death/Library" && \
             sudo -E rsync -a --delete-after "$(pwd)/Library.tar.gz" ${CACHE_HOST}; \
-        echo -e "\t> Build"   && \
-            sudo -E tar -zcf "$(pwd)/Build.tar.gz" "$BUILD_DIR"                          && \
-            sudo -E rsync -a --delete-after "$(pwd)/Build.tar.gz"   ${CACHE_HOST}; \
     rm $HOME/.RSYNC_LOCK) &
+
+    # Uploading Build might not be necessary
+    #    echo -e "\t> Build"   && \
+    #        sudo -E tar -zcf "$(pwd)/Build.tar.gz" "$BUILD_DIR"                          && \
+    #        sudo -E rsync -a --delete-after "$(pwd)/Build.tar.gz"   ${CACHE_HOST}; \
 fi
 
 if [ $BUILD_WIN == 0 ] && [ $BUILD_LINUX == 0 ] && [ $BUILD_OSX == 0 ]; then

@@ -29,18 +29,25 @@ else
     # Use ; and not && to actually do all of them, even if one doesn't succeed
     (touch $HOME/.RSYNC_LOCK; \
         echo -e "\t> Temp"    && \
-            sudo -E rsync -a ${CACHE_HOST}Temp.tar.gz     $(pwd)/ && \
+            axel -q -n 10 ${CACHE_HOST}Temp.tar.gz    && \
             tar -xzf $(pwd)/Temp.tar.gz -C /; \
         echo -e "\t> Obj"     && \
-            sudo -E rsync -az ${CACHE_HOST}Obj.tar.gz     $(pwd)/ && \
+            axel -q -n 10 ${CACHE_HOST}Obj.tar.gz     && \
             tar -xzf $(pwd)/Obj.tar.gz -C /; \
         echo -e "\t> Library" && \
-            sudo -E rsync -az ${CACHE_HOST}Library.tar.gz $(pwd)/ && \
+            axel -q -n 10 ${CACHE_HOST}Library.tar.gz && \
             tar -xzf $(pwd)/Library.tar.gz -C /; \
-        echo -e "\t> Build"   && \
-            sudo -E rsync -az ${CACHE_HOST}Build.tar.gz   $(pwd)/ && \
-            tar -xzf $(pwd)/Build.tar.gz -C /; \
     rm $HOME/.RSYNC_LOCK) &
+
+    # Downloading build might not be necessary
+    #    echo -e "\t> Build"   && \
+    #        axel -q -n 10 ${CACHE_HOST}Build.tar.gz   && \
+    #        tar -xzf $(pwd)/Build.tar.gz -C /; \
+
+    (touch $HOME/.TIMESTAMPS_LOCK; \
+        echo "Fixing timestamps" && \
+        $HOME/ES2015A/Scripts/deploy.sh; \
+    rm $HOME/.TIMESTAMPS_LOCK) &
 
     echo 'Monkey-patching installer for non sudo execution and no input'
     sed -i '41,44d;49,50d' ./Unity.sh
@@ -56,11 +63,15 @@ else
     mkdir -p $HOME/.cache/unity3d
     mkdir -p $HOME/.local/share/unity3d/Unity
 
-    echo "Fixing timestamps"
-    $HOME/ES2015A/Scripts/deploy.sh
-
     echo -n "Waiting for cache to end downloading."
     while [ -f "$HOME/.RSYNC_LOCK" ]
+    do
+        echo -n "."
+        sleep 2
+    done
+
+    echo -en "\nWaiting for timestamp fixing to end."
+    while [ -f "$HOME/.TIMESTAMPS_LOCK" ]
     do
         echo -n "."
         sleep 2
