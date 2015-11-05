@@ -28,7 +28,7 @@ public class Main_Game : MonoBehaviour
         cam = GameObject.FindWithTag ("MainCamera").GetComponent<CameraController> ();
         //bm = GameObject.Find ("GameController").GetComponent<Managers.BuildingsManager> ();
         bm = new Managers.BuildingsManager();
-        terrain = GetComponent<Terrain>();
+        terrain = GameObject.Find("Terrain").GetComponent<Terrain>();
         if (info)
             info.LoadHUD ();
         //LoadPlayerStronghold ();
@@ -79,8 +79,9 @@ public class Main_Game : MonoBehaviour
             {
                 position = new Vector3();
                 position.x = building.position.X;
-                position.z = building.position.Y;Debug.Log("Original building position: " + position);
-                position.y = terrain.SampleHeight(position);Debug.Log("New building position: " + position);
+                position.z = building.position.Y;
+                // HACK Without the addition, Construction Grid detects the terrain as it not being flat
+                position.y = 1 + terrain.SampleHeight(position);
                 created = bm.createBuilding(position, Quaternion.Euler(0,0,0),
                                             building.entityType.building,
                                             player.Race);

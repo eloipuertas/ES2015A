@@ -37,6 +37,7 @@ namespace Assets.Scripts.AI
 
         Vector3 buildPosition;
         public Vector3 rootBasePosition;
+        private bool isRootBasePositionInitialized;
         public List<Unit> Army { get; set; }
         public List<Unit> Workers { get; set; }
 
@@ -65,6 +66,7 @@ namespace Assets.Scripts.AI
                 timers[i] = 0;
             //buildPosition = new Vector3(706, 80, 765);
             //rootBasePosition = new Vector3(706, 80, 765);
+            isRootBasePositionInitialized = false;
 
             ActorSelector selector = new ActorSelector()
             {
@@ -179,18 +181,18 @@ namespace Assets.Scripts.AI
             }
             else if (newEntity.info.isBuilding)
             {
-                // The next if-block is allways false
-                /*if (rootBasePosition == null)
-                {
-                    rootBasePosition = new Vector3(newEntity.getGameObject().transform.position.x,
-                                                   newEntity.getGameObject().transform.position.y,
-                                                   newEntity.getGameObject().transform.position.z);
-                    buildPosition = new Vector3(rootBasePosition.x, rootBasePosition.y, rootBasePosition.z);
-                }*/
-                buildPosition = newEntity.getTransform().position + new Vector3(0,0,20);
-                //buildPosition += new Vector3(0, 0, 20);
+                buildPosition = newEntity.getTransform().position + new Vector3(0,0,30);
                 if (newEntity.info.isBarrack)
                 {
+                    // TODO rootBasePosition should be initialized elsewhere
+                    if (!isRootBasePositionInitialized)
+                    {
+                        if (((BuildingInfo) newEntity.info).type == BuildingTypes.STRONGHOLD)
+                        {
+                            rootBasePosition = newEntity.getTransform().position;
+                            isRootBasePositionInitialized = !isRootBasePositionInitialized;
+                        }
+                    }
                     return;
                 }
                 Resource build = (Resource) newEntity;
