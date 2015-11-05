@@ -29,7 +29,7 @@ namespace Utils.UnitTests
         {
             // Get methods and fields
             UserInput uinput = GameObject.Find("GameController").GetComponent<UserInput>();
-            FieldInfo topLeftField = uinput.GetType().GetField("topLeft", BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo mouseButtonCurrentPointField = uinput.GetType().GetField("mouseButtonCurrentPoint", BindingFlags.NonPublic | BindingFlags.Instance);
             MethodInfo leftClickMethod = uinput.GetType().GetMethod("LeftClick", BindingFlags.NonPublic | BindingFlags.Instance);
             MethodInfo rightClickMethod = uinput.GetType().GetMethod("RightClick", BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -44,7 +44,8 @@ namespace Utils.UnitTests
             }
 
             // Click to unit
-            topLeftField.SetValue(uinput, Camera.main.WorldToScreenPoint(building.getTransform().position));
+            Vector3 point = Camera.main.WorldToScreenPoint(building.getTransform().position);
+            mouseButtonCurrentPointField.SetValue(uinput, new Vector2(point.x, point.y));
             leftClickMethod.Invoke(uinput, null);
 
             // Check it is really selected

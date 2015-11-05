@@ -29,12 +29,12 @@ namespace Utils.UnitTests
         {
             // Get methods and fields
             UserInput uinput = GameObject.Find("GameController").GetComponent<UserInput>();
-            FieldInfo topLeftField = uinput.GetType().GetField("topLeft", BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo mouseButtonCurrentPointField = uinput.GetType().GetField("mouseButtonCurrentPoint", BindingFlags.NonPublic | BindingFlags.Instance);
             MethodInfo leftClickMethod = uinput.GetType().GetMethod("LeftClick", BindingFlags.NonPublic | BindingFlags.Instance);
             MethodInfo rightClickMethod = uinput.GetType().GetMethod("RightClick", BindingFlags.NonPublic | BindingFlags.Instance);
 
             // Click nowhere
-            topLeftField.SetValue(uinput, new Vector3(0, 0, 0));
+            mouseButtonCurrentPointField.SetValue(uinput, new Vector2(0, 0));
             leftClickMethod.Invoke(uinput, null);
         }
     }

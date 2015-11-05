@@ -361,7 +361,7 @@ public class UserInput : MonoBehaviour
     /// <returns></returns>
     public GameObject FindHitObject()
     {
-        Ray ray = Camera.main.ScreenPointToRay(topLeft);
+        Ray ray = Camera.main.ScreenPointToRay(mouseButtonCurrentPoint);
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit)) return hit.collider.gameObject;
         return null;
@@ -373,7 +373,7 @@ public class UserInput : MonoBehaviour
     /// <returns></returns>
     public Vector3 FindHitPoint()
     {
-        Ray ray = Camera.main.ScreenPointToRay(topLeft);
+        Ray ray = Camera.main.ScreenPointToRay(mouseButtonCurrentPoint);
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit)) return hit.point;
         return this.invalidPosition;
@@ -385,7 +385,7 @@ public class UserInput : MonoBehaviour
     /// <returns></returns>
     public Vector3 FindTerrainHitPoint()
     {
-        Ray ray = Camera.main.ScreenPointToRay(topLeft);
+        Ray ray = Camera.main.ScreenPointToRay(mouseButtonCurrentPoint);
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, TerrainLayerMask))
             return hit.point;
         else
@@ -409,7 +409,7 @@ public class UserInput : MonoBehaviour
     /// <returns></returns>
     public GameObject FindHitEntity()
     {
-        Ray ray = Camera.main.ScreenPointToRay(topLeft);
+        Ray ray = Camera.main.ScreenPointToRay(mouseButtonCurrentPoint);
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit))
         {
