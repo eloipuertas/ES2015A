@@ -13,7 +13,7 @@ public class Main_Game : MonoBehaviour
 
     private List<BasePlayer> allPlayers;
 
-    Transform strongholdTransform;
+    Terrain terrain;
     GameObject playerHero;
 
     // Use this for initialization
@@ -28,6 +28,7 @@ public class Main_Game : MonoBehaviour
         cam = GameObject.FindWithTag ("MainCamera").GetComponent<CameraController> ();
         //bm = GameObject.Find ("GameController").GetComponent<Managers.BuildingsManager> ();
         bm = new Managers.BuildingsManager();
+        terrain = GetComponent<Terrain>();
         if (info)
             info.LoadHUD ();
         //LoadPlayerStronghold ();
@@ -38,31 +39,6 @@ public class Main_Game : MonoBehaviour
         inputs.TerrainLayerMask = new LayerMask();
         inputs.TerrainLayerMask = 520;// HACK LayerMask.NameToLayer("Terrain"); didn't work
         bm.Inputs = inputs; 
-    }
-
-    private void LoadPlayerStronghold ()
-    {
-        GameObject playerStronghold;
-        if (info)
-        {
-            playerStronghold = bm.createBuilding (strongholdTransform.position, 
-                              strongholdTransform.rotation, 
-                              BuildingTypes.STRONGHOLD, info.GetPlayerRace ());
-            user.addEntity (playerStronghold.GetComponent<IGameEntity> ());
-            cam.lookGameObject (playerStronghold);
-        }
-    }
-
-    private void LoadPlayerUnits ()
-    {
-        if (info)
-        {
-            // TODO Must be able to load other kinds of units (both civilian and military)
-            playerHero = Info.get.createUnit (info.GetPlayerRace (),
-                                             UnitTypes.HERO, playerHero.transform.position,
-                                         playerHero.transform.rotation);
-            user.addEntity (playerHero.GetComponent<IGameEntity> ());
-        }
     }
 
     public GameInformation GetGameInformationObject ()
@@ -84,6 +60,7 @@ public class Main_Game : MonoBehaviour
     private void LoadCampaign ()
     {
         GameObject created;
+        Vector3 position;
         foreach (Battle.PlayerInformation player in info.GetBattle().GetPlayerInformationList())
         {
             BasePlayer basePlayer;
@@ -100,10 +77,13 @@ public class Main_Game : MonoBehaviour
             basePlayer.Start();
             foreach (Battle.PlayableEntity building in player.GetBuildings())
             {
-                // TODO Take into account all 3 axis positions with a world map
-                // Maybe try for the height either 81.15f or 78.92283f
-                created = bm.createBuilding(new Vector3(building.position.X, 80, building.position.Y),
-                                  Quaternion.Euler(0,0,0), building.entityType.building, player.Race);
+                position = new Vector3();
+                position.x = building.position.X;
+                position.z = building.position.Y;Debug.Log("Original building position: " + position);
+                position.y = terrain.SampleHeight(position);Debug.Log("New building position: " + position);
+                created = bm.createBuilding(position, Quaternion.Euler(0,0,0),
+                                            building.entityType.building,
+                                            player.Race);
                 basePlayer.addEntity(created.GetComponent<IGameEntity>());
                 if (building.entityType.building == BuildingTypes.STRONGHOLD &&
                     info.GetPlayerRace() == basePlayer.race)
@@ -113,10 +93,12 @@ public class Main_Game : MonoBehaviour
             }
             foreach (Battle.PlayableEntity unit in player.GetUnits())
             {
-                // TODO Take into account all 3 axis positions with a world map
+                position = new Vector3();
+                position.x = unit.position.X;
+                position.z = unit.position.Y;
+                position.y = terrain.SampleHeight(position);
                 created = Info.get.createUnit(player.Race, unit.entityType.unit,
-                                              new Vector3(unit.position.X, 80, unit.position.Y),
-                                              Quaternion.Euler(0,0,0));
+                                              position, Quaternion.Euler(0,0,0));
                 basePlayer.addEntity(created.GetComponent<IGameEntity>());
             }
             basePlayer.SetInitialResources(player.GetResources().Wood,
