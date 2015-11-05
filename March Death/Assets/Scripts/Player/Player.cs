@@ -31,7 +31,8 @@ public class Player : BasePlayer
     public override void Start()
     {   
         base.Start();
-        _buildings = GetComponent<Managers.BuildingsManager>();
+        //_buildings = GetComponent<Managers.BuildingsManager>();
+        _buildings = GetComponent<Main_Game>().BuildingsMgr;
         //request the race of the player
         _selfRace = info.GetPlayerRace();
         _selection.SetRace(race);
@@ -96,8 +97,8 @@ public class Player : BasePlayer
         return (ArrayList) SelectedObjects.Clone();
     }
 
-    /// <summary>
-    /// Getter for the resources of the player.
-    /// </summary>
-    public Managers.ResourcesManager resources {get { return _resources; } }
+    // <summary>
+    // Getter for the resources of the player.
+    // </summary>
+    //public Managers.ResourcesManager resources {get { return _resources; } }
 }

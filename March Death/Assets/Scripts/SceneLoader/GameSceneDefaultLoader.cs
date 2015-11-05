@@ -8,7 +8,6 @@ namespace SceneLoader
     {
         public Storage.Races _playerRace = Storage.Races.ELVES;
         private Storage.Races _iaRace = Storage.Races.MEN;
-
         private GameObject informationObject = null;
         private GameInformation gameInfo;
 
