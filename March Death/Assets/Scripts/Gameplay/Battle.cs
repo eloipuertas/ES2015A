@@ -41,7 +41,7 @@ public class Battle
 
     public enum MissionType
     {
-        DESTROY, CREATE, ACCUMULATE, RETAIN, CONQUER
+        DESTROY, NEW, KEEP, CONQUER
     }
 
     public struct MissionDefinition
