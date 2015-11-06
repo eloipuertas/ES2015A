@@ -16,7 +16,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     /// The resources manager
     /// </summary>
     protected Managers.ResourcesManager _resources = new Managers.ResourcesManager();
-    public Managers.IResourcesManager resources { get { return _resources; } }
+    public Managers.ResourcesManager resources { get { return _resources; } }
 
     /// <summary>
     /// The buildings manager
@@ -69,4 +69,12 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     }
 
     void Update () {}
+
+    public void SetInitialResources(uint wood, uint food, uint metal)
+    {
+        // TODO Consider adding a maximum capacity
+        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.FOOD, food));
+        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.WOOD, wood));
+        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.METAL, metal));
+    }
 }

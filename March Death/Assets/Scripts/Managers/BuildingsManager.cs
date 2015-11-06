@@ -12,12 +12,11 @@ namespace Managers
         private UserInput _inputs;
         public Player Player { set { _player = value; } }
         public UserInput Inputs { set { _inputs = value; } }
-
         private CursorManager cursor;
         private ConstructionGrid grid;
         private Color red = Color.red;
         private Color green = Color.green;
-        private struct NewBuilgind
+        private struct NewBuilding
         {
             public GameObject ghost;
             public GameObject building;
@@ -28,7 +27,7 @@ namespace Managers
 
         }
 
-        private NewBuilgind _newBuilding;
+        private NewBuilding _newBuilding;
         float yoffset = 1f;
 
         // Use this for initialization
@@ -60,7 +59,6 @@ namespace Managers
             }
 
         }
-
 
         /// <summary>
         /// Starts creating a building, required the name of the building ex: 'elf-farm'
@@ -106,6 +104,29 @@ namespace Managers
         private GameObject CreateFinalBuilding(Storage.Races race, Storage.BuildingTypes type)
         {
             return Storage.Info.get.createBuilding(race, type);
+        }
+
+        /// <summary>
+        /// Creates a building in the given position.
+        /// </summary>
+        /// <returns>The building, if the position is available for 
+        /// construction, or <code>null</code>.</returns>
+        /// 
+        /// <param name="position">The position of the building.</param>
+        /// <param name="rotation">The rotation of the building.</param>
+        /// <param name="type">The type of building.</param>
+        /// <param name="race">The race this building belongs to.</param>
+        public GameObject createBuilding(Vector3 position, Quaternion rotation,
+                                         Storage.BuildingTypes type, Storage.Races race)
+        {
+            GameObject obj = null;if (grid == null) Debug.LogError("Grid is null");
+            position = grid.discretizeMapCoords(position);
+            if (grid.isNewPositionAbleForConstrucction(position))
+            {
+                obj = Storage.Info.get.createBuilding(race, type, position, rotation);
+                grid.reservePosition(position);
+            }
+            return obj;
         }
 
 
