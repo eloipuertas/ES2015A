@@ -67,7 +67,7 @@ if [ $TESTS_RESULT == 0 ]; then
     COMMIT_AUTHOR=`git log -1 | grep -Po "(?<=Author: ).*(?= <)"`
     curl -i -X POST -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/json" \
         https://api.github.com/repos/eloipuertas/ES2015A/issues/193/comments \
-        -d "{\"body\":\"Commit by: @${COMMIT_AUTHOR}\nBranch: ${TRAVIS_BRANCH}\nCommit hash: ${TRAVIS_COMMIT}\nDetailed log: https://travis-ci.org/eloipuertas/ES2015A/builds/${TRAVIS_BUILD_ID}\"}" > /dev/null
+        -d "{\"body\":\"Commit didn't pass **tests**.\n\nCommit by: @${COMMIT_AUTHOR}\nBranch: ${TRAVIS_BRANCH}\nCommit hash: ${TRAVIS_COMMIT}\nDetailed log: https://travis-ci.org/eloipuertas/ES2015A/builds/${TRAVIS_BUILD_ID}\"}" > /dev/null
 
 fi
 
