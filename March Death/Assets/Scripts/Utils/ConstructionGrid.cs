@@ -3,7 +3,7 @@ using System.Collections;
 using System.Linq;
 using System;
 
-public class ConstructionGrid : MonoBehaviour {
+public class ConstructionGrid {
 
     private Vector2 dimensions = new Vector2(15f, 15f);
     private ArrayList reservedPositions = new ArrayList();
