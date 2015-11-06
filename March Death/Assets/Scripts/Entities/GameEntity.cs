@@ -238,7 +238,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         setupAbilities();
     }
 
-    public void Destroy()
+    public void Destroy(bool immediately = false)
     {
         // TODO: Should this be automatically handled with events?
         FOWManager.Instance.removeEntity(this.GetComponent<FOWEntity>());
@@ -253,8 +253,9 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         // TODO: Should this be automatically handled with events?
         BasePlayer.getOwner(this).removeEntity(this);
 
-        // Destroy us
-        Destroy(this.gameObject);
+        // Play dead and/or destroy
+        setStatus(info.isUnit ? EntityStatus.DEAD : EntityStatus.DESTROYED);
+        Destroy(this.gameObject, immediately ? 0.0f : 5.0f);
     }
 
     public override void Update()
