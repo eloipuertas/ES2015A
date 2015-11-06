@@ -14,7 +14,6 @@ namespace Managers
         public UserInput Inputs { set { _inputs = value; } }
         private CursorManager cursor;
         private ConstructionGrid grid;
-        public ConstructionGrid Grid { get { return grid; } }
         private Color red = Color.red;
         private Color green = Color.green;
         private struct NewBuilding
@@ -36,7 +35,7 @@ namespace Managers
         {
             _player = GetComponent<Player>();
             _inputs = GetComponent<UserInput>();
-            grid = new ConstructionGrid();//GetComponent<ConstructionGrid>();
+            grid = GetComponent<ConstructionGrid>();
             cursor = CursorManager.Instance;
             // alpha components for the colors
             red.a = 0.5f;

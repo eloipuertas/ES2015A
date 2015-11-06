@@ -31,11 +31,16 @@ public class Main_Game : MonoBehaviour {
 	private void LoadPlayerStronghold()
 	{
 		GameObject playerStronghold;
+        ConstructionGrid grid;
         if (info)
         {
-            playerStronghold = bm.createBuilding(strongholdTransform.position,
-                                                 strongholdTransform.rotation,
-                                                 BuildingTypes.STRONGHOLD, info.GetPlayerRace());
+            grid = GetComponent<ConstructionGrid>();
+            strongholdTransform.position = grid.discretizeMapCoords(strongholdTransform.position);
+            playerStronghold = Info.get.createBuilding(info.GetPlayerRace(),
+                                                       BuildingTypes.STRONGHOLD,
+                                                       strongholdTransform.position,
+                                                       strongholdTransform.rotation);
+            grid.reservePosition(strongholdTransform.position);
 			user.addEntity(playerStronghold.GetComponent<IGameEntity>());
 			cam.lookGameObject(playerStronghold);
         }
