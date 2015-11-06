@@ -32,6 +32,7 @@ public interface IGameEntity : IBaseActor
 
     Races getRace();
     E getType<E>() where E : struct, IConvertible;
+    void Destroy();
 
     IKeyGetter registerFatalWounds(Action<System.Object> func);
     IKeyGetter unregisterFatalWounds(Action<System.Object> func);

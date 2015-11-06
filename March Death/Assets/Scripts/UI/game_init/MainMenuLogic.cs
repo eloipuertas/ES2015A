@@ -26,7 +26,6 @@ public class MainMenuLogic : MonoBehaviour {
         }
         */
 		Cursor.visible = true;
-
 	}
 
 	/* MOUSE OVER */

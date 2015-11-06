@@ -238,6 +238,25 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         setupAbilities();
     }
 
+    public void Destroy()
+    {
+        // TODO: Should this be automatically handled with events?
+        FOWManager.Instance.removeEntity(this.GetComponent<FOWEntity>());
+
+        // TODO: Should this be automatically handled with events?
+        Selectable selectable = GetComponent<Selectable>();
+        if (selectable.currentlySelected)
+        {
+            selectable.DeselectMe();
+        }
+
+        // TODO: Should this be automatically handled with events?
+        BasePlayer.getOwner(this).removeEntity(this);
+
+        // Destroy us
+        Destroy(this.gameObject);
+    }
+
     public override void Update()
     {
         foreach (Ability ability in _abilities)
@@ -247,21 +266,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 
         if (status == EntityStatus.DEAD || status == EntityStatus.DESTROYED)
         {
-            // TODO: Should this be automatically handled with events?
-            FOWManager.Instance.removeEntity(this.GetComponent<FOWEntity>());
-
-            // TODO: Should this be automatically handled with events?
-            Selectable selectable = GetComponent<Selectable>();
-            if (selectable.currentlySelected)
-            {
-                selectable.DeselectMe();
-            }
-
-            // TODO: Should this be automatically handled with events?
-            BasePlayer.getOwner(this).removeEntity(this);
-
-            // Destroy us
-            Destroy(this.gameObject);
+            Destroy();
         }
     }
 

@@ -58,14 +58,18 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     /// When destroyed, it's called
     /// </summary>
     public override void OnDestroy() 
-    {
-        ConstructionGrid grid = GameObject.FindGameObjectWithTag("GameController").GetComponent<ConstructionGrid>();
-        Vector3 disc_pos = grid.discretizeMapCoords(gameObject.transform.position);
-        grid.liberatePosition(disc_pos);
-        base.OnDestroy();
-    }
-
-    /// <summary>
+	{
+		try {
+			ConstructionGrid grid = GameObject.Find("GameController").GetComponent<ConstructionGrid>();
+			Vector3 disc_pos = grid.discretizeMapCoords(gameObject.transform.position);
+			grid.liberatePosition(disc_pos);
+		} catch(Exception e) {
+			Debug.LogWarning("Exception while trying to liberate position of a building: " + e.ToString());
+		}
+		base.OnDestroy();
+	}
+	
+	/// <summary>
     /// Object initialization
     /// </summary>
     public override void Awake()

@@ -37,7 +37,11 @@ public class FOWManager : MonoBehaviour
     List<FOWEntity> entities;
     Texture2D fowTex;
     Color32[] pixels;
-
+    /// <summary>
+    /// Dictionary Range,Table
+    /// Contains precalculated tables for optimitzation purposes
+    /// </summary>
+    Dictionary<int, Color32[]> rangeTables;
     /// <summary>
     /// This will contain the grid for the vision of the AI.
     /// This can be only an enum because it doesn't need to be passed to the shader nor does it need to have all the fancy gradient fading the normal FOW has.
@@ -46,12 +50,13 @@ public class FOWManager : MonoBehaviour
 
     void Awake()
     {
-        frames = 1;
+        frames = 0;
         cFrame = 0;
         fadeRate=200;
         if (Application.isPlaying)
             InitializeTexture();
         entities= new List<FOWEntity>();
+        rangeTables = new Dictionary<int, Color32[]>();
     }
     /// <summary>
     /// Creates a new texture the size of terrain
@@ -76,7 +81,6 @@ public class FOWManager : MonoBehaviour
             fowTex = new Texture2D(width, height, TextureFormat.RGB24, false);
             pixels = fowTex.GetPixels32();
             aiVision = new visible[width * height];
-            
             //Paint it all black
             Color cc = NotFullyOpaque? new Color(0, 255, 0): Color.black;
             for (int i = 0; i < pixels.Length; i++)
@@ -152,42 +156,96 @@ public class FOWManager : MonoBehaviour
     /// <param name="entity">Entity which reveals an area</param>
     private void reveal(FOWEntity entity)
     {
-        Rect rect = entity.Bounds;
-        int xMin, xMax, yMin, yMax;
-        getBounds(rect, Mathf.RoundToInt(entity.Range * Quality), out xMin, out xMax, out yMin, out yMax);
-        //Initialize variables to optimize
-        int texWidth = fowTex.width;
-        float halfRange = (entity.Range / 2);
-        float doubleRange = entity.Range * entity.Range;
-        Vector2 pos, intlPos;
-        for (int y = yMin; y <= yMax; y++)
-        {
-            float yIntl = Mathf.Clamp(y, rect.yMin, rect.yMax - 1);
-            for (int x = xMin; x <= xMax; x++)
-            {
-                pos = new Vector2(x, y) / Quality;
-                intlPos = new Vector2(Mathf.Clamp(pos.x, rect.xMin, rect.xMax - 1), yIntl);
+        Color32[] table;
+        int range = Mathf.RoundToInt(entity.Range*Quality);
 
-                float dist = (intlPos - pos).sqrMagnitude;
-                //Check if it's out of range
-                if (dist > doubleRange)
-                    continue;
-                int n = x + y * texWidth;
-                if (n < pixels.Length)
+        if (!rangeTables.TryGetValue(range,out table))
+        {
+            table = makeTable(entity.Range);
+            rangeTables.Add(range, table);
+        }
+        Vector2 center = entity.Bounds.center*Quality;
+        float xOff = center.x - range;
+        float yOff = center.y - range;
+        int xCen = Mathf.RoundToInt(xOff);
+        int yCen = Mathf.RoundToInt(yOff);
+        int texWidth = fowTex.width;
+        int dRange = range * 2;
+        if (entity.IsOwnedByPlayer)
+        {
+            Vector2 offset = new Vector2(xOff - xCen, yOff - yCen);
+            for (int x = 0; x <= dRange; x++)
+            {
+                for (int y = 0; y <= dRange; y++)
                 {
-                    float fade = 1;
-                    if (dist > entity.Range+2)
-                        fade = Mathf.Clamp01((entity.Range - Mathf.Sqrt(dist)) / halfRange);
-                    if (entity.IsOwnedByPlayer)
+                    int n = x + y * dRange;
+                    int n2 = (xCen+x) + (yCen+y) * texWidth;
+                    if (n2 < pixels.Length)
                     {
-                        pixels[n].g = (byte)Mathf.Max(pixels[n].g, 255 * fade);
-                        pixels[n].b = (byte)Mathf.Max(pixels[n].b, 255 * fade);
+
+                        if (table[n].b > 0)
+                        {
+                            pixels[n2].g = (byte)Mathf.Max(pixels[n2].g, table[n].g, 255);
+                            if (table[n].b == 255)
+                            {
+                                pixels[n2].b = (byte)Mathf.Max(pixels[n2].b, table[n].b);
+                            }
+                            else
+                            {
+                                pixels[n2].b = (byte)Mathf.Max(pixels[n2].b, Mathf.Min(table[n].b + Mathf.RoundToInt(offset.x * (x - range) + offset.y * (y - range)), 255));
+                            }
+                        }
                     }
-                    else
-                        aiVision[n] = (visible.explored | visible.visible);
                 }
             }
         }
+        else
+        {
+            for (int x = 0; x <= dRange; x++)
+            {
+                for (int y = 0; y <= dRange; y++)
+                {
+                    int n = x + y * dRange;
+                    int n2 = (xCen + x) + (yCen + y) * texWidth;
+                    if (n2 < pixels.Length && table[n].b > 1)
+                    {
+                        aiVision[n2] = (visible.explored | visible.visible);
+                    }
+                }
+            }
+        }
+    }
+    private Color32[] makeTable(float range)
+    {
+        //Initialize variables to optimize
+        float halfRange = (range / 2);
+        float sqrRange = range * range;
+        int dRange = Mathf.RoundToInt(2*range*Quality);
+        Color32[] table = new Color32[dRange*(dRange+1)+1];
+        Vector2 pos;
+        Vector2 intlPos = new Vector2(range, range);
+        for (int y = 0; y <= dRange; y++)
+        {
+            for (int x = 0; x <= dRange; x++)
+            {
+                pos = new Vector2(x, y) / Quality;
+
+                float dist = (intlPos - pos).sqrMagnitude;
+                //Check if it's out of range
+                if (dist > sqrRange)
+                    continue;
+                int n = x + y * dRange;
+                if (n < table.Length)
+                {
+                    float fade = 1;
+                    if (dist > range)
+                        fade = Mathf.Clamp01((range - Mathf.Sqrt(dist)) / halfRange);
+                    table[n].g = (byte)Mathf.Max(pixels[n].g, 255 * fade);
+                    table[n].b = (byte)Mathf.Max(pixels[n].b, 255 * fade);
+                }
+            }
+        }
+        return table;
     }
     /// <summary>
     /// Checks if there is some point of the rectange with visiblity = vis

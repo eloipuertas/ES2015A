@@ -5,9 +5,14 @@ namespace Managers
 {
     public class BuildingsManager : MonoBehaviour
     {
+        public enum Place { ABLE, NOT_ABLE }
+        private Place _currentPlace = Place.ABLE;
+        public Place currentPlace { get { return _currentPlace; } }
+        private Player _player;
+        private UserInput _inputs;
+        public Player Player { set { _player = value; } }
+        public UserInput Inputs { set { _inputs = value; } }
 
-        private Player player;
-        private UserInput inputs;
         private CursorManager cursor;
         private ConstructionGrid grid;
         private Color red = Color.red;
@@ -29,8 +34,8 @@ namespace Managers
         // Use this for initialization
         void Start()
         {
-            player = GetComponent<Player>();
-            inputs = GetComponent<UserInput>();
+            _player = GetComponent<Player>();
+            _inputs = GetComponent<UserInput>();
             grid = GetComponent<ConstructionGrid>();
             cursor = CursorManager.Instance;
             // alpha components for the colors
@@ -70,7 +75,7 @@ namespace Managers
                 _newBuilding.ghost = CreateGhostBuilding(race, type);
                 _newBuilding.material = _newBuilding.ghost.GetComponent<Renderer>().material;
                 _newBuilding.placing = true;
-                player.setCurrently(Player.status.PLACING_BUILDING);
+                _player.setCurrently(Player.status.PLACING_BUILDING);
             }
 
         }
@@ -126,7 +131,7 @@ namespace Managers
         {
             Vector3 newDestination = GetNewDestination();
             // if is not a vaild point, the building remains quiet
-            if (newDestination == inputs.invalidPosition) return false;
+            if (newDestination == _inputs.invalidPosition) return false;
 
             // alter the color if is not a valid location
             if (checkLocation(newDestination))
@@ -139,7 +144,7 @@ namespace Managers
 
                 //TODO : check another way to get the IGameEntity
                 IGameEntity entity = (IGameEntity)finalBuilding.GetComponent<Unit>();
-                player.addEntity(entity);
+                _player.addEntity(entity);
 
                 // remaining operations
                 _finishPlacing();
@@ -183,7 +188,7 @@ namespace Managers
         private Vector3 GetNewDestination()
         {
             // 1. getPoint
-            Vector3 toLocation = inputs.FindTerrainHitPoint();
+            Vector3 toLocation = _inputs.FindTerrainHitPoint();
             // let the buildings not to fall down
             toLocation.y += yoffset;
             // 2. discretize
@@ -199,18 +204,18 @@ namespace Managers
 
             Vector3 newDestination = GetNewDestination();
             // if is not a vaild point, the building remains quiet
-            if (newDestination == inputs.invalidPosition) return;
+            if (newDestination == _inputs.invalidPosition) return;
 
             // 2. check and move alter the color if is not a valid location
             _newBuilding.ghost.transform.position = newDestination;
             if (checkLocation(newDestination))
             {
-                cursor.setCursor(CursorManager.cursor.DEFAULT);
+                _currentPlace = Place.ABLE;
                 _newBuilding.material.color = green;
             }
             else
             {
-                cursor.setCursor(CursorManager.cursor.NO_BUILDING_IN);
+                _currentPlace = Place.NOT_ABLE;
                 _newBuilding.material.color = red;
             }
 

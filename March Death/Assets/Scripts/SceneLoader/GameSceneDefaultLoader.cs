@@ -7,7 +7,8 @@ namespace SceneLoader
     public class GameSceneDefaultLoader : MonoBehaviour
     {
         public Storage.Races _playerRace = Storage.Races.ELVES;
-        public Storage.Races _iaRace = Storage.Races.MEN;
+        private Storage.Races _iaRace = Storage.Races.MEN;
+
         private GameObject informationObject = null;
         private GameInformation gameInfo;
 
@@ -52,7 +53,8 @@ namespace SceneLoader
 
             if (_playerRace == _iaRace)
             {
-                throw new Exception("Player and IA can't have the same race. Loading will fail");
+                _iaRace = Storage.Races.ELVES;
+                //throw new Exception("Player and IA can't have the same race. Loading will fail");
             }
 
             

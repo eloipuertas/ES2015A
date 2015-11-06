@@ -52,8 +52,7 @@ namespace Assets.Scripts.AI
 
                 if(AIController.AI_DEBUG_ENABLED)
                 {
-                    ai.aiDebug.controllingAgent = bAgent.agentName;
-                    ai.aiDebug.confidence = bVal;
+                    ai.aiDebug.setControllingAgent(bAgent.agentName, bVal);
                 }
 
                 bAgent.controlUnits(lu);
