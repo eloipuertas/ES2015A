@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-
-public class SelectableTroop: ISelection
+/// <summary>
+/// Basic Selectable Troop implementation
+/// </summary>
+public class SelectableTroop
 {
-    private List<Selectable> _selectedEntities;
+    protected List<Selectable> _selectedEntities;
     public int Count { get { return _selectedEntities.Count; } }
 
 
@@ -22,48 +24,11 @@ public class SelectableTroop: ISelection
         _selectedEntities = selectables;
     }
 
-    public void Select(Selectable selectable)
-    {
-        if (!_selectedEntities.Contains(selectable))
-        {
-            _selectedEntities.Add(selectable);
-            selectable.SelectEntity();
-        }
 
-    }
-
-    public void Select(List<Selectable> selectables)
+    public void ChangeSelectables(List<Selectable> selectables)
     {
-        Clear();
         _selectedEntities = selectables;
 
-    }
-
-    public void Deselect(Selectable selectable)
-    {
-        if (_selectedEntities.Contains(selectable))
-        {
-            selectable.DeselectEntity();
-        }
-    }
-
-    public void Clear()
-    {
-        foreach (Selectable selected in _selectedEntities)
-        {
-            selected.DeselectEntity();
-        }
-    }
-
-    public void Remove(Selectable selectable)
-    {
-        selectable.DeselectEntity();
-    }
-
-
-    public bool IsTroop()
-    {
-        return true;
     }
 
     public bool Contains(Selectable selectable)

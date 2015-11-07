@@ -3,28 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-public class SelectableGroup : ISelection
+public class SelectableGroup : SelectableTroop
 {
-    private List<Selectable> _selectedEntities;
-    public int Count { get { return _selectedEntities.Count; } }
+    public SelectableGroup() : base() { }
+
+    public SelectableGroup(List<Selectable> selectables) : base(selectables) { }
 
 
-    public SelectableGroup()
-    {
-        _selectedEntities = new List<Selectable>();
-    }
-
-    public SelectableGroup(List<Selectable> selectables)
-    {
-        _selectedEntities = selectables;
-    }
-
-
-    /// <summary>
-    /// SelectUnique performs a deselection of the current entities, if there are any selected, and a selection of the entity specified by parameter
-    /// </summary>
-    /// <param name="selectable">The entity that is going to be selected </param>
-    public void Select(Selectable selectable)
+    
+    public bool Select(Selectable selectable)
     {
         // Add the entity to the list selects the selectable 
         // do not select two times the same element
@@ -32,7 +19,9 @@ public class SelectableGroup : ISelection
         {
             _selectedEntities.Add(selectable);
             selectable.SelectEntity();
+            return true;
         }
+        return false;
 
     }
 
@@ -40,16 +29,22 @@ public class SelectableGroup : ISelection
     {
         Clear();
         _selectedEntities = selectables;
+        foreach (Selectable selected in _selectedEntities)
+        {
+            selected.SelectEntity();
+        }
 
     }
 
-    public void Deselect(Selectable selectable)
+    public bool Deselect(Selectable selectable)
     {
         if (_selectedEntities.Contains(selectable))
         {
             _selectedEntities.Remove(selectable);
             selectable.DeselectEntity();
+            return true;
         }
+        return false;
     }
 
     public void Clear()
@@ -68,31 +63,6 @@ public class SelectableGroup : ISelection
         _selectedEntities.Remove(selectable);
     }
 
-
-    public bool IsTroop()
-    {
-        return false;
-    }
-
-    public bool Contains(Selectable selectable)
-    {
-        return _selectedEntities.Contains(selectable);
-    }
-
-    public Selectable[] ToArray()
-    {
-        return _selectedEntities.ToArray();
-    }
-
-    public ArrayList ToArrayList()
-    {
-        return new ArrayList(_selectedEntities.ToArray());
-    }
-
-    public List<Selectable> ToList()
-    {
-        return new List<Selectable>(_selectedEntities);
-    }
 
 }
 

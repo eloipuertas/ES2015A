@@ -7,15 +7,15 @@ namespace Managers
 {
     public class SelectionManager
     {
-        private ISelection _selectedEntities;
-        private List<Selectable> _selected;
-        private Dictionary<string, ISelection> _troops;
+        private SelectableGroup _selectedEntities;
+        private Dictionary<string, SelectableTroop> _troops;
         private Storage.Races _ownRace;
+        private bool _isTroop = false;
+        public bool IsTroop { get { return _isTroop; } }
         public int Troops { get { return _troops.Count; } }
 
         public SelectionManager()
         {
-
             _selectedEntities = new SelectableGroup();
         }
 
@@ -34,11 +34,10 @@ namespace Managers
             // firstly it checks if an entity can be selected
             if (!CanBeSelected(selectable)) return;
 
+            _isTroop = false;
+
             //Deselects other selected objects
             if (_selectedEntities.Count > 0) _selectedEntities.Clear();
-
-            // Creates new group
-            if (_selectedEntities.IsTroop()) _selectedEntities = new SelectableGroup();
 
             _selectedEntities.Select(selectable);
             
@@ -48,6 +47,7 @@ namespace Managers
         {
             SelectableTroop troop = new SelectableTroop(_selectedEntities.ToList());
             _troops.Add(key, troop);
+            _isTroop = true;
         }
 
 
@@ -57,17 +57,7 @@ namespace Managers
         /// <param name="selectable">The entity that is going to be selected </param>
         public void Select(Selectable selectable)
         {
-
-            // Creates new group
-            if (_selectedEntities.IsTroop())
-            { 
-                _selectedEntities.Clear();
-                _selectedEntities = new SelectableGroup();
-
-            }
-
-            _selectedEntities.Select(selectable);
-
+            if(_selectedEntities.Select(selectable)) _isTroop = false;
         }
 
 
@@ -77,14 +67,15 @@ namespace Managers
         /// <param name="entity"></param>
         public void Deselect(Selectable selectable)
         {
-            _selectedEntities.Deselect(selectable);
+            
+            if(_selectedEntities.Deselect(selectable)) _isTroop = false;
         }
 
 
         public void SelectTroop(string key)
         {
-            _selectedEntities.Clear();
-            _selectedEntities = _troops[key];
+            _selectedEntities.Select(_troops[key].ToList());
+            _isTroop = true;
         }
 
 
@@ -95,7 +86,7 @@ namespace Managers
         /// <param name="selectable"></param>
         public void DeselectFromSelected(Selectable selectable)
         {
-                _selectedEntities.Remove(selectable);
+            _selectedEntities.Remove(selectable);
         }
 
 
@@ -105,6 +96,7 @@ namespace Managers
         public void EmptySelection()
         {
             _selectedEntities.Clear();
+            _isTroop = false;
         }
 
 
@@ -131,7 +123,7 @@ namespace Managers
 
         public void DeleteTroop(string key)
         {
-            _troops[key].Clear();
+            if(_isTroop) EmptySelection();
             _troops.Remove(key);
         }
 
