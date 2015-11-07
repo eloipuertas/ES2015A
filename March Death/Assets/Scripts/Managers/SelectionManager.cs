@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,12 +7,16 @@ namespace Managers
 {
     public class SelectionManager
     {
-        private List<Selectable> _selectedEntities;
+        private ISelection _selectedEntities;
+        private List<Selectable> _selected;
+        private Dictionary<string, ISelection> _troops;
         private Storage.Races _ownRace;
+        public int Troops { get { return _troops.Count; } }
 
         public SelectionManager()
         {
-            _selectedEntities = new List<Selectable>();
+
+            _selectedEntities = new SelectableGroup();
         }
 
         /// <summary>
@@ -23,22 +28,27 @@ namespace Managers
             _ownRace = race;
         }
 
-        /// <summary>
-        /// SelectUnique performs a deselection of the current entities, if there are any selected, and a selection of the entity specified by parameter
-        /// </summary>
-        /// <param name="selectable">The entity that is going to be selected </param>
+
         public void SelectUnique(Selectable selectable)
         {
             // firstly it checks if an entity can be selected
             if (!CanBeSelected(selectable)) return;
 
-            //Deselect other selected objects
-            if (_selectedEntities.Count  > 0) EmptySelection();
+            //Deselects other selected objects
+            if (_selectedEntities.Count > 0) _selectedEntities.Clear();
 
-            Select(selectable);
+            // Creates new group
+            if (_selectedEntities.IsTroop()) _selectedEntities = new SelectableGroup();
+
+            _selectedEntities.Select(selectable);
             
         }
 
+        public void NewTroop(String key)
+        {
+            SelectableTroop troop = new SelectableTroop(_selectedEntities.ToList());
+            _troops.Add(key, troop);
+        }
 
 
         /// <summary>
@@ -47,42 +57,45 @@ namespace Managers
         /// <param name="selectable">The entity that is going to be selected </param>
         public void Select(Selectable selectable)
         {
-            
-            // do not select two times the same element
-            if (!_selectedEntities.Contains(selectable))
-            {
-                // Add the entity to the list selects the selectable component
-                _selectedEntities.Add(selectable);
-                selectable.SelectEntity();
+
+            // Creates new group
+            if (_selectedEntities.IsTroop())
+            { 
+                _selectedEntities.Clear();
+                _selectedEntities = new SelectableGroup();
+
             }
+
+            _selectedEntities.Select(selectable);
+
         }
 
 
         /// <summary>
-        /// Removes the specified entity from the selected entities
+        /// Deselects the specified entity from the selected entities
         /// </summary>
         /// <param name="entity"></param>
         public void Deselect(Selectable selectable)
         {
-            if (_selectedEntities.Contains(selectable))
-            {
-                _selectedEntities.Remove(selectable);
-                selectable.DeselectEntity();
-            }
-
-
+            _selectedEntities.Deselect(selectable);
         }
 
+
+        public void SelectTroop(string key)
+        {
+            _selectedEntities.Clear();
+            _selectedEntities = _troops[key];
+        }
+
+
+
         /// <summary>
-        /// Deselect and entity from the selected entitite without notify to the selectable element. This method should be used only from a selectable class
+        /// Deselect and entity from the selected entitite without notify to the selectable element. This method should be used only from a selectable object
         /// </summary>
         /// <param name="selectable"></param>
         public void DeselectFromSelected(Selectable selectable)
         {
-            if (_selectedEntities.Contains(selectable))
-            {
                 _selectedEntities.Remove(selectable);
-            }
         }
 
 
@@ -91,14 +104,7 @@ namespace Managers
         /// </summary>
         public void EmptySelection()
         {
-            Selectable[] selectedEntities = _selectedEntities.ToArray();
             _selectedEntities.Clear();
-
-            foreach (Selectable selected in selectedEntities)
-            {
-                selected.DeselectEntity();
-            }
-           
         }
 
 
@@ -123,6 +129,12 @@ namespace Managers
         }
 
 
+        public void DeleteTroop(string key)
+        {
+            _troops[key].Clear();
+            _troops.Remove(key);
+        }
+
         /// <summary>
         /// Removes all the buildings from the current selection
         /// </summary>
@@ -146,7 +158,7 @@ namespace Managers
         /// <param name="point"></param>
         public void MoveTo(Vector3 point)
         {
-            foreach (Selectable selected in _selectedEntities)
+            foreach (Selectable selected in _selectedEntities.ToArray())
             {
                 if (selected.entity.info.isUnit)
                     selected.GetComponent<Unit>().moveTo(point);
@@ -162,15 +174,15 @@ namespace Managers
         /// <param name="point"></param>
         public void AttackTo(IGameEntity enemy)
         {
-            foreach (Selectable selected in _selectedEntities)
+            foreach (Selectable selected in _selectedEntities.ToArray())
             {
                 
                 if (selected.entity.info.isUnit)
                 {
                     Unit unit = selected.GetComponent<Unit>();
-                    // so far we only can attack units
-                    //TODO : (hermetico) check why we can't attack buildings
-                    if(enemy.info.isUnit) unit.attackTarget((Unit)enemy);
+                    if (enemy.info.isUnit) unit.attackTarget((Unit)enemy);
+                    else if(enemy.info.isBarrack)unit.attackTarget((Barrack)enemy);
+                    else if(enemy.info.isResource)unit.attackTarget((Resource)enemy);
                 }
             }
             Debug.Log("attacking");
