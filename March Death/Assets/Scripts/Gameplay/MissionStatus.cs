@@ -119,7 +119,7 @@ public class MissionStatus
                     missionTargets[1]--;
                     if (missionTargets[1] == 0)
                     {
-                        controller.notifyBuildingCreated(type);
+                        controller.notifyBuildingCreated(type, owner);
                     }
                 }
             }
@@ -138,7 +138,7 @@ public class MissionStatus
                     missionTargets[0]--;
                     if (missionTargets[0] == 0)
                     {
-                        controller.notifyBuildingDestroyed(type);
+                        controller.notifyBuildingDestroyed(type, owner);
                     }
                 }
             }

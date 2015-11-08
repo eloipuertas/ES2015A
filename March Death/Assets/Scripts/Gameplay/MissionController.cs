@@ -7,8 +7,8 @@ public class MissionController : MonoBehaviour
 
     //public enum Winner { NONE = 0, PLAYER = 1, PC = 2 }
 
-    private static Dictionary<Storage.UnitTypes, uint> destroyedUnitsWinners = new Dictionary<Storage.UnitTypes, Winner>();
-    private static Dictionary<Storage.BuildingTypes, uint> destroyedBuildingsWinners = new Dictionary<Storage.BuildingTypes, Winner>();
+    private static Dictionary<Storage.UnitTypes, uint> destroyedUnitsWinners = new Dictionary<Storage.UnitTypes, uint>();
+    private static Dictionary<Storage.BuildingTypes, uint> destroyedBuildingsWinners = new Dictionary<Storage.BuildingTypes, uint>();
 
     private Battle battle;
 
@@ -50,9 +50,8 @@ public class MissionController : MonoBehaviour
 
     public Battle.MissionDefinition[] getMissionListArray()
     {
-        Battle.MissionDefinition[] missions;
-        battle.GetMissions().CopyTo(missions);
-        return missions;
+        List<Battle.MissionDefinition> missions = battle.GetMissions();
+        return missions.ToArray();
     }
 
     /// <summary>

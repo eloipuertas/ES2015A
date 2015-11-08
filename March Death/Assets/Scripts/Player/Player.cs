@@ -103,13 +103,13 @@ public class Player : BasePlayer
     // </summary>
     //public Managers.ResourcesManager resources {get { return _resources; } }
 
-    private void performUnitDied(Object obj)
+    private void performUnitDied(System.Object obj)
     {
         IGameEntity e = ((GameObject) obj).GetComponent<IGameEntity>();
         missionStatus.OnUnitKilled(((Unit) e).type);
     }
 
-    private void performBuildingDestroyed(Object obj)
+    private void performBuildingDestroyed(System.Object obj)
     {
         IGameEntity e = ((GameObject) obj).GetComponent<IGameEntity>();
         if (e.info.isBarrack)
