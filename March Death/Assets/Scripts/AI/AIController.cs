@@ -79,6 +79,8 @@ namespace Assets.Scripts.AI
                 aiDebug = AIDebugSystem.CreateComponent(gameObject, this);
             }
 
+            AcquirePlayerID();
+            missionStatus = new MissionStatus(playerId);
         }
         void Update()
         {
@@ -98,10 +100,12 @@ namespace Assets.Scripts.AI
             if (g.info.isUnit)
             {
                 EnemyUnits.Remove((Unit)g);
+                missionStatus.OnUnitKilled(((Unit) g).type);
             }
             else if (g.info.isBuilding)
             {
                 EnemyBuildings.Remove(g);
+                missionStatus.OnBuildingDestroyed(g.getType<Storage.BuildingTypes>());
             }
         }
         void OnEntityFound(System.Object obj)

@@ -36,6 +36,8 @@ public class Player : BasePlayer
         _selfRace = info.GetPlayerRace();
         _selection.SetRace(race);
         
+        AcquirePlayerID();
+        missionStatus = new MissionStatus(playerId);
     }
 
     // Update is called once per frame
@@ -100,4 +102,35 @@ public class Player : BasePlayer
     // Getter for the resources of the player.
     // </summary>
     //public Managers.ResourcesManager resources {get { return _resources; } }
+
+    private void performUnitDied(Object obj)
+    {
+        IGameEntity e = ((GameObject) obj).GetComponent<IGameEntity>();
+        missionStatus.OnUnitKilled(((Unit) e).type);
+    }
+
+    private void performBuildingDestroyed(Object obj)
+    {
+        IGameEntity e = ((GameObject) obj).GetComponent<IGameEntity>();
+        if (e.info.isBarrack)
+        {
+            missionStatus.OnBuildingDestroyed(((Barrack) e).type);
+        }
+        else if (e.info.isResource)
+        {
+            missionStatus.OnBuildingDestroyed(((Resource) e).type);
+        }
+    }
+
+    public void registerGameEntityActions(IGameEntity entity)
+    {
+        if (entity.info.isUnit)
+        {
+            entity.registerFatalWounds(performUnitDied);
+        }
+        else if (entity.info.isBuilding)
+        {
+            entity.registerFatalWounds(performBuildingDestroyed);
+        }
+    }
 }

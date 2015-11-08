@@ -154,6 +154,7 @@ public class UserInput : MonoBehaviour
 
                 if (entity.info.race != player.race) // If it is another race, we'll attack, but if it's the same race?
                 {
+                    player.registerGameEntityActions(entity);
                     sManager.AttackTo(entity);
                 }
             }
