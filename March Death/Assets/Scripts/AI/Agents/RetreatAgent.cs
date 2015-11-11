@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.AI.Agents
@@ -27,6 +24,7 @@ namespace Assets.Scripts.AI.Agents
         Rect enemySquadBoundingBox, ownSquadBoundingBox;
         Vector3 safeArea;
         float minDistanceBetweenHeroAndNearestEnemy;
+        private float _maxUnitRange;
 
         bool isHeroInDanger;
 
@@ -46,6 +44,17 @@ namespace Assets.Scripts.AI.Agents
                     hero = u;
                 }
             }
+
+            if (ai.race == Storage.Races.ELVES)
+            {
+                _maxUnitRange = Storage.Info.get.of(Storage.Races.MEN, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
+            }
+            else
+            {
+                _maxUnitRange = Storage.Info.get.of(Storage.Races.ELVES, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
+            }
+
+            Debug.Log("Max range = " + _maxUnitRange);
 
         }
 
