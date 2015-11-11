@@ -8,17 +8,14 @@ namespace Managers
 {
     public class SelectionManager
     {
-        private SelectableGroup _selectedEntities;
-        private Dictionary<string, SelectableTroop> _troops;
+        private SelectableGroup _selectedEntities = new SelectableGroup();
+        private Dictionary<string, SelectableTroop> _troops = new Dictionary<string, SelectableTroop>();
         private Storage.Races _ownRace;
         private bool _isTroop = false;
         public bool IsTroop { get { return _isTroop; } }
         public int Troops { get { return _troops.Count; } }
 
-        public SelectionManager()
-        {
-            _selectedEntities = new SelectableGroup();
-        }
+        public SelectionManager() {}
 
         /// <summary>
         /// Setter for the race
@@ -48,9 +45,13 @@ namespace Managers
 
         public void NewTroop(String key)
         {
+            Assert.IsFalse(_troops.ContainsKey(key));
+            Assert.IsTrue(_selectedEntities.Count > 1);
+
             SelectableTroop troop = new SelectableTroop(_selectedEntities.ToList());
             _troops.Add(key, troop);
             _isTroop = true;
+            Debug.Log("Created troop: " + key);
         }
 
 
@@ -81,11 +82,18 @@ namespace Managers
             }
         }
 
+        public bool HasTroop(string key)
+        {
+            return _troops.ContainsKey(key);
+        }
+
 
         public void SelectTroop(string key)
         {
+            Assert.IsTrue(_troops.ContainsKey(key));
             _selectedEntities.Select(_troops[key].ToList());
             _isTroop = true;
+            Debug.Log("Selected troop: " + key);
         }
 
 

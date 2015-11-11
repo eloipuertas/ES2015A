@@ -27,7 +27,7 @@ public class SelectableGroup : SelectableTroop
     {
         Clear();
         
-        foreach (Selectable selected in _selectedEntities)
+        foreach (Selectable selected in selectables)
         {
             Select(selected);
         }
