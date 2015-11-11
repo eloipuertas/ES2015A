@@ -43,15 +43,23 @@ namespace Managers
             
         }
 
-        public void NewTroop(String key)
+        public bool NewTroop(String key)
         {
             Assert.IsFalse(_troops.ContainsKey(key));
-            Assert.IsTrue(_selectedEntities.Count > 1);
+            if(_selectedEntities.Count > 1)
+            {
 
-            SelectableTroop troop = new SelectableTroop(_selectedEntities.ToList());
-            _troops.Add(key, troop);
-            _isTroop = true;
-            Debug.Log("Created troop: " + key);
+                SelectableTroop troop = new SelectableTroop(_selectedEntities.ToList());
+                _troops.Add(key, troop);
+                _isTroop = true;
+                Debug.Log("Created troop: " + key);
+                return true;
+            }
+            else
+            {
+                Debug.Log("Troops should have more than 1 unit");
+                return false;
+            }
         }
 
 
