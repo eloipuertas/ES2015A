@@ -138,7 +138,7 @@ public partial class UserInput : MonoBehaviour
         {
             //Do nothing
         }
-        else if (player.isCurrently(Player.status.SELECTED_UNITS))
+        else if ( player.isCurrently(Player.status.SELECTED_UNITS) && !sManager.IsBuilding())
         {
 
             GameObject hitObject = FindHitObject();

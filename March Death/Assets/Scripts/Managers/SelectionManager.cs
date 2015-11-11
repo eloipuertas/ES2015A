@@ -208,6 +208,16 @@ namespace Managers
         }
 
 
+        public bool IsBuilding()
+        {
+            //there aren't buildings in multiple selection
+            if (_selectedEntities.Count == 1)
+            {
+                if(_selectedEntities.ToArray()[0].entity.info.isBuilding) return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Returns an array list with the current selected entities
         /// </summary>
