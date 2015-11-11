@@ -138,7 +138,7 @@ public partial class UserInput : MonoBehaviour
         {
             //Do nothing
         }
-        else if ( player.isCurrently(Player.status.SELECTED_UNITS) && !sManager.IsBuilding())
+        else if ( player.isCurrently(Player.status.SELECTED_UNITS) && !sManager.IsBuilding() )
         {
 
             GameObject hitObject = FindHitObject();
@@ -154,7 +154,7 @@ public partial class UserInput : MonoBehaviour
             {
                 IGameEntity entity = hitObject.GetComponent<IGameEntity>();
 
-                if (entity.info.race != player.race) // If it is another race, we'll attack, but if it's the same race?
+                if ((entity.info.race != player.race) && entity.status != EntityStatus.DEAD && entity.status != EntityStatus.DESTROYED) // If it is another race, we'll attack, but if it's the same race?
                 {
                     sManager.AttackTo(entity);
                 }
