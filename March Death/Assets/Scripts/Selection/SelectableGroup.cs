@@ -3,25 +3,23 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine.Assertions;
+
 public class SelectableGroup : SelectableTroop
 {
     public SelectableGroup() : base() { }
-
     public SelectableGroup(List<Selectable> selectables) : base(selectables) { }
 
 
     
-    public bool Select(Selectable selectable)
+    public void Select(Selectable selectable)
     {
         // Add the entity to the list selects the selectable 
         // do not select two times the same element
-        if (!_selectedEntities.Contains(selectable))
-        {
-            _selectedEntities.Add(selectable);
-            selectable.SelectEntity();
-            return true;
-        }
-        return false;
+        //TODO:(hermetico) user assertions and not booleans
+        Assert.IsTrue(_selectedEntities.Contains(selectable));
+        _selectedEntities.Add(selectable);
+        selectable.SelectEntity();
 
     }
 
@@ -36,15 +34,12 @@ public class SelectableGroup : SelectableTroop
 
     }
 
-    public bool Deselect(Selectable selectable)
+    public void Deselect(Selectable selectable)
     {
-        if (_selectedEntities.Contains(selectable))
-        {
-            _selectedEntities.Remove(selectable);
-            selectable.DeselectEntity();
-            return true;
-        }
-        return false;
+        //TODO:(hermetico) user assertions and not booleans
+        Assert.IsFalse(_selectedEntities.Contains(selectable));
+        _selectedEntities.Remove(selectable);
+        selectable.DeselectEntity();
     }
 
     public void Clear()

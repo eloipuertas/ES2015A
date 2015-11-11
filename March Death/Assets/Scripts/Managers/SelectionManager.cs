@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Managers
 {
@@ -32,7 +33,9 @@ namespace Managers
         public void SelectUnique(Selectable selectable)
         {
             // firstly it checks if an entity can be selected
-            if (!CanBeSelected(selectable)) return;
+            //if (!CanBeSelected(selectable)) return;
+            Assert.IsTrue(CanBeSelected(selectable));
+            
 
             _isTroop = false;
 
@@ -57,7 +60,9 @@ namespace Managers
         /// <param name="selectable">The entity that is going to be selected </param>
         public void Select(Selectable selectable)
         {
-            if(_selectedEntities.Select(selectable)) _isTroop = false;
+            //TODO:(hermetico) user assertions and not booleans
+            _selectedEntities.Select(selectable);
+            _isTroop = false;
         }
 
 
@@ -67,8 +72,9 @@ namespace Managers
         /// <param name="entity"></param>
         public void Deselect(Selectable selectable)
         {
-            
-            if(_selectedEntities.Deselect(selectable)) _isTroop = false;
+            //TODO:(hermetico) user assertions and not booleans
+            _selectedEntities.Deselect(selectable);
+            _isTroop = false;
         }
 
 
