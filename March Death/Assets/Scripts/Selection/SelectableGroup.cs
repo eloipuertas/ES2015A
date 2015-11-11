@@ -17,7 +17,7 @@ public class SelectableGroup : SelectableTroop
         // Add the entity to the list selects the selectable 
         // do not select two times the same element
         //TODO:(hermetico) user assertions and not booleans
-        Assert.IsTrue(_selectedEntities.Contains(selectable));
+        Assert.IsFalse(_selectedEntities.Contains(selectable));
         _selectedEntities.Add(selectable);
         selectable.SelectEntity();
 
@@ -26,10 +26,10 @@ public class SelectableGroup : SelectableTroop
     public void Select(List<Selectable> selectables)
     {
         Clear();
-        _selectedEntities = selectables;
+        
         foreach (Selectable selected in _selectedEntities)
         {
-            selected.SelectEntity();
+            Select(selected);
         }
 
     }
@@ -37,7 +37,7 @@ public class SelectableGroup : SelectableTroop
     public void Deselect(Selectable selectable)
     {
         //TODO:(hermetico) user assertions and not booleans
-        Assert.IsFalse(_selectedEntities.Contains(selectable));
+        Assert.IsTrue(_selectedEntities.Contains(selectable));
         _selectedEntities.Remove(selectable);
         selectable.DeselectEntity();
     }

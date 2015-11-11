@@ -60,9 +60,11 @@ namespace Managers
         /// <param name="selectable">The entity that is going to be selected </param>
         public void Select(Selectable selectable)
         {
-            //TODO:(hermetico) user assertions and not booleans
-            _selectedEntities.Select(selectable);
-            _isTroop = false;
+            if (!_selectedEntities.Contains(selectable))
+            {
+                _selectedEntities.Select(selectable);
+                _isTroop = false;
+            }
         }
 
 
@@ -72,9 +74,11 @@ namespace Managers
         /// <param name="entity"></param>
         public void Deselect(Selectable selectable)
         {
-            //TODO:(hermetico) user assertions and not booleans
-            _selectedEntities.Deselect(selectable);
-            _isTroop = false;
+            if (_selectedEntities.Contains(selectable))
+            {
+                _selectedEntities.Deselect(selectable);
+                _isTroop = false;
+            }
         }
 
 
@@ -92,7 +96,8 @@ namespace Managers
         /// <param name="selectable"></param>
         public void DeselectFromSelected(Selectable selectable)
         {
-            _selectedEntities.Remove(selectable);
+            if(_selectedEntities.Contains(selectable))
+                _selectedEntities.Remove(selectable);
         }
 
 
