@@ -1,18 +1,21 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Managers
 {
     public class SelectionManager
     {
-        private List<Selectable> _selectedEntities;
+        private SelectableGroup _selectedEntities = new SelectableGroup();
+        private Dictionary<string, SelectableTroop> _troops = new Dictionary<string, SelectableTroop>();
         private Storage.Races _ownRace;
+        private bool _isTroop = false;
+        public bool IsTroop { get { return _isTroop; } }
+        public int Troops { get { return _troops.Count; } }
 
-        public SelectionManager()
-        {
-            _selectedEntities = new List<Selectable>();
-        }
+        public SelectionManager() {}
 
         /// <summary>
         /// Setter for the race
@@ -23,22 +26,41 @@ namespace Managers
             _ownRace = race;
         }
 
-        /// <summary>
-        /// SelectUnique performs a deselection of the current entities, if there are any selected, and a selection of the entity specified by parameter
-        /// </summary>
-        /// <param name="selectable">The entity that is going to be selected </param>
+
         public void SelectUnique(Selectable selectable)
         {
             // firstly it checks if an entity can be selected
-            if (!CanBeSelected(selectable)) return;
+            //if (!CanBeSelected(selectable)) return;
+            Assert.IsTrue(CanBeSelected(selectable));
+            
 
-            //Deselect other selected objects
-            if (_selectedEntities.Count  > 0) EmptySelection();
+            _isTroop = false;
 
-            Select(selectable);
+            //Deselects other selected objects
+            if (_selectedEntities.Count > 0) _selectedEntities.Clear();
+
+            _selectedEntities.Select(selectable);
             
         }
 
+        public bool NewTroop(String key)
+        {
+            Assert.IsFalse(_troops.ContainsKey(key));
+            if(_selectedEntities.Count > 1)
+            {
+
+                SelectableTroop troop = new SelectableTroop(_selectedEntities.ToList());
+                _troops.Add(key, troop);
+                _isTroop = true;
+                Debug.Log("Created troop: " + key);
+                return true;
+            }
+            else
+            {
+                Debug.Log("Troops should have more than 1 unit");
+                return false;
+            }
+        }
 
 
         /// <summary>
@@ -47,42 +69,51 @@ namespace Managers
         /// <param name="selectable">The entity that is going to be selected </param>
         public void Select(Selectable selectable)
         {
-            
-            // do not select two times the same element
             if (!_selectedEntities.Contains(selectable))
             {
-                // Add the entity to the list selects the selectable component
-                _selectedEntities.Add(selectable);
-                selectable.SelectEntity();
+                _selectedEntities.Select(selectable);
+                _isTroop = false;
             }
         }
 
 
         /// <summary>
-        /// Removes the specified entity from the selected entities
+        /// Deselects the specified entity from the selected entities
         /// </summary>
         /// <param name="entity"></param>
         public void Deselect(Selectable selectable)
         {
             if (_selectedEntities.Contains(selectable))
             {
-                _selectedEntities.Remove(selectable);
-                selectable.DeselectEntity();
+                _selectedEntities.Deselect(selectable);
+                _isTroop = false;
             }
-
-
         }
 
+        public bool HasTroop(string key)
+        {
+            return _troops.ContainsKey(key);
+        }
+
+
+        public void SelectTroop(string key)
+        {
+            Assert.IsTrue(_troops.ContainsKey(key));
+            _selectedEntities.Select(_troops[key].ToList());
+            _isTroop = true;
+            Debug.Log("Selected troop: " + key);
+        }
+
+
+
         /// <summary>
-        /// Deselect and entity from the selected entitite without notify to the selectable element. This method should be used only from a selectable class
+        /// Deselect and entity from the selected entitite without notify to the selectable element. This method should be used only from a selectable object
         /// </summary>
         /// <param name="selectable"></param>
         public void DeselectFromSelected(Selectable selectable)
         {
-            if (_selectedEntities.Contains(selectable))
-            {
+            if(_selectedEntities.Contains(selectable))
                 _selectedEntities.Remove(selectable);
-            }
         }
 
 
@@ -91,14 +122,8 @@ namespace Managers
         /// </summary>
         public void EmptySelection()
         {
-            Selectable[] selectedEntities = _selectedEntities.ToArray();
             _selectedEntities.Clear();
-
-            foreach (Selectable selected in selectedEntities)
-            {
-                selected.DeselectEntity();
-            }
-           
+            _isTroop = false;
         }
 
 
@@ -123,6 +148,12 @@ namespace Managers
         }
 
 
+        public void DeleteTroop(string key)
+        {
+            if(_isTroop) EmptySelection();
+            _troops.Remove(key);
+        }
+
         /// <summary>
         /// Removes all the buildings from the current selection
         /// </summary>
@@ -146,7 +177,7 @@ namespace Managers
         /// <param name="point"></param>
         public void MoveTo(Vector3 point)
         {
-            foreach (Selectable selected in _selectedEntities)
+            foreach (Selectable selected in _selectedEntities.ToArray())
             {
                 if (selected.entity.info.isUnit)
                     selected.GetComponent<Unit>().moveTo(point);
@@ -162,15 +193,15 @@ namespace Managers
         /// <param name="point"></param>
         public void AttackTo(IGameEntity enemy)
         {
-            foreach (Selectable selected in _selectedEntities)
+            foreach (Selectable selected in _selectedEntities.ToArray())
             {
                 
                 if (selected.entity.info.isUnit)
                 {
                     Unit unit = selected.GetComponent<Unit>();
-                    // so far we only can attack units
-                    //TODO : (hermetico) check why we can't attack buildings
-                    if(enemy.info.isUnit) unit.attackTarget((Unit)enemy);
+                    if (enemy.info.isUnit) unit.attackTarget((Unit)enemy);
+                    else if(enemy.info.isBarrack)unit.attackTarget((Barrack)enemy);
+                    else if(enemy.info.isResource)unit.attackTarget((Resource)enemy);
                 }
             }
             Debug.Log("attacking");

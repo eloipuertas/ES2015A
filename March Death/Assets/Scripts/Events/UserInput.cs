@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using Managers;
 
-public class UserInput : MonoBehaviour
+public partial class UserInput : MonoBehaviour
 {
     public enum action { NONE, LEFT_CLICK, RIGHT_CLICK, DRAG }
     private action currentAction;
@@ -83,6 +83,8 @@ public class UserInput : MonoBehaviour
 
     void Update()
     {
+        CheckKeyboard();
+
         currentAction = GetMouseAction();
         // FIXME: add HUD colliders
         if (rectActions.Contains(Input.mousePosition) || rectInformation.Contains(Input.mousePosition))
