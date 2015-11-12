@@ -147,12 +147,6 @@ namespace Assets.Scripts.AI.Agents
             return confidence;
         }
 
-        private bool checkIfUnitsInEnemyAtackRange(Unit enemy, List<Unit> units)
-        {
-
-            return true;
-        }
-
         /// <summary>
         /// Returns the bounding box of an squad
         /// </summary>
