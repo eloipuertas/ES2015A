@@ -25,6 +25,7 @@ namespace Assets.Scripts.AI.Agents
         Vector3 safeArea;
         float minDistanceBetweenHeroAndNearestEnemy;
         private float _maxUnitRange;
+        private Storage.Races _enemyRace;
 
         bool isHeroInDanger;
 
@@ -48,14 +49,13 @@ namespace Assets.Scripts.AI.Agents
             if (ai.race == Storage.Races.ELVES)
             {
                 _maxUnitRange = Storage.Info.get.of(Storage.Races.MEN, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
+                _enemyRace = Storage.Races.MEN;
             }
             else
             {
                 _maxUnitRange = Storage.Info.get.of(Storage.Races.ELVES, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
+                _enemyRace = Storage.Races.ELVES;
             }
-
-            Debug.Log("Max range = " + _maxUnitRange);
-
         }
 
         public override void controlUnits(List<Unit> units)
@@ -122,7 +122,7 @@ namespace Assets.Scripts.AI.Agents
             ownSquadBoundingBox = getSquadBoundingBox(units);
 
             //Smell what is over this position
-            Debug.Log(ai.senses.getObjectsNearPosition(new Vector3(ownSquadBoundingBox.x, units[0].transform.position.y, ownSquadBoundingBox.y), _maxUnitRange).Length);
+            Debug.Log(ai.senses.getUnitsOfRaceNearPosition(new Vector3(ownSquadBoundingBox.x, units[0].transform.position.y, ownSquadBoundingBox.y), _maxUnitRange, _enemyRace).Length);
 
             foreach (Unit u in ai.EnemyUnits)
             {
