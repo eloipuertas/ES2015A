@@ -10,7 +10,7 @@ namespace Assets.Scripts.AI.Agents
         /// <summary>
         /// This confidence will be applied to every confidence return by this agent.
         /// </summary>
-        int baseConfidence { get; set; }
+        public int baseConfidence { get; set; }
         protected AIController ai;
         public float modifier { get; set; }
         public string agentName;
