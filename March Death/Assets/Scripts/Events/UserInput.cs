@@ -154,7 +154,9 @@ public partial class UserInput : MonoBehaviour
             {
                 IGameEntity entity = hitObject.GetComponent<IGameEntity>();
 
-                if ((entity.info.race != player.race) && entity.status != EntityStatus.DEAD && entity.status != EntityStatus.DESTROYED) // If it is another race, we'll attack, but if it's the same race?
+                if ( (entity.info.race != player.race) 
+                    && entity.status != EntityStatus.DEAD 
+                    && entity.status != EntityStatus.DESTROYED) 
                 {
                     sManager.AttackTo(entity);
                 }
