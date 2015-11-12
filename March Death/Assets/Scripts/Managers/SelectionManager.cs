@@ -8,12 +8,18 @@ namespace Managers
 {
     public class SelectionManager
     {
+        // class controller for the selected entities
         private SelectableGroup _selectedEntities = new SelectableGroup();
+        //Troops
         private Dictionary<string, SelectableTroop> _troops = new Dictionary<string, SelectableTroop>();
+        // the own race
         private Storage.Races _ownRace;
+        // to know whether the current selection is a troop or is just a bunch of selected entities
         private bool _isTroop = false;
         public bool IsTroop { get { return _isTroop; } }
-        public int Troops { get { return _troops.Count; } }
+
+        // the amount of troops made
+        public int TroopsCount { get { return _troops.Count; } }
 
         public SelectionManager() {}
 
@@ -27,6 +33,11 @@ namespace Managers
         }
 
 
+        /// <summary>
+        /// This method selects just an element, if there are more elements in the selected list, it will remove them
+        /// Also changes the stat of the selection to a not troop selection
+        /// </summary>
+        /// <param name="selectable"></param>
         public void SelectUnique(Selectable selectable)
         {
             // firstly it checks if an entity can be selected
@@ -43,6 +54,13 @@ namespace Managers
             
         }
 
+        /// <summary>
+        /// Creates a new troop from the currently selected elements. 
+        /// Returns true if the troop is created succesfully , returns false if not. 
+        /// A troop should have more than one element, if not, will return false
+        /// </summary>
+        /// <param name="key">a key for the troop</param>
+        /// <returns></returns>
         public bool NewTroop(String key)
         {
             Assert.IsFalse(_troops.ContainsKey(key));
@@ -90,12 +108,26 @@ namespace Managers
             }
         }
 
+
+        /// <summary>
+        /// Checks if there is a troop created with the provided key
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public bool HasTroop(string key)
         {
             return _troops.ContainsKey(key);
         }
 
 
+        /// <summary>
+        /// Performs a selection of the troop related to the provided key
+        /// The key must exist, please use the methid HasTroop prior to call this method.
+        /// It changes the current selection for the elements in the troop, also calls each select function
+        /// of each selectable element.
+        /// Also changes the state of this manager to show that the current selection is a troop
+        /// </summary>
+        /// <param name="key"></param>
         public void SelectTroop(string key)
         {
             Assert.IsTrue(_troops.ContainsKey(key));
@@ -147,7 +179,11 @@ namespace Managers
             return _selectedEntities.Count > 0;
         }
 
-
+        /// <summary>
+        /// Deletes the troop specified by parameter.  
+        /// First it checks if the current selection is a troop. This ehaviour may change
+        /// </summary>
+        /// <param name="key"></param>
         public void DeleteTroop(string key)
         {
             if(_isTroop) EmptySelection();
@@ -208,6 +244,10 @@ namespace Managers
         }
 
 
+        /// <summary>
+        /// This method checks if the current selection is a building, returns true or false.
+        /// </summary>
+        /// <returns></returns>
         public bool IsBuilding()
         {
             //there aren't buildings in multiple selection

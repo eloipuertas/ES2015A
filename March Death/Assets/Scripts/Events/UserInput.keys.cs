@@ -11,7 +11,7 @@ public partial class UserInput
         //creates a new troop
         if ( Input.GetKeyDown(KeyCode.T))
         {
-            string key = (sManager.Troops + 1).ToString();
+            string key = (sManager.TroopsCount + 1).ToString();
             if (!sManager.HasTroop(key))
             {
                 sManager.NewTroop(key);
