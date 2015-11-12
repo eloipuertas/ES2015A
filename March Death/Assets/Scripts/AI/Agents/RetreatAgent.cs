@@ -118,6 +118,12 @@ namespace Assets.Scripts.AI.Agents
                 return 0;
             }
 
+            //Get the squad bounding box
+            ownSquadBoundingBox = getSquadBoundingBox(units);
+
+            //Smell what is over this position
+            Debug.Log(ai.senses.getObjectsNearPosition(new Vector3(ownSquadBoundingBox.x, units[0].transform.position.y, ownSquadBoundingBox.y), _maxUnitRange).Length);
+
             foreach (Unit u in ai.EnemyUnits)
             {
                 float distance = Vector3.Distance(u.transform.position, hero.transform.position);
@@ -174,5 +180,6 @@ namespace Assets.Scripts.AI.Agents
             //safeArea = new Vector3(ownSquadCenter.x - safePointxzDirection.x * 30, ai.Army[0].transform.position.y, ownSquadCenter.y - safePointxzDirection.y * 10);
 
         }
+
     }
 }
