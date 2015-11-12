@@ -136,6 +136,7 @@ namespace Assets.Scripts.AI.Agents
                         //If our hero is in range and is going to die
                         if(hero.healthPercentage < HERO_HEALTH_TOLERANCE_BEFORE_RETREAT && ownUnit.type == Storage.UnitTypes.HERO)
                         {
+							ai.Micro.agents[MicroManager.AGENT_ASSIST].addConfidence(400);
                             return CONFIDENCE_HERO_IS_AT_FIFTY_PERCENT;      
                         }
 

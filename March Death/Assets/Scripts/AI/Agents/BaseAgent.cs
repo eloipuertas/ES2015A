@@ -12,6 +12,7 @@ namespace Assets.Scripts.AI.Agents
         /// This confidence will be applied to every confidence return by this agent.
         /// </summary>
         public int baseConfidence { get; set; }
+		public int extraConfidence {get; set; }
         protected AIController ai;
         public float modifier { get; set; }
         public string agentName;
@@ -33,13 +34,24 @@ namespace Assets.Scripts.AI.Agents
 		{
 			if(baseConfidence + confidenceToAdd > MAX_AGENT_CONFIDENCE)
 			{
-				baseConfidence = MAX_AGENT_CONFIDENCE;
+				extraConfidence = MAX_AGENT_CONFIDENCE;
 			}
 			else
 			{
-				baseConfidence += confidenceToAdd;
+				extraConfidence += confidenceToAdd;
 			}
 
+		}
+
+		/// <summary>
+		/// Uses the extra confidence.
+		/// </summary>
+		/// <returns>The extra confidence.</returns>
+		public int useExtraConfidence(){
+			int c;
+			c = extraConfidence;
+			extraConfidence = 0;
+			return c;
 		}
     }
 }

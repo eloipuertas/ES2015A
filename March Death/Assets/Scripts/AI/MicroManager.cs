@@ -15,6 +15,11 @@ namespace Assets.Scripts.AI
 {
     public class MicroManager
     {
+		public const int AGENT_ATACK = 0;
+		public const int AGENT_EXPLORER = 1;
+		public const int AGENT_RETREAT = 2;
+		public const int AGENT_ASSIST = 3;
+
         AIController ai;
         /// <summary>
         /// Commite of agents who will each vote at what to do with every squad
@@ -28,6 +33,7 @@ namespace Assets.Scripts.AI
             agents.Add(new ExplorerAgent(ai, "Explorer"));
             agents.Add(aA);
             agents.Add(new RetreatAgent(ai, aA, "Retreat"));
+			agents.Add(new AssistAgent(ai, "Assist"));
         }
         /// <summary>
         /// Called pretty fast, it's just like Update()
