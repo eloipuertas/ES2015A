@@ -10,5 +10,8 @@ namespace Pathfinding
     {
         [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool createNavmesh(ref Config cfg, ref PolyMesh pmesh, ref PolyMeshDetail dmesh, ref IntPtr navData, ref int dataSize);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr getTile(IntPtr navmesh, int i);
     }
 }

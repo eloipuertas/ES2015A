@@ -51,7 +51,7 @@ namespace Pathfinding
             if (!ConfigLoaded)
             {
                 // Standard config
-                IntPtr ptr = Recast.DefaultConfig(Application.dataPath + Path.DirectorySeparatorChar + "Recast.log");
+                IntPtr ptr = Recast.DefaultConfig(Application.dataPath + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Recast.log");
                 config = (Config)Marshal.PtrToStructure(ptr, typeof(Config));
 
                 AgentHeight = config.walkableHeight * config.ch;
@@ -234,11 +234,38 @@ namespace Pathfinding
             TileCache.getTileCacheHeaders(ref asset.header, ref tilesHeader, tileCache, navMesh);
 
             // Copy to asset
-            asset.tilesHeader = new TileCacheAsset.TileCacheTileHeader[asset.header.numTiles];
+            asset.config = config;
+
+            // Copy sizes
             int structSize = Marshal.SizeOf(typeof(TileCacheAsset.TileCacheTileHeader));
+            asset.tilesHeader = new TileCacheAsset.TileCacheTileHeader[asset.header.numTiles];
             for (uint i = 0; i < asset.header.numTiles; ++i)
             {
                 asset.tilesHeader[i] = (TileCacheAsset.TileCacheTileHeader)Marshal.PtrToStructure(new IntPtr(tilesHeader.ToInt32() + (structSize * i)), typeof(TileCacheAsset.TileCacheTileHeader));
+            }
+
+            // Copy data
+            int dataSize = 0;
+            int start = 0;
+            for (uint i = 0; i < asset.header.numTiles; ++i)
+            {
+                dataSize += asset.tilesHeader[i].dataSize;
+            }
+
+            asset.tilesData = new byte[dataSize];
+
+            for (uint i = 0; i < asset.header.numTiles; ++i)
+            {
+                IntPtr tilePtr = TileCache.getTileCacheTile(tileCache, (int)i);
+                CompressedTile tile = (CompressedTile)Marshal.PtrToStructure(tilePtr, typeof(CompressedTile));
+
+                asset.tilesHeader[i] = (TileCacheAsset.TileCacheTileHeader)Marshal.PtrToStructure(new IntPtr(tilesHeader.ToInt32() + (structSize * i)), typeof(TileCacheAsset.TileCacheTileHeader));
+
+                if (asset.tilesHeader[i].dataSize > 0)
+                {
+                    Marshal.Copy(tile.data, asset.tilesData, start, asset.tilesHeader[i].dataSize);
+                    start += asset.tilesHeader[i].dataSize;
+                }
             }
 
             // Save asset

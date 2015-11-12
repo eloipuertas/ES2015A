@@ -361,58 +361,78 @@ void getTileCacheHeaders(TileCacheSetHeader& header, TileCacheTileHeader*& tiles
 	}
 }
 
-bool loadFromTileCacheHeaders(TileCacheSetHeader header, TileCacheTileHeader* tilesHeader, dtTileCache*& tileCache, dtNavMesh*& navMesh)
+bool loadFromTileCacheHeaders(TileCacheSetHeader header, TileCacheTileHeader* tilesHeader, unsigned char* data, dtTileCache*& tileCache, dtNavMesh*& navMesh)
 {
 	if (header.magic != TILECACHESET_MAGIC)
 	{
+		ctx->log(RC_LOG_ERROR, "FAILED MAGIC");
 		return false;
 	}
 	if (header.version != TILECACHESET_VERSION)
 	{
+		ctx->log(RC_LOG_ERROR, "FAILED VERSION");
 		return false;
 	}
 
 	navMesh = dtAllocNavMesh();
 	if (!navMesh)
 	{
+		ctx->log(RC_LOG_ERROR, "FAILED dtAllocNavMesh");
 		return false;
 	}
 
 	dtStatus status = navMesh->init(&header.meshParams);
 	if (dtStatusFailed(status))
 	{
+		ctx->log(RC_LOG_ERROR, "FAILED navMesh->init");
 		return false;
 	}
 
 	tileCache = dtAllocTileCache();
 	if (!tileCache)
 	{
+		ctx->log(RC_LOG_ERROR, "FAILED dtAllocTileCache");
 		return false;
 	}
 	status = tileCache->init(&header.cacheParams, allocator, compressor, processor);
 	if (dtStatusFailed(status))
 	{
+		ctx->log(RC_LOG_ERROR, "FAILED tileCache->init");
 		return false;
 	}
 
+	ctx->log(RC_LOG_ERROR, "We have %d tiles", header.numTiles);
+
 	// Read tiles.
 	int n = 0;
+	int start = 0;
 	for (int i = 0; i < header.numTiles; ++i)
 	{
 		TileCacheTileHeader& tileHeader = tilesHeader[n++];
 		if (!tileHeader.tileRef || !tileHeader.dataSize)
 			break;
 
-		unsigned char* data = (unsigned char*)dtAlloc(tileHeader.dataSize, DT_ALLOC_PERM);
-		if (!data) break;
-		memset(data, 0, tileHeader.dataSize);
-
 		dtCompressedTileRef tile = 0;
-		tileCache->addTile(data, tileHeader.dataSize, DT_COMPRESSEDTILE_FREE_DATA, &tile);
+		tileCache->addTile(data + start, tileHeader.dataSize, DT_COMPRESSEDTILE_FREE_DATA, &tile);
+		start += tileHeader.dataSize;
 
+		dtStatus status = DT_FAILURE;
 		if (tile)
-			tileCache->buildNavMeshTile(tile, navMesh);
+			status = tileCache->buildNavMeshTile(tile, navMesh);
+
+		ctx->log(RC_LOG_ERROR, "Tile %d = %x \t %d", i, tile, status);
 	}
 
 	return true;
 }
+
+dtCompressedTile* getTileCacheTile(dtTileCache* tileCache, int i)
+{
+	return (dtCompressedTile*)tileCache->getTile(i);
+}
+
+dtMeshTile* getTile(dtNavMesh* navmesh, int i)
+{
+	return (dtMeshTile*)navmesh->getTileIdx(i);
+}
+

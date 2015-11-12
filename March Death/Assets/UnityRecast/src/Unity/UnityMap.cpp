@@ -11,8 +11,6 @@ bool handleBuild(rcConfig* cfg, float* verts, int nverts, int* tris, int ntris)
 	float bmax[3];
 	rcCalcBounds(verts, nverts / 3, bmin, bmax);
 
-	ctx->log(RC_LOG_PROGRESS, "OK 1");
-	ctx->log(RC_LOG_PROGRESS, "OK 2");
 	// Set the area where the navigation will be build.
 	// Here the bounds of the input mesh are used, but the
 	// area could be specified by an user defined box, etc.
@@ -45,7 +43,6 @@ bool handleBuild(rcConfig* cfg, float* verts, int nverts, int* tris, int ntris)
 		ctx->log(RC_LOG_ERROR, "buildNavigation: Could not create solid heightfield.");
 		return false;
 	}
-	ctx->log(RC_LOG_PROGRESS, "OK 3");
 
 	// Allocate array that can hold triangle area types.
 	// If you have multiple meshes you need to process, allocate
@@ -56,7 +53,6 @@ bool handleBuild(rcConfig* cfg, float* verts, int nverts, int* tris, int ntris)
 		ctx->log(RC_LOG_ERROR, "buildNavigation: Out of memory 'm_triareas' (%d).", ntris);
 		return false;
 	}
-	ctx->log(RC_LOG_PROGRESS, "OK 4");
 
 	// Find triangles which are walkable based on their slope and rasterize them.
 	// If your input data is multiple meshes, you can transform them here, calculate
@@ -70,7 +66,6 @@ bool handleBuild(rcConfig* cfg, float* verts, int nverts, int* tris, int ntris)
 		delete[] triareas;
 		triareas = 0;
 	}
-	ctx->log(RC_LOG_PROGRESS, "OK 5");
 
 	//
 	// Step 3. Filter walkables surfaces.
@@ -82,9 +77,7 @@ bool handleBuild(rcConfig* cfg, float* verts, int nverts, int* tris, int ntris)
 	rcFilterLowHangingWalkableObstacles(ctx, cfg->walkableClimb, *solid);
 	rcFilterLedgeSpans(ctx, cfg->walkableHeight, cfg->walkableClimb, *solid);
 	rcFilterWalkableLowHeightSpans(ctx, cfg->walkableHeight, *solid);
-
-	ctx->log(RC_LOG_PROGRESS, "OK 6");
-
+	
 	//
 	// Step 4. Partition walkable surface to simple regions.
 	//
@@ -104,7 +97,6 @@ bool handleBuild(rcConfig* cfg, float* verts, int nverts, int* tris, int ntris)
 		return false;
 	}
 
-	ctx->log(RC_LOG_PROGRESS, "OK 7");
 	//if (!m_keepInterResults)
 	{
 		rcFreeHeightField(solid);
@@ -123,7 +115,6 @@ bool handleBuild(rcConfig* cfg, float* verts, int nverts, int* tris, int ntris)
 	//for (int i  = 0; i < m_geom->getConvexVolumeCount(); ++i)
 	//rcMarkConvexPolyArea(&ctx, vols[i].verts, vols[i].nverts, vols[i].hmin, vols[i].hmax, (unsigned char)vols[i].area, *chf);
 
-	ctx->log(RC_LOG_PROGRESS, "OK 8");
 	if (monotonePartitioning)
 	{
 		// Partition the walkable surface into simple regions without holes.
@@ -154,7 +145,6 @@ bool handleBuild(rcConfig* cfg, float* verts, int nverts, int* tris, int ntris)
 	//
 	// Step 5. Trace and simplify region contours.
 	//
-	ctx->log(RC_LOG_PROGRESS, "OK 9");
 
 	// Create contours.
 	rcContourSet* cset = rcAllocContourSet();
@@ -172,8 +162,6 @@ bool handleBuild(rcConfig* cfg, float* verts, int nverts, int* tris, int ntris)
 	//
 	// Step 6. Build polygons mesh from contours.
 	//
-
-	ctx->log(RC_LOG_PROGRESS, "OK 10");
 
 	// Build polygon navmesh from the contours.
 	pmesh = rcAllocPolyMesh();

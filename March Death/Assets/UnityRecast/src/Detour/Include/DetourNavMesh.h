@@ -412,6 +412,7 @@ public:
 	///  @param[in]	i		The tile index. [Limit: 0 >= index < #getMaxTiles()]
 	/// @return The tile at the specified index.
 	const dtMeshTile* getTile(int i) const;
+	const dtMeshTile* getTileIdx(int i) const { return getTile(i); }	
 
 	/// Gets the tile and polygon for the specified polygon reference.
 	///  @param[in]		ref		The reference for the a polygon.

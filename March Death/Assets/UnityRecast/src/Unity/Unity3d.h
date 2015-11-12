@@ -7,7 +7,7 @@
 #ifdef WIN32
 	#define DLL_EXPORT extern "C" __declspec(dllexport)
 #else
-	#define DLL_EXPORT extern "C" 
+	#define DLL_EXPORT extern "C"
 #endif
 
 // Externs
@@ -30,4 +30,8 @@ DLL_EXPORT bool createNavmesh(rcConfig* cfg, rcPolyMesh* pmesh, rcPolyMeshDetail
 // TileCache
 DLL_EXPORT bool handleTileCacheBuild(rcConfig* cfg, ExtendedConfig* ecfg, InputGeometry* geom, dtTileCache*& tileCache, dtNavMesh*& navMesh, dtNavMeshQuery*& navQuery);
 DLL_EXPORT void getTileCacheHeaders(TileCacheSetHeader& header, TileCacheTileHeader*& tilesHeader, dtTileCache* tileCache, dtNavMesh* navMesh);
-DLL_EXPORT bool loadFromTileCacheHeaders(TileCacheSetHeader header, TileCacheTileHeader* tilesHeader, dtTileCache*& tileCache, dtNavMesh*& navMesh);
+DLL_EXPORT bool loadFromTileCacheHeaders(TileCacheSetHeader header, TileCacheTileHeader* tilesHeader, unsigned char* data, dtTileCache*& tileCache, dtNavMesh*& navMesh);
+
+// Class related
+DLL_EXPORT dtCompressedTile* getTileCacheTile(dtTileCache* tileCache, int i);
+DLL_EXPORT dtMeshTile* getTile(dtNavMesh* navmesh, int i);
