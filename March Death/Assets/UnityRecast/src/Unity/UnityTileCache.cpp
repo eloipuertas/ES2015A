@@ -436,3 +436,7 @@ dtMeshTile* getTile(dtNavMesh* navmesh, int i)
 	return (dtMeshTile*)navmesh->getTileIdx(i);
 }
 
+void addObstacle(dtTileCache* tileCache, float* pos, float* verts, int nverts, int height)
+{
+	tileCache->addObstacle(pos, verts, nverts, height, NULL);
+}

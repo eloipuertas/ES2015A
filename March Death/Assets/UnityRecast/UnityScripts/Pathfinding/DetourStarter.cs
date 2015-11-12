@@ -18,7 +18,7 @@ class DetourStarter : MonoBehaviour
 
     public void OnEnable()
     {
-        Detour.get.Initialize(navmeshData);
+        PathDetour.get.Initialize(navmeshData);
 
         if (Application.isPlaying)
         {
@@ -38,7 +38,7 @@ class DetourStarter : MonoBehaviour
 
                 case RenderMode.TILE_POLYS:
                     for (int i = 0; i < navmeshData.header.numTiles; ++i)
-                        RecastDebug.ShowTilePolyDetails(mesh, Detour.get.NavMesh, i);
+                        RecastDebug.ShowTilePolyDetails(mesh, PathDetour.get.NavMesh, i);
                     break;
             }
 

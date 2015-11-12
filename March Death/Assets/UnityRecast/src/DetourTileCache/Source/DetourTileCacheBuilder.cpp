@@ -2004,6 +2004,75 @@ dtStatus dtMarkCylinderArea(dtTileCacheLayer& layer, const float* orig, const fl
 	return DT_SUCCESS;
 }
 
+static int pointInPoly(int nvert, const float* verts, const float* p)
+{
+	int i, j, c = 0;
+	for (i = 0, j = nvert - 1; i < nvert; j = i++)
+	{
+		const float* vi = &verts[i * 3];
+		const float* vj = &verts[j * 3];
+		if (((vi[2] > p[2]) != (vj[2] > p[2])) &&
+			(p[0] < (vj[0] - vi[0]) * (p[2] - vi[2]) / (vj[2] - vi[2]) + vi[0]))
+			c = !c;
+	}
+	return c;
+}
+
+dtStatus dtMarkPolyArea(dtTileCacheLayer& layer, const float* orig,
+	const float cs, const float ch, const float* verts, const int nverts,
+	unsigned char areaId)
+{
+	float bmin[3], bmax[3];
+	dtVcopy(bmin, verts);
+	dtVcopy(bmax, verts);
+	for (int i = 1; i < nverts; ++i)
+	{
+		dtVmin(bmin, &verts[i * 3]);
+		dtVmax(bmax, &verts[i * 3]);
+	}
+
+	const int w = (int)layer.header->width;
+	const int h = (int)layer.header->height;
+	const float ics = 1.0f / cs;
+	const float ich = 1.0f / ch;
+
+	int minx = (int)floorf((bmin[0] - orig[0])*ics);
+	int miny = (int)floorf((bmin[1] - orig[1])*ich);
+	int minz = (int)floorf((bmin[2] - orig[2])*ics);
+	int maxx = (int)floorf((bmax[0] - orig[0])*ics);
+	int maxy = (int)floorf((bmax[1] - orig[1])*ich);
+	int maxz = (int)floorf((bmax[2] - orig[2])*ics);
+
+	if (maxx < 0) return DT_SUCCESS;
+	if (minx >= w) return DT_SUCCESS;
+	if (maxz < 0) return DT_SUCCESS;
+	if (minz >= h) return DT_SUCCESS;
+
+	if (minx < 0) minx = 0;
+	if (maxx >= w) maxx = w - 1;
+	if (minz < 0) minz = 0;
+	if (maxz >= h) maxz = h - 1;
+
+	// TODO: Optimize.
+	for (int z = minz; z <= maxz; ++z)
+	{
+		for (int x = minx; x <= maxx; ++x)
+		{
+			float p[3];
+			p[0] = orig[0] + (x + 0.5f)*cs;
+			p[1] = 0;
+			p[2] = orig[2] + (z + 0.5f)*cs;
+
+			if (pointInPoly(nverts, verts, p))
+			{
+				layer.areas[x + z*w] = areaId;
+			}
+		}
+	}
+
+	return DT_SUCCESS;
+}
+
 
 dtStatus dtBuildTileCacheLayer(dtTileCacheCompressor* comp,
 							   dtTileCacheLayerHeader* header,

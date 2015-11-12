@@ -9,6 +9,8 @@ using UnityEngine;
 using UnityEditor;
 
 
+#if UNITY_EDITOR
+
 namespace Pathfinding
 {
     class RecastWindow : EditorWindow
@@ -425,3 +427,5 @@ namespace Pathfinding
         }
     }
 }
+
+#endif

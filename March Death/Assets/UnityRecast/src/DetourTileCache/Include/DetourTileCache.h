@@ -36,6 +36,7 @@ enum ObstacleState
 };
 
 static const int DT_MAX_TOUCHED_TILES = 8;
+static const int DT_MAX_CONVEX_HULL_VERTICES = 8;
 struct dtTileCacheObstacle
 {
 	float pos[3], radius, height;
@@ -46,6 +47,10 @@ struct dtTileCacheObstacle
 	unsigned char ntouched;
 	unsigned char npending;
 	dtTileCacheObstacle* next;
+
+	// Use nverts == 0 to differentiate between poly or cylinder obstacle
+	float verts[DT_MAX_CONVEX_HULL_VERTICES * 3];
+	int nverts;
 };
 
 struct dtTileCacheParams
@@ -106,6 +111,7 @@ public:
 	dtStatus removeTile(dtCompressedTileRef ref, unsigned char** data, int* dataSize);
 	
 	dtStatus addObstacle(const float* pos, const float radius, const float height, dtObstacleRef* result);
+	dtStatus addObstacle(const float* pos, const float* convexHullVertices, int numConvexHullVertices, const float height, dtObstacleRef* result);
 	dtStatus removeObstacle(const dtObstacleRef ref);
 	
 	dtStatus queryTiles(const float* bmin, const float* bmax,

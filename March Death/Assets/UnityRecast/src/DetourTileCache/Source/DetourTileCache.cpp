@@ -384,6 +384,45 @@ dtStatus dtTileCache::addObstacle(const float* pos, const float radius, const fl
 	return DT_SUCCESS;
 }
 
+dtStatus dtTileCache::addObstacle(const float* pos, const float* convexHullVertices, int numConvexHullVertices, const float height, dtObstacleRef* result)
+{
+	if (m_nreqs >= MAX_REQUESTS)
+		return DT_FAILURE | DT_BUFFER_TOO_SMALL;
+
+	dtTileCacheObstacle* ob = 0;
+	if (m_nextFreeObstacle)
+	{
+		ob = m_nextFreeObstacle;
+		m_nextFreeObstacle = ob->next;
+		ob->next = 0;
+	}
+	if (!ob)
+		return DT_FAILURE | DT_OUT_OF_MEMORY;
+
+	unsigned short salt = ob->salt;
+	memset(ob, 0, sizeof(dtTileCacheObstacle));
+	ob->salt = salt;
+	ob->state = DT_OBSTACLE_PROCESSING;
+	dtVcopy(ob->pos, pos);
+	ob->radius = 0.f;   // 0 means obstacle is a polygon instead of cylinder
+	ob->height = height;
+	ob->nverts = numConvexHullVertices;
+	for (int i = 0; i < ob->nverts; i++)
+	{
+		dtVcopy(&ob->verts[i * 3], &convexHullVertices[i * 3]);
+	}
+
+	ObstacleRequest* req = &m_reqs[m_nreqs++];
+	memset(req, 0, sizeof(ObstacleRequest));
+	req->action = REQUEST_ADD;
+	req->ref = getObstacleRef(ob);
+
+	if (result)
+		*result = req->ref;
+
+	return DT_SUCCESS;
+}
+
 dtStatus dtTileCache::removeObstacle(const dtObstacleRef ref)
 {
 	if (!ref)
@@ -604,8 +643,21 @@ dtStatus dtTileCache::buildNavMeshTile(const dtCompressedTileRef ref, dtNavMesh*
 			continue;
 		if (contains(ob->touched, ob->ntouched, ref))
 		{
+#if defined(ORIGINAL_RECAST_CODE)
 			dtMarkCylinderArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
 							   ob->pos, ob->radius, ob->height, 0);
+#else
+			if (ob->radius != 0)
+			{
+				dtMarkCylinderArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
+					ob->pos, ob->radius, ob->height, 0);
+			}
+			else
+			{
+				dtMarkPolyArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
+					ob->verts, ob->nverts, 0);
+			}
+#endif
 		}
 	}
 	
@@ -695,10 +747,42 @@ void dtTileCache::calcTightTileBounds(const dtTileCacheLayerHeader* header, floa
 
 void dtTileCache::getObstacleBounds(const struct dtTileCacheObstacle* ob, float* bmin, float* bmax) const
 {
-	bmin[0] = ob->pos[0] - ob->radius;
-	bmin[1] = ob->pos[1];
-	bmin[2] = ob->pos[2] - ob->radius;
-	bmax[0] = ob->pos[0] + ob->radius;
-	bmax[1] = ob->pos[1] + ob->height;
-	bmax[2] = ob->pos[2] + ob->radius;	
+	if (ob->nverts == 0)
+	{
+		// Cylindrical
+		bmin[0] = ob->pos[0] - ob->radius;
+		bmin[1] = ob->pos[1];
+		bmin[2] = ob->pos[2] - ob->radius;
+		bmax[0] = ob->pos[0] + ob->radius;
+		bmax[1] = ob->pos[1] + ob->height;
+		bmax[2] = ob->pos[2] + ob->radius;
+	}
+	else
+	{
+		// Convex hull obstacles
+		dtVcopy(bmin, ob->verts);
+		dtVcopy(bmax, ob->verts);
+
+		bmax[1] = bmin[1] + ob->height;
+		for (int i = 1; i < ob->nverts; i++)
+		{
+			if (ob->verts[i * 3] < bmin[0])
+			{
+				bmin[0] = ob->verts[i * 3];
+			}
+			else if (ob->verts[i * 3] > bmax[0])
+			{
+				bmax[0] = ob->verts[i * 3];
+			}
+
+			if (ob->verts[i * 3 + 2] < bmin[2])
+			{
+				bmin[2] = ob->verts[i * 3 + 2];
+			}
+			else if (ob->verts[i * 3 + 2] > bmax[2])
+			{
+				bmax[2] = ob->verts[i * 3 + 2];
+			}
+		}
+	}
 }

@@ -6,12 +6,12 @@ using System.Text;
 using System.IO;
 using UnityEngine;
 
-public class Detour : Utils.Singleton<Detour>
+public class PathDetour : Utils.Singleton<PathDetour>
 {
     public IntPtr TileCache = new IntPtr(0);
     public IntPtr NavMesh = new IntPtr(0);
 
-    private Detour()
+    private PathDetour()
     {
     }
 
@@ -24,5 +24,25 @@ public class Detour : Utils.Singleton<Detour>
         {
             throw new ArgumentException("Invalid navmesh data");
         }
+    }
+
+    public void AddObstacle(Pathfinding.DetourObstacle block)
+    {
+        Vector3[] blockVertices = block.Vertices();
+
+        float[] vertices =
+        {
+            blockVertices[0].x, blockVertices[0].y, blockVertices[0].z,
+            blockVertices[1].x, blockVertices[1].y, blockVertices[1].z,
+            blockVertices[2].x, blockVertices[2].y, blockVertices[2].z,
+            blockVertices[3].x, blockVertices[3].y, blockVertices[3].z,
+        };
+
+        float[] position =
+        {
+            block.transform.position.x, block.transform.position.y, block.transform.position.z
+        };
+
+        Pathfinding.TileCache.addObstacle(TileCache, position, vertices, 4, (int)Mathf.Ceil(block.Size.y));
     }
 }

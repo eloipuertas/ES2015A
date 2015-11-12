@@ -34,6 +34,17 @@ BUILD_WIN=0
 echo "Attempting to start dummy audio driver"
 sudo modprobe snd-dummy
 
+# Build navmesh first
+echo -e "\nAttempting to build Recast/Detour for Linux"
+cd March\ Death/Assets/UnityRecast
+mkdir Build
+cd Build
+cmake ..
+make -j2
+cp -f src/Recast.so ../../Plugins/x86_64/
+cd $HOME/ES2015A
+
+# Build Unity project
 echo -e "\nAttempting to build $project for Linux"
 sudo -E xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' \
     $UNITY_ROOT/Editor/Unity \
