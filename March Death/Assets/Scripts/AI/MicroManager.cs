@@ -24,8 +24,8 @@ namespace Assets.Scripts.AI
         {
             agents = new List<BaseAgent>();
             this.ai = ai;
-            agents.Add(new ExplorerAgent(ai, "Explorer"));
             AttackAgent aA = new AttackAgent(ai, "Atack");
+            agents.Add(new ExplorerAgent(ai, "Explorer"));
             agents.Add(aA);
             agents.Add(new RetreatAgent(ai, aA, "Retreat"));
         }
@@ -36,12 +36,12 @@ namespace Assets.Scripts.AI
         {
             float bVal = float.MinValue;
             BaseAgent bAgent = agents[0];
-            float val;
+            int val;
             foreach(List<Unit> lu in SplitInGroups(ai.Army))
             {
                 foreach(BaseAgent a in agents)
                 {
-                    val = a.getConfidence(lu) * a.modifier + getError();
+                    val = a.getConfidence(lu);
                     if(AIController.AI_DEBUG_ENABLED) ai.aiDebug.setAgentConfidence(a.agentName, val);
                     if (val > bVal)
                     {
