@@ -7,6 +7,7 @@ namespace Assets.Scripts.AI.Agents
 {
     public abstract class BaseAgent
     {
+		public const int MAX_AGENT_CONFIDENCE = 1000;
         /// <summary>
         /// This confidence will be applied to every confidence return by this agent.
         /// </summary>
@@ -23,5 +24,22 @@ namespace Assets.Scripts.AI.Agents
         }
         public abstract int getConfidence(List<Unit> units);
         public abstract void controlUnits(List<Unit> units);
+
+		/// <summary>
+		/// Transfers confidence to the agent.
+		/// </summary>
+		/// <param name="confidenceToAdd">Confidence to add.</param>
+		public void addConfidence(int confidenceToAdd)
+		{
+			if(baseConfidence + confidenceToAdd > MAX_AGENT_CONFIDENCE)
+			{
+				baseConfidence = MAX_AGENT_CONFIDENCE;
+			}
+			else
+			{
+				baseConfidence += confidenceToAdd;
+			}
+
+		}
     }
 }
