@@ -6,18 +6,26 @@ public class SoundsManager : SingletonMono<SoundsManager> {
 
     public AudioSource efxSource;
     public AudioSource musicSource;
-    public AudioClip testSound;
+    public AudioClip selectionSound;
+    public AudioClip actionSound;
+    private GameInformation information = null; 
 
 
     void Awake()
     {
         // extraido de la wiki de unity
-        if (Instance != this) Destroy(gameObject);
+        //if (Instance != this) Destroy(gameObject);
+        //DontDestroyOnLoad(gameObject);
 
-        DontDestroyOnLoad(gameObject);
+        //if(information == null) information = GameObject.Find("GameInformationObject").GetComponent<GameInformation>();
 
         //Register to selectable actions
         Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.SELECTED, onUnitSelected);
+
+        /*Subscriber<Unit.Actions, Unit>.get.registerForAll(Unit.Actions.MOVEMENT_START, onUnitAction,new ActorSelector()
+        {
+            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == information.GetPlayerRace()
+        });*/
     }
 
 
@@ -36,7 +44,7 @@ public class SoundsManager : SingletonMono<SoundsManager> {
     public void PlaySingle()
     {
         //Set the clip of our efxSource audio source to the clip passed in as a parameter.
-        efxSource.clip = testSound;
+        efxSource.clip = selectionSound;
 
         //Play the clip.
         efxSource.Play();
@@ -46,7 +54,16 @@ public class SoundsManager : SingletonMono<SoundsManager> {
     public void onUnitSelected(System.Object obj)
     {
         //Set the clip of our efxSource audio source to the clip passed in as a parameter.
-        efxSource.clip = testSound;
+        efxSource.clip = selectionSound;
+
+        //Play the clip.
+        efxSource.Play();
+    }
+
+    public void onUnitAction(System.Object obj)
+    {
+        //Set the clip of our efxSource audio source to the clip passed in as a parameter.
+        efxSource.clip = actionSound;
 
         //Play the clip.
         efxSource.Play();
