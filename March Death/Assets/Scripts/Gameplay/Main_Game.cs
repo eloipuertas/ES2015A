@@ -8,6 +8,7 @@ public class Main_Game : MonoBehaviour {
 	private CameraController cam;
 	private Player user;
     Managers.BuildingsManager bm;
+    Managers.SoundsManager sounds;
     public Managers.BuildingsManager BuildingsMgr { get { return bm; } }
 
 	Transform strongholdTransform;
@@ -22,7 +23,8 @@ public class Main_Game : MonoBehaviour {
 		user = GameObject.Find("GameController").GetComponent("Player") as Player;
 		cam = GameObject.FindWithTag("MainCamera").GetComponent<CameraController>();
         bm = GameObject.Find("GameController").GetComponent<Managers.BuildingsManager>();
-        if(info) info.LoadHUD();
+        sounds = GameObject.Find("GameController").GetComponent<Managers.SoundsManager>();
+        if (info) info.LoadHUD();
         LoadPlayerStronghold();
         LoadPlayerUnits();
         StartGame();

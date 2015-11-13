@@ -3,11 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Utils;
 
 namespace Managers
 {
-    public class SelectionManager
+    public class SelectionManager : SubscribableActor<SelectionManager.Actions, SelectionManager>
     {
+        public enum Actions { SELECT, ATTACK, MOVE};
         // class controller for the selected entities
         private SelectableGroup _selectedEntities = new SelectableGroup();
         //Troops
@@ -21,7 +23,10 @@ namespace Managers
         // the amount of troops made
         public int TroopsCount { get { return _troops.Count; } }
 
-        public SelectionManager() {}
+        public override void Start()
+        {
+            base.Start();
+        }
 
         /// <summary>
         /// Setter for the race
@@ -51,7 +56,8 @@ namespace Managers
             if (_selectedEntities.Count > 0) _selectedEntities.Clear();
 
             _selectedEntities.Select(selectable);
-            
+            fire(Actions.SELECT, selectable.gameObject);
+
         }
 
         /// <summary>
@@ -90,6 +96,7 @@ namespace Managers
             if (!_selectedEntities.Contains(selectable))
             {
                 _selectedEntities.Select(selectable);
+                fire(Actions.SELECT, selectable.gameObject);
                 _isTroop = false;
             }
         }
@@ -216,9 +223,14 @@ namespace Managers
             foreach (Selectable selected in _selectedEntities.ToArray())
             {
                 if (selected.entity.info.isUnit)
+                {
                     selected.GetComponent<Unit>().moveTo(point);
+                    fire(Actions.MOVE, selected.gameObject);
+                }
+
             }
             Debug.Log("Moving there");
+            
         }
 
 
@@ -235,9 +247,21 @@ namespace Managers
                 if (selected.entity.info.isUnit)
                 {
                     Unit unit = selected.GetComponent<Unit>();
-                    if (enemy.info.isUnit) unit.attackTarget((Unit)enemy);
-                    else if(enemy.info.isBarrack)unit.attackTarget((Barrack)enemy);
-                    else if(enemy.info.isResource)unit.attackTarget((Resource)enemy);
+                    if (enemy.info.isUnit)
+                    {
+                        unit.attackTarget((Unit)enemy);
+                        fire(Actions.ATTACK, selected.gameObject);
+                    }
+                    else if (enemy.info.isBarrack)
+                    {
+                        unit.attackTarget((Barrack)enemy);
+                        fire(Actions.ATTACK, selected.gameObject);
+                    }
+                    else if (enemy.info.isResource)
+                    {
+                        unit.attackTarget((Resource)enemy);
+                        fire(Actions.ATTACK, selected.gameObject);
+                    }
                 }
             }
             Debug.Log("attacking");
