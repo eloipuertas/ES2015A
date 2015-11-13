@@ -10,6 +10,7 @@ public class PathDetour : Utils.Singleton<PathDetour>
 {
     public IntPtr TileCache = new IntPtr(0);
     public IntPtr NavMesh = new IntPtr(0);
+    public IntPtr NavQuery = new IntPtr(0);
 
     private PathDetour()
     {
@@ -19,7 +20,7 @@ public class PathDetour : Utils.Singleton<PathDetour>
     {
         Pathfinding.Recast.DefaultConfig(Application.dataPath + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Recast.log");
 
-        bool result = Pathfinding.TileCache.loadFromTileCacheHeaders(ref navmeshData.header, navmeshData.tilesHeader, navmeshData.tilesData, ref TileCache, ref NavMesh);
+        bool result = Pathfinding.TileCache.loadFromTileCacheHeaders(ref navmeshData.header, navmeshData.tilesHeader, navmeshData.tilesData, ref TileCache, ref NavMesh, ref NavQuery);
         if (!result)
         {
             throw new ArgumentException("Invalid navmesh data");

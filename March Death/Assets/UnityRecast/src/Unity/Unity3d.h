@@ -1,8 +1,12 @@
+#ifndef UNITY3D_H
+#define UNITY3D_H
+
 #include <malloc.h>
 #include <string.h>
 #include <math.h>
 #include <fstream>
 #include "UnityClasses.h"
+#include "DetourCrowd.h"
 
 #ifdef WIN32
 	#define DLL_EXPORT extern "C" __declspec(dllexport)
@@ -30,9 +34,17 @@ DLL_EXPORT bool createNavmesh(rcConfig* cfg, rcPolyMesh* pmesh, rcPolyMeshDetail
 // TileCache
 DLL_EXPORT bool handleTileCacheBuild(rcConfig* cfg, ExtendedConfig* ecfg, InputGeometry* geom, dtTileCache*& tileCache, dtNavMesh*& navMesh, dtNavMeshQuery*& navQuery);
 DLL_EXPORT void getTileCacheHeaders(TileCacheSetHeader& header, TileCacheTileHeader*& tilesHeader, dtTileCache* tileCache, dtNavMesh* navMesh);
-DLL_EXPORT bool loadFromTileCacheHeaders(TileCacheSetHeader header, TileCacheTileHeader* tilesHeader, unsigned char* data, dtTileCache*& tileCache, dtNavMesh*& navMesh);
+DLL_EXPORT bool loadFromTileCacheHeaders(TileCacheSetHeader* header, TileCacheTileHeader* tilesHeader, unsigned char* data, dtTileCache*& tileCache, dtNavMesh*& navMesh, dtNavMeshQuery*& navQuery);
 
 // Class related
 DLL_EXPORT dtMeshTile* getTile(dtNavMesh* navmesh, int i);
 DLL_EXPORT dtCompressedTile* getTileCacheTile(dtTileCache* tileCache, int i);
 DLL_EXPORT void addObstacle(dtTileCache* tileCache, float* pos, float* verts, int nverts, int height);
+
+// Crowd
+DLL_EXPORT dtCrowd* createCrowd(int maxAgents, int maxRadius, dtNavMesh* navmesh);
+DLL_EXPORT int addAgent(dtCrowd* crowd, const float* p, int radius, int height);
+DLL_EXPORT void setMoveTarget(dtNavMeshQuery* navquery, dtCrowd* crowd, int idx, float* p, bool adjust);
+DLL_EXPORT void updateTick(dtNavMesh* nav, dtCrowd* crowd, float dt, float* positions, int& npos);
+
+#endif

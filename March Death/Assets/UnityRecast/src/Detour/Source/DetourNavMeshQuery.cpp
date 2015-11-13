@@ -697,6 +697,8 @@ dtStatus dtNavMeshQuery::getPolyHeight(dtPolyRef ref, const float* pos, float* h
 	return DT_FAILURE | DT_INVALID_PARAM;
 }
 
+#include "Unity3d.h"
+
 /// @par 
 ///
 /// @note If the search box does not intersect any polygons the search will 
@@ -721,6 +723,8 @@ dtStatus dtNavMeshQuery::findNearestPoly(const float* center, const float* exten
 	if (dtStatusFailed(queryPolygons(center, extents, filter, polys, &polyCount, MAX_SEARCH)))
 		return DT_FAILURE | DT_INVALID_PARAM;
 	
+	ctx->log(RC_LOG_ERROR, "FindNearest, polyCount=%d", polyCount);
+
 	// Find nearest polygon amongst the nearby polygons.
 	dtPolyRef nearest = 0;
 	float nearestDistanceSqr = FLT_MAX;
@@ -769,6 +773,8 @@ int dtNavMeshQuery::queryPolygonsInTile(const dtMeshTile* tile, const float* qmi
 										dtPolyRef* polys, const int maxPolys) const
 {
 	dtAssert(m_nav);
+
+	ctx->log(RC_LOG_ERROR, "queryPolygonsInTile bvTree: %d", tile->bvTree);
 
 	if (tile->bvTree)
 	{
@@ -838,7 +844,10 @@ int dtNavMeshQuery::queryPolygonsInTile(const dtMeshTile* tile, const float* qmi
 			// Must pass filter
 			const dtPolyRef ref = base | (dtPolyRef)i;
 			if (!filter->passFilter(ref, tile, p))
+			{
+				ctx->log(RC_LOG_ERROR, "queryPolygonsInTile NOT_PASSING_FILET");
 				continue;
+			}
 			// Calc polygon bounds.
 			const float* v = &tile->verts[p->verts[0]*3];
 			dtVcopy(bmin, v);
@@ -885,6 +894,8 @@ dtStatus dtNavMeshQuery::queryPolygons(const float* center, const float* extents
 
 	static const int MAX_NEIS = 32;
 	const dtMeshTile* neis[MAX_NEIS];
+
+	ctx->log(RC_LOG_ERROR, "TileLoc (%d, %d) - (%d, %d)", minx, miny, maxx, maxy);
 	
 	int n = 0;
 	for (int y = miny; y <= maxy; ++y)
@@ -892,6 +903,7 @@ dtStatus dtNavMeshQuery::queryPolygons(const float* center, const float* extents
 		for (int x = minx; x <= maxx; ++x)
 		{
 			const int nneis = m_nav->getTilesAt(x,y,neis,MAX_NEIS);
+			ctx->log(RC_LOG_ERROR, "getTilesAt %d", nneis);
 			for (int j = 0; j < nneis; ++j)
 			{
 				n += queryPolygonsInTile(neis[j], bmin, bmax, filter, polys+n, maxPolys-n);

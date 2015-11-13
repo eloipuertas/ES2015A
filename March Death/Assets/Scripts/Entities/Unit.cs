@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utils;
 using Storage;
+using Pathfinding;
 
 
 /// <summary>
@@ -63,7 +64,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// <summary>
     /// NavAgent, used fot map navigation
     /// </summary>
-    private NavMeshAgent _navAgent;
+    private DetourAgent _detourAgent;
     private bool _hasPath = false;
 
     /// <summary>
@@ -254,10 +255,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// <param name="movePoint">Point to move to</param>
     public bool moveTo(Vector3 movePoint)
     {
-        if (!_navAgent.SetDestination(movePoint))
-        {
-            return false;
-        }
+        _detourAgent.MoveTo(movePoint);
         
         _followingTarget = false;
         _target = null;
@@ -294,10 +292,8 @@ public class Unit : GameEntity<Unit.Actions>
 
         activateFOWEntity();
 
-        // Get NagMeshAgent and set basic variables
-        _navAgent = GetComponent<NavMeshAgent>();
-        _navAgent.speed = _info.unitAttributes.movementRate;
-        _navAgent.acceleration = info.unitAttributes.movementRate * 2.5f;
+        // Get DetourAgent and set basic variables
+        _detourAgent = GetComponent<DetourAgent>();
     }
 
     /// <summary>
@@ -376,6 +372,7 @@ public class Unit : GameEntity<Unit.Actions>
                 // If we are already in range, start attacking
                 // Must be called before MoveTowards because it uses _distanceToTarget, which
                 // would be otherwise outdated
+                /*
                 if (_followingTarget)
                 {
                     // Update destination only if target has moved
@@ -415,6 +412,7 @@ public class Unit : GameEntity<Unit.Actions>
                         }
                     }
                 }
+                */
                 
                 break;
         }

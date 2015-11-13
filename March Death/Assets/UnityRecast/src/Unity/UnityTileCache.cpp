@@ -4,7 +4,7 @@ static const int EXPECTED_LAYERS_PER_TILE = 4;
 static const int TILECACHESET_MAGIC = 'T' << 24 | 'S' << 16 | 'E' << 8 | 'T'; //'TSET';
 static const int TILECACHESET_VERSION = 1;
 
-LinearAllocator* allocator = new LinearAllocator(32000);
+LinearAllocator* allocator = new LinearAllocator(5*1024*1024);
 FastLZCompressor* compressor = new FastLZCompressor();
 MeshProcess* processor = new MeshProcess();
 
@@ -215,10 +215,11 @@ bool handleTileCacheBuild(rcConfig* cfg, ExtendedConfig* ecfg, InputGeometry* ge
 	//m_tmproc->init(m_geom);
 
 	// Init cache
-	rcCalcGridSize(bmin, bmax, cfg->cs, &cfg->width, &cfg->height);
+	int gw = 0, gh = 0;
+	rcCalcGridSize(bmin, bmax, cfg->cs, &gw, &gh);
 	const int ts = cfg->tileSize;
-	const int tw = (cfg->width + ts - 1) / ts;
-	const int th = (cfg->height + ts - 1) / ts;
+	const int tw = (gw + ts - 1) / ts;
+	const int th = (gh + ts - 1) / ts;
 
 	int tileBits = rcMin((int)dtIlog2(dtNextPow2(tw*th*EXPECTED_LAYERS_PER_TILE)), 14);
 	if (tileBits > 14) tileBits = 14;
@@ -227,6 +228,10 @@ bool handleTileCacheBuild(rcConfig* cfg, ExtendedConfig* ecfg, InputGeometry* ge
 	int maxPolysPerTile = 1 << polyBits;
 
 	// Generation params.
+	cfg->borderSize = cfg->walkableRadius + 3; // Reserve enough padding.
+	cfg->width = cfg->tileSize + cfg->borderSize * 2;
+	cfg->height = cfg->tileSize + cfg->borderSize * 2;
+
 	rcVcopy(cfg->bmin, bmin);
 	rcVcopy(cfg->bmax, bmax);
 
@@ -361,14 +366,14 @@ void getTileCacheHeaders(TileCacheSetHeader& header, TileCacheTileHeader*& tiles
 	}
 }
 
-bool loadFromTileCacheHeaders(TileCacheSetHeader header, TileCacheTileHeader* tilesHeader, unsigned char* data, dtTileCache*& tileCache, dtNavMesh*& navMesh)
+bool loadFromTileCacheHeaders(TileCacheSetHeader* header, TileCacheTileHeader* tilesHeader, unsigned char* data, dtTileCache*& tileCache, dtNavMesh*& navMesh, dtNavMeshQuery*& navQuery)
 {
-	if (header.magic != TILECACHESET_MAGIC)
+	if (header->magic != TILECACHESET_MAGIC)
 	{
 		ctx->log(RC_LOG_ERROR, "FAILED MAGIC");
 		return false;
 	}
-	if (header.version != TILECACHESET_VERSION)
+	if (header->version != TILECACHESET_VERSION)
 	{
 		ctx->log(RC_LOG_ERROR, "FAILED VERSION");
 		return false;
@@ -381,7 +386,7 @@ bool loadFromTileCacheHeaders(TileCacheSetHeader header, TileCacheTileHeader* ti
 		return false;
 	}
 
-	dtStatus status = navMesh->init(&header.meshParams);
+	dtStatus status = navMesh->init(&header->meshParams);
 	if (dtStatusFailed(status))
 	{
 		ctx->log(RC_LOG_ERROR, "FAILED navMesh->init");
@@ -394,19 +399,19 @@ bool loadFromTileCacheHeaders(TileCacheSetHeader header, TileCacheTileHeader* ti
 		ctx->log(RC_LOG_ERROR, "FAILED dtAllocTileCache");
 		return false;
 	}
-	status = tileCache->init(&header.cacheParams, allocator, compressor, processor);
+	status = tileCache->init(&header->cacheParams, allocator, compressor, processor);
 	if (dtStatusFailed(status))
 	{
 		ctx->log(RC_LOG_ERROR, "FAILED tileCache->init");
 		return false;
 	}
 
-	ctx->log(RC_LOG_ERROR, "We have %d tiles", header.numTiles);
+	ctx->log(RC_LOG_ERROR, "We have %d tiles", header->numTiles);
 
 	// Read tiles.
 	int n = 0;
 	int start = 0;
-	for (int i = 0; i < header.numTiles; ++i)
+	for (int i = 0; i < header->numTiles; ++i)
 	{
 		TileCacheTileHeader& tileHeader = tilesHeader[n++];
 		if (!tileHeader.tileRef || !tileHeader.dataSize)
@@ -420,7 +425,18 @@ bool loadFromTileCacheHeaders(TileCacheSetHeader header, TileCacheTileHeader* ti
 		if (tile)
 			status = tileCache->buildNavMeshTile(tile, navMesh);
 
-		ctx->log(RC_LOG_ERROR, "Tile %d = %x \t %d", i, tile, status);
+		if (dtStatusFailed(status))
+		{
+			ctx->log(RC_LOG_ERROR, "FAILED BUILDING TILE %d [%x] [[%lld]]", i, status, status);
+		}
+	}
+
+	navQuery = dtAllocNavMeshQuery();
+	status = navQuery->init(navMesh, 2048);
+	if (dtStatusFailed(status))
+	{
+		ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Could not init Detour navmesh query");
+		return false;
 	}
 
 	return true;
@@ -439,4 +455,159 @@ dtMeshTile* getTile(dtNavMesh* navmesh, int i)
 void addObstacle(dtTileCache* tileCache, float* pos, float* verts, int nverts, int height)
 {
 	tileCache->addObstacle(pos, verts, nverts, height, NULL);
+}
+
+dtCrowd* createCrowd(int maxAgents, int maxRadius, dtNavMesh* navmesh)
+{
+	dtCrowd* crowd = dtAllocCrowd();
+	crowd->init(maxAgents, maxRadius, navmesh);
+	crowd->getEditableFilter(0)->setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
+
+	dtObstacleAvoidanceParams params;
+	// Use mostly default settings, copy from dtCrowd.
+	memcpy(&params, crowd->getObstacleAvoidanceParams(0), sizeof(dtObstacleAvoidanceParams));
+
+	// Low (11)
+	params.velBias = 0.5f;
+	params.adaptiveDivs = 5;
+	params.adaptiveRings = 2;
+	params.adaptiveDepth = 1;
+	crowd->setObstacleAvoidanceParams(0, &params);
+
+	// Medium (22)
+	params.velBias = 0.5f;
+	params.adaptiveDivs = 5;
+	params.adaptiveRings = 2;
+	params.adaptiveDepth = 2;
+	crowd->setObstacleAvoidanceParams(1, &params);
+
+	// Good (45)
+	params.velBias = 0.5f;
+	params.adaptiveDivs = 7;
+	params.adaptiveRings = 2;
+	params.adaptiveDepth = 3;
+	crowd->setObstacleAvoidanceParams(2, &params);
+
+	// High (66)
+	params.velBias = 0.5f;
+	params.adaptiveDivs = 7;
+	params.adaptiveRings = 3;
+	params.adaptiveDepth = 3;
+
+	crowd->setObstacleAvoidanceParams(3, &params);
+	return crowd;
+}
+
+int addAgent(dtCrowd* crowd, const float* p, int radius, int height)
+{
+	dtCrowdAgentParams ap;
+	memset(&ap, 0, sizeof(ap));
+	ap.radius = radius;
+	ap.height = height;
+	ap.maxAcceleration = 8.0f;
+	ap.maxSpeed = 3.5f;
+	ap.collisionQueryRange = ap.radius * 12.0f;
+	ap.pathOptimizationRange = ap.radius * 30.0f;
+	ap.updateFlags = 0;
+	
+	//if (m_toolParams.m_anticipateTurns)
+		ap.updateFlags |= DT_CROWD_ANTICIPATE_TURNS;
+	//if (m_toolParams.m_optimizeVis)
+		ap.updateFlags |= DT_CROWD_OPTIMIZE_VIS;
+	//if (m_toolParams.m_optimizeTopo)
+		ap.updateFlags |= DT_CROWD_OPTIMIZE_TOPO;
+	//if (m_toolParams.m_obstacleAvoidance)
+		ap.updateFlags |= DT_CROWD_OBSTACLE_AVOIDANCE;
+	//if (m_toolParams.m_separation)
+		ap.updateFlags |= DT_CROWD_SEPARATION;
+
+	ap.obstacleAvoidanceType = (unsigned char)2;
+	ap.separationWeight = 1;
+
+	return crowd->addAgent(p, &ap);
+}
+
+static void calcVel(float* vel, const float* pos, const float* tgt, const float speed)
+{
+	dtVsub(vel, tgt, pos);
+	vel[1] = 0.0;
+	dtVnormalize(vel);
+	dtVscale(vel, vel, speed);
+}
+
+void setMoveTarget(dtNavMeshQuery* navquery, dtCrowd* crowd, int idx, float* p, bool adjust)
+{
+	// Find nearest point on navmesh and set move request to that location.
+	const dtQueryFilter* filter = crowd->getFilter(0);
+	const float* ext = crowd->getQueryExtents();
+
+	if (adjust)
+	{
+		float vel[3];
+		// Request velocity
+		if (idx != -1)
+		{
+			const dtCrowdAgent* ag = crowd->getAgent(idx);
+			if (ag && ag->active)
+			{
+				calcVel(vel, ag->npos, p, ag->params.maxSpeed);
+				crowd->requestMoveVelocity(idx, vel);
+			}
+		}
+		else
+		{
+			for (int i = 0; i < crowd->getAgentCount(); ++i)
+			{
+				const dtCrowdAgent* ag = crowd->getAgent(i);
+				if (!ag->active) continue;
+				calcVel(vel, ag->npos, p, ag->params.maxSpeed);
+				crowd->requestMoveVelocity(i, vel);
+			}
+		}
+	}
+	else
+	{
+		dtPolyRef targetRef;
+		float targetPos[3] = { 0, 0, 0 };
+		dtStatus status = navquery->findNearestPoly(p, ext, filter, &targetRef, targetPos);
+
+		ctx->log(RC_LOG_ERROR, "DebugMove: %d -> (%d,%d,%d) [%d]", targetRef, targetPos[0], targetPos[1], targetPos[2], status);
+
+		if (idx != -1)
+		{
+			const dtCrowdAgent* ag = crowd->getAgent(idx);
+			if (ag && ag->active)
+			{
+				ctx->log(RC_LOG_ERROR, "DebugMove: Requesting move for %x (%d)", ag, idx);
+				crowd->requestMoveTarget(idx, targetRef, targetPos);
+			}
+		}
+		else
+		{
+			for (int i = 0; i < crowd->getAgentCount(); ++i)
+			{
+				const dtCrowdAgent* ag = crowd->getAgent(i);
+				if (!ag->active) continue;
+				crowd->requestMoveTarget(i, targetRef, targetPos);
+			}
+		}
+	}
+}
+
+void updateTick(dtNavMesh* nav, dtCrowd* crowd, float dt, float* positions, int& npos)
+{
+	if (!nav || !crowd) return;
+
+	crowd->update(dt, NULL);
+
+	// Update agent trails
+	npos = crowd->getAgentCount();
+	for (int i = 0; i < npos; ++i)
+	{
+		const dtCrowdAgent* ag = crowd->getAgent(i);
+
+		positions[i * 3 + 0] = ag->npos[0];
+		positions[i * 3 + 1] = ag->npos[1];
+		positions[i * 3 + 2] = ag->npos[2];
+	}
 }

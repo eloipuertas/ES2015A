@@ -15,7 +15,7 @@ namespace Pathfinding
         public static extern void getTileCacheHeaders(ref TileCacheAsset.TileCacheSetHeader header, ref IntPtr tilesHeader, IntPtr tileCache, IntPtr navMesh);
 
         [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool loadFromTileCacheHeaders(ref TileCacheAsset.TileCacheSetHeader header, TileCacheAsset.TileCacheTileHeader[] tilesHeader, byte[] data, ref IntPtr tileCache, ref IntPtr navMesh);
+        public static extern bool loadFromTileCacheHeaders(ref TileCacheAsset.TileCacheSetHeader header, TileCacheAsset.TileCacheTileHeader[] tilesHeader, byte[] data, ref IntPtr tileCache, ref IntPtr navMesh, ref IntPtr navQuery);
 
         [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr getTileCacheTile(IntPtr tileCache, int i);
