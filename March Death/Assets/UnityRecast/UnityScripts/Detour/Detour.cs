@@ -22,10 +22,16 @@ namespace Pathfinding
         public static class Crowd
         {
             [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
-            public static extern IntPtr createCrowd(int maxAgents, int maxRadius, IntPtr navmesh);
+            public static extern IntPtr createCrowd(int maxAgents, float maxRadius, IntPtr navmesh);
 
             [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
-            public static extern int addAgent(IntPtr crowd, float[] p, int radius, int height);
+            public static extern int addAgent(IntPtr crowd, float[] p, float radius, float height);
+
+            [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr getAgent(IntPtr crowd, int idx);
+
+            [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+            public static extern void updateAgent(IntPtr crowd, int idx, float maxAcceleration, float maxSpeed);
 
             [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
             public static extern void setMoveTarget(IntPtr navquery, IntPtr crowd, int idx, float[] p, bool adjust);

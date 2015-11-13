@@ -457,7 +457,7 @@ void addObstacle(dtTileCache* tileCache, float* pos, float* verts, int nverts, i
 	tileCache->addObstacle(pos, verts, nverts, height, NULL);
 }
 
-dtCrowd* createCrowd(int maxAgents, int maxRadius, dtNavMesh* navmesh)
+dtCrowd* createCrowd(int maxAgents, float maxRadius, dtNavMesh* navmesh)
 {
 	dtCrowd* crowd = dtAllocCrowd();
 	crowd->init(maxAgents, maxRadius, navmesh);
@@ -498,7 +498,7 @@ dtCrowd* createCrowd(int maxAgents, int maxRadius, dtNavMesh* navmesh)
 	return crowd;
 }
 
-int addAgent(dtCrowd* crowd, const float* p, int radius, int height)
+int addAgent(dtCrowd* crowd, const float* p, float radius, float height)
 {
 	dtCrowdAgentParams ap;
 	memset(&ap, 0, sizeof(ap));
@@ -525,6 +525,19 @@ int addAgent(dtCrowd* crowd, const float* p, int radius, int height)
 	ap.separationWeight = 1;
 
 	return crowd->addAgent(p, &ap);
+}
+
+dtCrowdAgent* getAgent(dtCrowd* crowd, int idx)
+{
+	return (dtCrowdAgent*)crowd->getAgent(idx);
+}
+
+void updateAgent(dtCrowd* crowd, int idx, float maxAcceleration, float maxSpeed)
+{
+	dtCrowdAgentParams ap = crowd->getAgent(idx)->params;
+	ap.maxAcceleration = maxAcceleration;
+	ap.maxSpeed = maxSpeed;
+	crowd->updateAgentParameters(idx, &ap);
 }
 
 static void calcVel(float* vel, const float* pos, const float* tgt, const float speed)

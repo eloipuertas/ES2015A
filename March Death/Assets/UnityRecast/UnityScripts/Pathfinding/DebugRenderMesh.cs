@@ -325,7 +325,7 @@ public class DbgRenderMesh
         }
     }
 
-    public void CreateGameObjects(string name, Material material)
+    public List<GameObject> CreateGameObjects(string name, Material material)
     {
         int nGameObjects = (int)Mathf.Ceil(3 * m_Triangles.Count / 65000.0f);
 
@@ -348,20 +348,14 @@ public class DbgRenderMesh
             gao.GetComponent<Renderer>().material = material;
             m_GameObjects.Add(gao);
         }
+
+        return m_GameObjects;
     }
 
-    public void DestroyGameObjects()
+    public void Destroy()
     {
-        foreach (GameObject gao in m_GameObjects)
-        {
-            Clear();
-
-            GameObject.Destroy(gao);
-            m_MeshFilter = null;
-            m_MeshRenderer = null;
-        }
-
         m_Mesh.Clear();
+        Clear();
         m_GameObjects.Clear();
     }
 

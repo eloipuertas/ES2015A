@@ -294,6 +294,8 @@ public class Unit : GameEntity<Unit.Actions>
 
         // Get DetourAgent and set basic variables
         _detourAgent = GetComponent<DetourAgent>();
+        _detourAgent.SetMaxSpeed(info.unitAttributes.movementRate);
+        _detourAgent.SetMaxAcceleration(info.unitAttributes.movementRate * 1.5f);
     }
 
     /// <summary>

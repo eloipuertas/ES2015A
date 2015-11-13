@@ -42,8 +42,10 @@ DLL_EXPORT dtCompressedTile* getTileCacheTile(dtTileCache* tileCache, int i);
 DLL_EXPORT void addObstacle(dtTileCache* tileCache, float* pos, float* verts, int nverts, int height);
 
 // Crowd
-DLL_EXPORT dtCrowd* createCrowd(int maxAgents, int maxRadius, dtNavMesh* navmesh);
-DLL_EXPORT int addAgent(dtCrowd* crowd, const float* p, int radius, int height);
+DLL_EXPORT dtCrowd* createCrowd(int maxAgents, float maxRadius, dtNavMesh* navmesh);
+DLL_EXPORT int addAgent(dtCrowd* crowd, const float* p, float radius, float height);
+DLL_EXPORT dtCrowdAgent* getAgent(dtCrowd* crowd, int idx);
+DLL_EXPORT void updateAgent(dtCrowd* crowd, int idx, float maxAcceleration, float maxSpeed);
 DLL_EXPORT void setMoveTarget(dtNavMeshQuery* navquery, dtCrowd* crowd, int idx, float* p, bool adjust);
 DLL_EXPORT void updateTick(dtNavMesh* nav, dtCrowd* crowd, float dt, float* positions, int& npos);
 

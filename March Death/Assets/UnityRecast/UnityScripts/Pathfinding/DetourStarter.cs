@@ -9,12 +9,14 @@ class DetourStarter : MonoBehaviour
 {
     public enum RenderMode { POLYS, DETAIL_POLYS, TILE_POLYS }
 
+    public bool Render = false;
     public Material material;
     public PolyMeshAsset polymesh;
     public TileCacheAsset navmeshData;
     public RenderMode Mode;
 
     private DbgRenderMesh mesh = new DbgRenderMesh();
+    private List<GameObject> gameObjects = new List<GameObject>();
 
     public void OnEnable()
     {
@@ -24,7 +26,7 @@ class DetourStarter : MonoBehaviour
         {
             Destroy(this);
         }
-        else
+        else if (Render)
         {
             mesh.Clear();
 
@@ -39,23 +41,21 @@ class DetourStarter : MonoBehaviour
                     break;
 
                 case RenderMode.TILE_POLYS:
-                    for (int i = 0; i < navmeshData.header.numTiles-1; ++i)
+                    for (int i = 0; i < navmeshData.header.numTiles; ++i)
                         RecastDebug.ShowTilePolyDetails(mesh, PathDetour.get.NavMesh, i);
                     break;
             }
 
-            mesh.CreateGameObjects("RecastRenderer", material);
+            gameObjects = mesh.CreateGameObjects("RecastRenderer", material);
             mesh.Rebuild();
         }
     }
 
-    public void OnDestroy()
-    {
-        mesh.DestroyGameObjects();
-    }
-
     public void OnDisable()
     {
-        mesh.DestroyGameObjects();
+        foreach (GameObject gob in gameObjects)
+        {
+            DestroyImmediate(gob);
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace Pathfinding
     public class DetourCrowd : MonoBehaviour
     {
         public int MaxAgents = 1024;
-        public int AgentMaxRadius = 2;
+        public float AgentMaxRadius = 2;
 
         private IntPtr crowd = new IntPtr(0);
         private Dictionary<int, IGameEntity> agents = new Dictionary<int, IGameEntity>();
@@ -45,16 +45,20 @@ namespace Pathfinding
             return new Vector3(p[off + 0], p[off + 1], p[off + 2]);
         }
 
-        public int AddAgent(IGameEntity entity)
+        public int AddAgent(IGameEntity entity, float radius, float height)
         {
-            // HACK: Height is hardcoded
-            int idx = Detour.Crowd.addAgent(crowd, ToFloat(entity.getTransform().position), AgentMaxRadius, 2);
+            int idx = Detour.Crowd.addAgent(crowd, ToFloat(entity.getTransform().position), radius, height);
             if (idx != -1)
             {
                 agents.Add(idx, entity);
             }
 
             return idx;
+        }
+
+        public void SetAgentParemeters(int idx, float maxAcceleration, float maxSpeed)
+        {
+            Detour.Crowd.updateAgent(crowd, idx, maxAcceleration, maxSpeed);
         }
 
         public void MoveTarget(int idx, Vector3 target)
@@ -68,7 +72,6 @@ namespace Pathfinding
 
             foreach (KeyValuePair<int, IGameEntity> entry in agents)
             {
-                Debug.Log(ToVector3(positionHolder, entry.Key * 3));
                 entry.Value.getTransform().position = ToVector3(positionHolder, entry.Key * 3);
             }
         }
