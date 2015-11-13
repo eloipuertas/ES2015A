@@ -29,7 +29,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     /// <summary>
     /// The selection Manager
     /// </summary>
-    protected Managers.SelectionManager _selection = new Managers.SelectionManager();
+    protected Managers.SelectionManager _selection;
     public Managers.SelectionManager selection { get { return _selection; } }
      
 
