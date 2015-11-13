@@ -9,7 +9,14 @@ namespace Assets.Scripts.AI.Agents
 {
     public class ExplorerAgent : BaseAgent
     {
+		const int CONFIDENCE_EXPLORER_BY_DEFAULT = 50;
+		const int CONFIDENCE_EXPLORER_ALL_CIVILS = 50;
+		const int CONFIDENCE_EXPLORER_DISABLED = -1;
+		const int CONFIDENCE_HERO_ALREADY_FOUND = 0;
+
         bool heroVisible;
+		bool allCivils;
+
         FOWManager fowManager;
         /// <summary>
         /// Last position when we saw the enemy hero
@@ -19,7 +26,7 @@ namespace Assets.Scripts.AI.Agents
         /// Helper array for fast explroe.
         /// </summary>
         int[,] dirHelper = new int[8,2]{ { 0, -1 }, { -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 } };
-
+		int confidence = 0;
         public ExplorerAgent(AIController ai, String name) : base(ai, name)
         {
             ActorSelector selector = new ActorSelector()
@@ -106,14 +113,38 @@ namespace Assets.Scripts.AI.Agents
             }
             return new Vector3(u.transform.position.x+1, u.transform.position.y, u.transform.position.z);
         }
+
         public override int getConfidence(List<Unit> units)
         {
-            if (!fowManager.Enabled)
-                return - 1000;
+
+			confidence = CONFIDENCE_EXPLORER_BY_DEFAULT;
+            
+			if (!fowManager.Enabled)
+			{
+                return CONFIDENCE_EXPLORER_DISABLED;
+			}
+
             if (heroVisible)
-                return 0;
-            return 20;
+			{
+                return CONFIDENCE_HERO_ALREADY_FOUND;
+			}
+
+			foreach(Unit unit in units)
+			{
+				if(unit.type != Storage.UnitTypes.CIVIL)
+				{
+					allCivils = false;
+				}
+			}
+
+			if(allCivils)
+			{
+				confidence += CONFIDENCE_EXPLORER_ALL_CIVILS;
+			}
+
+			return confidence;
         }
+
         void OnEntityFound(System.Object obj)
         {
             IGameEntity g = ((GameObject)obj).GetComponent<IGameEntity>();
@@ -121,6 +152,7 @@ namespace Assets.Scripts.AI.Agents
                 if (((Unit)g).type == Storage.UnitTypes.HERO)
                     heroVisible = true;
         }
+
         void OnEntityLost(System.Object obj)
         {
             IGameEntity g = ((GameObject)obj).GetComponent<IGameEntity>();
