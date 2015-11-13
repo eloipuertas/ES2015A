@@ -19,9 +19,10 @@ public class Player : BasePlayer
     public List<IGameEntity> activeEntities {
         get { return new List<IGameEntity>(_activeEntities); }
     }
-    
-	//the list of player units in the scene
-	public ArrayList currentUnits = new ArrayList ();
+
+
+    //the list of player units in the scene
+    public ArrayList currentUnits = new ArrayList ();
 
     // i order to mantain InformationController working
 	//public ArrayList SelectedObjects = new ArrayList();
@@ -36,6 +37,7 @@ public class Player : BasePlayer
     {   
         base.Start();
         _buildings = GetComponent<Managers.BuildingsManager>();
+        _selection = GetComponent<Managers.SelectionManager>();
         //request the race of the player
         _selfRace = info.GetPlayerRace();
         _selection.SetRace(race);
