@@ -452,13 +452,21 @@ dtMeshTile* getTile(dtNavMesh* navmesh, int i)
 	return (dtMeshTile*)navmesh->getTileIdx(i);
 }
 
-void addObstacle(dtTileCache* tileCache, float* pos, float* verts, int nverts, int height)
+dtObstacleRef addObstacle(dtTileCache* tileCache, float* pos, float* verts, int nverts, int height)
 {
 	for (int i = 0; i < nverts; ++i)
 	{
 		ctx->log(RC_LOG_ERROR, "Vert: (%.3f, %.3f, %.3f)", verts[i * 3 + 0], verts[i * 3 + 1], verts[i * 3 + 2]);
 	}
-	tileCache->addObstacle(pos, verts, nverts, height, NULL);
+
+	dtObstacleRef ref;
+	tileCache->addObstacle(pos, verts, nverts, height, &ref);
+	return ref;
+}
+
+void removeObstacle(dtTileCache* tileCache, dtObstacleRef ref)
+{
+	tileCache->removeObstacle(ref);
 }
 
 float* getObstacles(dtTileCache* tc, int& nobstacles)
@@ -552,8 +560,8 @@ int addAgent(dtCrowd* crowd, const float* p, float radius, float height)
 	//if (m_toolParams.m_separation)
 		ap.updateFlags |= DT_CROWD_SEPARATION;
 
-	ap.obstacleAvoidanceType = (unsigned char)3;
-	ap.separationWeight = 100;
+	ap.obstacleAvoidanceType = (unsigned char)2;
+	ap.separationWeight = 1;
 
 	return crowd->addAgent(p, &ap);
 }

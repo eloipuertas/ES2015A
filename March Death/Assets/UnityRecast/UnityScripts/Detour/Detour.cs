@@ -14,9 +14,6 @@ namespace Pathfinding
         [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr getTile(IntPtr navmesh, int i);
 
-        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr getObstacles(IntPtr tileCache, ref int nobstacles);
-
         public static class Query
         {
 

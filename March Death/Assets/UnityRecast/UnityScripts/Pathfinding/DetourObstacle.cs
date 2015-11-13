@@ -9,11 +9,18 @@ namespace Pathfinding
         public bool DebugOnEditor = true;
         public Vector3 Position = new Vector3(0, 0, 0);
         public Vector3 Size = new Vector3(1, 1, 1);
+        public float CheckEverySeconds = 1.0f;
 
         private Vector3 Bottom_1;
         private Vector3 Bottom_2;
         private Vector3 Bottom_3;
         private Vector3 Bottom_4;
+
+        private uint obstacleReference = 0;
+        private float lastChecked = 0.0f;
+        private Vector3 lastKnownPosition = new Vector3();
+        private Quaternion lastKnownRotation = new Quaternion();
+        private bool alreadyAdded = false;
 
         private void CalcVertices()
         {
@@ -36,10 +43,28 @@ namespace Pathfinding
             Bottom_4.z -= size.z / 2;
         }
 
-        public void Start()
+        private void checkObstacleStatus()
         {
-            CalcVertices();
-            PathDetour.get.AddObstacle(this);
+            if (Time.time - lastChecked >= CheckEverySeconds)
+            {
+                lastChecked = Time.time;
+
+                if (!alreadyAdded || lastKnownPosition != transform.position ||
+                    lastKnownRotation != transform.rotation)
+                {
+                    lastKnownPosition = transform.position;
+                    lastKnownRotation = transform.rotation;
+                    CalcVertices();
+
+                    if (alreadyAdded)
+                    {
+                        PathDetour.get.RemoveObstacle(obstacleReference);
+                    }
+
+                    obstacleReference = PathDetour.get.AddObstacle(this);
+                    alreadyAdded = true;
+                }
+            }
         }
 
         public Vector3[] Vertices()
@@ -52,6 +77,8 @@ namespace Pathfinding
 
         public void Update()
         {
+            checkObstacleStatus();
+
 #if UNITY_EDITOR
             if (DebugOnEditor)
             {

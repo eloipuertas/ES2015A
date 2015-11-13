@@ -31,7 +31,7 @@ public class PathDetour : Utils.Singleton<PathDetour>
         }
     }
 
-    public void AddObstacle(Pathfinding.DetourObstacle block)
+    public uint AddObstacle(Pathfinding.DetourObstacle block)
     {
         Assert.IsTrue(TileCache.ToInt32() != 0);
 
@@ -51,6 +51,11 @@ public class PathDetour : Utils.Singleton<PathDetour>
             pos.x, pos.y - 3.0f, pos.z
         };
 
-        Pathfinding.TileCache.addObstacle(TileCache, position, vertices, 4, (int)Mathf.Ceil(block.Size.y));
+        return Pathfinding.TileCache.addObstacle(TileCache, position, vertices, 4, (int)Mathf.Ceil(block.Size.y));
+    }
+
+    public void RemoveObstacle(uint reference)
+    {
+        Pathfinding.TileCache.removeObstacle(TileCache, reference);
     }
 }

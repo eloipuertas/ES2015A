@@ -336,7 +336,7 @@ public static partial class RecastDebug
     public static void RenderObstacles(IntPtr tileCache)
     {
         int nobstacles = 0;
-        IntPtr verticesPtr = Pathfinding.Detour.getObstacles(tileCache, ref nobstacles);
+        IntPtr verticesPtr = Pathfinding.TileCache.getObstacles(tileCache, ref nobstacles);
 
         float[] vertices = new float[nobstacles * 6];
         Marshal.Copy(verticesPtr, vertices, 0, nobstacles * 6);

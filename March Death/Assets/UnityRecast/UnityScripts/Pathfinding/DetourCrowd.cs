@@ -80,13 +80,16 @@ namespace Pathfinding
                     Vector3 newPosition = ToVector3(positionHolder, entry.Key * 3);
 
                     Vector3 direction = (newPosition - entityTransform.position).normalized;
-                    Quaternion lookRotation = Quaternion.LookRotation(direction);
-                    lookRotation = Quaternion.Slerp(entityTransform.rotation, lookRotation, Time.deltaTime * 10f);
-                    Vector3 eulerAngles = lookRotation.eulerAngles;
-                    eulerAngles = new Vector3(0, eulerAngles.y, 0);
+                    if (direction.sqrMagnitude != 0)
+                    {
+                        Quaternion lookRotation = Quaternion.LookRotation(direction);
+                        lookRotation = Quaternion.Slerp(entityTransform.rotation, lookRotation, Time.deltaTime * 10f);
+                        Vector3 eulerAngles = lookRotation.eulerAngles;
+                        eulerAngles = new Vector3(0, eulerAngles.y, 0);
 
-                    entityTransform.position = newPosition;
-                    entityTransform.rotation = Quaternion.Euler(eulerAngles);
+                        entityTransform.position = newPosition;
+                        entityTransform.rotation = Quaternion.Euler(eulerAngles);
+                    }
                 }
             }
         }

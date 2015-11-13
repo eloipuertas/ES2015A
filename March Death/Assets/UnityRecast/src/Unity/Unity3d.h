@@ -39,7 +39,8 @@ DLL_EXPORT bool loadFromTileCacheHeaders(TileCacheSetHeader* header, TileCacheTi
 // Class related
 DLL_EXPORT dtMeshTile* getTile(dtNavMesh* navmesh, int i);
 DLL_EXPORT dtCompressedTile* getTileCacheTile(dtTileCache* tileCache, int i);
-DLL_EXPORT void addObstacle(dtTileCache* tileCache, float* pos, float* verts, int nverts, int height);
+DLL_EXPORT dtObstacleRef addObstacle(dtTileCache* tileCache, float* pos, float* verts, int nverts, int height);
+DLL_EXPORT void removeObstacle(dtTileCache* tileCache, dtObstacleRef ref);
 DLL_EXPORT float* getObstacles(dtTileCache* tc, int& nobstacles);
 
 // Crowd

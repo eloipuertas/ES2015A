@@ -21,6 +21,12 @@ namespace Pathfinding
         public static extern IntPtr getTileCacheTile(IntPtr tileCache, int i);
 
         [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void addObstacle(IntPtr tileCache, float[] pos, float[] verts, int nverts, int height);
+        public static extern uint addObstacle(IntPtr tileCache, float[] pos, float[] verts, int nverts, int height);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void removeObstacle(IntPtr tileCache, uint reference);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr getObstacles(IntPtr tileCache, ref int nobstacles);
     }
 }
