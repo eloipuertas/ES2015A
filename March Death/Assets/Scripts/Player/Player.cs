@@ -52,7 +52,6 @@ public class Player : BasePlayer
             if (strStatus.Equals(""))
             {
                 strStatus = missionStatus.hasWon(playerId) ? "You win!" : "You loose";
-                Time.timeScale = 0;
                 showMsgBox = true;
             }
             _currently = status.TERMINATED;
@@ -77,7 +76,6 @@ public class Player : BasePlayer
         if (GUI.Button(new Rect(5, 120, messageBox.width - 10, 20), "Ok"))
         {
             showMsgBox = false;
-            Time.timeScale = 1;
             Application.LoadLevel(0);
         }
     }

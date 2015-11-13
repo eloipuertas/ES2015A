@@ -80,6 +80,11 @@ public class Main_Game : MonoBehaviour {
         // TODO Create campaign
     }
 
+    void OnDestroy()
+    {
+        ClearGame();
+    }
+
     public void ClearGame()
     {
         GameObject obj;

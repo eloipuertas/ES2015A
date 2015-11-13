@@ -40,6 +40,9 @@ namespace Assets.Scripts.AI
         public List<Unit> Army { get; set; }
         public List<Unit> Workers { get; set; }
 
+        // HACK To signal MicroManager that the game has ended when the AI hero is killed
+        public bool FinishPlaying { get { return missionStatus.isGameOver(); } }
+
         public override void Start()
         {
             base.Start();

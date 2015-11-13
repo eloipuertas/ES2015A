@@ -50,10 +50,15 @@ public class MissionController : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
-        /*if (IsGameOver())
+        if (IsGameOver())
         {
             Time.timeScale = 0;
-        }*/
+        }
+    }
+
+    void OnDestroy()
+    {
+        Time.timeScale = 1;
     }
 
     public Battle.MissionDefinition[] getMissionListArray()
