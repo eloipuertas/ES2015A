@@ -19,7 +19,7 @@ public class Main_Game : MonoBehaviour {
         playerHero = GameObject.Find("PlayerHero");
         if(GameObject.Find("GameInformationObject"))
 		    info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
-		user = GameObject.Find("GameController").GetComponent("Player") as Player;
+        user = GameObject.Find("GameController").GetComponent("Player") as Player;
 		cam = GameObject.FindWithTag("MainCamera").GetComponent<CameraController>();
         bm = GameObject.Find("GameController").GetComponent<Managers.BuildingsManager>();
         if(info) info.LoadHUD();

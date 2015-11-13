@@ -10,7 +10,7 @@ public class Player : BasePlayer
     /// </summary>
     private status _currently;
     public status currently { get { return _currently; }}
-    public enum status {IDLE, PLACING_BUILDING, SELECTED_UNITS /*...*/}
+    public enum status {IDLE, PLACING_BUILDING, SELECTED_UNITS, TERMINATED /*...*/}
 
     /// <summary>
     /// Information regarding the entities of the player
@@ -27,6 +27,10 @@ public class Player : BasePlayer
 	//public ArrayList SelectedObjects = new ArrayList();
     public ArrayList SelectedObjects { get { return _selection.ToArrayList(); } }
 
+    private bool showMsgBox = false;
+    private Rect messageBox = new Rect((Screen.width - 200) / 2, (Screen.height - 300) / 2, 200, 150);
+    private string strStatus = "";
+
     // Use this for initialization
     public override void Start()
     {   
@@ -36,10 +40,47 @@ public class Player : BasePlayer
         _selfRace = info.GetPlayerRace();
         _selection.SetRace(race);
         
+        AcquirePlayerID();
+        missionStatus = new MissionStatus(playerId);
     }
 
     // Update is called once per frame
-    void Update() { }
+    void Update()
+    {
+        if (missionStatus.isGameOver())
+        {
+            if (strStatus.Equals(""))
+            {
+                strStatus = missionStatus.hasWon(playerId) ? "You win!" : "You loose";
+                Time.timeScale = 0;
+                showMsgBox = true;
+            }
+            _currently = status.TERMINATED;
+        }
+    }
+
+    void OnGUI()
+    {
+        if (showMsgBox)
+        {
+            messageBox = GUI.Window(0, messageBox, DrawWindow, "Game Over!");
+        }
+    }
+    
+    /// <summary>
+    /// Draws the message box.
+    /// </summary>
+    /// <param name="window">Window.</param>
+    void DrawWindow(int window)
+    {
+        GUI.Label(new Rect(5, 20, messageBox.width, 20), strStatus);
+        if (GUI.Button(new Rect(5, 120, messageBox.width - 10, 20), "Ok"))
+        {
+            showMsgBox = false;
+            Time.timeScale = 1;
+            Application.LoadLevel(0);
+        }
+    }
 
     public override void removeEntity(IGameEntity entity)
     {
@@ -100,4 +141,35 @@ public class Player : BasePlayer
     // Getter for the resources of the player.
     // </summary>
     //public Managers.ResourcesManager resources {get { return _resources; } }
+
+    private void performUnitDied(System.Object obj)
+    {
+        IGameEntity e = ((GameObject) obj).GetComponent<IGameEntity>();
+        missionStatus.OnUnitKilled(((Unit) e).type);
+    }
+
+    private void performBuildingDestroyed(System.Object obj)
+    {
+        IGameEntity e = ((GameObject) obj).GetComponent<IGameEntity>();
+        if (e.info.isBarrack)
+        {
+            missionStatus.OnBuildingDestroyed(((Barrack) e).type);
+        }
+        else if (e.info.isResource)
+        {
+            missionStatus.OnBuildingDestroyed(((Resource) e).type);
+        }
+    }
+
+    public void registerGameEntityActions(IGameEntity entity)
+    {
+        if (entity.info.isUnit)
+        {
+            entity.registerFatalWounds(performUnitDied);
+        }
+        else if (entity.info.isBuilding)
+        {
+            entity.registerFatalWounds(performBuildingDestroyed);
+        }
+    }
 }

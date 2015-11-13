@@ -158,6 +158,7 @@ public partial class UserInput : MonoBehaviour
                     && entity.status != EntityStatus.DEAD 
                     && entity.status != EntityStatus.DESTROYED) 
                 {
+                    player.registerGameEntityActions(entity);
                     sManager.AttackTo(entity);
                 }
             }
