@@ -85,6 +85,48 @@ NavMeshSettings:
     cellSize: .166666672
     manualCellSize: 0
   m_NavMeshData: {fileID: 23800000, guid: a0452aa1774b4584195ceefa61ccc08b, type: 2}
+--- !u!1001 &8510713
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 401258, guid: 3152d48119a527e4aa6984ca1a49ea99, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 812.458191
+      objectReference: {fileID: 0}
+    - target: {fileID: 401258, guid: 3152d48119a527e4aa6984ca1a49ea99, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 78.4661789
+      objectReference: {fileID: 0}
+    - target: {fileID: 401258, guid: 3152d48119a527e4aa6984ca1a49ea99, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 779.380005
+      objectReference: {fileID: 0}
+    - target: {fileID: 401258, guid: 3152d48119a527e4aa6984ca1a49ea99, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 401258, guid: 3152d48119a527e4aa6984ca1a49ea99, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 401258, guid: 3152d48119a527e4aa6984ca1a49ea99, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 401258, guid: 3152d48119a527e4aa6984ca1a49ea99, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 401258, guid: 3152d48119a527e4aa6984ca1a49ea99, type: 2}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 3152d48119a527e4aa6984ca1a49ea99, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1 &85871685
 GameObject:
   m_ObjectHideFlags: 0
@@ -171,7 +213,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 5
 --- !u!114 &85871691
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -253,7 +295,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 3
 --- !u!114 &112888546
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -297,7 +339,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerRace: 0
-  _iaRace: 0
 --- !u!4 &792425303
 Transform:
   m_ObjectHideFlags: 0
@@ -309,7 +350,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 11
 --- !u!1 &865109079
 GameObject:
   m_ObjectHideFlags: 0
@@ -354,7 +395,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 4
 --- !u!114 &865109082
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -485,7 +526,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 10
 --- !u!1 &1206465148
 GameObject:
   m_ObjectHideFlags: 0
@@ -572,7 +613,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
 --- !u!114 &1206465154
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -733,7 +774,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
 --- !u!114 &1488202882
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -772,7 +813,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
 --- !u!1 &1713228883
 GameObject:
   m_ObjectHideFlags: 0
@@ -846,7 +887,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
 --- !u!1 &2106929317
 GameObject:
   m_ObjectHideFlags: 0
@@ -873,4 +914,4 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 9
