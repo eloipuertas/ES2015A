@@ -17,32 +17,29 @@ namespace Pathfinding
 
         private void CalcVertices()
         {
+            Vector3 size = transform.rotation * Size;
+
             Bottom_1 = transform.position + Position;
-            Bottom_1.x -= Size.x / 2;
-            Bottom_1.z += Size.z / 2;
+            Bottom_1.x -= size.x / 2;
+            Bottom_1.z += size.z / 2;
 
             Bottom_2 = transform.position + Position;
-            Bottom_2.x += Size.x / 2;
-            Bottom_2.z += Size.z / 2;
+            Bottom_2.x += size.x / 2;
+            Bottom_2.z += size.z / 2;
 
             Bottom_3 = transform.position + Position;
-            Bottom_3.x += Size.x / 2;
-            Bottom_3.z -= Size.z / 2;
+            Bottom_3.x += size.x / 2;
+            Bottom_3.z -= size.z / 2;
 
             Bottom_4 = transform.position + Position;
-            Bottom_4.x -= Size.x / 2;
-            Bottom_4.z -= Size.z / 2;
+            Bottom_4.x -= size.x / 2;
+            Bottom_4.z -= size.z / 2;
         }
 
-        public void OnEnable()
+        public void Start()
         {
             CalcVertices();
-
-            if (Application.isPlaying)
-            {
-                Assert.IsTrue(PathDetour.get.TileCache.ToInt32() != 0);
-                PathDetour.get.AddObstacle(this);
-            }
+            PathDetour.get.AddObstacle(this);
         }
 
         public Vector3[] Vertices()

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-[ExecuteInEditMode]
+//[ExecuteInEditMode]
 class DetourStarter : MonoBehaviour
 {
     public enum RenderMode { POLYS, DETAIL_POLYS, TILE_POLYS }
@@ -16,8 +16,7 @@ class DetourStarter : MonoBehaviour
     public RenderMode Mode;
 
     private DbgRenderMesh mesh = new DbgRenderMesh();
-    private List<GameObject> gameObjects = new List<GameObject>();
-
+    
     public void OnEnable()
     {
         PathDetour.get.Initialize(navmeshData);
@@ -46,16 +45,10 @@ class DetourStarter : MonoBehaviour
                     break;
             }
 
-            gameObjects = mesh.CreateGameObjects("RecastRenderer", material);
-            mesh.Rebuild();
-        }
-    }
+            RecastDebug.RenderObstacles(PathDetour.get.TileCache);
 
-    public void OnDisable()
-    {
-        foreach (GameObject gob in gameObjects)
-        {
-            DestroyImmediate(gob);
+            mesh.CreateGameObjects("RecastRenderer", material);
+            mesh.Rebuild();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Pathfinding
         public float AgentMaxRadius = 2;
 
         private IntPtr crowd = new IntPtr(0);
-        private Dictionary<int, IGameEntity> agents = new Dictionary<int, IGameEntity>();
+        private Dictionary<int, DetourAgent> agents = new Dictionary<int, DetourAgent>();
 
         private float[] positionHolder = null;
         int numUpdated = 0;
@@ -50,7 +50,7 @@ namespace Pathfinding
             int idx = Detour.Crowd.addAgent(crowd, ToFloat(entity.getTransform().position), radius, height);
             if (idx != -1)
             {
-                agents.Add(idx, entity);
+                agents.Add(idx, entity.getGameObject().GetComponent<DetourAgent>());
             }
 
             return idx;
@@ -68,11 +68,26 @@ namespace Pathfinding
 
         public void Update()
         {
-            Detour.Crowd.updateTick(PathDetour.get.NavMesh, crowd, Time.deltaTime, positionHolder, ref numUpdated);
+            Detour.Crowd.updateTick(PathDetour.get.TileCache, PathDetour.get.NavMesh, crowd, Time.deltaTime, positionHolder, ref numUpdated);
 
-            foreach (KeyValuePair<int, IGameEntity> entry in agents)
+            foreach (KeyValuePair<int, DetourAgent> entry in agents)
             {
-                entry.Value.getTransform().position = ToVector3(positionHolder, entry.Key * 3);
+                DetourAgent agent = entry.Value;
+
+                if (agent.IsMoving)
+                {
+                    Transform entityTransform = entry.Value.transform;
+                    Vector3 newPosition = ToVector3(positionHolder, entry.Key * 3);
+
+                    Vector3 direction = (newPosition - entityTransform.position).normalized;
+                    Quaternion lookRotation = Quaternion.LookRotation(direction);
+                    lookRotation = Quaternion.Slerp(entityTransform.rotation, lookRotation, Time.deltaTime * 10f);
+                    Vector3 eulerAngles = lookRotation.eulerAngles;
+                    eulerAngles = new Vector3(0, eulerAngles.y, 0);
+
+                    entityTransform.position = newPosition;
+                    entityTransform.rotation = Quaternion.Euler(eulerAngles);
+                }
             }
         }
     }

@@ -17,6 +17,15 @@ namespace Pathfinding
         private int idx = -1;
         private bool updateScheduled = false;
 
+        private bool _isMoving;
+        public bool IsMoving
+        {
+            get
+            {
+                return _isMoving;
+            }
+        }
+
         public void Start()
         {
             idx = DetourCrowd.Instance.AddAgent(GetComponent<IGameEntity>(), Radius, Height);
@@ -36,6 +45,7 @@ namespace Pathfinding
 
         public void MoveTo(Vector3 target)
         {
+            _isMoving = true;
             DetourCrowd.Instance.MoveTarget(idx, target);
         }
 

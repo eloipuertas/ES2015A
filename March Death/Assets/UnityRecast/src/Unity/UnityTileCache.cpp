@@ -454,7 +454,38 @@ dtMeshTile* getTile(dtNavMesh* navmesh, int i)
 
 void addObstacle(dtTileCache* tileCache, float* pos, float* verts, int nverts, int height)
 {
+	for (int i = 0; i < nverts; ++i)
+	{
+		ctx->log(RC_LOG_ERROR, "Vert: (%.3f, %.3f, %.3f)", verts[i * 3 + 0], verts[i * 3 + 1], verts[i * 3 + 2]);
+	}
 	tileCache->addObstacle(pos, verts, nverts, height, NULL);
+}
+
+float* getObstacles(dtTileCache* tc, int& nobstacles)
+{
+	nobstacles = tc->getObstacleCount();
+
+	if (nobstacles > 0)
+	{
+		float* vertices = new float[nobstacles * 6];
+
+		// Draw obstacles
+		for (int i = 0; i < nobstacles; ++i)
+		{
+			const dtTileCacheObstacle* ob = tc->getObstacle(i);
+			if (ob->state == DT_OBSTACLE_EMPTY) continue;
+			tc->getObstacleBounds(ob, &vertices[i * 6], &vertices[i * 6 + 3]);
+
+			float bmin[3], bmax[3];
+			tc->getObstacleBounds(ob, bmin, bmax);
+			ctx->log(RC_LOG_ERROR, "BMIN: (%.3f, %.3f, %.3f)", bmin[0], bmin[1], bmin[2]);
+			ctx->log(RC_LOG_ERROR, "BMAX: (%.3f, %.3f, %.3f)", bmax[0], bmax[1], bmax[2]);
+		}
+
+		return vertices;
+	}
+
+	return NULL;
 }
 
 dtCrowd* createCrowd(int maxAgents, float maxRadius, dtNavMesh* navmesh)
@@ -521,8 +552,8 @@ int addAgent(dtCrowd* crowd, const float* p, float radius, float height)
 	//if (m_toolParams.m_separation)
 		ap.updateFlags |= DT_CROWD_SEPARATION;
 
-	ap.obstacleAvoidanceType = (unsigned char)2;
-	ap.separationWeight = 1;
+	ap.obstacleAvoidanceType = (unsigned char)3;
+	ap.separationWeight = 100;
 
 	return crowd->addAgent(p, &ap);
 }
@@ -607,10 +638,11 @@ void setMoveTarget(dtNavMeshQuery* navquery, dtCrowd* crowd, int idx, float* p, 
 	}
 }
 
-void updateTick(dtNavMesh* nav, dtCrowd* crowd, float dt, float* positions, int& npos)
+void updateTick(dtTileCache* tileCache, dtNavMesh* nav, dtCrowd* crowd, float dt, float* positions, int& npos)
 {
 	if (!nav || !crowd) return;
 
+	tileCache->update(dt, nav);
 	crowd->update(dt, NULL);
 
 	// Update agent trails

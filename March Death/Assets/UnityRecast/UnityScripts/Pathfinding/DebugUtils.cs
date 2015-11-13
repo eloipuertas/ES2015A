@@ -332,5 +332,25 @@ public static partial class RecastDebug
 
         renderMesh.Rebuild();
     }
+
+    public static void RenderObstacles(IntPtr tileCache)
+    {
+        int nobstacles = 0;
+        IntPtr verticesPtr = Pathfinding.Detour.getObstacles(tileCache, ref nobstacles);
+
+        float[] vertices = new float[nobstacles * 6];
+        Marshal.Copy(verticesPtr, vertices, 0, nobstacles * 6);
+        
+        for (int i = 0; i < nobstacles; ++i)
+        {
+            Vector3 from = new Vector3(vertices[i * 6 + 0], vertices[i * 6 + 1], vertices[i * 6 + 2]);
+            Vector3 to = new Vector3(vertices[i * 6 + 3], vertices[i * 6 + 4], vertices[i * 6 + 5]);
+
+            if (from != to)
+            {
+                Debug.DrawLine(from, to, Color.cyan);
+            }
+        }
+    }
     
 }
