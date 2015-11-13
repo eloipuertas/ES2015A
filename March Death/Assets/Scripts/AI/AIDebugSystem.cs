@@ -6,6 +6,7 @@ using System;
 
 public class AIDebugSystem : MonoBehaviour {
 
+	//Used to visualize spheres when our Aisenses asks for it
     public struct DebugSphere
     {
         public Vector3 center;
@@ -22,7 +23,7 @@ public class AIDebugSystem : MonoBehaviour {
 
     bool showInfo { get; set; }
     public Rect commandingAgentWindowRect = new Rect(20, 20, 200, 80);
-    public Rect statsWindowRect = new Rect(20 + 200 + 10, 20, 400, 90);
+    public Rect statsWindowRect = new Rect(20 + 200 + 10, 20, 400, 100);
 
     private const int WINDOW_HEIGHT_OFFSET_TOLERANCE = 20;
 
@@ -275,6 +276,9 @@ public class AIDebugSystem : MonoBehaviour {
         return nextLine;
     }
 
+	/// <summary>
+	/// Raises the draw gizmos event and draws the spheres on scene mode.
+	/// </summary>
     void OnDrawGizmos()
     {
         Gizmos.color = Color.white;
