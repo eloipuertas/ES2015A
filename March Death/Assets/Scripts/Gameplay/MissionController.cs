@@ -7,19 +7,23 @@ public class MissionController : MonoBehaviour
 
     //public enum Winner { NONE = 0, PLAYER = 1, PC = 2 }
 
-    private static Dictionary<Storage.UnitTypes, uint> destroyedUnitsWinners = new Dictionary<Storage.UnitTypes, uint>();
-    private static Dictionary<Storage.BuildingTypes, uint> destroyedBuildingsWinners = new Dictionary<Storage.BuildingTypes, uint>();
+    private Dictionary<Storage.UnitTypes, uint> destroyedUnitsWinners = new Dictionary<Storage.UnitTypes, uint>();
+    private Dictionary<Storage.BuildingTypes, uint> destroyedBuildingsWinners = new Dictionary<Storage.BuildingTypes, uint>();
 
     private Battle battle;
 
-    private int missionsToComplete = 0;
+    private int missionsToComplete;
+
+    private uint winnerID;
 
 	// Use this for initialization
     void Start()
     {
         //Dictionary<Storage.UnitTypes, uint> dUnits = new Dictionary<Storage.UnitTypes, uint>();
         //Dictionary<Storage.BuildingTypes, uint> dBuildings = new Dictionary<Storage.BuildingTypes, uint>();
-        battle = GameObject.Find("GameInformationObject").GetComponent<GameInformation>().GetBattle();
+        missionsToComplete = 0;
+        GameInformation info = GameObject.Find("GameInformationObject").GetComponent<GameInformation>();
+        battle = info.GetBattle();
         foreach (Battle.MissionDefinition mission in battle.GetMissions())
         {
             switch (mission.purpose)
@@ -43,15 +47,40 @@ public class MissionController : MonoBehaviour
         }
     }
 	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    // Update is called once per frame
+    void Update ()
+    {
+        /*if (IsGameOver())
+        {
+            Time.timeScale = 0;
+        }*/
+    }
 
     public Battle.MissionDefinition[] getMissionListArray()
     {
         List<Battle.MissionDefinition> missions = battle.GetMissions();
         return missions.ToArray();
+    }
+
+    public bool HasWon(uint id)
+    {
+        float total;
+        int playerScore = 0;
+        total = destroyedUnitsWinners.Count + destroyedBuildingsWinners.Count;
+        foreach (uint i in destroyedUnitsWinners.Values)
+        {
+            if (i == id) playerScore++;
+        }
+        foreach (uint i in destroyedBuildingsWinners.Values)
+        {
+            if (i == id) playerScore++;
+        }
+        return (playerScore / total) >= 0.5f;
+    }
+
+    public bool IsGameOver()
+    {
+        return missionsToComplete <= 0;
     }
 
     /// <summary>
@@ -67,7 +96,7 @@ public class MissionController : MonoBehaviour
         {
             if (destroyedUnitsWinners.TryGetValue(type, out winner))
             {
-                if (winner == 0)
+                if (winner == 0)    // If there is no winner
                 {
                     notify = true;
                     destroyedUnitsWinners[type] = caller;

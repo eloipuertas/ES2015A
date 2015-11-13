@@ -25,7 +25,8 @@ public class MissionStatus
         buildings = new Dictionary<Storage.BuildingTypes, uint[]>();
         units = new Dictionary<Storage.UnitTypes, uint[]>();
         //resources = new Dictionary<WorldResources.Type, uint[]>();
-        list = controller.getMissionListArray();
+        GameInformation info = GameObject.Find("GameInformationObject").GetComponent<GameInformation>();
+        list = info.GetBattle().GetMissions().ToArray();
         foreach (Battle.MissionDefinition mission in list)
         {
             switch (mission.target)
@@ -186,4 +187,14 @@ public class MissionStatus
     }
 
     //public void OnUnitKilled(Storage.UnitTypes type, string name) {}
+
+    public bool isGameOver()
+    {
+        return controller.IsGameOver();
+    }
+
+    public bool hasWon(uint owner)
+    {
+        return controller.HasWon(owner);
+    }
 }

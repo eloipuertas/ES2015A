@@ -84,13 +84,16 @@ namespace Assets.Scripts.AI
         }
         void Update()
         {
-            for (int i = 0; i < modules.Count; i++)
+            if (!missionStatus.isGameOver())
             {
-                timers[i] += Time.deltaTime;
-                if (timers[i] > modules[i].period)
+                for (int i = 0; i < modules.Count; i++)
                 {
-                    modules[i].Callback();
-                    timers[i] = 0f;
+                    timers[i] += Time.deltaTime;
+                    if (timers[i] > modules[i].period)
+                    {
+                        modules[i].Callback();
+                        timers[i] = 0f;
+                    }
                 }
             }
         }
