@@ -9,6 +9,7 @@ namespace Assets.Scripts.AI.Agents
 {
     public class ExplorerAgent : BaseAgent
     {
+		//Those are the confidence posibilities of our Explorer Agent
 		const int CONFIDENCE_EXPLORER_BY_DEFAULT = 50;
 		const int CONFIDENCE_EXPLORER_ALL_CIVILS = 50;
 		const int CONFIDENCE_EXPLORER_DISABLED = -1;
@@ -27,7 +28,8 @@ namespace Assets.Scripts.AI.Agents
         /// </summary>
         int[,] dirHelper = new int[8,2]{ { 0, -1 }, { -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 } };
 		int confidence = 0;
-        public ExplorerAgent(AIController ai, String name) : base(ai, name)
+        
+		public ExplorerAgent(AIController ai, String name) : base(ai, name)
         {
             ActorSelector selector = new ActorSelector()
             {
@@ -40,6 +42,7 @@ namespace Assets.Scripts.AI.Agents
             fowManager = FOWManager.Instance;
             heroLastPos = Vector3.zero;
         }
+
         public override void controlUnits(List<Unit> units)
         {
             if (fowManager.Enabled)
@@ -81,6 +84,7 @@ namespace Assets.Scripts.AI.Agents
                 }
             }
         }
+
         Vector3 findPlaceToExplore(Unit u,FOWManager.visible[] grid, Vector2 size)
         {
             //Basic try of an algorithm, just check the grid in a star way until something unexplored
@@ -114,21 +118,29 @@ namespace Assets.Scripts.AI.Agents
             return new Vector3(u.transform.position.x+1, u.transform.position.y, u.transform.position.z);
         }
 
+		/// <summary>
+		/// Gets the confidence of this agent.
+		/// </summary>
+		/// <returns>The confidence.</returns>
+		/// <param name="units">Units.</param>
         public override int getConfidence(List<Unit> units)
         {
-
+			//Explorer agent has some confidence by default
 			confidence = CONFIDENCE_EXPLORER_BY_DEFAULT;
             
+			//If fow manager is not enabled this agent will never act
 			if (!fowManager.Enabled)
 			{
                 return CONFIDENCE_EXPLORER_DISABLED;
 			}
 
+			//If we have found enemy's hero we don't need to explore.
             if (heroVisible)
 			{
                 return CONFIDENCE_HERO_ALREADY_FOUND;
 			}
 
+			//If all units of the squad adds some more confidence to this behaivour
 			foreach(Unit unit in units)
 			{
 				if(unit.type != Storage.UnitTypes.CIVIL)
