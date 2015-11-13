@@ -6,6 +6,18 @@ using System;
 
 public class AIDebugSystem : MonoBehaviour {
 
+    public struct DebugSphere
+    {
+        public Vector3 center;
+        public float radius;
+
+        public DebugSphere(Vector3 cent, float rad)
+        {
+            center = cent;
+            radius = rad;
+        }
+    }
+
     AIController controller { get; set; }
 
     bool showInfo { get; set; }
@@ -23,6 +35,8 @@ public class AIDebugSystem : MonoBehaviour {
     //This angent is who is controllin NOW the situation
     public string controllingAgent;
     public float confidence;
+
+    public DebugSphere debugSphere;
 
     //Stores the actual confidence of each agent
     Dictionary<string, float> agentsConfidence = new Dictionary<string, float>();
@@ -52,6 +66,7 @@ public class AIDebugSystem : MonoBehaviour {
         AIDebugSystem AIDSys = parent.AddComponent<AIDebugSystem>();
         AIDSys.controller = controller;
         AIDSys.enabled = true;
+        AIDSys.debugSphere = new DebugSphere(Vector3.zero, 10);
         return AIDSys;
     }
     
@@ -76,7 +91,7 @@ public class AIDebugSystem : MonoBehaviour {
         {
             showInfo = !showInfo;
         }
-	}
+    }
 
     /// <summary>
     /// Method to show all the info on the screen
@@ -258,5 +273,11 @@ public class AIDebugSystem : MonoBehaviour {
         }
 
         return nextLine;
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireSphere(debugSphere.center, debugSphere.radius);
     }
 }
