@@ -24,7 +24,7 @@
 	#define PACK_END	__pragma(pack(pop))
 #else
 	#define PACK_START	
-#define PACK_END	__atribute__((__packed__))
+	#define PACK_END	__atribute__((packed))
 #endif
 
 /// The value of PI used by Recast.

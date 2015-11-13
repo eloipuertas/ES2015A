@@ -26,6 +26,8 @@ class DetourStarter : MonoBehaviour
         }
         else
         {
+            mesh.Clear();
+
             switch (Mode)
             {
                 case RenderMode.POLYS:
@@ -37,7 +39,7 @@ class DetourStarter : MonoBehaviour
                     break;
 
                 case RenderMode.TILE_POLYS:
-                    for (int i = 0; i < navmeshData.header.numTiles; ++i)
+                    for (int i = 0; i < navmeshData.header.numTiles-1; ++i)
                         RecastDebug.ShowTilePolyDetails(mesh, PathDetour.get.NavMesh, i);
                     break;
             }

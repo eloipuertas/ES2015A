@@ -329,9 +329,18 @@ public class DbgRenderMesh
     {
         int nGameObjects = (int)Mathf.Ceil(3 * m_Triangles.Count / 65000.0f);
 
+        // Destroy all existing
+        GameObject gob = GameObject.Find(name);
+        while (gob)
+        {
+            GameObject.Destroy(gob);
+            gob = GameObject.Find(name);
+        }
+
+        // Create new gobs
         for (int i = 0; i < nGameObjects; ++i)
         {
-            GameObject gao = new GameObject(name + "(" + (i + 1) + ")");
+            GameObject gao = new GameObject(name);
             gao.transform.position = Vector3.zero;
             gao.transform.rotation = Quaternion.identity;
             Setup(gao);
@@ -347,7 +356,7 @@ public class DbgRenderMesh
         {
             Clear();
 
-            GameObject.DestroyImmediate(gao);
+            GameObject.Destroy(gao);
             m_MeshFilter = null;
             m_MeshRenderer = null;
         }

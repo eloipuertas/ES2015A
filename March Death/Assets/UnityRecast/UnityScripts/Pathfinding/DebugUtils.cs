@@ -263,8 +263,6 @@ public static partial class RecastDebug
     
     public static void ShowTilePolyDetails(DbgRenderMesh renderMesh, IntPtr navMesh, int tileId)
     {
-        renderMesh.Clear();
-
         UnityEngine.Random.seed = c_RandomSeed;
 
         if (navMesh == null)
@@ -283,11 +281,11 @@ public static partial class RecastDebug
 
         Pathfinding.MeshHeader header = (Pathfinding.MeshHeader)Marshal.PtrToStructure(tile.header, typeof(Pathfinding.MeshHeader));
 
-        byte[] detailTris = new byte[header.detailTriCount * 3];
-        Marshal.Copy(tile.detailTris, detailTris, 0, header.detailTriCount * 3);
+        byte[] detailTris = new byte[header.detailTriCount * 4];
+        Marshal.Copy(tile.detailTris, detailTris, 0, header.detailTriCount * 4);
 
-        float[] verts = new float[header.vertCount];
-        Marshal.Copy(tile.verts, verts, 0, header.vertCount);
+        float[] verts = new float[header.vertCount * 3];
+        Marshal.Copy(tile.verts, verts, 0, header.vertCount * 3);
 
         float[] detailVerts = new float[header.detailVertCount * 3];
         Marshal.Copy(tile.detailVerts, detailVerts, 0, header.detailVertCount * 3);
@@ -327,9 +325,11 @@ public static partial class RecastDebug
                 Vector3 c = new Vector3(vSrc[2][vStarts[2] + 0], vSrc[2][vStarts[2] + 1], vSrc[2][vStarts[2] + 2]);
 
                 col = VaryColor(col);
+
                 renderMesh.AddTriangle(new DbgRenderTriangle(a, b, c, col));
             }
         }
+
         renderMesh.Rebuild();
     }
     

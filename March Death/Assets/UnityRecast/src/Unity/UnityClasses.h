@@ -192,7 +192,10 @@ struct MeshProcess : public dtTileCacheMeshProcess
 	{
 		for (int i = 0; i < params->polyCount; ++i)
 		{
-			polyFlags[i] = SAMPLE_POLYFLAGS_WALK;
+			if (polyFlags[i] == DT_TILECACHE_WALKABLE_AREA)
+			{
+				polyFlags[i] = SAMPLE_POLYFLAGS_WALK;
+			}
 		}
 	}
 };
