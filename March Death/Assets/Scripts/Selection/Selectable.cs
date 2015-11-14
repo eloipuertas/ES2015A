@@ -34,9 +34,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         base.Awake();
         currentlySelected = false;
         controller = GameObject.Find("GameController");
-        player = controller.GetComponent<Player>();
-        selectedBox = SelectionOverlay.CreateTexture();
-        entity = GetComponent<IGameEntity>();
+		player = controller.GetComponent<Player>();
         _collider = GetComponent<Collider>();
         selectedRect = SelectionOverlay.CalculateBox(_collider);
     }
@@ -45,6 +43,9 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
         base.Start();
         fire(Actions.CREATED, this.gameObject);
+		entity = GetComponent<IGameEntity>();
+		bool ownUnit = entity.info.race == player.race;
+		selectedBox = SelectionOverlay.CreateTexture(ownUnit);
     }
 
     public override void Update() { }
