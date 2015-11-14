@@ -43,7 +43,6 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     public static Player player { get { return (Player)_player; } }
     public static AIController ia { get { return (AIController)_ia; } }
 
-    private static Object _lock = new Object();
     private static uint instances = 0;
     protected uint playerId = 0;
 
@@ -87,10 +86,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     {
         if (playerId == 0)
         {
-            lock (_lock)
-            {
-                playerId = ++instances;
-            }
+            playerId = ++instances;
         }
     }
 }

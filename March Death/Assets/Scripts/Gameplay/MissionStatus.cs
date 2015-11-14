@@ -7,10 +7,6 @@ public class MissionStatus
     private Dictionary<Storage.UnitTypes, uint[]> units;
     private Dictionary<WorldResources.Type, uint[]> resources;
 
-    private static Object resourcesThreadLock = new Object();
-    private static Object unitsThreadLock = new Object();
-    private static Object buildingsThreadLock = new Object();
-
     private uint owner;
 
     private MissionController controller;
@@ -72,26 +68,23 @@ public class MissionStatus
         uint[] missionTargets;
         if (resources.TryGetValue(type, out missionTargets))
         {
-            lock (resourcesThreadLock)
+            // Logic for the resource finding (accumulation) mission
+            if (missionTargets[0] != 0)
             {
-                // Logic for the resource finding (accumulation) mission
-                if (missionTargets[0] != 0)
+                if (missionTargets[0] < ammount)
                 {
-                    if (missionTargets[0] < ammount)
-                    {
-                        missionTargets[0] = 0;
-                    }
-                    else
-                    {
-                        missionTargets[0] -= ammount;
-                    }
-                    if (missionTargets[0] == 0)
-                    {
-                        // TODO Notify the controller
-                    }
+                    missionTargets[0] = 0;
                 }
-                // TODO Logic for resource keeping
+                else
+                {
+                    missionTargets[0] -= ammount;
+                }
+                if (missionTargets[0] == 0)
+                {
+                    // TODO Notify the controller
+                }
             }
+            // TODO Logic for resource keeping
         }
     }
 
@@ -100,11 +93,8 @@ public class MissionStatus
         uint[] missionTargets;
         if (resources.TryGetValue(type, out missionTargets))
         {
-            lock (resourcesThreadLock)
-            {
-                // No importa en caso de acumular
-                // TODO Logic for resource keeping
-            }
+            // No importa en caso de acumular
+            // TODO Logic for resource keeping
         }
     }
 
@@ -113,15 +103,12 @@ public class MissionStatus
         uint[] missionTargets;
         if (buildings.TryGetValue(type, out missionTargets))
         {
-            lock (buildingsThreadLock)
+            if (missionTargets[1] > 0)
             {
-                if (missionTargets[1] > 0)
+                missionTargets[1]--;
+                if (missionTargets[1] == 0)
                 {
-                    missionTargets[1]--;
-                    if (missionTargets[1] == 0)
-                    {
-                        controller.notifyBuildingCreated(type, owner);
-                    }
+                    controller.notifyBuildingCreated(type, owner);
                 }
             }
         }
@@ -132,15 +119,12 @@ public class MissionStatus
         uint[] missionTargets;
         if (buildings.TryGetValue(type, out missionTargets))
         {
-            lock (buildingsThreadLock)
+            if (missionTargets[0] > 0)
             {
-                if (missionTargets[0] > 0)
+                missionTargets[0]--;
+                if (missionTargets[0] == 0)
                 {
-                    missionTargets[0]--;
-                    if (missionTargets[0] == 0)
-                    {
-                        controller.notifyBuildingDestroyed(type, owner);
-                    }
+                    controller.notifyBuildingDestroyed(type, owner);
                 }
             }
         }
@@ -153,15 +137,12 @@ public class MissionStatus
         uint[] missionTargets;
         if (units.TryGetValue(type, out missionTargets))
         {
-            lock (unitsThreadLock)
+            if (missionTargets[1] > 0)
             {
-                if (missionTargets[1] > 0)
+                missionTargets[1]--;
+                if (missionTargets[1] == 0)
                 {
-                    missionTargets[1]--;
-                    if (missionTargets[1] == 0)
-                    {
-                        controller.notifyUnitCreated(type, owner);
-                    }
+                    controller.notifyUnitCreated(type, owner);
                 }
             }
         }
@@ -172,15 +153,12 @@ public class MissionStatus
         uint[] missionTargets;
         if (units.TryGetValue(type, out missionTargets))
         {
-            lock (unitsThreadLock)
+            if (missionTargets[0] > 0)
             {
-                if (missionTargets[0] > 0)
+                missionTargets[0]--;
+                if (missionTargets[0] == 0)
                 {
-                    missionTargets[0]--;
-                    if (missionTargets[0] == 0)
-                    {
-                        controller.notifyUnitKilled(type, owner);
-                    }
+                    controller.notifyUnitKilled(type, owner);
                 }
             }
         }
