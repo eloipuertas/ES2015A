@@ -9,12 +9,13 @@ public class Main_Game : MonoBehaviour
     private CameraController cam;
     private Player user;
     Managers.BuildingsManager bm;
+    Managers.SoundsManager sounds;
     public Managers.BuildingsManager BuildingsMgr { get { return bm; } }
 
     private List<BasePlayer> allPlayers;
 
     Terrain terrain;
-    GameObject playerHero;
+    GameObject gameController;
 
     // Use this for initialization
     void Start ()
@@ -29,8 +30,8 @@ public class Main_Game : MonoBehaviour
         //bm = GameObject.Find ("GameController").GetComponent<Managers.BuildingsManager> ();
         bm = new Managers.BuildingsManager();
         terrain = GameObject.Find("Terrain").GetComponent<Terrain>();
-        if (info)
-            info.LoadHUD ();
+        sounds = GameObject.Find("GameController").GetComponent<Managers.SoundsManager>();
+        if (info) info.LoadHUD ();
         //LoadPlayerStronghold ();
         //LoadPlayerUnits ();
         StartGame();
@@ -110,7 +111,7 @@ public class Main_Game : MonoBehaviour
         // TODO Set initial resources in the map
     }
 
-    public void ClearGame ()
+    public void ClearGame()
     {
         GameObject obj;
         // Unregisters events in the HUD

@@ -41,6 +41,11 @@ public class ResourcesPlacer : MonoBehaviour
 
     void Update(){ }
 
+    void OnDestroy()
+    {
+        Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.CREATED, onUnitCreated);
+    }
+
     // PUBLIC METHODS
 
     /// <summary>
@@ -49,7 +54,6 @@ public class ResourcesPlacer : MonoBehaviour
     /// <param name="entity"></param>
     public void updateUnitCreated(IGameEntity entity)
     {
-        Debug.Log(entity.info.entityType);
         player.resources.SubstractAmount(WorldResources.Type.FOOD, entity.info.resources.food);
         player.resources.SubstractAmount(WorldResources.Type.WOOD, entity.info.resources.wood);
         player.resources.SubstractAmount(WorldResources.Type.METAL, entity.info.resources.metal);

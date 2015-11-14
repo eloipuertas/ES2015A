@@ -67,7 +67,7 @@ namespace Managers
         /// <param name="name"></param>
         public void createBuilding(Storage.Races race, Storage.BuildingTypes type )
         {
-            if (!_newBuilding.placing)
+            if (!_newBuilding.placing && isAffordable(race, type))
             {
                 _newBuilding.race = race;
                 _newBuilding.type = type;
@@ -77,6 +77,15 @@ namespace Managers
                 _player.setCurrently(Player.status.PLACING_BUILDING);
             }
 
+        }
+
+        public bool isAffordable(Storage.Races race, Storage.BuildingTypes type)
+        {
+            Storage.BuildingInfo i = Storage.Info.get.of(race, type);
+
+            return (_player.resources.getAmount(WorldResources.Type.FOOD) >= i.resources.food &&
+                    _player.resources.getAmount(WorldResources.Type.WOOD) >= i.resources.wood &&
+                    _player.resources.getAmount(WorldResources.Type.METAL) >= i.resources.metal);
         }
 
 

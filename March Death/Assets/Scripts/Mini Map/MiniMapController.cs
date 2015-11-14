@@ -63,8 +63,8 @@ public class MiniMapController : MonoBehaviour
     /// </summary>
     private void initializeCameraPars()
     {
-        main_zoom = mainCam.orthographicSize;
-        act_pos = mainCam.transform.position;
+        main_zoom = -1;
+        act_pos = new Vector3(-1,-1,-1);
         aspect = mainCam.aspect;
     }
 
@@ -73,8 +73,9 @@ public class MiniMapController : MonoBehaviour
     /// </summary>
     void OnGUI()
     {
-            GUI.depth = -1;
-            GUI.DrawTexture(rect_marker, tex);
+        GUI.depth = -1;
+        GUI.DrawTexture(rect_marker, tex);
+
     }
 
     /// <summary>
@@ -83,7 +84,7 @@ public class MiniMapController : MonoBehaviour
     private void createMarker()
     {
         rect_marker = getCameraRect();
-        tex = MinimapOverlays.CreateTextureMarker(Color.red);
+        tex = MinimapOverlays.CreateTextureMarker(Color.white);
     }
 
     /// <summary>
@@ -108,8 +109,8 @@ public class MiniMapController : MonoBehaviour
         if (main_zoom != mainCam.orthographicSize) // if the zoom has changed
         {
             float diff = (mainCam.orthographicSize - main_zoom) / 6.0f; // to reduce the zoom vel increment value (hack)
-            rect_marker.width += diff; rect_marker.height += diff;
-            rect_marker.center -= new Vector2(diff/2, diff/2);
+            rect_marker.width += diff; rect_marker.height = rect_marker.width/mainCam.aspect;
+            rect_marker.center -= new Vector2(diff/2, diff/(2*mainCam.aspect));
             main_zoom = mainCam.orthographicSize;
         }
         if (!act_pos.Equals(mainCam.transform.position)) // if the camera has moved
@@ -168,10 +169,10 @@ public class MiniMapController : MonoBehaviour
 
         Rect r = new Rect();
 
-        r.xMax = corners_minimap[1].x + 5;
-        r.xMin = corners_minimap[0].x - 5;
-        r.yMax = Screen.height - corners_minimap[1].y + 7;
-        r.yMin = Screen.height - corners_minimap[0].y - 7;
+        r.xMax = corners_minimap[1].x + 0;
+        r.xMin = corners_minimap[0].x - 0;
+        r.yMax = Screen.height - corners_minimap[1].y + 0;
+        r.yMin = Screen.height - corners_minimap[0].y - 0;
 
         Vector3 v = _camera.WorldToScreenPoint(mainCam.transform.position - mainCam.GetComponent<CameraController>().getCameraOffset);
         v.y = Screen.height - v.y;

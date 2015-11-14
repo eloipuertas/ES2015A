@@ -93,7 +93,7 @@ public static class AreaMarker {
             }
 
         }
-
+        
         texToReturn.Apply();
         return texToReturn;
     }

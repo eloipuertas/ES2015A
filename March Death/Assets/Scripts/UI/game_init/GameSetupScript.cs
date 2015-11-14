@@ -29,7 +29,7 @@ public class GameSetupScript : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
-        info = (GameInformation)GameObject.Find ("GameInformationObject").GetComponent ("GameInformation");
+        info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
         raceSelected = false;
         showMsgBox = false;
     }
@@ -73,7 +73,7 @@ public class GameSetupScript : MonoBehaviour
         info.setGameMode (GameInformation.GameMode.CAMPAIGN);
     }
 
-    public void StartGame ()
+    public void StartGame()
     {
         if (raceSelected)
         {

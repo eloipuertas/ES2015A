@@ -29,7 +29,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     /// <summary>
     /// The selection Manager
     /// </summary>
-    protected Managers.SelectionManager _selection = new Managers.SelectionManager();
+    protected Managers.SelectionManager _selection;
     public Managers.SelectionManager selection { get { return _selection; } }
      
 
@@ -43,6 +43,10 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     public static Player player { get { return (Player)_player; } }
     public static AIController ia { get { return (AIController)_ia; } }
 
+    private static uint instances = 0;
+    protected uint playerId = 0;
+
+    protected MissionStatus missionStatus;
 
     public virtual void Start ()
     {
@@ -57,7 +61,6 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
 
     public abstract void removeEntity(IGameEntity entity);
     public abstract void addEntity(IGameEntity newEntity);
-
 
     public static BasePlayer getOwner(IGameEntity entity)
     {
@@ -77,5 +80,13 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
         _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.FOOD, food));
         _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.WOOD, wood));
         _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.METAL, metal));
+    }
+
+    protected void AcquirePlayerID()
+    {
+        if (playerId == 0)
+        {
+            playerId = ++instances;
+        }
     }
 }

@@ -55,7 +55,7 @@ namespace WorldResources
         /// <returns></returns>
         public float Substract(float amount)
         {
-            _amount = amount > 0f ? _amount - amount : 0f;
+            _amount = amount < _amount ? _amount - amount : 0f;
             return _amount;
         }
 

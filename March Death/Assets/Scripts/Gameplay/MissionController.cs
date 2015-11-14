@@ -3,149 +3,132 @@ using System.Collections.Generic;
 
 public class MissionController : MonoBehaviour
 {
-    private Dictionary<Storage.BuildingTypes, uint[]> buildings;
-    private Dictionary<Storage.UnitTypes, uint[]> units;
-    private Dictionary<WorldResources.Type, uint[]> resources;
+    //public enum Winner { NONE = 0, PLAYER = 1, PC = 2 }
 
-    private static Object resourceThreadLock = new Object();
-    private static Object unitThreadLock = new Object();
-    private static Object buildingThreadLock = new Object();
+    private Dictionary<Storage.UnitTypes, uint> destroyedUnitsWinners = new Dictionary<Storage.UnitTypes, uint>();
+    private Dictionary<Storage.BuildingTypes, uint> destroyedBuildingsWinners = new Dictionary<Storage.BuildingTypes, uint>();
 
-    public enum Winner { NONE, PLAYER, PC }
+    private Battle battle;
 
-    private static Dictionary<Storage.UnitTypes, Winner[]> unitWinners;
-    private static Dictionary<Storage.BuildingTypes, Winner[]> buildingWinners;
+    private int missionsToComplete;
 
-    private Winner owner;
-
-    private static readonly int ACCUMULATE = 0;
+    private uint winnerID;
 
 	// Use this for initialization
-	void Start () {
+    void Start()
+    {
+        //Dictionary<Storage.UnitTypes, uint> dUnits = new Dictionary<Storage.UnitTypes, uint>();
+        //Dictionary<Storage.BuildingTypes, uint> dBuildings = new Dictionary<Storage.BuildingTypes, uint>();
+        missionsToComplete = 0;
+        GameInformation info = GameObject.Find("GameInformationObject").GetComponent<GameInformation>();
+        battle = info.GetBattle();
+        foreach (Battle.MissionDefinition mission in battle.GetMissions())
+        {
+            switch (mission.purpose)
+            {
+                case Battle.MissionType.DESTROY:
+                    switch (mission.target)
+                    {
+                        case Storage.EntityType.UNIT:
+                            destroyedUnitsWinners.Add(mission.targetType.unit, 0);
+                            //dUnits.Add(mission.targetType.unit, mission.amount);
+                            missionsToComplete++;
+                            break;
+                        case Storage.EntityType.BUILDING:
+                            destroyedBuildingsWinners.Add(mission.targetType.building, 0);
+                            //dBuildings.Add(mission.targetType.building, mission.amount);
+                            missionsToComplete++;
+                            break;
+                    }
+                    break;
+            }
+        }
+    }
 	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-
-    public void OnResourceAmountChanged(WorldResources.Type type, uint newAmmount) {}
-
-    public void OnResourceAdded(WorldResources.Type type, uint ammount)
+    // Update is called once per frame
+    void Update ()
     {
-        uint[] missionTargets;
-        if (resources.TryGetValue(type, out missionTargets))
+        if (IsGameOver())
         {
-            lock (resourceThreadLock)
-            {
-                // Logic for the resource finding (accumulation) mission
-                if (missionTargets[0] != 0)
-                {
-                    if (missionTargets[0] < ammount)
-                    {
-                        missionTargets[0] = 0;
-                    }
-                    else
-                    {
-                        missionTargets[0] -= ammount;
-                    }
-                }
-                // TODO Logic for resource keeping
-            }
+            Time.timeScale = 0;
         }
     }
 
-    public void OnResourceSubtracted(WorldResources.Type type, uint ammount)
+    void OnDestroy()
     {
-        uint[] missionTargets;
-        if (resources.TryGetValue(type, out missionTargets))
+        Time.timeScale = 1;
+    }
+
+    public Battle.MissionDefinition[] getMissionListArray()
+    {
+        List<Battle.MissionDefinition> missions = battle.GetMissions();
+        return missions.ToArray();
+    }
+
+    public bool HasWon(uint id)
+    {
+        float total;
+        int playerScore = 0;
+        total = destroyedUnitsWinners.Count + destroyedBuildingsWinners.Count;
+        foreach (uint i in destroyedUnitsWinners.Values)
         {
-            lock (resourceThreadLock)
+            if (i == id) playerScore++;
+        }
+        foreach (uint i in destroyedBuildingsWinners.Values)
+        {
+            if (i == id) playerScore++;
+        }
+        return (playerScore / total) >= 0.5f;
+    }
+
+    public bool IsGameOver()
+    {
+        return missionsToComplete <= 0;
+    }
+
+    /// <summary>
+    /// Notifies the controller that the caller has completed the mission to kill a unit.
+    /// </summary>
+    /// <param name="type">Type of unit.</param>
+    /// <param name="caller">ID of the player (either human or PC).</param>
+    public void notifyUnitKilled(Storage.UnitTypes type, uint caller)
+    {
+        bool notify = false;
+        uint winner;
+        if (destroyedUnitsWinners.TryGetValue(type, out winner))
+        {
+            if (winner == 0)    // If there is no winner
             {
-                // No importa en caso de acumular
-                // TODO Logic for resource keeping
+                notify = true;
+                destroyedUnitsWinners[type] = caller;
+                missionsToComplete--;
             }
+        }
+        if (notify)
+        {
+            // TODO for each player, indicate winner
         }
     }
 
-    public void OnBuildingCreated(Storage.BuildingTypes type)
+    public void notifyBuildingDestroyed(Storage.BuildingTypes type, uint caller)
     {
-        uint[] missionTargets;
-        if (buildings.TryGetValue(type, out missionTargets))
+        bool notify = false;
+        uint winner;
+        if (destroyedBuildingsWinners.TryGetValue(type, out winner))
         {
-            lock (buildingThreadLock)
+            if (winner == 0)
             {
-                if (missionTargets[1] > 0)
-                {
-                    missionTargets[1]--;
-                    if (missionTargets[1] == 0 && buildingWinners[type][1] == Winner.NONE)
-                    {
-                        buildingWinners[type][1] = owner;
-                    }
-                }
+                notify = true;
+                destroyedBuildingsWinners[type] = caller;
+                missionsToComplete--;
             }
+        }
+        if (notify)
+        {
+            // TODO for each player, indicate winner
         }
     }
 
-    public void OnBuildingDestroyed(Storage.BuildingTypes type)
-    {
-        uint[] missionTargets;
-        if (buildings.TryGetValue(type, out missionTargets))
-        {
-            lock (buildingThreadLock)
-            {
-                if (missionTargets[0] > 0)
-                {
-                    missionTargets[0]--;
-                    if (missionTargets[0] == 0 && buildingWinners[type][0] == Winner.NONE)
-                    {
-                        buildingWinners[type][0] = owner;
-                    }
-                }
-            }
-        }
-    }
-
-    //public void OnBuildingDestroyed(Storage.BuildingTypes type, string name) {}
-
-    public void OnUnitCreated(Storage.UnitTypes type)
-    {
-        uint[] missionTargets;
-        if (units.TryGetValue(type, out missionTargets))
-        {
-            lock (unitThreadLock)
-            {
-                if (missionTargets[1] > 0)
-                {
-                    missionTargets[1]--;
-                    if (missionTargets[1] == 0 && unitWinners[type][1] == Winner.NONE)
-                    {
-                        unitWinners[type][1] = owner;
-                    }
-                }
-            }
-        }
-    }
-
-    public void OnUnitKilled(Storage.UnitTypes type)
-    {
-        uint[] missionTargets;
-        if (units.TryGetValue(type, out missionTargets))
-        {
-            lock (unitThreadLock)
-            {
-                if (missionTargets[0] > 0)
-                {
-                    missionTargets[0]--;
-                    if (missionTargets[0] == 0 && unitWinners[type][0] == Winner.NONE)
-                    {
-                        unitWinners[type][0] = owner;
-                    }
-                }
-            }
-        }
-    }
-
-    //public void OnUnitKilled(Storage.UnitTypes type, string name) {}
+    public void notifyUnitCreated(Storage.UnitTypes type, uint caller) {}
+    public void notifyBuildingCreated(Storage.BuildingTypes type, uint caller) {}
 }
