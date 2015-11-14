@@ -158,7 +158,6 @@ namespace Assets.Scripts.AI
             Unit u = (Unit)obj;
             Workers.Add(u);
             u.register(Unit.Actions.DIED, OnUnitDead);
-
         }
         void OnBuildingDestroyed(System.Object obj)
         {
@@ -174,11 +173,22 @@ namespace Assets.Scripts.AI
                 Workers.Remove(u);
             if (Army.Contains(u))
                 Army.Remove(u);
+            Micro.OnUnitDead(u);
         }
 
         // TODO: Should it be handled with events??
         public override void removeEntity(IGameEntity entity) { }
         public override void addEntity(IGameEntity newEntity) { }
+        public void addToArmy(List<Unit> units)
+        {
+            foreach (Unit u in units)
+                addToArmy(u);
+        }
+        public void addToArmy(Unit u)
+        {
+            Army.Add(u);
+            Micro.assignUnit(u);
+        }
     }
     struct AIModule
     {

@@ -43,18 +43,18 @@ namespace Assets.Scripts.AI.Agents
             heroLastPos = Vector3.zero;
         }
 
-        public override void controlUnits(List<Unit> units)
+        public override void controlUnits(SquadAI squad)
         {
             if (fowManager.Enabled)
             {
                 //PLACEHOLDER, until sprint2 when we split things
-                if (units.Count < 2)
+                if (squad.units.Count < 2)
                 {
-                    int num = 2 - units.Count();
+                    int num = 2 - squad.units.Count();
                     if (ai.Macro.canTakeArms() >= num)
                         ai.Macro.takeArms(num);
                 }
-                foreach (Unit u in units)
+                foreach (Unit u in squad.units)
                 {
                     u.moveTo(findPlaceToExplore(u, fowManager.aiVision, fowManager.getGridSize()));
                     if (AIController.AI_DEBUG_ENABLED)
@@ -63,12 +63,12 @@ namespace Assets.Scripts.AI.Agents
                     }
                 }
                 //We have a previous last seen location for the hero, better send someone to scout it
-                if (heroLastPos != Vector3.zero && !heroVisible && units.Count > 0)
+                if (heroLastPos != Vector3.zero && !heroVisible && squad.units.Count > 0)
                 {
                     float bVal = float.MaxValue;
-                    Unit bUnit = units[0];
+                    Unit bUnit = squad.units[0];
                     //better find which unit is closer to the last hero position
-                    foreach (Unit u in units)
+                    foreach (Unit u in squad.units)
                     {
                         float dist = Vector3.Distance(u.transform.position, heroLastPos);
                         //We arrived where the hero was before, scout around here
@@ -123,7 +123,7 @@ namespace Assets.Scripts.AI.Agents
 		/// </summary>
 		/// <returns>The confidence.</returns>
 		/// <param name="units">Units.</param>
-        public override int getConfidence(List<Unit> units)
+        public override int getConfidence(SquadAI squad)
         {
 			//Explorer agent has some confidence by default
 			confidence = CONFIDENCE_EXPLORER_BY_DEFAULT;
@@ -141,7 +141,7 @@ namespace Assets.Scripts.AI.Agents
 			}
 
 			//If all units of the squad adds some more confidence to this behaivour
-			foreach(Unit unit in units)
+			foreach(Unit unit in squad.units)
 			{
 				if(unit.type != Storage.UnitTypes.CIVIL)
 				{

@@ -19,12 +19,12 @@ namespace Assets.Scripts.AI.Agents
 			}
 		}
 		
-		public override void controlUnits(List<Unit> units)
+		public override void controlUnits(SquadAI squad)
 		{
 		}
 		
 		
-		public override int getConfidence(List<Unit> units)
+		public override int getConfidence(SquadAI squad)
 		{	
 			int confidence;
 			confidence = useExtraConfidence();

@@ -25,15 +25,18 @@ namespace Assets.Scripts.AI
         /// Commite of agents who will each vote at what to do with every squad
         /// </summary>
         public List<BaseAgent> agents;
+        public List<SquadAI> squads;
         public MicroManager(AIController ai)
         {
             agents = new List<BaseAgent>();
+            squads = new List<SquadAI>();
             this.ai = ai;
             AttackAgent aA = new AttackAgent(ai, "Atack");
             agents.Add(new ExplorerAgent(ai, "Explorer"));
             agents.Add(aA);
             agents.Add(new RetreatAgent(ai, aA, "Retreat"));
 			agents.Add(new AssistAgent(ai, "Assist"));
+            addSquad(ai.Army); //hero squad
         }
         /// <summary>
         /// Called pretty fast, it's just like Update()
@@ -43,11 +46,11 @@ namespace Assets.Scripts.AI
             float bVal = float.MinValue;
             BaseAgent bAgent = agents[0];
             int val;
-            foreach(List<Unit> lu in SplitInGroups(ai.Army))
+            foreach(SquadAI sq in squads)
             {
                 foreach(BaseAgent a in agents)
                 {
-                    val = a.getConfidence(lu);
+                    val = a.getConfidence(sq);
                     if(AIController.AI_DEBUG_ENABLED) ai.aiDebug.setAgentConfidence(a.agentName, val);
                     if (val > bVal)
                     {
@@ -55,13 +58,13 @@ namespace Assets.Scripts.AI
                         bAgent = a;
                     }
                 }
-
+                sq.lastAgent = bAgent;
                 if(AIController.AI_DEBUG_ENABLED)
                 {
                     ai.aiDebug.setControllingAgent(bAgent.agentName, bVal);
                 }
 
-                bAgent.controlUnits(lu);
+                bAgent.controlUnits(sq);
             }
         }
         /// <summary>
@@ -76,17 +79,12 @@ namespace Assets.Scripts.AI
                 return 6 / (ai.DifficultyLvl+1);
             return 0;
         }
-        /// <summary>
-        /// Splits units in different groups which will handled by different agents
-        /// </summary>
-        /// <param name="units"></param>
-        /// <returns></returns>
-        private List<List<Unit>> SplitInGroups(List<Unit> units)
+        private void addSquad(List<Unit> units)
         {
-            List<List<Unit>> squads= new List<List<Unit>>();
-            //TODO, cluster by position or something faster
-            squads.Add(units);
-            return squads;
+            //Squad id 0 is used by temp squads
+            SquadAI s = new SquadAI(squads.Count + 1);
+            s.addUnits(units);
+            squads.Add(s);
         }
         public void setPersonality(List<float> rates)
         {
@@ -106,6 +104,22 @@ namespace Assets.Scripts.AI
         {
             for (int i = 0; i < agents.Count; i++)
                 agents[i].modifier = rate;
+        }
+
+        public void OnUnitDead(Unit u)
+        {
+            foreach (SquadAI s in squads)
+                if (s.units.Contains(u))
+                    s.removeUnit(u);
+        }
+        /// <summary>
+        /// Function tasked with deciding which squad should take care of the new created units
+        /// </summary>
+        /// <param name="u"></param>
+        public void assignUnit(Unit u)
+        {
+            //TODO: placeholder until we know how to split the squads
+            squads[0].addUnit(u);
         }
     }
 }

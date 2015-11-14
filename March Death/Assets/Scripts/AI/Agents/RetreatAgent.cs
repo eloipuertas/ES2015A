@@ -57,7 +57,7 @@ namespace Assets.Scripts.AI.Agents
             }
         }
 
-        public override void controlUnits(List<Unit> units)
+        public override void controlUnits(SquadAI squad)
         {
 
             isHeroInDanger = false;
@@ -97,13 +97,18 @@ namespace Assets.Scripts.AI.Agents
                         ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
                     }
                 }
-                
-                if(isHeroInDanger) attackAgent.controlUnits(squadToAtackManager);
+
+                if (isHeroInDanger)
+                {
+                    SquadAI s = new SquadAI(0);
+                    s.addUnits(squadToAtackManager);
+                    attackAgent.controlUnits(s);
+                }
             }
         }
 
 
-        public override int getConfidence(List<Unit> units)
+        public override int getConfidence(SquadAI squad)
         {
             if (ai.EnemyUnits.Count == 0)
                 return 0;
@@ -118,16 +123,16 @@ namespace Assets.Scripts.AI.Agents
             }
 
             //Get the squad bounding box
-            ownSquadBoundingBox = getSquadBoundingBox(units);
+            ownSquadBoundingBox = getSquadBoundingBox(squad.units);
 
             float maxLongitudeOfBox = ownSquadBoundingBox.width > ownSquadBoundingBox.height ? ownSquadBoundingBox.width : ownSquadBoundingBox.height;
             
             //Smell what is near this position
-            Unit[] enemyUnitsNearUs = ai.senses.getUnitsOfRaceNearPosition(new Vector3(ownSquadBoundingBox.x, units[0].transform.position.y, ownSquadBoundingBox.y), maxLongitudeOfBox * 2 * _maxUnitRange, _enemyRace);
+            Unit[] enemyUnitsNearUs = ai.senses.getUnitsOfRaceNearPosition(new Vector3(ownSquadBoundingBox.x, squad.units[0].transform.position.y, ownSquadBoundingBox.y), maxLongitudeOfBox * 2 * _maxUnitRange, _enemyRace);
 
             foreach (Unit enemyUnit in enemyUnitsNearUs)
             {
-                foreach (Unit ownUnit in units)
+                foreach (Unit ownUnit in squad.units)
                 {
                     float distance = Vector3.Distance(enemyUnit.transform.position, ownUnit.transform.position);
                     //HACK: Change this magic number before intefore integration.
