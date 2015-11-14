@@ -2383,7 +2383,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 122
   m_CollisionDetection: 0
 --- !u!65 &6573962
 BoxCollider:
@@ -2421,6 +2421,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43c34b4ae45e2c94f90ae970db2ad9f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _collider: {fileID: 0}
 --- !u!114 &11453958
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2470,6 +2471,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Size.y
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Constraints
+      value: 122
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
