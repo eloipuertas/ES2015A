@@ -205,14 +205,14 @@ public class Unit : GameEntity<Unit.Actions>
             _auto += entity.registerFatalWounds(onTargetDied);
             _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
 
-			// if target has changed, hide old target health
-			Selectable selectable = null;
-			if (_target != null) {
-				selectable = _target.getGameObject().GetComponent<Selectable>();
-				selectable.NotAttackedEntity();
-			}
-			
-			_target = entity;
+            // if target has changed, hide old target health
+            Selectable selectable = null;
+            if (_target != null) {
+            	selectable = _target.getGameObject().GetComponent<Selectable>();
+            	selectable.NotAttackedEntity();
+            }
+
+            _target = entity;
             
             // Show target health
             selectable = _target.getGameObject().GetComponent<Selectable>();
@@ -237,11 +237,11 @@ public class Unit : GameEntity<Unit.Actions>
     {
         if (_target != null)
         {
-			// Hide target health
-			Selectable selectable = _target.getGameObject().GetComponent<Selectable>();
-			selectable.NotAttackedEntity();
-			
-			// Unregister all events
+            // Hide target health
+            Selectable selectable = _target.getGameObject().GetComponent<Selectable>();
+            selectable.NotAttackedEntity();
+
+            // Unregister all events
             _auto -= _target.unregisterFatalWounds(onTargetDied);
             _auto -= _target.getGameObject().GetComponent<FOWEntity>().unregister(FOWEntity.Actions.HIDDEN, onTargetHidden);
             _target = null;
@@ -274,7 +274,7 @@ public class Unit : GameEntity<Unit.Actions>
         }
         
         _followingTarget = false;
-		stopAttack();
+        stopAttack();
         _hasPath = false;
         _movePoint = movePoint;
         setStatus(EntityStatus.MOVING);

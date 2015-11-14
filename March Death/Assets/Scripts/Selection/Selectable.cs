@@ -34,7 +34,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         base.Awake();
         currentlySelected = false;
         controller = GameObject.Find("GameController");
-		player = controller.GetComponent<Player>();
+        player = controller.GetComponent<Player>();
         _collider = GetComponent<Collider>();
         selectedRect = SelectionOverlay.CalculateBox(_collider);
     }
@@ -43,9 +43,9 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
         base.Start();
         fire(Actions.CREATED, this.gameObject);
-		entity = GetComponent<IGameEntity>();
-		bool ownUnit = entity.info.race == player.race;
-		selectedBox = SelectionOverlay.CreateTexture(ownUnit);
+        entity = GetComponent<IGameEntity>();
+        bool ownUnit = entity.info.race == player.race;
+        selectedBox = SelectionOverlay.CreateTexture(ownUnit);
     }
 
     public override void Update() { }
@@ -111,25 +111,25 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         fire(Actions.DESELECTED);
     }
 
-	/// <summary>
-	/// Set as selected to show health bar
-	/// ! Use only for rival units
-	/// </summary>
-	public virtual void AttackedEntity()
-	{
-		this.currentlySelected = true;
-	}
+    /// <summary>
+    /// Set as selected to show health bar
+    /// ! Use only for rival units
+    /// </summary>
+    public virtual void AttackedEntity()
+    {
+    	this.currentlySelected = true;
+    }
 
-	/// <summary>
-	///  Hides health bar
-	/// ! Use only for rival units
-	/// </summary>
-	public virtual void NotAttackedEntity()
-	{
-		this.currentlySelected = false;
-	}
-	
-	private void DrawSelection()
+    /// <summary>
+    ///  Hides health bar
+    /// ! Use only for rival units
+    /// </summary>
+    public virtual void NotAttackedEntity()
+    {
+    	this.currentlySelected = false;
+    }
+
+    private void DrawSelection()
     {
         GUI.DrawTexture(selectedRect, selectedBox);
     }
