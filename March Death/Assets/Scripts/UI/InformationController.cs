@@ -99,7 +99,7 @@ public class InformationController : MonoBehaviour {
 		txtActorName.enabled = true;
 		txtActorRace.text = entity.info.race.ToString ();
 		txtActorRace.enabled = true;
-		txtActorHealth.text = entity.healthPercentage.ToString () + "/100";
+		txtActorHealth.text = Math.Ceiling(entity.healthPercentage).ToString () + "/100";
 		txtActorHealth.enabled = true;	
 		
 		sliderActorHealth.value = entity.healthPercentage;
@@ -381,6 +381,7 @@ public class InformationController : MonoBehaviour {
 		GameObject gameObject = (GameObject) obj;
 		IGameEntity entity = gameObject.GetComponent<IGameEntity> ();
 		sliderActorHealth.value = entity.healthPercentage;
+		txtActorHealth.text = Math.Ceiling(entity.healthPercentage).ToString () + "/100";
 	}
 	
 	public void onUnitDied(System.Object obj)
