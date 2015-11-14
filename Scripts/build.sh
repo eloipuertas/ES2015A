@@ -41,7 +41,7 @@ mkdir Build
 cd Build
 cmake ..
 make -j2
-cp -f src/Recast.so ../../Plugins/x86_64/
+cp -f Lib/libRecast.so ../../Plugins/x86_64/Recast.so
 cd $HOME/ES2015A
 
 # Build Unity project
