@@ -40,6 +40,7 @@ namespace Assets.Scripts.AI
         private bool isRootBasePositionInitialized;
         public List<Unit> Army { get; set; }
         public List<Unit> Workers { get; set; }
+        public AISenses senses;
 
         public override void Start()
         {
@@ -57,6 +58,12 @@ namespace Assets.Scripts.AI
             //Army.Add(Info.get.createUnit(_selfRace, UnitTypes.HERO, rootBasePosition,Quaternion.Euler(0,0,0)).GetComponent<Unit>());
             Workers = new List<Unit>();
             Macro = new MacroManager(this);
+
+            //We need to implement som kind of senses for te AI so here they are 
+            GameObject sensesContainer = new GameObject("AI Senses");
+            sensesContainer.AddComponent<AISenses>();
+            senses = sensesContainer.GetComponent<AISenses>();
+
             Micro = new MicroManager(this);
             modules.Add(new AIModule(Macro.MacroHigh, 30));
             modules.Add(new AIModule(Macro.MacroLow, 5));
@@ -153,7 +160,6 @@ namespace Assets.Scripts.AI
             Unit u = (Unit)obj;
             Workers.Add(u);
             u.register(Unit.Actions.DIED, OnUnitDead);
-
         }
         void OnBuildingDestroyed(System.Object obj)
         {
@@ -169,6 +175,7 @@ namespace Assets.Scripts.AI
                 Workers.Remove(u);
             if (Army.Contains(u))
                 Army.Remove(u);
+            Micro.OnUnitDead(u);
         }
 
         // TODO: Should it be handled with events??
@@ -199,6 +206,17 @@ namespace Assets.Scripts.AI
                 build.register(Resource.Actions.CREATE_UNIT, OnCivilCreated);
                 build.register(Resource.Actions.DESTROYED, OnBuildingDestroyed);
             }
+        }
+
+        public void addToArmy(List<Unit> units)
+        {
+            foreach (Unit u in units)
+                addToArmy(u);
+        }
+        public void addToArmy(Unit u)
+        {
+            Army.Add(u);
+            Micro.assignUnit(u);
         }
     }
     struct AIModule

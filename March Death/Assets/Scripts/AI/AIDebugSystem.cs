@@ -6,11 +6,24 @@ using System;
 
 public class AIDebugSystem : MonoBehaviour {
 
+	//Used to visualize spheres when our Aisenses asks for it
+    public struct DebugSphere
+    {
+        public Vector3 center;
+        public float radius;
+
+        public DebugSphere(Vector3 cent, float rad)
+        {
+            center = cent;
+            radius = rad;
+        }
+    }
+
     AIController controller { get; set; }
 
     bool showInfo { get; set; }
     public Rect commandingAgentWindowRect = new Rect(20, 20, 200, 80);
-    public Rect statsWindowRect = new Rect(20 + 200 + 10, 20, 400, 90);
+    public Rect statsWindowRect = new Rect(20 + 200 + 10, 20, 400, 100);
 
     private const int WINDOW_HEIGHT_OFFSET_TOLERANCE = 20;
 
@@ -23,6 +36,8 @@ public class AIDebugSystem : MonoBehaviour {
     //This angent is who is controllin NOW the situation
     public string controllingAgent;
     public float confidence;
+
+    public DebugSphere debugSphere;
 
     //Stores the actual confidence of each agent
     Dictionary<string, float> agentsConfidence = new Dictionary<string, float>();
@@ -52,6 +67,7 @@ public class AIDebugSystem : MonoBehaviour {
         AIDebugSystem AIDSys = parent.AddComponent<AIDebugSystem>();
         AIDSys.controller = controller;
         AIDSys.enabled = true;
+        AIDSys.debugSphere = new DebugSphere(Vector3.zero, 10);
         return AIDSys;
     }
     
@@ -76,7 +92,7 @@ public class AIDebugSystem : MonoBehaviour {
         {
             showInfo = !showInfo;
         }
-	}
+    }
 
     /// <summary>
     /// Method to show all the info on the screen
@@ -258,5 +274,14 @@ public class AIDebugSystem : MonoBehaviour {
         }
 
         return nextLine;
+    }
+
+	/// <summary>
+	/// Raises the draw gizmos event and draws the spheres on scene mode.
+	/// </summary>
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireSphere(debugSphere.center, debugSphere.radius);
     }
 }

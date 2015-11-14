@@ -7,10 +7,12 @@ namespace Assets.Scripts.AI.Agents
 {
     public abstract class BaseAgent
     {
+		public const int MAX_AGENT_CONFIDENCE = 1000;
         /// <summary>
         /// This confidence will be applied to every confidence return by this agent.
         /// </summary>
-        int baseConfidence { get; set; }
+        public int baseConfidence { get; set; }
+		public int extraConfidence {get; set; }
         protected AIController ai;
         public float modifier { get; set; }
         public string agentName;
@@ -21,7 +23,35 @@ namespace Assets.Scripts.AI.Agents
             modifier = 1;
             agentName = name;
         }
-        public abstract int getConfidence(List<Unit> units);
-        public abstract void controlUnits(List<Unit> units);
+        public abstract int getConfidence(SquadAI squad);
+        public abstract void controlUnits(SquadAI squad);
+
+		/// <summary>
+		/// Transfers confidence to the agent.
+		/// </summary>
+		/// <param name="confidenceToAdd">Confidence to add.</param>
+		public void addConfidence(int confidenceToAdd)
+		{
+			if(baseConfidence + confidenceToAdd > MAX_AGENT_CONFIDENCE)
+			{
+				extraConfidence = MAX_AGENT_CONFIDENCE;
+			}
+			else
+			{
+				extraConfidence += confidenceToAdd;
+			}
+
+		}
+
+		/// <summary>
+		/// Uses the extra confidence.
+		/// </summary>
+		/// <returns>The extra confidence.</returns>
+		public int useExtraConfidence(){
+			int c;
+			c = extraConfidence;
+			extraConfidence = 0;
+			return c;
+		}
     }
 }

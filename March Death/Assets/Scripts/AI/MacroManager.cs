@@ -70,7 +70,7 @@ namespace Assets.Scripts.AI
                 int min = Math.Min(num, ai.Workers.Count);
                 List<Unit> lu = ai.Workers.GetRange(0, min);
                 ai.Workers.RemoveRange(0, min);
-                ai.Army.AddRange(lu);
+                ai.addToArmy(lu);
             }
         }
     }
