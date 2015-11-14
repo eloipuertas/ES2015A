@@ -28,3 +28,8 @@ add_library(FastLZ
 if(BUILD_32_BITS)
     set_target_properties(FastLZ PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 endif()
+
+if (UNIX)
+  set_target_properties(FastLZ PROPERTIES COMPILE_FLAGS "-fPIC")
+endif()
+
