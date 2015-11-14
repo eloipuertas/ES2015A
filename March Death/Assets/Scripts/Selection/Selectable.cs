@@ -111,8 +111,25 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         fire(Actions.DESELECTED);
     }
 
+	/// <summary>
+	/// Set as selected to show health bar
+	/// ! Use only for rival units
+	/// </summary>
+	public virtual void AttackedEntity()
+	{
+		this.currentlySelected = true;
+	}
 
-    private void DrawSelection()
+	/// <summary>
+	///  Hides health bar
+	/// ! Use only for rival units
+	/// </summary>
+	public virtual void NotAttackedEntity()
+	{
+		this.currentlySelected = false;
+	}
+	
+	private void DrawSelection()
     {
         GUI.DrawTexture(selectedRect, selectedBox);
     }
