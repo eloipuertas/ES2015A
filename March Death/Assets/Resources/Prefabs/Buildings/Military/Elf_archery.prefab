@@ -433,7 +433,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 104000}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 344.097046, y: 79.0026245, z: 816.534424}
+  m_LocalPosition: {x: 790.57074, y: 79.0026245, z: 844.487671}
   m_LocalScale: {x: 1, y: 1.20000005, z: 1}
   m_Children:
   - {fileID: 416506}
@@ -607,7 +607,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: e2a41992f9f49b542992ca1acb1d24f3, type: 2}
+  - {fileID: 2100000, guid: 9aaa0eba6bed61f46b4b3fa4774b7ee7, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
@@ -679,7 +679,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 9aaa0eba6bed61f46b4b3fa4774b7ee7, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
@@ -802,7 +802,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: ec2c74f03842525499c1d21dc8ec322e, type: 2}
+  - {fileID: 2100000, guid: 9aaa0eba6bed61f46b4b3fa4774b7ee7, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
@@ -853,7 +853,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 6e53fe57bf2f10741bb89734850434e5, type: 2}
+  - {fileID: 2100000, guid: 9aaa0eba6bed61f46b4b3fa4774b7ee7, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
@@ -877,7 +877,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: c679b130b77e25f4eb6098e26270babd, type: 2}
+  - {fileID: 2100000, guid: 9aaa0eba6bed61f46b4b3fa4774b7ee7, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
@@ -1163,7 +1163,7 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -.000771045685, y: .0013229847, z: 1.14440918e-05}
+    m_Center: {x: -.000770926476, y: .00132369995, z: 1.14440918e-05}
     m_Extent: {x: .0109024886, y: .0113813449, z: 3.29767236e-09}
   m_DirtyAABB: 0
 --- !u!183 &18320896
@@ -1419,6 +1419,10 @@ Prefab:
       propertyPath: type
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9aaa0eba6bed61f46b4b3fa4774b7ee7, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 104000}
