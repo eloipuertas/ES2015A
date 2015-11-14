@@ -20,8 +20,6 @@ public class PauseMenuLogic : MonoBehaviour
 	void QuitToMainMenu ()
 	{
 		MenuButtonLogic.Pause_Play ();
-		Main_Game mg = GameObject.Find("GameController").GetComponent<Main_Game>();
-		mg.ClearGame();
 		Application.LoadLevel (0);
 	}
 

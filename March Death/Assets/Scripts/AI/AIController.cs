@@ -40,6 +40,9 @@ namespace Assets.Scripts.AI
         public List<Unit> Army { get; set; }
         public List<Unit> Workers { get; set; }
 
+        // HACK To signal MicroManager that the game has ended when the AI hero is killed
+        public bool FinishPlaying { get { return missionStatus.isGameOver(); } }
+
         public override void Start()
         {
             base.Start();
@@ -79,16 +82,21 @@ namespace Assets.Scripts.AI
                 aiDebug = AIDebugSystem.CreateComponent(gameObject, this);
             }
 
+            AcquirePlayerID();
+            missionStatus = new MissionStatus(playerId);
         }
         void Update()
         {
-            for (int i = 0; i < modules.Count; i++)
+            if (!missionStatus.isGameOver())
             {
-                timers[i] += Time.deltaTime;
-                if (timers[i] > modules[i].period)
+                for (int i = 0; i < modules.Count; i++)
                 {
-                    modules[i].Callback();
-                    timers[i] = 0f;
+                    timers[i] += Time.deltaTime;
+                    if (timers[i] > modules[i].period)
+                    {
+                        modules[i].Callback();
+                        timers[i] = 0f;
+                    }
                 }
             }
         }
@@ -98,10 +106,12 @@ namespace Assets.Scripts.AI
             if (g.info.isUnit)
             {
                 EnemyUnits.Remove((Unit)g);
+                missionStatus.OnUnitKilled(((Unit) g).type);
             }
             else if (g.info.isBuilding)
             {
                 EnemyBuildings.Remove(g);
+                missionStatus.OnBuildingDestroyed(g.getType<Storage.BuildingTypes>());
             }
         }
         void OnEntityFound(System.Object obj)

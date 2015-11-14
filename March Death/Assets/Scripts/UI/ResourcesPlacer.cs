@@ -41,6 +41,11 @@ public class ResourcesPlacer : MonoBehaviour
 
     void Update(){ }
 
+    void OnDestroy()
+    {
+        Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.CREATED, onUnitCreated);
+    }
+
     // PUBLIC METHODS
 
     /// <summary>
