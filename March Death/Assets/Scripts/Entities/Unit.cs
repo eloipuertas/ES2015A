@@ -101,7 +101,7 @@ public class Unit : GameEntity<Unit.Actions>
     private void onTargetDied(System.Object obj)
     {
         // TODO: Our target died, select next? Do nothing?
-		stopAttack();
+        stopAttack();
 	}
 
     /// <summary>
