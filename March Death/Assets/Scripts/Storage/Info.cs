@@ -29,10 +29,12 @@ namespace Storage
             parseJSONFiles<UnitInfo, UnitTypes>("Data/Units", unitStore, EntityType.UNIT);
             parseJSONFiles<ResourceInfo, BuildingTypes>("Data/Buildings/Resources", buildingStore, EntityType.BUILDING);
             parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Barracks", buildingStore, EntityType.BUILDING);
+            parseJSONFiles<ResourceInfo, BuildingTypes>("Data/Buildings/Military", buildingStore, EntityType.BUILDING);
 
             parsePrefabs<Unit, UnitTypes>("Prefabs/Units", unitPrefabs);
             parsePrefabs<Resource, BuildingTypes>("Prefabs/Buildings/Resources", buildingPrefabs);
             parsePrefabs<Barrack, BuildingTypes>("Prefabs/Buildings/Barracks", buildingPrefabs);
+            parsePrefabs<Resource, BuildingTypes>("Prefabs/Buildings/Military", buildingPrefabs);
         }
 
         /// <summary>
