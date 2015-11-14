@@ -45,7 +45,7 @@ namespace Pathfinding
         public byte minx, maxx, miny, maxy;   ///< Usable sub-region.
     };
 
-    struct CompressedTile
+    public struct CompressedTile
     {
         public uint salt;                      ///< Counter describing modifications to the tile.
         public IntPtr header;
