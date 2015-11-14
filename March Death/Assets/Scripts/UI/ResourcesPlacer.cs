@@ -30,12 +30,17 @@ public class ResourcesPlacer : MonoBehaviour
         }
 
         setupText();
-        updateAll();
+        updateAmounts();
 
         Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.CREATED, onUnitCreated, new ActorSelector()
         {
             registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
         });
+
+        /*Subscriber<Resource.Actions, Resource>.get.registerForAll(Resource.Actions.COLLECTION, onCollection, new ActorSelector()
+        {
+            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
+        });*/
 
     }
 
@@ -44,6 +49,7 @@ public class ResourcesPlacer : MonoBehaviour
     void OnDestroy()
     {
         Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.CREATED, onUnitCreated);
+        Subscriber<Resource.Actions, Resource>.get.unregisterFromAll(Resource.Actions.COLLECTION, onCollection);
     }
 
     // PUBLIC METHODS
@@ -58,7 +64,15 @@ public class ResourcesPlacer : MonoBehaviour
         player.resources.SubstractAmount(WorldResources.Type.WOOD, entity.info.resources.wood);
         player.resources.SubstractAmount(WorldResources.Type.METAL, entity.info.resources.metal);
 
-        updateAll();
+        updateAmounts();
+    }
+
+    public void updateAmounts()
+    {
+        for (int i = 0; i < txt_names.Length; i++)
+        {
+            res_amounts[i].text = "" + player.resources.getAmount(t[i]);
+        }
     }
 
     public void insufficientFundsColor(IGameEntity entity)
@@ -98,15 +112,6 @@ public class ResourcesPlacer : MonoBehaviour
         }
     }
 
-
-    private void updateAll()
-    {
-        for (int i = 0; i < txt_names.Length; i++)
-        {
-            res_amounts[i].text = "" + player.resources.getAmount(t[i]);
-        }
-    }
-
     private void setupText()
     {
         foreach (Text t in res_amounts) {
@@ -132,4 +137,38 @@ public class ResourcesPlacer : MonoBehaviour
                 updateUnitCreated(go.GetComponent<IGameEntity>());
         }
     }
+
+    public void onFoodConsumption(System.Object obj)
+    {
+        Goods goods = (Goods)obj;
+        Debug.Log("Let's eat an amount of: " + goods.amount + " on: " + goods.type);
+        player.resources.SubstractAmount(t[0], goods.amount); // t[0] is FOOD
+
+        updateAmounts();
+    }
+
+    public void onCollection(System.Object obj)
+    {
+        Goods goods = (Goods)obj;
+
+        Debug.Log("Let's collect an amount of: " + goods.amount + " on: " + goods.type);
+
+        switch (goods.type)
+        {
+            case Goods.GoodsType.FOOD:
+                player.resources.AddAmount(t[0], goods.amount);
+                break;
+            case Goods.GoodsType.WOOD:
+                player.resources.AddAmount(t[1], goods.amount);
+                break;
+            case Goods.GoodsType.METAL:
+                player.resources.AddAmount(t[2], goods.amount);
+                break;
+            default:
+                break;
+        }
+
+        updateAmounts();
+    }
+
 }
