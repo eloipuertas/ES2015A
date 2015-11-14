@@ -168,7 +168,7 @@ public class InformationController : MonoBehaviour {
 			selectable.SelectOnlyMe();
 		});
 		
-		return createCustomButton(buttonCenter, multiselectionButtonSize, "MultiSelectionButton", entity.info.name.ToString (), buttonImage: GetImageForEntity (entity), actionMethod: selectUnique);
+		return CreateCustomButton(buttonCenter, multiselectionButtonSize, "MultiSelectionButton", entity.info.name.ToString (), buttonImage: GetImageForEntity (entity), actionMethod: selectUnique);
 	}
 
 	private void ReloadSquadGenerationButton() 
@@ -205,7 +205,7 @@ public class InformationController : MonoBehaviour {
 			ReloadSquadGenerationButton();
 		});
 
-		createCustomButton(buttonCenter, squadsButtonSize, "SquadGenerationButton", "+", actionMethod: createSquadAction);
+		CreateCustomButton(buttonCenter, squadsButtonSize, "SquadGenerationButton", "+", actionMethod: createSquadAction);
 	}
 
 	private void addNewSquadButton(int i) {
@@ -221,7 +221,7 @@ public class InformationController : MonoBehaviour {
 			//TODO, here we'll select all units for this squad
 		});
 
-		GameObject button = createCustomButton(buttonCenter, squadsButtonSize, "SquadButton", text, actionMethod: squadAction);
+		GameObject button = CreateCustomButton(buttonCenter, squadsButtonSize, "SquadButton", text, actionMethod: squadAction);
 		squadButtons.Add(button);
 	}
 
@@ -328,14 +328,14 @@ public class InformationController : MonoBehaviour {
 		}
 	}
 
-	private GameObject createCustomButton(Vector2 center, Vector2 size, String tag, String text = "", Sprite buttonImage = null, UnityAction actionMethod = null) {
+	private GameObject CreateCustomButton(Vector2 center, Vector2 size, String tag, String text = "", Sprite buttonImage = null, UnityAction actionMethod = null) {
 		String canvasName = tag + "Canvas";
 		String buttonName = tag + "Button";
 		String textName = tag + "Text";
-		return createButton(center, size, tag, text, canvasName, buttonName, textName, buttonImage, actionMethod);
+		return CreateButton(center, size, tag, text, canvasName, buttonName, textName, buttonImage, actionMethod);
 	}
 	
-	private GameObject createButton(Vector2 center, Vector2 size, String tag = "", String text = "", String canvasName = "", String buttonName = "", 
+	private GameObject CreateButton(Vector2 center, Vector2 size, String tag = "", String text = "", String canvasName = "", String buttonName = "", 
 	                                String textName = "", Sprite buttonImage = null, UnityAction actionMethod = null) 
 	{
 		GameObject canvasObject = new GameObject(canvasName);
