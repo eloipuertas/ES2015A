@@ -15,7 +15,7 @@ namespace Utils
         private static T _instance;
 
         private static object _lock = new object();
-
+        
         public static T Instance
         {
             get
@@ -71,9 +71,9 @@ namespace Utils
         ///   even after stopping playing the Application. Really bad!
         /// So, this was made to be sure we're not creating that buggy ghost object.
         /// </summary>
-        public void OnDestroy()
+        public virtual void OnDestroy()
         {
-            applicationIsQuitting = true;
+            _instance = null;
         }
     }
 }

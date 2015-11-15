@@ -11,7 +11,7 @@ public class MusicPj : MonoBehaviour {
         if (mainMenu)
             menuMusic = mainMenu.gameObject;
         else
-            Debug.LogWarning("Expected mainMenu in MusigPj");
+            Debug.LogWarning("Expected mainMenu in MusicPj");
 
 	}
 }
