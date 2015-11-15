@@ -184,7 +184,7 @@ namespace Managers
             if (newDestination == _inputs.invalidPosition) return false;
 
             // alter the color if is not a valid location
-            if (checkLocation(newDestination))
+            if (checkLocation(newDestination) && isAffordable(_newBuilding.race, _newBuilding.type))
             {
 
                 GameObject finalBuilding = CreateFinalBuilding(_newBuilding.race, _newBuilding.type);
@@ -264,7 +264,7 @@ namespace Managers
 
             // 2. check and move alter the color if is not a valid location
             _newBuilding.ghost.transform.position = newDestination;
-            if (checkLocation(newDestination))
+            if (checkLocation(newDestination) && isAffordable(_newBuilding.race, _newBuilding.type))
             {
                 _currentPlace = Place.ABLE;
                 _newBuilding.material.color = green;
