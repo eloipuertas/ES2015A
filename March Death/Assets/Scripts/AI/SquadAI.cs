@@ -160,11 +160,11 @@ namespace Assets.Scripts.AI
             float maxLongitudeOfBox = boudningBox.width > boudningBox.height ? boudningBox.width : boudningBox.height;
 
             //Smell what is near this position
-            Unit[] enemyUnitsNearUs = ai.senses.getUnitsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 2 * _maxUnitRange, _enemyRace);
-
+            enemySquad.units = ai.senses.getUnitsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 2 * _maxUnitRange, _enemyRace);
 
             enemySquad.boudningBox = enemySquad.getSquadBoundingBox();
 
+            //Calculate the Enemy units atack data
             ad = enemySquad.getData<AttackData>();
             val = 0;
             if (ad.hasChanged)
