@@ -82,7 +82,7 @@ public partial class InformationController : MonoBehaviour {
 	void Update () 
 	{
 	}
-	
+
 	private void ShowInformation(GameObject gameObject) 
 	{
 		IGameEntity entity = gameObject.GetComponent<IGameEntity> ();
@@ -249,7 +249,7 @@ public partial class InformationController : MonoBehaviour {
 		HideInformation ();
 	}
 	
-	public void Clear()
+	void OnDestroy()
 	{
 		Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.SELECTED, onUnitSelected);
 		Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.DESELECTED, onUnitDeselected);

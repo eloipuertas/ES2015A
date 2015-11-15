@@ -218,7 +218,7 @@ public class EntityAbilitiesController : MonoBehaviour
         return newImg;
     }
 
-	public void Clear()
+	void OnDestroy()
 	{
 		Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.SELECTED, onActorSelected);
 		Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.DESELECTED, onActorDeselected);
