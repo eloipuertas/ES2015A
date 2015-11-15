@@ -8,23 +8,23 @@ using Utils;
 public class ResourcesPlacer : MonoBehaviour
 {
     // attributes
+    private const float UPDATE_STATS = 1.5f;
+    private float _timer = 1.5f;
 
     private readonly string[] txt_names = { "meat", "wood", "metal" };
     private WorldResources.Type[] t = { WorldResources.Type.FOOD, WorldResources.Type.WOOD, WorldResources.Type.METAL };
     private List<Text> res_amounts;
+    private List<Text> res_stats;
     private Player player;
 
-    private Statistics[] _statistics = {
-                                            new Statistics(WorldResources.Type.FOOD),
-                                            new Statistics(WorldResources.Type.WOOD),
-                                            new Statistics(WorldResources.Type.METAL)
-                                       };
+    private float[] _statistics = { 0f, 0f, 0f };
 
 
 
     void Start()
     {
         res_amounts = new List<Text>();
+        res_stats = new List<Text>();
 
         player = GameObject.Find("GameController").GetComponent<Player>();
 
@@ -33,6 +33,13 @@ public class ResourcesPlacer : MonoBehaviour
         for (int i = 0; i < txt_names.Length; i++)
         {
             res_amounts.Add(GameObject.Find("HUD/resources/text_" + txt_names[i]).GetComponent<Text>());
+            if (player.race == Races.ELVES)
+            {
+                if (i != 2)
+                    res_stats.Add(GameObject.Find("HUD/resources/text_" + txt_names[i] + "_hour").GetComponent<Text>());
+                else
+                    res_stats.Add(GameObject.Find("HUD/resources/text_meta_hour").GetComponent<Text>());
+            }
         }
 
         setupText();
@@ -45,8 +52,15 @@ public class ResourcesPlacer : MonoBehaviour
 
     }
 
-    void Update(){
-        updateStatistics();
+    void Update()
+    {
+        if (_timer >= UPDATE_STATS)
+        { 
+            updateStatistics();
+            _timer = 0f;
+        }
+        else _timer += Time.deltaTime;
+
     }
 
     void OnDestroy()
@@ -79,12 +93,14 @@ public class ResourcesPlacer : MonoBehaviour
 
     public void updateStatistics()
     {
-        Debug.Log("INIT --------------------------------");
-        for (int i = 0; i < _statistics.Length; i++)
+        for (int i = 0; i < txt_names.Length; i++)
         {
-            Debug.Log("* STAT: " + _statistics[i]._type + " -> " + _statistics[i].growth_speed);
+            if (player.race == Races.ELVES)
+            {
+                res_stats[i].text = "" + _statistics[i] + "/s";
+                res_stats[i].color = _statistics[i] >= 0 ? Color.gray : Color.red;
+            }
         }
-        Debug.Log("END ---------------------------------");
     }
 
     public void insufficientFundsColor(IGameEntity entity)
@@ -150,21 +166,20 @@ public class ResourcesPlacer : MonoBehaviour
         }
     }
 
-    public void onStatisticsCreated(System.Object obj)
+    public void onStatisticsUpdate(System.Object obj)
     {
-        Debug.Log("Habemus Statistics!");
         Statistics st = (Statistics)obj;
 
         switch (st._type)
         {
             case WorldResources.Type.FOOD:
-                _statistics[0] = _statistics[0] + st;
+                _statistics[0] += st.growth_speed;
                 break;
             case WorldResources.Type.WOOD:
-                _statistics[1] = _statistics[1] + st; ;
+                _statistics[1] += st.growth_speed;
                 break;
             case WorldResources.Type.METAL:
-                _statistics[2] = _statistics[2] + st;
+                _statistics[2] += st.growth_speed;
                 break;
             default:
                 break;

@@ -27,6 +27,8 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     private float buildTime2 = 0;
     private float buildTime3 = 0;
 
+    bool hasConstructionFinished = false;
+
 
     /// <summary>
     /// When a wound is received, this is called
@@ -120,7 +122,10 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 
             case EntityStatus.BUILDING_PHASE_3:
                 if (buildTime3 >= 3)
+                {
+                    hasConstructionFinished = true;
                     setStatus(EntityStatus.IDLE);
+                }
                 else
                     buildTime3 += Time.deltaTime;
                 break;

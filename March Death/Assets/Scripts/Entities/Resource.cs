@@ -7,7 +7,7 @@ using Storage;
 
 public class Resource : Building<Resource.Actions>
 {
-    public enum Actions { CREATED, DAMAGED, DESTROYED, COLLECTION, CREATE_UNIT };
+    public enum Actions { CREATED, DAMAGED, DESTROYED, COLLECTION, CREATE_UNIT , DEL_STATS};
 
     /// <summary>
     /// civilian creation waste some time. When units are being created status
@@ -213,6 +213,9 @@ public class Resource : Building<Resource.Actions>
 
     private readonly object syncLock = new object();
     bool hasCreatedCivil = false;
+
+    bool once = false;
+
     List<GameObject> pendingProducers = new List<GameObject>();
     List<GameObject> pendingWanderers = new List<GameObject>();
 
@@ -546,7 +549,10 @@ public class Resource : Building<Resource.Actions>
     /// When building is destroyed civilian workers turns into explorers
     /// </summary>
     public override void OnDestroy()
-    {        
+    {
+        statistics.growth_speed *= -1;
+        fire(Actions.DEL_STATS, statistics);
+
         foreach (Unit unit in workersList)
         {
             unit.role = Unit.Roles.WANDERING;
@@ -592,12 +598,12 @@ public class Resource : Building<Resource.Actions>
         if (Player.getOwner(_entity).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
         {
             register(Actions.COLLECTION, res_pl.onCollection);
-            register(Actions.CREATED, res_pl.onStatisticsCreated);
+            register(Actions.CREATED, res_pl.onStatisticsUpdate);
+            register(Actions.DEL_STATS, res_pl.onStatisticsUpdate);
         }
 
-        statistics = new Statistics(getResourceType(), (int)info.resourceAttributes.updateInterval, info.resourceAttributes.storeSize);
+        statistics = new Statistics(getResourceType(), (int)info.resourceAttributes.updateInterval, 10); // hardcoded, To modify, by now the collection rate is always 10, but theres no workers yet
 
-        fire(Actions.CREATED, statistics);
     }
 
 
@@ -617,6 +623,10 @@ public class Resource : Building<Resource.Actions>
 
                 if (!hasDefaultUnit)
                 {
+                    if (!once) {
+                        fire(Actions.CREATED, statistics); once = true;
+                    }
+
                     createCivilian();
                     hasDefaultUnit = true;
                 }
