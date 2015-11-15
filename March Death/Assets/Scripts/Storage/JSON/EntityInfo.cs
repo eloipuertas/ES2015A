@@ -82,7 +82,40 @@ namespace Storage
         {
             get
             {
-                return isBuilding && !isResource;
+                return isBuilding && ((((BuildingInfo)this).type == BuildingTypes.BARRACK));
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the entity is an Archery building, false otherwise
+        /// </summary>
+        public bool isArchery
+        {
+            get
+            {
+                return ((((BuildingInfo)this).type == BuildingTypes.ARCHERY));
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the entity is an Archery building, false otherwise
+        /// </summary>
+        public bool isStable
+        {
+            get
+            {
+                return ((((BuildingInfo)this).type == BuildingTypes.STABLE));
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the entity is Stronghold building, false otherwise
+        /// </summary>
+        public bool isStronghold
+        {
+            get
+            {
+                return ((((BuildingInfo)this).type == BuildingTypes.STRONGHOLD));
             }
         }
 
@@ -152,6 +185,40 @@ namespace Storage
                 }
 
                 return (BarrackAttributes)this.attributes;
+            }
+        }
+
+        /// <summary>
+        /// If this info describes an archery, returns the ArcheryAttributes class, otherwise it returns null
+        /// It should always be used either by first checking isArchery, or checking if returned value is not null
+        /// </summary>
+        public ArcheryAttributes archeryAttributes
+        {
+            get
+            {
+                if (!isArchery)
+                {
+                    return null;
+                }
+
+                return (ArcheryAttributes)this.attributes;
+            }
+        }
+
+        /// <summary>
+        /// If this info describes a stable, returns the stableAttributes class, otherwise it returns null
+        /// It should always be used either by first checking isStable, or checking if returned value is not null
+        /// </summary>
+        public StableAttributes stableAttributes
+        {
+            get
+            {
+                if (!isStable)
+                {
+                    return null;
+                }
+
+                return (StableAttributes)this.attributes;
             }
         }
     }

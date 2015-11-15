@@ -31,7 +31,7 @@ GameObject:
   - 114: {fileID: 11484850}
   - 114: {fileID: 11425372}
   - 208: {fileID: 20850588}
-  - 114: {fileID: 11445382}
+  - 114: {fileID: 11416662}
   m_Layer: 0
   m_Name: Elf_archery
   m_TagString: Untagged
@@ -1095,6 +1095,19 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11416662
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 104000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5fbb8f6c39668245a0bbf75a57821ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 1
+  type: 4
 --- !u!114 &11425372
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1107,19 +1120,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider: {fileID: 0}
---- !u!114 &11445382
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 104000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3aa7bd748c483ad44a9454c6c5f8639b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  race: 1
-  type: 4
 --- !u!114 &11484850
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1418,6 +1418,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: type
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
