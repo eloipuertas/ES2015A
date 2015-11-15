@@ -65,6 +65,12 @@ public class GameSetupScript : MonoBehaviour {
         raceSelected = true;
     }
 
+    // TODO Implement mechanism to select game mode
+    public void SetGameMode ()
+    {
+        info.setGameMode (GameInformation.GameMode.CAMPAIGN);
+    }
+
     public void StartGame()
     {
 
@@ -74,7 +80,8 @@ public class GameSetupScript : MonoBehaviour {
 			if (menuMusic) {
 				Destroy (menuMusic);
 			}
-		    Application.LoadLevel("ES2015A");
+            SetGameMode();
+            Application.LoadLevel("ES2015A");
         }
         else
         {

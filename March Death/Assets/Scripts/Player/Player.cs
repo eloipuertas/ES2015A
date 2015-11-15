@@ -10,7 +10,7 @@ public class Player : BasePlayer
     /// </summary>
     private status _currently;
     public status currently { get { return _currently; }}
-    public enum status {IDLE, PLACING_BUILDING, SELECTED_UNITS /*...*/}
+    public enum status {IDLE, PLACING_BUILDING, SELECTED_UNITS, TERMINATED /*...*/}
 
     /// <summary>
     /// Information regarding the entities of the player
@@ -19,27 +19,74 @@ public class Player : BasePlayer
     public List<IGameEntity> activeEntities {
         get { return new List<IGameEntity>(_activeEntities); }
     }
-    
-	//the list of player units in the scene
-	public ArrayList currentUnits = new ArrayList ();
+
+
+    //the list of player units in the scene
+    public ArrayList currentUnits = new ArrayList ();
 
     // i order to mantain InformationController working
 	//public ArrayList SelectedObjects = new ArrayList();
     public ArrayList SelectedObjects { get { return _selection.ToArrayList(); } }
+
+    private bool isGameOverScreenDisplayed = false;
 
     // Use this for initialization
     public override void Start()
     {   
         base.Start();
         _buildings = GetComponent<Managers.BuildingsManager>();
+        _selection = GetComponent<Managers.SelectionManager>();
         //request the race of the player
         _selfRace = info.GetPlayerRace();
         _selection.SetRace(race);
         
+        AcquirePlayerID();
+        missionStatus = new MissionStatus(playerId);
     }
 
     // Update is called once per frame
-    void Update() { }
+    void Update()
+    {
+        if (missionStatus.isGameOver())
+        {
+            if (!isGameOverScreenDisplayed)
+            {
+                GameObject gameOverDialog = null;
+                if (missionStatus.hasWon(playerId))
+                {
+                    switch (_selfRace)
+                    {
+                        case Storage.Races.MEN:
+                            gameOverDialog = (GameObject) Resources.Load("GameEndWinHuman");
+                            break;
+                        case Storage.Races.ELVES:
+                            gameOverDialog = (GameObject) Resources.Load("GameEndWinElf");
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (_selfRace)
+                    {
+                        case Storage.Races.MEN:
+                            gameOverDialog = (GameObject) Resources.Load("GameOver-Human");
+                            break;
+                        case Storage.Races.ELVES:
+                            gameOverDialog = (GameObject) Resources.Load("GameOver-Elf");
+                            break;
+                    }
+                }
+                Instantiate(gameOverDialog);
+                isGameOverScreenDisplayed = true;
+            }
+            _currently = status.TERMINATED;
+        }
+    }
+
+    void OnDestroy()
+    {
+        _currently = status.TERMINATED;
+    }
 
     public override void removeEntity(IGameEntity entity)
     {
@@ -96,8 +143,39 @@ public class Player : BasePlayer
         return (ArrayList) SelectedObjects.Clone();
     }
 
-    /// <summary>
-    /// Getter for the resources of the player.
-    /// </summary>
-    public Managers.ResourcesManager resources {get { return _resources; } }
+    // <summary>
+    // Getter for the resources of the player.
+    // </summary>
+    //public Managers.ResourcesManager resources {get { return _resources; } }
+
+    private void performUnitDied(System.Object obj)
+    {
+        IGameEntity e = ((GameObject) obj).GetComponent<IGameEntity>();
+        missionStatus.OnUnitKilled(((Unit) e).type);
+    }
+
+    private void performBuildingDestroyed(System.Object obj)
+    {
+        IGameEntity e = ((GameObject) obj).GetComponent<IGameEntity>();
+        if (e.info.isBarrack)
+        {
+            missionStatus.OnBuildingDestroyed(((Barrack) e).type);
+        }
+        else if (e.info.isResource)
+        {
+            missionStatus.OnBuildingDestroyed(((Resource) e).type);
+        }
+    }
+
+    public void registerGameEntityActions(IGameEntity entity)
+    {
+        if (entity.info.isUnit)
+        {
+            entity.registerFatalWounds(performUnitDied);
+        }
+        else if (entity.info.isBuilding)
+        {
+            entity.registerFatalWounds(performBuildingDestroyed);
+        }
+    }
 }
