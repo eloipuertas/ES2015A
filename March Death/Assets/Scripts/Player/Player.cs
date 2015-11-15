@@ -53,8 +53,30 @@ public class Player : BasePlayer
         {
             if (strStatus.Equals(""))
             {
-                strStatus = missionStatus.hasWon(playerId) ? "You win!" : "You loose";
-                showMsgBox = true;
+                GameObject gameOverDialog = null;
+                if (missionStatus.hasWon(playerId))
+                {
+                    strStatus = "You win!";
+                    switch (_selfRace)
+                    {
+                        case Storage.Races.MEN:
+                        case Storage.Races.ELVES:
+                            gameOverDialog = (GameObject) Resources.Load("GameEndWinElf");
+                            break;
+                    }
+                }
+                else
+                {
+                    strStatus = "You loose";
+                    switch (_selfRace)
+                    {
+                        case Storage.Races.MEN:
+                        case Storage.Races.ELVES:
+                            gameOverDialog = (GameObject) Resources.Load("GameOver-Elf");
+                            break;
+                    }
+                }
+                Instantiate(gameOverDialog);
             }
             _currently = status.TERMINATED;
         }

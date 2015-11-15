@@ -12,7 +12,7 @@ using Storage;
 /// </summary>
 public class Unit : GameEntity<Unit.Actions>
 {
-    public enum Actions { MOVEMENT_START, MOVEMENT_END, DAMAGED, DIED };
+    public enum Actions { MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED };
     public enum Roles { PRODUCING, WANDERING };
 
     public Unit() { }
@@ -20,7 +20,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// <summary>
     /// Interval between resources update in miliseconds
     /// </summary>
-    const int RESOURCES_UPDATE_INTERVAL = 5000;
+    const int RESOURCES_UPDATE_INTERVAL = 20;
 
     ///<sumary>
     /// Auto-unregister events when we are destroyed
@@ -101,9 +101,8 @@ public class Unit : GameEntity<Unit.Actions>
     private void onTargetDied(System.Object obj)
     {
         // TODO: Our target died, select next? Do nothing?
-        setStatus(EntityStatus.IDLE);
-        _target = null;
-    }
+        stopAttack();
+	}
 
     /// <summary>
     /// Callback issued when a target hides in the FOW
@@ -112,7 +111,6 @@ public class Unit : GameEntity<Unit.Actions>
     {
         // Move to last known position (ie. current position)
         moveTo(((GameObject)obj).transform.position);
-        _target = null;
     }
 
     /// <summary>
@@ -206,7 +204,19 @@ public class Unit : GameEntity<Unit.Actions>
             // Register for DEAD/DESTROYED and HIDDEN
             _auto += entity.registerFatalWounds(onTargetDied);
             _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
+
+            // if target has changed, hide old target health
+            Selectable selectable = null;
+            if (_target != null) {
+            	selectable = _target.getGameObject().GetComponent<Selectable>();
+            	selectable.NotAttackedEntity();
+            }
+
             _target = entity;
+            
+            // Show target health
+            selectable = _target.getGameObject().GetComponent<Selectable>();
+            selectable.AttackedEntity();
 
             // Update distance for immediate usage (ie. canDoRangedAttack)
             updateDistanceToTarget();
@@ -227,6 +237,10 @@ public class Unit : GameEntity<Unit.Actions>
     {
         if (_target != null)
         {
+            // Hide target health
+            Selectable selectable = _target.getGameObject().GetComponent<Selectable>();
+            selectable.NotAttackedEntity();
+
             // Unregister all events
             _auto -= _target.unregisterFatalWounds(onTargetDied);
             _auto -= _target.getGameObject().GetComponent<FOWEntity>().unregister(FOWEntity.Actions.HIDDEN, onTargetHidden);
@@ -260,7 +274,7 @@ public class Unit : GameEntity<Unit.Actions>
         }
         
         _followingTarget = false;
-        _target = null;
+        stopAttack();
         _hasPath = false;
         _movePoint = movePoint;
         setStatus(EntityStatus.MOVING);
@@ -298,6 +312,13 @@ public class Unit : GameEntity<Unit.Actions>
         _navAgent = GetComponent<NavMeshAgent>();
         _navAgent.speed = _info.unitAttributes.movementRate;
         _navAgent.acceleration = info.unitAttributes.movementRate * 2.5f;
+
+        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
+        GameObject gameController = GameObject.Find("GameController");
+        ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
+
+        if (Player.getOwner(this).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
+            register(Actions.EAT, res_pl.onFoodConsumption);
     }
 
     /// <summary>
@@ -316,8 +337,10 @@ public class Unit : GameEntity<Unit.Actions>
 
         // Calculate food consumption
         float resourcesElapsed = Time.time - _lastResourcesUpdate;
+        //Debug.Log("res_elapsed: " + resourcesElapsed + " INTERVAL: " + RESOURCES_UPDATE_INTERVAL); // RAUL_DEB
         if (resourcesElapsed > RESOURCES_UPDATE_INTERVAL)
         {
+
             _lastResourcesUpdate = Time.time;
 
             // Food is always consumed
@@ -333,9 +356,15 @@ public class Unit : GameEntity<Unit.Actions>
             }
 
             // Update this unit resources
-            BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.GOLD, goldProduced);
-            BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.GOLD, goldConsumed);
+            //BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.GOLD, goldProduced); // <-- this causes EXCEPTION, GOLD does not exist
+            //BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.GOLD, goldConsumed);
             BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.FOOD, foodConsumed);
+
+            Goods goods = new Goods();
+            goods.type = Goods.GoodsType.FOOD;
+            goods.amount = 10;
+            Debug.Log("FIRE EAT"); // RAUL_DEB
+            fire(Actions.EAT, goods);
         }
 
         // Status dependant functionality

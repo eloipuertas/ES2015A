@@ -40,7 +40,7 @@ public static class SelectionOverlay{
 
     }
 
-    public static Texture2D CreateTexture()
+    public static Texture2D CreateTexture(bool ownUnit)
     {
         Texture2D texToReturn = new Texture2D(Width, Height, TextureFormat.ARGB32, false);
 
@@ -48,10 +48,18 @@ public static class SelectionOverlay{
         {
             for (int j = 0; j < Height; j++)
             {
-                if (i == 0 || i == 1 || j == 0 || j == 1 || i == Width - 1 || i == Width - 2 || j == Height - 1
-                    || j == Height - 2 || j == Height - HealthHeight || j == Height - HealthHeight - 1)
+                //Draw all selectionOverlay
+                if (ownUnit && (i == 0 || i == 1 || j == 0 || j == 1 || i == Width - 1 || i == Width - 2 || j == Height - 1
+                    || j == Height - 2 || j == Height - HealthHeight || j == Height - HealthHeight - 1)) 
                 {
-                    texToReturn.SetPixel(i, j, BorderColour);
+                	texToReturn.SetPixel(i, j, BorderColour);
+                }
+
+                //Draw only health
+                else if (!ownUnit && ((((i == 0  || i == 1 || i == Width - 1 || i == Width - 2) && (j > Height - HealthHeight )) 
+                    || (j == Height - 1 || j == Height - 2 || j == Height - HealthHeight || j == Height - HealthHeight - 1))))
+                {
+                	texToReturn.SetPixel(i, j, BorderColour);
                 }
 
                 else if (j > Height - HealthHeight)

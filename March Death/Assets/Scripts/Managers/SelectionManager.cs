@@ -52,11 +52,11 @@ namespace Managers
 
             _isTroop = false;
 
-            //Deselects other selected objects
-            if (_selectedEntities.Count > 0) _selectedEntities.Clear();
-
+             if( _selectedEntities.Count > 0 ) _selectedEntities.Clear();
+                
             _selectedEntities.Select(selectable);
             fire(Actions.SELECT, selectable.gameObject);
+
 
         }
 
@@ -175,6 +175,17 @@ namespace Managers
         public bool CanBeSelected(Selectable selectable)
         {
             return _ownRace == selectable.entity.getRace();
+        }
+
+
+        /// <summary>
+        /// Returns if is the unique selected element
+        /// </summary>
+        /// <param name="selectable"></param>
+        /// <returns></returns>
+        public bool UniqueSelected(Selectable selectable)
+        {
+            return _selectedEntities.Count == 1 && _selectedEntities.Contains(selectable);
         }
 
         /// <summary>

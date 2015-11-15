@@ -43,7 +43,46 @@ public class EntityAbilitiesController : MonoBehaviour
 
     public void onActorDeselected(System.Object obj)
     {
+        GameObject gameObject = (GameObject)obj;
+        IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+        unregisterEntity(entity);
         destroyButtons();
+    }
+
+    private void registerEntity(IGameEntity entity) {
+
+    	entity.doIfUnit(unit =>
+    	 {
+    		unit.register(Unit.Actions.DIED, onActorDeselected);
+    	});
+
+    	entity.doIfResource(resource =>
+    	{
+    		resource.register(Resource.Actions.DESTROYED, onActorDeselected);
+    	});
+
+    	entity.doIfBarrack(barrack =>
+    	{
+    		barrack.register(Barrack.Actions.DESTROYED, onActorDeselected);
+    	});
+    }
+
+    private void unregisterEntity(IGameEntity entity) {
+    	
+    	entity.doIfUnit(unit =>
+    	{
+    		unit.unregister(Unit.Actions.DIED, onActorDeselected);
+    	});
+
+    	entity.doIfResource(resource =>
+    	{
+    		resource.unregister(Resource.Actions.DESTROYED, onActorDeselected);
+    	});
+    	
+    	entity.doIfBarrack(barrack =>
+    	{
+    		barrack.unregister(Barrack.Actions.DESTROYED, onActorDeselected);
+    	});
     }
 
     void showActions(GameObject gameObject)
@@ -52,6 +91,7 @@ public class EntityAbilitiesController : MonoBehaviour
 
         if (!actionPanel) return;
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+        registerEntity(entity);
         var rectTransform = actionPanel.GetComponent<RectTransform>();
         var size = rectTransform.sizeDelta;
         var globalScaleXY = new Vector2(rectTransform.lossyScale.x, rectTransform.lossyScale.y);

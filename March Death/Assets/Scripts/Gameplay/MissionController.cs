@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 public class MissionController : MonoBehaviour
 {
-    private static Object winnerTestLock = new Object();
-
     //public enum Winner { NONE = 0, PLAYER = 1, PC = 2 }
 
     private Dictionary<Storage.UnitTypes, uint> destroyedUnitsWinners = new Dictionary<Storage.UnitTypes, uint>();
@@ -97,16 +95,13 @@ public class MissionController : MonoBehaviour
     {
         bool notify = false;
         uint winner;
-        lock (winnerTestLock)
+        if (destroyedUnitsWinners.TryGetValue(type, out winner))
         {
-            if (destroyedUnitsWinners.TryGetValue(type, out winner))
+            if (winner == 0)    // If there is no winner
             {
-                if (winner == 0)    // If there is no winner
-                {
-                    notify = true;
-                    destroyedUnitsWinners[type] = caller;
-                    missionsToComplete--;
-                }
+                notify = true;
+                destroyedUnitsWinners[type] = caller;
+                missionsToComplete--;
             }
         }
         if (notify)
@@ -119,16 +114,13 @@ public class MissionController : MonoBehaviour
     {
         bool notify = false;
         uint winner;
-        lock (winnerTestLock)
+        if (destroyedBuildingsWinners.TryGetValue(type, out winner))
         {
-            if (destroyedBuildingsWinners.TryGetValue(type, out winner))
+            if (winner == 0)
             {
-                if (winner == 0)
-                {
-                    notify = true;
-                    destroyedBuildingsWinners[type] = caller;
-                    missionsToComplete--;
-                }
+                notify = true;
+                destroyedBuildingsWinners[type] = caller;
+                missionsToComplete--;
             }
         }
         if (notify)

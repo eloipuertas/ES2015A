@@ -568,6 +568,13 @@ public class Resource : Building<Resource.Actions>
         base.Start();
         this.GetComponent<Rigidbody>().isKinematic = false;
 
+        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
+        GameObject gameController = GameObject.Find("GameController");
+        ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
+
+        if (Player.getOwner(_entity).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
+            register(Actions.COLLECTION, res_pl.onCollection);
+
     }
     
 
@@ -579,6 +586,7 @@ public class Resource : Building<Resource.Actions>
     override public void Update()
     {
         base.Update();
+
         switch (status)
         {
 
