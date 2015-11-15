@@ -11,16 +11,22 @@ public class MainMenuLogic : MonoBehaviour {
 
 	bool bStillInside = false;
 
-	// Use this for initialization
-	void Start () {
-        TestEnvironment.Instance.Init();
-		Cursor.visible = true;
-	}
+    public static MainMenuLogic instance = null;
+    // Use this for initialization
+    void Start()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            TestEnvironment.Instance.Init();
+            Cursor.visible = true;
+        }
+    }
 
-	/* MOUSE OVER */
+    /* MOUSE OVER */
 
-	/* This method changes the color of the object we are over on entering */
-	void OnMouseEnter(){
+    /* This method changes the color of the object we are over on entering */
+    void OnMouseEnter(){
 		GetComponent<Renderer> ().material.color = YELLOW;
 		bStillInside = true;
 	}
