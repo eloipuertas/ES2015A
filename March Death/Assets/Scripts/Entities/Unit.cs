@@ -354,11 +354,9 @@ public class Unit : GameEntity<Unit.Actions>
             }
 
             // Update this unit resources
-            /*
             BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.GOLD, goldProduced);
             BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.GOLD, goldConsumed);
             BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.FOOD, foodConsumed);
-            */
         }
 
         // Status dependant functionality
