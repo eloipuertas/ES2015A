@@ -96,11 +96,8 @@ namespace Managers
         /// <returns></returns>
         private GameObject CreateGhostBuilding(Storage.Races race, Storage.BuildingTypes type)
         {
-            //TODO : (hermetico) change shared ghost
-            GameObject ghost = (GameObject)Resources.Load("Prefabs/Buildings/Resources/GHOST_Elf-Farm", typeof(GameObject));
-            ghost = (GameObject)Instantiate(ghost, new Vector3(0, 0, 0), Quaternion.identity);
+            GameObject ghost = Storage.Info.get.createBuilding(race, type, new Vector3(0, 0, 0), Quaternion.identity, Storage.Info.BuildingVariant.GHOST);
             return ghost;
-
         }
 
 
