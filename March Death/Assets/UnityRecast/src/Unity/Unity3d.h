@@ -1,7 +1,7 @@
 #ifndef UNITY3D_H
 #define UNITY3D_H
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include <fstream>

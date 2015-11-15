@@ -333,6 +333,8 @@ bool handleTileCacheBuild(rcConfig* cfg, ExtendedConfig* ecfg, InputGeometry* ge
 		for (int x = 0; x < tw; ++x)
 			tileCache->buildNavMeshTilesAt(x, y, navMesh);
 	ctx->stopTimer(RC_TIMER_TOTAL);
+
+	return true;
 }
 
 void getTileCacheHeaders(TileCacheSetHeader& header, TileCacheTileHeader*& tilesHeader, dtTileCache* tileCache, dtNavMesh* navMesh)

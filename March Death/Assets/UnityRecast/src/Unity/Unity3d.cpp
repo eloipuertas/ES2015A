@@ -30,7 +30,7 @@ rcConfig* DefaultConfig(char* logpath)
 	monotonePartitioning = false;
 
 	// Init build configuration from GUI
-	memset(cfg, 0, sizeof(cfg));
+	memset(cfg, 0, sizeof(rcConfig));
 	cfg->cs = cellSize;
 	cfg->ch = cellHeight;
 	cfg->tileSize = 48;
