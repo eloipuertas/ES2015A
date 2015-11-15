@@ -28,6 +28,8 @@ public interface IGameEntity : IBaseActor
 
     UnityEngine.Transform getTransform();
     UnityEngine.GameObject getGameObject();
+    UnityEngine.Vector3 closestPointTo(UnityEngine.Vector3 point);
+
     Ability getAbility(string name);
 
     Races getRace();

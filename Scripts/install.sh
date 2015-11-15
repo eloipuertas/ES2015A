@@ -15,7 +15,7 @@ echo 'Background downloading cache'
 # Use ; and not && to actually do all of them, even if one doesn't succeed
 (touch $HOME/.CACHE_LOCK; \
     echo -e "\t> Library" && \
-        axel -q -n 10 ${CACHE_URL}Library.tar.gz; \
+        $(pwd)/Scripts/axel -q -n 10 ${CACHE_URL}Library.tar.gz; \
 rm $HOME/.CACHE_LOCK) &
 
 (touch $HOME/.TIMESTAMPS_LOCK; \
