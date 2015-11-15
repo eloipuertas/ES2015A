@@ -47,52 +47,56 @@ namespace Assets.Scripts.AI
 
         public override void Start()
         {
-            base.Start();
-
-            _selfRace = info.GetPlayerRace() == Races.MEN ? Races.ELVES : Races.MEN;
-
-            //Init lists
-            EnemyUnits = new List<Unit>();
-            EnemyBuildings = new List<IGameEntity>();
-            OwnBuildings = new List<IGameEntity>();
-            modules = new List<AIModule>();
-            Army = new List<Unit>();
-            //rootBasePosition = new Vector3(706, 80, 765);
-            //Army.Add(Info.get.createUnit(_selfRace, UnitTypes.HERO, rootBasePosition,Quaternion.Euler(0,0,0)).GetComponent<Unit>());
-            Workers = new List<Unit>();
-            Macro = new MacroManager(this);
-
-            //We need to implement som kind of senses for te AI so here they are 
-            GameObject sensesContainer = new GameObject("AI Senses");
-            sensesContainer.AddComponent<AISenses>();
-            senses = sensesContainer.GetComponent<AISenses>();
-
-            Micro = new MicroManager(this);
-            modules.Add(new AIModule(Macro.MacroHigh, 30));
-            modules.Add(new AIModule(Macro.MacroLow, 5));
-            modules.Add(new AIModule(Micro.Micro, 1));
-            timers = new float[modules.Count];
-            for (int i = 0; i < modules.Count; i++)
-                timers[i] = 0;
-            //buildPosition = new Vector3(706, 80, 765);
-            //rootBasePosition = new Vector3(706, 80, 765);
-            isRootBasePositionInitialized = false;
-
-            ActorSelector selector = new ActorSelector()
+            if (!_initialized)
             {
-                registerCondition = gameObject => gameObject.GetComponent<FOWEntity>().IsOwnedByPlayer,
-                fireCondition = gameObject => true
-            };
-            Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.DISCOVERED, OnEntityFound, selector);
-            Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.HIDDEN, OnEntityLost, selector);
+                _initialized = true;
+                Debug.Log("AI Start");base.Start();
 
-            if (AI_DEBUG_ENABLED)
-            {
-                aiDebug = AIDebugSystem.CreateComponent(gameObject, this);
+                _selfRace = info.GetPlayerRace() == Races.MEN ? Races.ELVES : Races.MEN;
+
+                //Init lists
+                EnemyUnits = new List<Unit>();
+                EnemyBuildings = new List<IGameEntity>();
+                OwnBuildings = new List<IGameEntity>();
+                modules = new List<AIModule>();
+                Army = new List<Unit>();
+                //rootBasePosition = new Vector3(706, 80, 765);
+                //Army.Add(Info.get.createUnit(_selfRace, UnitTypes.HERO, rootBasePosition,Quaternion.Euler(0,0,0)).GetComponent<Unit>());
+                Workers = new List<Unit>();
+                Macro = new MacroManager(this);
+
+                //We need to implement som kind of senses for te AI so here they are 
+                GameObject sensesContainer = new GameObject("AI Senses");
+                sensesContainer.AddComponent<AISenses>();
+                senses = sensesContainer.GetComponent<AISenses>();
+
+                Micro = new MicroManager(this);
+                modules.Add(new AIModule(Macro.MacroHigh, 30));
+                modules.Add(new AIModule(Macro.MacroLow, 5));
+                modules.Add(new AIModule(Micro.Micro, 1));
+                timers = new float[modules.Count];
+                for (int i = 0; i < modules.Count; i++)
+                    timers[i] = 0;
+                //buildPosition = new Vector3(706, 80, 765);
+                //rootBasePosition = new Vector3(706, 80, 765);
+                isRootBasePositionInitialized = false;
+
+                ActorSelector selector = new ActorSelector()
+                {
+                    registerCondition = gameObject => gameObject.GetComponent<FOWEntity>().IsOwnedByPlayer,
+                    fireCondition = gameObject => true
+                };
+                Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.DISCOVERED, OnEntityFound, selector);
+                Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.HIDDEN, OnEntityLost, selector);
+
+                if (AI_DEBUG_ENABLED)
+                {
+                    aiDebug = AIDebugSystem.CreateComponent(gameObject, this);
+                }
+
+                AcquirePlayerID();
+                missionStatus = new MissionStatus(playerId);
             }
-
-            AcquirePlayerID();
-            missionStatus = new MissionStatus(playerId);
         }
         void Update()
         {

@@ -35,15 +35,19 @@ public class Player : BasePlayer
     // Use this for initialization
     public override void Start()
     {   
-        base.Start();
-        _buildings = GetComponent<Main_Game>().BuildingsMgr;
-        _selection = GetComponent<Managers.SelectionManager>();
-        //request the race of the player
-        _selfRace = info.GetPlayerRace();
-        _selection.SetRace(race);
+        if (!_initialized)
+        {
+            _initialized = true;
+            Debug.Log("Player Start");base.Start();
+            _buildings = GetComponent<Main_Game>().BuildingsMgr;
+            _selection = GetComponent<Managers.SelectionManager>();
+            //request the race of the player
+            _selfRace = info.GetPlayerRace();
+            _selection.SetRace(race);
         
-        AcquirePlayerID();
-        missionStatus = new MissionStatus(playerId);
+            AcquirePlayerID();
+            missionStatus = new MissionStatus(playerId);
+        }
     }
 
     // Update is called once per frame

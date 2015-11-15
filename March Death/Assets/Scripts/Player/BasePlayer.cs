@@ -48,9 +48,11 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
 
     protected MissionStatus missionStatus;
 
+    protected bool _initialized = false;
+
     public virtual void Start ()
     {
-        GameObject gameController = GameObject.FindGameObjectWithTag("GameController");
+        Debug.Log("BasePlayer START");GameObject gameController = GameObject.FindGameObjectWithTag("GameController");
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
 
         _info = gameInformationObject.GetComponent<GameInformation>();
