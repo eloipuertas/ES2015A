@@ -23,6 +23,7 @@ namespace Managers
             public Storage.Races race;
             public Storage.BuildingTypes type;
             public bool placing;
+            public bool continuousConstruction;
             public Material material;
 
         }
@@ -46,8 +47,10 @@ namespace Managers
 
         private void InitBuildingStruct()
         {
+            
             _newBuilding.placing = false;
             _newBuilding.ghost = null;
+            _newBuilding.continuousConstruction = false;
         }
 
         // Update is called once per frame
@@ -56,15 +59,34 @@ namespace Managers
             if (_newBuilding.placing)
             {
                 relocate();
+                CheckKeyboard();
             }
 
         }
 
         /// <summary>
+        /// Keyboard shorcuts when placing buildings
+        /// </summary>
+        private void CheckKeyboard()
+        {
+            // Toggles placing buildings continuously
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                _newBuilding.continuousConstruction = !_newBuilding.continuousConstruction;
+                if (_newBuilding.continuousConstruction)
+                    Debug.Log("Continuous building construction enabled");
+                else
+                    Debug.Log("Continuous building construction disabled");
+            }
+
+        }
+
+
+        /// <summary>
         /// Starts creating a building, required the name of the building ex: 'elf-farm'
         /// </summary>
         /// <param name="name"></param>
-        public void createBuilding(Storage.Races race, Storage.BuildingTypes type )
+        public void createBuilding(Storage.Races race, Storage.BuildingTypes type , bool continuousConstruction = false)
         {
             if (!_newBuilding.placing && isAffordable(race, type))
             {
@@ -73,6 +95,7 @@ namespace Managers
                 _newBuilding.ghost = CreateGhostBuilding(race, type);
                 _newBuilding.material = _newBuilding.ghost.GetComponent<Renderer>().material;
                 _newBuilding.placing = true;
+                _newBuilding.continuousConstruction = continuousConstruction;
                 _player.setCurrently(Player.status.PLACING_BUILDING);
             }
 
@@ -173,10 +196,14 @@ namespace Managers
                 IGameEntity entity = (IGameEntity)finalBuilding.GetComponent<Unit>();
                 _player.addEntity(entity);
 
-                // remaining operations
-                _finishPlacing();
-
-                return true;
+                if (!_newBuilding.continuousConstruction)
+                {
+                    // remaining operations
+                    _finishPlacing();
+                    return true;
+                }
+                else
+                    return false;
             }
             else
                 return false;
@@ -204,6 +231,8 @@ namespace Managers
         {
             Destroy(_newBuilding.ghost);
             _newBuilding.placing = false;
+            _newBuilding.continuousConstruction = false;
+            _currentPlace = Place.ABLE;
 
         }
 
