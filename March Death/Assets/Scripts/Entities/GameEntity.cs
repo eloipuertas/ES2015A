@@ -391,23 +391,23 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         }
     }
 
-	public void doIfResource(Action<Resource> callIfTrue)
-	{
-		Resource resource = this as Resource;
-		if (resource != null)
-		{
-			callIfTrue(resource);
-		}
-	}
+    public void doIfResource(Action<Resource> callIfTrue)
+    {
+    	Resource resource = this as Resource;
+    	if (resource != null)
+    	{
+    		callIfTrue(resource);
+    	}
+    }
 
-	public void doIfBarrack(Action<Barrack> callIfTrue)
-	{
-		Barrack barrack = this as Barrack;
-		if (barrack != null)
-		{
-			callIfTrue(barrack);
-		}
-	}
+    public void doIfBarrack(Action<Barrack> callIfTrue)
+    {
+    	Barrack barrack = this as Barrack;
+    	if (barrack != null)
+    	{
+    		callIfTrue(barrack);
+    	}
+    }
 
     protected void setStatus(EntityStatus status)
     {
