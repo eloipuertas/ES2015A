@@ -40,4 +40,6 @@ public interface IGameEntity : IBaseActor
     void receiveAttack(Unit from, bool isRanged);
 
     void doIfUnit(Action<Unit> callIfTrue);
+	void doIfResource(Action<Resource> callIfTrue);
+	void doIfBarrack(Action<Barrack> callIfTrue);
 }
