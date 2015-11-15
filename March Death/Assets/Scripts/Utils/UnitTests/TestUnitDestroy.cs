@@ -41,7 +41,7 @@ namespace Utils.UnitTests
             }
             else if (State == ExecutionState.NOT_DONE && elapsed > 1)
             {
-                entity.Destroy();
+                entity.Destroy(true);
                 State = ExecutionState.DONE;
             }
 

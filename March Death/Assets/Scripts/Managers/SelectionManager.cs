@@ -168,9 +168,7 @@ namespace Managers
                 if (selected.entity.info.isUnit)
                 {
                     Unit unit = selected.GetComponent<Unit>();
-                    // so far we only can attack units
-                    //TODO : (hermetico) check why we can't attack buildings
-                    if(enemy.info.isUnit) unit.attackTarget((Unit)enemy);
+                    unit.attackTarget(enemy);
                 }
             }
             Debug.Log("attacking");

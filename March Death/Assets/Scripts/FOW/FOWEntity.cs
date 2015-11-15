@@ -8,11 +8,14 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
 {
     public enum Actions { DISCOVERED,HIDDEN }
     /// <summary>
-    /// If true this entity will reveal the area around it.
+    /// If false this entity will be treated as scenary, that implies:
+    ///     Not launching events
+    ///     Not discovering the area around it
+    ///     Will be visible in explored terrain
     /// </summary>
-    public bool IsRevealer { get; set; }
+    public bool IsActor = true;
     /// <summary>
-    /// the range around this unit which will be revealed (only used if IsRevealer=True).
+    /// the range around this unit which will be revealed (only used if IsActor=True).
     /// </summary>
     public int Range;
     /// <summary>
@@ -38,8 +41,10 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
     public override void Start()
     {
         base.Start();
-        activated = false;
-        IsRevealer = true;
+        if (IsActor)
+            activated = false;
+        else
+            Activate(false);
     }
     public Rect Bounds
     {
@@ -60,9 +65,14 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
     {
         if (IsRevealed != isVisible)
         {
-            fire((isVisible) ? Actions.DISCOVERED : Actions.HIDDEN);
+            if (IsActor)
+            {
+                fire((isVisible) ? Actions.DISCOVERED : Actions.HIDDEN);
+            }
             if (!IsOwnedByPlayer)
+            {
                 changeRenders(isVisible);
+            }
             IsRevealed = isVisible;
         }
     }

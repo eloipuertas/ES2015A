@@ -20,7 +20,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// <summary>
     /// Interval between resources update in miliseconds
     /// </summary>
-    const int RESOURCES_UPDATE_INTERVAL = 5000;
+    const float RESOURCES_UPDATE_INTERVAL = 5.0f;
 
     ///<sumary>
     /// Auto-unregister events when we are destroyed
@@ -37,7 +37,9 @@ public class Unit : GameEntity<Unit.Actions>
     /// If in battle, this is the target and last attack time
     /// </summary>
     private IGameEntity _target = null;
-    private float _distanceToTarget = 0;
+    public float _distanceToTarget = 0;
+    private Vector3 _attackPoint;
+    private Vector3 _closestPointToTarget;
 
     /// <summary>
     /// Set to true if we are following our target (ie. attacking but not in range)
@@ -112,7 +114,6 @@ public class Unit : GameEntity<Unit.Actions>
     {
         // Move to last known position (ie. current position)
         moveTo(((GameObject)obj).transform.position);
-        _target = null;
     }
 
     /// <summary>
@@ -188,7 +189,13 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     private void updateDistanceToTarget()
     {
-        _distanceToTarget = Vector3.Distance(_target.getTransform().position, transform.position);
+        _attackPoint = closestPointTo(_target.getTransform().position);
+        _attackPoint.y = transform.position.y;
+
+        _closestPointToTarget = _target.closestPointTo(transform.position);
+        _closestPointToTarget.y = _target.getTransform().position.y;
+
+        _distanceToTarget = Vector3.Distance(_attackPoint, _closestPointToTarget);
     }
 
     /// <summary>
@@ -218,6 +225,24 @@ public class Unit : GameEntity<Unit.Actions>
 
         // TODO: Hack to get AI working
         return true;
+    }
+
+    public bool attackTarget(IGameEntity entity)
+    {
+        if (entity.info.isUnit)
+        {
+            return attackTarget((Unit)entity);
+        }
+        else if (entity.info.isBarrack)
+        {
+            return attackTarget((Barrack)entity);
+        }
+        else if (entity.info.isResource)
+        {
+            return attackTarget((Resource)entity);
+        }
+
+        throw new ArgumentException("Unkown entity type to attack");
     }
 
     /// <summary>
@@ -346,7 +371,7 @@ public class Unit : GameEntity<Unit.Actions>
                 if (_target != null)
                 {
                     // Look at it
-                    faceTo(_target.getTransform().position);
+                    faceTo(_closestPointToTarget);
 
                     // Check if we are still in range
                     if (_distanceToTarget > currentAttackRange())
@@ -363,6 +388,18 @@ public class Unit : GameEntity<Unit.Actions>
                 }
                 break;
         }
+
+#if UNITY_EDITOR
+        if (status == EntityStatus.ATTACKING)
+        {
+            Debug.DrawLine(transform.position, _target.getTransform().position, Color.yellow);
+            Debug.DrawLine(_attackPoint, _closestPointToTarget, Color.red);
+        }
+        else if (status == EntityStatus.MOVING)
+        {
+            Debug.DrawLine(transform.position, _movePoint, Color.green);
+        }
+#endif
     }
 
     /// <summary>
@@ -379,7 +416,7 @@ public class Unit : GameEntity<Unit.Actions>
                 if (_followingTarget)
                 {
                     // Update destination only if target has moved
-                    Vector3 destination = _target.getTransform().position;
+                    Vector3 destination = _closestPointToTarget;
                     if (destination != _movePoint)
                     {
                         _hasPath = false;
@@ -390,6 +427,7 @@ public class Unit : GameEntity<Unit.Actions>
                     // If we are already close enough, stop and attack
                     if (_distanceToTarget <= currentAttackRange())
                     {
+                        _navAgent.SetDestination(transform.position);
                         _navAgent.ResetPath();
                         setStatus(EntityStatus.ATTACKING);
                         return;
