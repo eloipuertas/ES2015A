@@ -7,13 +7,15 @@ using Storage;
 
 public class Resource : Building<Resource.Actions>
 {
-    public enum Actions { DAMAGED, DESTROYED, COLLECTION, CREATE_UNIT };
+    public enum Actions { CREATED, DAMAGED, DESTROYED, COLLECTION, CREATE_UNIT , DEL_STATS};
 
     /// <summary>
     /// civilian creation waste some time. When units are being created status
     /// changes to RUN. Process can only be started while IDLE status.
     /// </summary>
     public enum createCivilStatus { IDLE, RUN, DISABLED };
+
+    public Statistics statistics;
 
     // Constructor
     public Resource() { }
@@ -211,6 +213,9 @@ public class Resource : Building<Resource.Actions>
 
     private readonly object syncLock = new object();
     bool hasCreatedCivil = false;
+
+    bool once = false;
+
     List<GameObject> pendingProducers = new List<GameObject>();
     List<GameObject> pendingWanderers = new List<GameObject>();
 
@@ -443,6 +448,20 @@ public class Resource : Building<Resource.Actions>
         Debug.Log(" You are trying to recruit worker but building capacity is full"); 
     }
 
+    private WorldResources.Type getResourceType()
+    {
+        switch (type) {
+            case BuildingTypes.FARM:
+                return WorldResources.Type.FOOD;
+            case BuildingTypes.MINE:
+                return WorldResources.Type.METAL;
+            case BuildingTypes.SAWMILL:
+                return WorldResources.Type.WOOD;
+            default:
+                throw new Exception("That resource type does not exist!");
+        }
+    }
+
     /// <summary>
     /// when collider interact with other gameobject method checks if 
     /// gameobject is a civilian unit. Civilians units are recruited as workers
@@ -530,7 +549,10 @@ public class Resource : Building<Resource.Actions>
     /// When building is destroyed civilian workers turns into explorers
     /// </summary>
     public override void OnDestroy()
-    {        
+    {
+        statistics.growth_speed *= -1;
+        fire(Actions.DEL_STATS, statistics);
+
         foreach (Unit unit in workersList)
         {
             unit.role = Unit.Roles.WANDERING;
@@ -558,6 +580,7 @@ public class Resource : Building<Resource.Actions>
         _makingNewCivil = false;
         _constructionTime = 10;
         _entity = this.GetComponent<IGameEntity>();
+
         // Call Building start
         base.Awake();
     }
@@ -573,10 +596,16 @@ public class Resource : Building<Resource.Actions>
         ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
 
         if (Player.getOwner(_entity).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
+        {
             register(Actions.COLLECTION, res_pl.onCollection);
+            register(Actions.CREATED, res_pl.onStatisticsUpdate);
+            register(Actions.DEL_STATS, res_pl.onStatisticsUpdate);
+        }
+
+        statistics = new Statistics(getResourceType(), (int)info.resourceAttributes.updateInterval, 10); // hardcoded, To modify, by now the collection rate is always 10, but theres no workers yet
 
     }
-    
+
 
     // Update is called once per frame
     // when updated, collecting units load materials from store and send it to
@@ -594,6 +623,10 @@ public class Resource : Building<Resource.Actions>
 
                 if (!hasDefaultUnit)
                 {
+                    if (!once) {
+                        fire(Actions.CREATED, statistics); once = true;
+                    }
+
                     createCivilian();
                     hasDefaultUnit = true;
                 }

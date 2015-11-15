@@ -12,7 +12,7 @@ using Storage;
 /// </summary>
 public class Unit : GameEntity<Unit.Actions>
 {
-    public enum Actions { MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED };
+    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED };
     public enum Roles { PRODUCING, WANDERING };
 
     public Unit() { }
@@ -21,6 +21,8 @@ public class Unit : GameEntity<Unit.Actions>
     /// Interval between resources update in miliseconds
     /// </summary>
     const int RESOURCES_UPDATE_INTERVAL = 20;
+
+    Statistics statistics;
 
     ///<sumary>
     /// Auto-unregister events when we are destroyed
@@ -127,6 +129,9 @@ public class Unit : GameEntity<Unit.Actions>
     protected override void onFatalWounds()
     {
         fire(Actions.DIED);
+
+        statistics.growth_speed *= -1;
+        fire(Actions.DIED, statistics);
     }
 
     /// <summary>
@@ -318,7 +323,15 @@ public class Unit : GameEntity<Unit.Actions>
         ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
 
         if (Player.getOwner(this).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
+        {
             register(Actions.EAT, res_pl.onFoodConsumption);
+            register(Actions.DIED, res_pl.onStatisticsUpdate);
+            register(Actions.CREATED, res_pl.onStatisticsUpdate);
+        }
+
+        statistics = new Statistics(WorldResources.Type.FOOD , RESOURCES_UPDATE_INTERVAL, -10);
+
+        fire(Actions.CREATED, statistics);
     }
 
     /// <summary>
@@ -363,7 +376,7 @@ public class Unit : GameEntity<Unit.Actions>
             Goods goods = new Goods();
             goods.type = Goods.GoodsType.FOOD;
             goods.amount = 10;
-            Debug.Log("FIRE EAT"); // RAUL_DEB
+
             fire(Actions.EAT, goods);
         }
 

@@ -8,17 +8,23 @@ using Utils;
 public class ResourcesPlacer : MonoBehaviour
 {
     // attributes
+    private const float UPDATE_STATS = 1.5f;
+    private float _timer = 1.5f;
 
     private readonly string[] txt_names = { "meat", "wood", "metal" };
     private WorldResources.Type[] t = { WorldResources.Type.FOOD, WorldResources.Type.WOOD, WorldResources.Type.METAL };
     private List<Text> res_amounts;
+    private List<Text> res_stats;
     private Player player;
+
+    private float[] _statistics = { 0f, 0f, 0f };
 
 
 
     void Start()
     {
         res_amounts = new List<Text>();
+        res_stats = new List<Text>();
 
         player = GameObject.Find("GameController").GetComponent<Player>();
 
@@ -27,6 +33,13 @@ public class ResourcesPlacer : MonoBehaviour
         for (int i = 0; i < txt_names.Length; i++)
         {
             res_amounts.Add(GameObject.Find("HUD/resources/text_" + txt_names[i]).GetComponent<Text>());
+            if (player.race == Races.ELVES)
+            {
+                if (i != 2)
+                    res_stats.Add(GameObject.Find("HUD/resources/text_" + txt_names[i] + "_hour").GetComponent<Text>());
+                else
+                    res_stats.Add(GameObject.Find("HUD/resources/text_meta_hour").GetComponent<Text>());
+            }
         }
 
         setupText();
@@ -37,19 +50,22 @@ public class ResourcesPlacer : MonoBehaviour
             registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
         });
 
-        /*Subscriber<Resource.Actions, Resource>.get.registerForAll(Resource.Actions.COLLECTION, onCollection, new ActorSelector()
-        {
-            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
-        });*/
-
     }
 
-    void Update(){ }
+    void Update()
+    {
+        if (_timer >= UPDATE_STATS)
+        { 
+            updateStatistics();
+            _timer = 0f;
+        }
+        else _timer += Time.deltaTime;
+
+    }
 
     void OnDestroy()
     {
         Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.CREATED, onUnitCreated);
-        Subscriber<Resource.Actions, Resource>.get.unregisterFromAll(Resource.Actions.COLLECTION, onCollection);
     }
 
     // PUBLIC METHODS
@@ -72,6 +88,18 @@ public class ResourcesPlacer : MonoBehaviour
         for (int i = 0; i < txt_names.Length; i++)
         {
             res_amounts[i].text = "" + player.resources.getAmount(t[i]);
+        }
+    }
+
+    public void updateStatistics()
+    {
+        for (int i = 0; i < txt_names.Length; i++)
+        {
+            if (player.race == Races.ELVES)
+            {
+                res_stats[i].text = "" + _statistics[i] + "/s";
+                res_stats[i].color = _statistics[i] >= 0 ? Color.gray : Color.red;
+            }
         }
     }
 
@@ -136,6 +164,27 @@ public class ResourcesPlacer : MonoBehaviour
             if (!isStarter(i_game))
                 updateUnitCreated(go.GetComponent<IGameEntity>());
         }
+    }
+
+    public void onStatisticsUpdate(System.Object obj)
+    {
+        Statistics st = (Statistics)obj;
+
+        switch (st._type)
+        {
+            case WorldResources.Type.FOOD:
+                _statistics[0] += st.growth_speed;
+                break;
+            case WorldResources.Type.WOOD:
+                _statistics[1] += st.growth_speed;
+                break;
+            case WorldResources.Type.METAL:
+                _statistics[2] += st.growth_speed;
+                break;
+            default:
+                break;
+        }
+
     }
 
     public void onFoodConsumption(System.Object obj)
