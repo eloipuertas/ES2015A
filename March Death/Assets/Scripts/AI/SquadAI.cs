@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.AI.Agents;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// Groups units with data, used only by AI.
@@ -63,6 +64,47 @@ namespace Assets.Scripts.AI
             }
             return (T)ad;
         }
+
+		/// <summary>
+		/// Returns the bounding box of an squad
+		/// </summary>
+		/// <param name="units"></param>
+		/// <returns></returns>
+		public Rect getSquadBoundingBox()
+		{
+			float minX = Mathf.Infinity;
+			float maxX = -Mathf.Infinity;
+			float minY = Mathf.Infinity;
+			float maxY = -Mathf.Infinity;
+			
+			foreach (Unit u in this.units)
+			{
+				if (maxY < u.transform.position.z) maxY = u.transform.position.z;
+				if (minY > u.transform.position.z) minY = u.transform.position.z;
+				if (maxX < u.transform.position.x) maxX = u.transform.position.x;
+				if (minX > u.transform.position.x) minX = u.transform.position.x;
+			}
+			
+			return new Rect(minX, minY, (maxX - minX) * 2, (maxY - minY) * 2);
+		}
+
+		public static Rect GetUnitListBoundingBox(List<Unit> targetUnits)
+		{
+			float minX = Mathf.Infinity;
+			float maxX = -Mathf.Infinity;
+			float minY = Mathf.Infinity;
+			float maxY = -Mathf.Infinity;
+			
+			foreach (Unit u in targetUnits)
+			{
+				if (maxY < u.transform.position.z) maxY = u.transform.position.z;
+				if (minY > u.transform.position.z) minY = u.transform.position.z;
+				if (maxX < u.transform.position.x) maxX = u.transform.position.x;
+				if (minX > u.transform.position.x) minX = u.transform.position.x;
+			}
+			
+			return new Rect(minX, minY, (maxX - minX) * 2, (maxY - minY) * 2);
+		}
     }
     /* Small class to save data for each agent on this squad
     Implements the following events:

@@ -63,10 +63,10 @@ namespace Assets.Scripts.AI.Agents
             isHeroInDanger = false;
 
             // Mirar on estan els enemics
-            enemySquadBoundingBox = getSquadBoundingBox(ai.EnemyUnits);
+			enemySquadBoundingBox = SquadAI.GetUnitListBoundingBox(ai.EnemyUnits);
             
             // Mirar on estic jo
-            ownSquadBoundingBox = getSquadBoundingBox(ai.Army);
+            ownSquadBoundingBox = squad.getSquadBoundingBox();
 
             // Intentar Veure on hauria d'anar una unitat per estar protegida
             recalcSafePoint();
@@ -123,7 +123,7 @@ namespace Assets.Scripts.AI.Agents
             }
 
             //Get the squad bounding box
-            ownSquadBoundingBox = getSquadBoundingBox(squad.units);
+            ownSquadBoundingBox = squad.getSquadBoundingBox();
 
             float maxLongitudeOfBox = ownSquadBoundingBox.width > ownSquadBoundingBox.height ? ownSquadBoundingBox.width : ownSquadBoundingBox.height;
             
@@ -151,29 +151,6 @@ namespace Assets.Scripts.AI.Agents
             }
              
             return confidence;
-        }
-
-        /// <summary>
-        /// Returns the bounding box of an squad
-        /// </summary>
-        /// <param name="units"></param>
-        /// <returns></returns>
-        private Rect getSquadBoundingBox(List<Unit> units)
-        {
-            float minX = Mathf.Infinity;
-            float maxX = -Mathf.Infinity;
-            float minY = Mathf.Infinity;
-            float maxY = -Mathf.Infinity;
-
-            foreach (Unit u in units)
-            {
-                if (maxY < u.transform.position.z) maxY = u.transform.position.z;
-                if (minY > u.transform.position.z) minY = u.transform.position.z;
-                if (maxX < u.transform.position.x) maxX = u.transform.position.x;
-                if (minX > u.transform.position.x) minX = u.transform.position.x;
-            }
-
-            return new Rect(minX, minY, (maxX - minX) * 2, (maxY - minY) * 2);
         }
 
         /// <summary>
