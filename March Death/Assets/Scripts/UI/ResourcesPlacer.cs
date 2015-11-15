@@ -14,6 +14,12 @@ public class ResourcesPlacer : MonoBehaviour
     private List<Text> res_amounts;
     private Player player;
 
+    private Statistics[] _statistics = {
+                                            new Statistics(WorldResources.Type.FOOD),
+                                            new Statistics(WorldResources.Type.WOOD),
+                                            new Statistics(WorldResources.Type.METAL)
+                                       };
+
 
 
     void Start()
@@ -37,19 +43,15 @@ public class ResourcesPlacer : MonoBehaviour
             registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
         });
 
-        /*Subscriber<Resource.Actions, Resource>.get.registerForAll(Resource.Actions.COLLECTION, onCollection, new ActorSelector()
-        {
-            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
-        });*/
-
     }
 
-    void Update(){ }
+    void Update(){
+        updateStatistics();
+    }
 
     void OnDestroy()
     {
         Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.CREATED, onUnitCreated);
-        Subscriber<Resource.Actions, Resource>.get.unregisterFromAll(Resource.Actions.COLLECTION, onCollection);
     }
 
     // PUBLIC METHODS
@@ -73,6 +75,16 @@ public class ResourcesPlacer : MonoBehaviour
         {
             res_amounts[i].text = "" + player.resources.getAmount(t[i]);
         }
+    }
+
+    public void updateStatistics()
+    {
+        Debug.Log("INIT --------------------------------");
+        for (int i = 0; i < _statistics.Length; i++)
+        {
+            Debug.Log("* STAT: " + _statistics[i]._type + " -> " + _statistics[i].growth_speed);
+        }
+        Debug.Log("END ---------------------------------");
     }
 
     public void insufficientFundsColor(IGameEntity entity)
@@ -136,6 +148,28 @@ public class ResourcesPlacer : MonoBehaviour
             if (!isStarter(i_game))
                 updateUnitCreated(go.GetComponent<IGameEntity>());
         }
+    }
+
+    public void onStatisticsCreated(System.Object obj)
+    {
+        Debug.Log("Habemus Statistics!");
+        Statistics st = (Statistics)obj;
+
+        switch (st._type)
+        {
+            case WorldResources.Type.FOOD:
+                _statistics[0] = _statistics[0] + st;
+                break;
+            case WorldResources.Type.WOOD:
+                _statistics[1] = _statistics[1] + st; ;
+                break;
+            case WorldResources.Type.METAL:
+                _statistics[2] = _statistics[2] + st;
+                break;
+            default:
+                break;
+        }
+
     }
 
     public void onFoodConsumption(System.Object obj)
