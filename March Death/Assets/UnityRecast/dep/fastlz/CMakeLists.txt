@@ -21,15 +21,16 @@ include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-add_library(FastLZ 
+add_library(FastLZ
   ${EPS_SRCS}
 )
 
-if(BUILD_32_BITS)
+if (APPLE)
+    set_target_properties(FastLZ PROPERTIES COMPILE_FLAGS "-arch i386 -arch x86_64" LINK_FLAGS "-arch i386 -arch x86_64")
+elseif(BUILD_32_BITS)
     set_target_properties(FastLZ PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 endif()
 
 if (UNIX OR APPLE)
   set_target_properties(FastLZ PROPERTIES COMPILE_FLAGS "-fPIC")
 endif()
-

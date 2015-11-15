@@ -35,7 +35,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/DetourCrowd/Source
   ${CMAKE_CURRENT_SOURCE_DIR}/DetourTileCache/Include
   ${CMAKE_CURRENT_SOURCE_DIR}/DetourTileCache/Source
-  
+
   ${CMAKE_SOURCE_DIR}/dep/fastlz
 )
 
@@ -43,8 +43,10 @@ add_library(Recast SHARED
   ${EPS_SRCS}
 )
 
-if(BUILD_32_BITS)
-    set_target_properties(Recast PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
+if (APPLE)
+    set_target_properties(FastLZ PROPERTIES COMPILE_FLAGS "-arch i386 -arch x86_64" LINK_FLAGS "-arch i386 -arch x86_64")
+elseif(BUILD_32_BITS)
+    set_target_properties(FastLZ PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 endif()
 
 target_link_libraries(Recast
