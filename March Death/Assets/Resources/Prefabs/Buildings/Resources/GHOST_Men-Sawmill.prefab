@@ -10,6 +10,7 @@ GameObject:
   - 4: {fileID: 434566}
   - 33: {fileID: 3344206}
   - 23: {fileID: 2324710}
+  - 114: {fileID: 11406122}
   m_Layer: 0
   m_Name: GHOST_Men-Sawmill
   m_TagString: Untagged
@@ -60,6 +61,19 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 167724}
   m_Mesh: {fileID: 4300000, guid: 53ce90f7f9203fd46b91edbcb4d1593b, type: 3}
+--- !u!114 &11406122
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 167724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc4dbd7bbbda4e14baa3f054762b3ca9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 0
+  type: 3
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -87,6 +101,10 @@ Prefab:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 35d6f0567f9dd8947b154a07bf732bdb, type: 2}
+    - target: {fileID: 0}
+      propertyPath: type
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 167724}
