@@ -21,8 +21,6 @@ namespace Assets.Scripts.AI.Agents
         Rect enemySquadBoundingBox, ownSquadBoundingBox;
         Vector3 safeArea;
         float minDistanceBetweenHeroAndNearestEnemy;
-        private float _maxUnitRange;
-        private Storage.Races _enemyRace;
 
         private int confidence;
 
@@ -45,16 +43,6 @@ namespace Assets.Scripts.AI.Agents
                 }
             }
 
-            if (ai.race == Storage.Races.ELVES)
-            {
-                _maxUnitRange = Storage.Info.get.of(Storage.Races.MEN, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
-                _enemyRace = Storage.Races.MEN;
-            }
-            else
-            {
-                _maxUnitRange = Storage.Info.get.of(Storage.Races.ELVES, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
-                _enemyRace = Storage.Races.ELVES;
-            }
         }
 
         public override void controlUnits(SquadAI squad)
@@ -100,7 +88,7 @@ namespace Assets.Scripts.AI.Agents
 
                 if (isHeroInDanger)
                 {
-                    SquadAI s = new SquadAI(0);
+                    SquadAI s = new SquadAI(0, ai);
                     s.addUnits(squadToAtackManager);
                     attackAgent.controlUnits(s);
                 }
@@ -122,15 +110,8 @@ namespace Assets.Scripts.AI.Agents
                 return 0;
             }
 
-            //Get the squad bounding box
-            ownSquadBoundingBox = squad.getSquadBoundingBox();
 
-            float maxLongitudeOfBox = ownSquadBoundingBox.width > ownSquadBoundingBox.height ? ownSquadBoundingBox.width : ownSquadBoundingBox.height;
-            
-            //Smell what is near this position
-            Unit[] enemyUnitsNearUs = ai.senses.getUnitsOfRaceNearPosition(new Vector3(ownSquadBoundingBox.x, squad.units[0].transform.position.y, ownSquadBoundingBox.y), maxLongitudeOfBox * 2 * _maxUnitRange, _enemyRace);
-
-            foreach (Unit enemyUnit in enemyUnitsNearUs)
+            foreach (Unit enemyUnit in squad.enemySquad.units)
             {
                 foreach (Unit ownUnit in squad.units)
                 {

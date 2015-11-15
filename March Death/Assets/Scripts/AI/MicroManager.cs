@@ -48,6 +48,7 @@ namespace Assets.Scripts.AI
             int val;
             foreach(SquadAI sq in squads)
             {
+                sq.recalculateSquadValues();
                 foreach(BaseAgent a in agents)
                 {
                     val = a.getConfidence(sq);
@@ -82,7 +83,7 @@ namespace Assets.Scripts.AI
         private void addSquad(List<Unit> units)
         {
             //Squad id 0 is used by temp squads
-            SquadAI s = new SquadAI(squads.Count + 1);
+            SquadAI s = new SquadAI(squads.Count + 1, ai);
             s.addUnits(units);
             squads.Add(s);
         }

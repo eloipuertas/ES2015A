@@ -10,6 +10,7 @@ namespace Assets.Scripts.AI
 {
     public class SquadAI
     {
+        const int ID_ENEMY_SQUAD = -1;
         public int Id { get; private set; }
         public List<Unit> units { get; private set; }
         /// <summary>
@@ -17,11 +18,31 @@ namespace Assets.Scripts.AI
         /// </summary>
         public BaseAgent lastAgent { get; set; }
         Dictionary<Type, AgentData> storage;
-        public SquadAI(int id)
+        Rect boudningBox;
+        public float squadValue;
+        public SquadAI enemySquad = null;
+
+        float _maxUnitRange;
+        Storage.Races _enemyRace;
+        AIController ai;
+
+        public SquadAI(int id, AIController ai)
         {
             Id = id;
+            this.ai = ai;
             units = new List<Unit>();
             storage = new Dictionary<Type, AgentData>();
+
+            if (ai.race == Storage.Races.ELVES)
+            {
+                _maxUnitRange = Storage.Info.get.of(Storage.Races.MEN, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
+                _enemyRace = Storage.Races.MEN;
+            }
+            else
+            {
+                _maxUnitRange = Storage.Info.get.of(Storage.Races.ELVES, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
+                _enemyRace = Storage.Races.ELVES;
+            }
         }
         public void addUnit(Unit u)
         {
@@ -105,6 +126,68 @@ namespace Assets.Scripts.AI
 			
 			return new Rect(minX, minY, (maxX - minX) * 2, (maxY - minY) * 2);
 		}
+
+        public void recalculateSquadValues()
+        {   
+
+            //Recalculate the atack data of the squad    
+            AttackData ad = getData<AttackData>();
+            float val = 0;
+            if (ad.hasChanged)
+            {
+                foreach (Unit u in this.units)
+                {
+                    val += valOfUnit(u);
+                }
+                ad.Value = val;
+                ad.hasChanged = false;
+            }
+            else
+            {
+                val = ad.Value;
+            }
+
+            //calculate our own bounding box
+            this.boudningBox = getSquadBoundingBox();
+            
+            //Calculate the EnemySquad values
+
+            if(this.enemySquad == null)
+            {
+                enemySquad = new SquadAI(ID_ENEMY_SQUAD, ai);
+            }
+
+            float maxLongitudeOfBox = boudningBox.width > boudningBox.height ? boudningBox.width : boudningBox.height;
+
+            //Smell what is near this position
+            Unit[] enemyUnitsNearUs = ai.senses.getUnitsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 2 * _maxUnitRange, _enemyRace);
+
+
+            enemySquad.boudningBox = enemySquad.getSquadBoundingBox();
+
+            ad = enemySquad.getData<AttackData>();
+            val = 0;
+            if (ad.hasChanged)
+            {
+                foreach (Unit u in this.units)
+                {
+                    val += valOfUnit(u);
+                }
+                ad.Value = val;
+                ad.hasChanged = false;
+            }
+            else
+            {
+                val = ad.Value;
+            }
+
+        }
+
+        float valOfUnit(Unit u)
+        {
+            return u.healthPercentage * (u.info.unitAttributes.resistance + u.info.unitAttributes.attackRate * u.info.unitAttributes.strength);
+        }
+
     }
     /* Small class to save data for each agent on this squad
     Implements the following events:

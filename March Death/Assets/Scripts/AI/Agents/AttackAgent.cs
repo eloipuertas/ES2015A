@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Assets.Scripts.AI.Agents
 {
@@ -71,15 +67,6 @@ namespace Assets.Scripts.AI.Agents
             }
         }
         
-		float valOfUnit(Unit u)
-        {
-            //TODO: Find a better formula with testing
-            if (ai.DifficultyLvl < 5)
-                return u.healthPercentage * u.info.unitAttributes.resistance+ u.info.unitAttributes.strength;
-            else
-                return u.healthPercentage * (u.info.unitAttributes.resistance + u.info.unitAttributes.attackRate * u.info.unitAttributes.strength);
-        }
-
 		/// <summary>
 		/// Gets the confidence of this squad.
 		/// </summary>
@@ -89,47 +76,7 @@ namespace Assets.Scripts.AI.Agents
         {
             if (ai.EnemyUnits.Count == 0)
                 return 0;
-
-            AttackData ad = squad.getData<AttackData>();
-
-            float val = 0;
-
-            if (ad.hasChanged)
-            {
-                foreach (Unit u in squad.units)
-				{
-                    val += valOfUnit(u);
-				}
-                ad.Value = val;
-                ad.hasChanged = false;
-            }
-            else
-			{
-                val = ad.Value;
-			}
-
-			//CAlc the bounding box of the squad
-			Rect ownSquadBoundingBox = squad.getSquadBoundingBox();
-			float maxLongitudeOfBox = ownSquadBoundingBox.width > ownSquadBoundingBox.height ? ownSquadBoundingBox.width : ownSquadBoundingBox.height;
-			Unit[] enemyUnitsNearUs = ai.senses.getUnitsOfRaceNearPosition(new Vector3(ownSquadBoundingBox.x, squad.units[0].transform.position.y, ownSquadBoundingBox.y), maxLongitudeOfBox * 2 * _maxUnitRange, _enemyRace);
-
-			foreach (Unit u in enemyUnitsNearUs)
-			{
-                val -= valOfUnit(u);
-			}
-
-            if (val < 0)
-            {
-                int volunteers = ai.Macro.canTakeArms();
-                float nval = (val + volunteers * valOfCitizen);
-                if (nval > 0)
-                {
-                    ai.Macro.takeArms(volunteers);
-                    return Mathf.RoundToInt(nval * 8);
-                }
-            }
-
-            return Mathf.RoundToInt(val*8);
+            return 0;
         }
     }
 
