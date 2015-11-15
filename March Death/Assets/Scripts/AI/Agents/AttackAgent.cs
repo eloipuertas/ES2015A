@@ -8,10 +8,27 @@ namespace Assets.Scripts.AI.Agents
 {
     public class AttackAgent : BaseAgent
     {
+		const int CONFIDENCE_NO_ENEMIES_AVALIABLE = 0;
+		const int CONFIDENCE_OWN_SQUAD_SUPREMACY = 5;
+		const int CONFIDENCE_OWN_SQUAD_SUPREMACI_MAX_MULTITPLIER = 5;
+
+		float _maxUnitRange;
+		Storage.Races _enemyRace;
+
         float valOfCitizen;
         public AttackAgent(AIController ai, string name) : base(ai, name)
         {
             valOfCitizen = 1f;
+			if (ai.race == Storage.Races.ELVES)
+			{
+				_maxUnitRange = Storage.Info.get.of(Storage.Races.MEN, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
+				_enemyRace = Storage.Races.MEN;
+			}
+			else
+			{
+				_maxUnitRange = Storage.Info.get.of(Storage.Races.ELVES, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
+				_enemyRace = Storage.Races.ELVES;
+			}
         }
         public override void controlUnits(SquadAI squad)
         {
@@ -53,7 +70,8 @@ namespace Assets.Scripts.AI.Agents
                     
             }
         }
-        float valOfUnit(Unit u)
+        
+		float valOfUnit(Unit u)
         {
             //TODO: Find a better formula with testing
             if (ai.DifficultyLvl < 5)
@@ -61,25 +79,45 @@ namespace Assets.Scripts.AI.Agents
             else
                 return u.healthPercentage * (u.info.unitAttributes.resistance + u.info.unitAttributes.attackRate * u.info.unitAttributes.strength);
         }
+
+		/// <summary>
+		/// Gets the confidence of this squad.
+		/// </summary>
+		/// <returns>The confidence.</returns>
+		/// <param name="squad">Squad.</param>
         public override int getConfidence(SquadAI squad)
         {
             if (ai.EnemyUnits.Count == 0)
                 return 0;
+
             AttackData ad = squad.getData<AttackData>();
 
             float val = 0;
+
             if (ad.hasChanged)
             {
                 foreach (Unit u in squad.units)
+				{
                     val += valOfUnit(u);
+				}
                 ad.Value = val;
                 ad.hasChanged = false;
             }
             else
+			{
                 val = ad.Value;
+			}
 
-            foreach (Unit u in ai.EnemyUnits)
+			//CAlc the bounding box of the squad
+			Rect ownSquadBoundingBox = squad.getSquadBoundingBox();
+			float maxLongitudeOfBox = ownSquadBoundingBox.width > ownSquadBoundingBox.height ? ownSquadBoundingBox.width : ownSquadBoundingBox.height;
+			Unit[] enemyUnitsNearUs = ai.senses.getUnitsOfRaceNearPosition(new Vector3(ownSquadBoundingBox.x, squad.units[0].transform.position.y, ownSquadBoundingBox.y), maxLongitudeOfBox * 2 * _maxUnitRange, _enemyRace);
+
+			foreach (Unit u in enemyUnitsNearUs)
+			{
                 val -= valOfUnit(u);
+			}
+
             if (val < 0)
             {
                 int volunteers = ai.Macro.canTakeArms();
@@ -90,9 +128,11 @@ namespace Assets.Scripts.AI.Agents
                     return Mathf.RoundToInt(nval * 8);
                 }
             }
+
             return Mathf.RoundToInt(val*8);
         }
     }
+
     class AttackData : AgentData
     {
         public float Value { get; set; }
