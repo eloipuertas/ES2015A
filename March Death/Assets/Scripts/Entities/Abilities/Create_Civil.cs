@@ -63,6 +63,7 @@ class CreateCivil : Ability
 
     public override void enable()
     {
+        // HACK: gpascualg, must be removed
         res.createCivilian();
 
 

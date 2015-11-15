@@ -34,21 +34,33 @@ namespace Pathfinding
 
         private int idx = -1;
         private bool updateScheduled = false;
+        private Vector3 targetPoint;
+        private float _lastKnownDistance;
 
         public Vector3 Velocity { get; set; }
         public CrowdAgentState State { get; set; }
         public MoveRequestState TargetState { get; set; }
+        public float LastKnownDistance { get { return _lastKnownDistance; } }
         public bool IsMoving
         {
             get
             {
-                return Velocity.x != 0 || Velocity.y != 0 || Velocity.z != 0;
+                _lastKnownDistance = (transform.position - targetPoint).sqrMagnitude;
+                if (_lastKnownDistance > 50f)
+                    return true;
+
+                return Velocity.sqrMagnitude >= 0.1;
             }
         }
 
         public void Start()
         {
             idx = DetourCrowd.Instance.AddAgent(GetComponent<IGameEntity>(), Radius, Height);
+        }
+
+        public void OnDestroy()
+        {
+            DetourCrowd.Instance.RemoveAgent(idx);
         }
 
         public void SetMaxSpeed(float maxSpeed)
@@ -65,6 +77,7 @@ namespace Pathfinding
 
         public void MoveTo(Vector3 target)
         {
+            targetPoint = target;
             DetourCrowd.Instance.MoveTarget(idx, target);
         }
 

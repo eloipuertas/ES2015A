@@ -67,6 +67,12 @@ namespace Pathfinding
             Detour.Crowd.updateAgent(crowd, idx, maxAcceleration, maxSpeed);
         }
 
+        public void RemoveAgent(int idx)
+        {
+            Detour.Crowd.removeAgent(crowd, idx);
+            agents.Remove(idx);
+        }
+
         public void MoveTarget(int idx, Vector3 target)
         {
             Detour.Crowd.setMoveTarget(PathDetour.get.NavQuery, crowd, idx, ToFloat(target), false);

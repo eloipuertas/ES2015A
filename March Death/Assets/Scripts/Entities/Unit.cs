@@ -192,7 +192,7 @@ public class Unit : GameEntity<Unit.Actions>
         _attackPoint = closestPointTo(_target.getTransform().position);
         _attackPoint.y = transform.position.y;
 
-        _closestPointToTarget = _target.closestPointTo(transform.position);
+        _closestPointToTarget = _target.closestPointTo(_attackPoint);
         _closestPointToTarget.y = _target.getTransform().position.y;
 
         _distanceToTarget = Vector3.Distance(_attackPoint, _closestPointToTarget);
@@ -354,9 +354,11 @@ public class Unit : GameEntity<Unit.Actions>
             }
 
             // Update this unit resources
+            /*
             BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.GOLD, goldProduced);
             BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.GOLD, goldConsumed);
             BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.FOOD, foodConsumed);
+            */
         }
 
         // Status dependant functionality
@@ -409,7 +411,6 @@ public class Unit : GameEntity<Unit.Actions>
                 // If we are already in range, start attacking
                 // Must be called before MoveTowards because it uses _distanceToTarget, which
                 // would be otherwise outdated
-                
                 if (_followingTarget)
                 {
                     // Update destination only if target has moved
@@ -424,16 +425,17 @@ public class Unit : GameEntity<Unit.Actions>
                     if (_distanceToTarget <= currentAttackRange())
                     {
                         _detourAgent.ResetPath();
+                        _followingTarget = false;
                         setStatus(EntityStatus.ATTACKING);
                         return;
                     }
                 }
-
-                //Debug.Log(_detourAgent.IsMoving + " " + _detourAgent.Velocity + " " + _detourAgent.TargetState + " " + _detourAgent.State);
+                
                 if (!_detourAgent.IsMoving)
                 {
                     if (!_followingTarget)
                     {
+                        _detourAgent.ResetPath();
                         setStatus(EntityStatus.IDLE);
                         fire(Actions.MOVEMENT_END);
                     }

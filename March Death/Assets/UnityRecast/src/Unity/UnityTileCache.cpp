@@ -579,6 +579,11 @@ void updateAgent(dtCrowd* crowd, int idx, float maxAcceleration, float maxSpeed)
 	crowd->updateAgentParameters(idx, &ap);
 }
 
+void removeAgent(dtCrowd* crowd, int idx)
+{
+	crowd->removeAgent(idx);
+}
+
 static void calcVel(float* vel, const float* pos, const float* tgt, const float speed)
 {
 	dtVsub(vel, tgt, pos);

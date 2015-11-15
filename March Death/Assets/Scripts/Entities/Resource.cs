@@ -321,6 +321,7 @@ public class Resource : Building<Resource.Actions>
 
     public void createCivilian()
     {
+        // HACK: gpascualg, must be removed
         newCivilian();
         if (!_makingNewCivil)
         {

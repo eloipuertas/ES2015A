@@ -48,6 +48,7 @@ DLL_EXPORT dtCrowd* createCrowd(int maxAgents, float maxRadius, dtNavMesh* navme
 DLL_EXPORT int addAgent(dtCrowd* crowd, const float* p, float radius, float height);
 DLL_EXPORT dtCrowdAgent* getAgent(dtCrowd* crowd, int idx);
 DLL_EXPORT void updateAgent(dtCrowd* crowd, int idx, float maxAcceleration, float maxSpeed);
+DLL_EXPORT void removeAgent(dtCrowd* crowd, int idx);
 DLL_EXPORT void setMoveTarget(dtNavMeshQuery* navquery, dtCrowd* crowd, int idx, float* p, bool adjust);
 DLL_EXPORT void resetPath(dtCrowd* crowd, int idx);
 DLL_EXPORT void updateTick(dtTileCache* tileCache, dtNavMesh* nav, dtCrowd* crowd, float dt, float* positions, float* velocity, unsigned char* state, unsigned char* targetState, int& nagents);

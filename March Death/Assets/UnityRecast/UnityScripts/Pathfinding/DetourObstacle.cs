@@ -22,6 +22,14 @@ namespace Pathfinding
         private Quaternion lastKnownRotation = new Quaternion();
         private bool alreadyAdded = false;
 
+        public void OnDestroy()
+        {
+            if (alreadyAdded)
+            {
+                PathDetour.get.RemoveObstacle(obstacleReference);
+            }
+        }
+
         private void CalcVertices()
         {
             Vector3 size = transform.rotation * Size;
