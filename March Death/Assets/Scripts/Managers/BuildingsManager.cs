@@ -79,6 +79,13 @@ namespace Managers
                     Debug.Log("Continuous building construction disabled");
             }
 
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                //Rotates 90º Y axis
+                ApplyRotation();
+                
+                Debug.Log("Building current y rotation: " + _newBuilding.ghost.transform.rotation.y + " º");
+            }
         }
 
 
@@ -191,6 +198,7 @@ namespace Managers
                 //TODO : (hermetico) restar recursos necesarios para crear el building
                 grid.reservePosition(newDestination);
                 finalBuilding.transform.position = newDestination;
+                finalBuilding.transform.rotation = _newBuilding.ghost.transform.rotation;
 
                 //TODO : check another way to get the IGameEntity
                 IGameEntity entity = (IGameEntity)finalBuilding.GetComponent<Unit>();
@@ -238,6 +246,16 @@ namespace Managers
 
 
         /// <summary>
+        /// Applyes the rotation to the ghost building
+        /// </summary>
+        /// <param name="rotation"></param>
+        private void ApplyRotation(float rotation = 90)
+        {
+            Vector3 _rotation = new Vector3(0f, rotation, 0f);
+            _newBuilding.ghost.transform.Rotate(_rotation);
+        }
+
+        /// <summary>
         /// returns a vector with the position after apply an offset and discretyze the position
         /// </summary>
         /// <returns></returns>
@@ -252,6 +270,8 @@ namespace Managers
             return toLocation;
 
         }
+
+
         /// <summary>
         /// Moves the building to the mouse position
         /// </summary>
