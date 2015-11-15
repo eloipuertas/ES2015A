@@ -14,7 +14,10 @@ namespace Pathfinding
         private IntPtr crowd = new IntPtr(0);
         private Dictionary<int, DetourAgent> agents = new Dictionary<int, DetourAgent>();
 
-        private float[] positionHolder = null;
+        private float[] positions = null;
+        private float[] velocities = null;
+        private byte[] targetStates = null;
+        private byte[] states = null;
         int numUpdated = 0;
 
         public static DetourCrowd Instance = null;
@@ -32,7 +35,10 @@ namespace Pathfinding
         public void OnEnable()
         {
             crowd = Detour.Crowd.createCrowd(MaxAgents, AgentMaxRadius, PathDetour.get.NavMesh);
-            positionHolder = new float[MaxAgents * 3];
+            positions = new float[MaxAgents * 3];
+            velocities = new float[MaxAgents * 3];
+            targetStates = new byte[MaxAgents];
+            states = new byte[MaxAgents];
         }
 
         public static float[] ToFloat(Vector3 p)
@@ -66,30 +72,29 @@ namespace Pathfinding
             Detour.Crowd.setMoveTarget(PathDetour.get.NavQuery, crowd, idx, ToFloat(target), false);
         }
 
+        public void ResetPath(int idx)
+        {
+            Detour.Crowd.resetPath(crowd, idx);
+        }
+
         public void Update()
         {
-            Detour.Crowd.updateTick(PathDetour.get.TileCache, PathDetour.get.NavMesh, crowd, Time.deltaTime, positionHolder, ref numUpdated);
+            Detour.Crowd.updateTick(PathDetour.get.TileCache, PathDetour.get.NavMesh, crowd, Time.deltaTime, positions, velocities, states, targetStates, ref numUpdated);
 
             foreach (KeyValuePair<int, DetourAgent> entry in agents)
             {
                 DetourAgent agent = entry.Value;
-
-                if (agent.IsMoving)
+                agent.Velocity = ToVector3(velocities, entry.Key * 3);
+                agent.State = (DetourAgent.CrowdAgentState)states[entry.Key];
+                agent.TargetState = (DetourAgent.MoveRequestState)targetStates[entry.Key];
+                
+                if (agent.Velocity.sqrMagnitude != 0)
                 {
-                    Transform entityTransform = entry.Value.transform;
-                    Vector3 newPosition = ToVector3(positionHolder, entry.Key * 3);
+                    Vector3 newPosition = ToVector3(positions, entry.Key * 3);
+                    Quaternion lookRotation = Quaternion.LookRotation(agent.Velocity);
 
-                    Vector3 direction = (newPosition - entityTransform.position).normalized;
-                    if (direction.sqrMagnitude != 0)
-                    {
-                        Quaternion lookRotation = Quaternion.LookRotation(direction);
-                        lookRotation = Quaternion.Slerp(entityTransform.rotation, lookRotation, Time.deltaTime * 10f);
-                        Vector3 eulerAngles = lookRotation.eulerAngles;
-                        eulerAngles = new Vector3(0, eulerAngles.y, 0);
-
-                        entityTransform.position = newPosition;
-                        entityTransform.rotation = Quaternion.Euler(eulerAngles);
-                    }
+                    agent.transform.position = newPosition;
+                    agent.transform.rotation = lookRotation;
                 }
             }
         }

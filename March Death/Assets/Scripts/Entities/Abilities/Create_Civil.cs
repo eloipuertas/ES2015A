@@ -63,8 +63,9 @@ class CreateCivil : Ability
 
     public override void enable()
     {
+        res.createCivilian();
 
-        
+
         base.enable();
 
         if (res.buttonCivilStatus == Resource.createCivilStatus.IDLE)

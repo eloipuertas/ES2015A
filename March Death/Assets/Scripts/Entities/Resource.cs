@@ -321,6 +321,7 @@ public class Resource : Building<Resource.Actions>
 
     public void createCivilian()
     {
+        newCivilian();
         if (!_makingNewCivil)
         {
             _makingNewCivil = true;

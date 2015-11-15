@@ -9,6 +9,24 @@ namespace Pathfinding
     [RequireComponent(typeof(IGameEntity))]
     public class DetourAgent : MonoBehaviour
     {
+        public enum CrowdAgentState
+        {
+            DT_CROWDAGENT_STATE_INVALID,        ///< The agent is not in a valid state.
+            DT_CROWDAGENT_STATE_WALKING,        ///< The agent is traversing a normal navigation mesh polygon.
+            DT_CROWDAGENT_STATE_OFFMESH,        ///< The agent is traversing an off-mesh connection.
+        };
+
+        public enum MoveRequestState
+        {
+            DT_CROWDAGENT_TARGET_NONE = 0,
+            DT_CROWDAGENT_TARGET_FAILED,
+            DT_CROWDAGENT_TARGET_VALID,
+            DT_CROWDAGENT_TARGET_REQUESTING,
+            DT_CROWDAGENT_TARGET_WAITING_FOR_QUEUE,
+            DT_CROWDAGENT_TARGET_WAITING_FOR_PATH,
+            DT_CROWDAGENT_TARGET_VELOCITY,
+        };
+
         public float Radius = 0.8f;
         public float Height = 2.0f;
         public float MaxSpeed = 2.0f;
@@ -17,12 +35,14 @@ namespace Pathfinding
         private int idx = -1;
         private bool updateScheduled = false;
 
-        private bool _isMoving;
+        public Vector3 Velocity { get; set; }
+        public CrowdAgentState State { get; set; }
+        public MoveRequestState TargetState { get; set; }
         public bool IsMoving
         {
             get
             {
-                return _isMoving;
+                return Velocity.x != 0 || Velocity.y != 0 || Velocity.z != 0;
             }
         }
 
@@ -45,8 +65,12 @@ namespace Pathfinding
 
         public void MoveTo(Vector3 target)
         {
-            _isMoving = true;
             DetourCrowd.Instance.MoveTarget(idx, target);
+        }
+
+        public void ResetPath()
+        {
+            DetourCrowd.Instance.ResetPath(idx);
         }
 
         public void Update()

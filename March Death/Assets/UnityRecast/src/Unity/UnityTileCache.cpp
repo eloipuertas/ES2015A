@@ -646,7 +646,12 @@ void setMoveTarget(dtNavMeshQuery* navquery, dtCrowd* crowd, int idx, float* p, 
 	}
 }
 
-void updateTick(dtTileCache* tileCache, dtNavMesh* nav, dtCrowd* crowd, float dt, float* positions, int& npos)
+void resetPath(dtCrowd* crowd, int idx)
+{
+	crowd->resetMoveTarget(idx);
+}
+
+void updateTick(dtTileCache* tileCache, dtNavMesh* nav, dtCrowd* crowd, float dt, float* positions, float* velocity, unsigned char* state, unsigned char* targetState, int& nagents)
 {
 	if (!nav || !crowd) return;
 
@@ -654,13 +659,20 @@ void updateTick(dtTileCache* tileCache, dtNavMesh* nav, dtCrowd* crowd, float dt
 	crowd->update(dt, NULL);
 
 	// Update agent trails
-	npos = crowd->getAgentCount();
-	for (int i = 0; i < npos; ++i)
+	nagents = crowd->getAgentCount();
+	for (int i = 0; i < nagents; ++i)
 	{
 		const dtCrowdAgent* ag = crowd->getAgent(i);
 
 		positions[i * 3 + 0] = ag->npos[0];
 		positions[i * 3 + 1] = ag->npos[1];
 		positions[i * 3 + 2] = ag->npos[2];
+
+		velocity[i * 3 + 0] = ag->vel[0];
+		velocity[i * 3 + 1] = ag->vel[1];
+		velocity[i * 3 + 2] = ag->vel[2];
+
+		state[i] = ag->state;
+		targetState[i] = ag->targetState;
 	}
 }
