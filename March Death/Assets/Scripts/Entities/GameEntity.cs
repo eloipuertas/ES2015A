@@ -19,6 +19,9 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public Races getRace() { return race; }
     public abstract E getType<E>() where E : struct, IConvertible;
 
+    protected Collider _collider;
+    protected Terrain _terrain;
+
     /// <summary>
     /// Called when Start has been called
     /// </summary>
@@ -147,6 +150,11 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         return gameObject;
     }
 
+    public Vector3 closestPointTo(Vector3 point)
+    {
+        return _collider.ClosestPointOnBounds(point);
+    }
+
     protected List<Ability> _abilities = new List<Ability>();
     public Ability getAbility(string name)
     {
@@ -236,6 +244,9 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public virtual void Start()
     {
         setupAbilities();
+
+        _collider = GetComponent<Collider>();
+        _terrain = Terrain.activeTerrain;
     }
 
     public void Destroy(bool immediately = false)
@@ -361,7 +372,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         }
 
         // Check if we are dead
-        if (_woundsReceived == info.unitAttributes.wounds)
+        if (_woundsReceived == info.attributes.wounds)
         {
             setStatus(info.isUnit ? EntityStatus.DEAD : EntityStatus.DESTROYED);
             onFatalWounds();
