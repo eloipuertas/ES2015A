@@ -238,7 +238,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         setupAbilities();
     }
 
-    public void Destroy()
+    public void Destroy(bool immediately = false)
     {
         // TODO: Should this be automatically handled with events?
         FOWManager.Instance.removeEntity(this.GetComponent<FOWEntity>());
@@ -253,8 +253,8 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         // TODO: Should this be automatically handled with events?
         BasePlayer.getOwner(this).removeEntity(this);
 
-        // Destroy us
-        Destroy(this.gameObject);
+        // Play dead and/or destroy
+        Destroy(this.gameObject, immediately ? 0.0f : 5.0f);
     }
 
     public override void Update()
@@ -262,11 +262,6 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         foreach (Ability ability in _abilities)
         {
             ability.Update();
-        }
-
-        if (status == EntityStatus.DEAD || status == EntityStatus.DESTROYED)
-        {
-            Destroy();
         }
     }
 
@@ -352,7 +347,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public void receiveAttack(Unit from, bool isRanged)
     {
         // Do not attack dead targets
-        if (_status == EntityStatus.DEAD || _status == EntityStatus.DESTROYED)
+        if (status == EntityStatus.DEAD || status == EntityStatus.DESTROYED)
         {
             throw new InvalidOperationException("Can not receive damage while not alive");
         }
@@ -368,8 +363,9 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         // Check if we are dead
         if (_woundsReceived == info.unitAttributes.wounds)
         {
-            _status = info.isUnit ? EntityStatus.DEAD : EntityStatus.DESTROYED;
+            setStatus(info.isUnit ? EntityStatus.DEAD : EntityStatus.DESTROYED);
             onFatalWounds();
+            Destroy();
         }
 
         // If we are a unit and doing nothing, attack back

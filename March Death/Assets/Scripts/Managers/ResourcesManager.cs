@@ -18,6 +18,7 @@ namespace Managers
             InitDeposit(new WorldResources.Resource(Type.FOOD, 2000));
             InitDeposit(new WorldResources.Resource(Type.METAL, 2000));
             InitDeposit(new WorldResources.Resource(Type.WOOD, 2000));
+            InitDeposit(new WorldResources.Resource(Type.GOLD, 2000));
         }
 
 
