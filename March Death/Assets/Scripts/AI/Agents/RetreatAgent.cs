@@ -21,8 +21,6 @@ namespace Assets.Scripts.AI.Agents
         Rect enemySquadBoundingBox, ownSquadBoundingBox;
         Vector3 safeArea;
         float minDistanceBetweenHeroAndNearestEnemy;
-        private float _maxUnitRange;
-        private Storage.Races _enemyRace;
 
         private int confidence;
 
@@ -45,16 +43,6 @@ namespace Assets.Scripts.AI.Agents
                 }
             }
 
-            if (ai.race == Storage.Races.ELVES)
-            {
-                _maxUnitRange = Storage.Info.get.of(Storage.Races.MEN, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
-                _enemyRace = Storage.Races.MEN;
-            }
-            else
-            {
-                _maxUnitRange = Storage.Info.get.of(Storage.Races.ELVES, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
-                _enemyRace = Storage.Races.ELVES;
-            }
         }
 
         public override void controlUnits(SquadAI squad)
@@ -63,10 +51,10 @@ namespace Assets.Scripts.AI.Agents
             isHeroInDanger = false;
 
             // Mirar on estan els enemics
-            enemySquadBoundingBox = getSquadBoundingBox(ai.EnemyUnits);
+			enemySquadBoundingBox = SquadAI.GetUnitListBoundingBox(ai.EnemyUnits);
             
             // Mirar on estic jo
-            ownSquadBoundingBox = getSquadBoundingBox(ai.Army);
+            ownSquadBoundingBox = squad.getSquadBoundingBox();
 
             // Intentar Veure on hauria d'anar una unitat per estar protegida
             recalcSafePoint();
@@ -100,7 +88,7 @@ namespace Assets.Scripts.AI.Agents
 
                 if (isHeroInDanger)
                 {
-                    SquadAI s = new SquadAI(0);
+                    SquadAI s = new SquadAI(0, ai);
                     s.addUnits(squadToAtackManager);
                     attackAgent.controlUnits(s);
                 }
@@ -123,14 +111,9 @@ namespace Assets.Scripts.AI.Agents
             }
 
             //Get the squad bounding box
-            ownSquadBoundingBox = getSquadBoundingBox(squad.units);
+            ownSquadBoundingBox = squad.getSquadBoundingBox();
 
-            float maxLongitudeOfBox = ownSquadBoundingBox.width > ownSquadBoundingBox.height ? ownSquadBoundingBox.width : ownSquadBoundingBox.height;
-            
-            //Smell what is near this position
-            Unit[] enemyUnitsNearUs = ai.senses.getUnitsOfRaceNearPosition(new Vector3(ownSquadBoundingBox.x, squad.units[0].transform.position.y, ownSquadBoundingBox.y), maxLongitudeOfBox * 2 * _maxUnitRange, _enemyRace);
-
-            foreach (Unit enemyUnit in enemyUnitsNearUs)
+            foreach (Unit enemyUnit in squad.enemySquad.units)
             {
                 foreach (Unit ownUnit in squad.units)
                 {
@@ -151,29 +134,6 @@ namespace Assets.Scripts.AI.Agents
             }
              
             return confidence;
-        }
-
-        /// <summary>
-        /// Returns the bounding box of an squad
-        /// </summary>
-        /// <param name="units"></param>
-        /// <returns></returns>
-        private Rect getSquadBoundingBox(List<Unit> units)
-        {
-            float minX = Mathf.Infinity;
-            float maxX = -Mathf.Infinity;
-            float minY = Mathf.Infinity;
-            float maxY = -Mathf.Infinity;
-
-            foreach (Unit u in units)
-            {
-                if (maxY < u.transform.position.z) maxY = u.transform.position.z;
-                if (minY > u.transform.position.z) minY = u.transform.position.z;
-                if (maxX < u.transform.position.x) maxX = u.transform.position.x;
-                if (minX > u.transform.position.x) minX = u.transform.position.x;
-            }
-
-            return new Rect(minX, minY, (maxX - minX) * 2, (maxY - minY) * 2);
         }
 
         /// <summary>
