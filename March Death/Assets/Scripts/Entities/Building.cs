@@ -232,9 +232,9 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 			IGameEntity entity = gameObject.GetComponent<IGameEntity> ();
 			UnitInfo unitInfo = Info.get.of (info.race, (UnitTypes) _creationQueue.Dequeue ());
 
-			Player.getOwner (entity).resources.SubstractAmount (WorldResources.Type.WOOD, unitInfo.resources.wood);
-			Player.getOwner (entity).resources.SubstractAmount (WorldResources.Type.METAL, unitInfo.resources.metal);
-			Player.getOwner (entity).resources.SubstractAmount (WorldResources.Type.FOOD, unitInfo.resources.food);
+			Player.getOwner (entity).resources.AddAmount (WorldResources.Type.WOOD, unitInfo.resources.wood);
+			Player.getOwner (entity).resources.AddAmount (WorldResources.Type.METAL, unitInfo.resources.metal);
+			Player.getOwner (entity).resources.AddAmount (WorldResources.Type.FOOD, unitInfo.resources.food);
 		}
 	}
 	
