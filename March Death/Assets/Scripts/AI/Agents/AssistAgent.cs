@@ -62,5 +62,10 @@ namespace Assets.Scripts.AI.Agents
         {
             requests.Add(request);
         }
+
+        public void clearRequests()
+        {
+            requests.Clear();
+        }
 	}
 }
