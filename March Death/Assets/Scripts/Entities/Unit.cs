@@ -227,6 +227,11 @@ public class Unit : GameEntity<Unit.Actions>
         return true;
     }
 
+    public IGameEntity getTarget()
+    {
+        return _target;
+    }
+
     public bool attackTarget(IGameEntity entity)
     {
         if (entity.info.isUnit)

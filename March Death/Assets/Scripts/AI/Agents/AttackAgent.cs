@@ -63,14 +63,14 @@ namespace Assets.Scripts.AI.Agents
 
                 foreach(Unit u in squad.units)
                 {
-                    if (u.status != EntityStatus.DEAD && !u.attackTarget(bTar))
+                    if (u.status != EntityStatus.DEAD && ((Unit)u.getTarget()!= bTar))
                     {
-                        u.moveTo(bTar.transform.position);
-                        if(AIController.AI_DEBUG_ENABLED)
-                        {
-                            ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
-                        }
-                    }     
+                        u.attackTarget(bTar);
+                    }
+                    if (AIController.AI_DEBUG_ENABLED)
+                    {
+                        ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
+                    }
                 }
                     
             }
