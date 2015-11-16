@@ -20,19 +20,29 @@ namespace Storage
         private Dictionary<Tuple<Races, BuildingTypes>, EntityInfo> buildingStore = new Dictionary<Tuple<Races, BuildingTypes>, EntityInfo>();
         private Dictionary<Tuple<Races, BuildingTypes>, List<string>> buildingPrefabs = new Dictionary<Tuple<Races, BuildingTypes>, List<string>>();
 
+        public enum BuildingVariant { REAL = 0, GHOST = 1 }
+
         /// <summary>
         /// Private constructor, singleton access only
         /// <remarks>Use Info.get instead</remarks>
         /// </summary>
         private Info()
         {
+            // JSON
             parseJSONFiles<UnitInfo, UnitTypes>("Data/Units", unitStore, EntityType.UNIT);
             parseJSONFiles<ResourceInfo, BuildingTypes>("Data/Buildings/Resources", buildingStore, EntityType.BUILDING);
             parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Barracks", buildingStore, EntityType.BUILDING);
 
+            // Unit prefabs
             parsePrefabs<Unit, UnitTypes>("Prefabs/Units", unitPrefabs);
+
+            // Buildings prefabs
             parsePrefabs<Resource, BuildingTypes>("Prefabs/Buildings/Resources", buildingPrefabs);
             parsePrefabs<Barrack, BuildingTypes>("Prefabs/Buildings/Barracks", buildingPrefabs);
+
+            // Ghosts prefabs (MUST BE DONE AFTER REALS!)
+            parsePrefabs<GhostBuilding, BuildingTypes>("Prefabs/Buildings/Resources", buildingPrefabs);
+            parsePrefabs<GhostBuilding, BuildingTypes>("Prefabs/Buildings/Barracks", buildingPrefabs);
         }
 
         /// <summary>
@@ -214,9 +224,9 @@ namespace Storage
         /// <param name="race">Race of the Building</param>
         /// <param name="type">Type of the Building</param>
         /// <returns>The created GameObject</returns>
-        public GameObject createBuilding(Races race, BuildingTypes type, int variant = -1)
+        public GameObject createBuilding(Races race, BuildingTypes type, BuildingVariant variant = BuildingVariant.REAL)
         {
-            string prefab = getPrefab(race, type, variant);
+            string prefab = getPrefab(race, type, (int)variant);
             return UnityEngine.Object.Instantiate((GameObject)Resources.Load(prefab, typeof(GameObject)));
         }
 
@@ -242,9 +252,9 @@ namespace Storage
         /// <param name="position">Building position</param>
         /// <param name="rotation">Building rotation</param>
         /// <returns>The created GameObject</returns>
-        public GameObject createBuilding(Races race, BuildingTypes type, Vector3 position, Quaternion rotation, int variant = 0)
+        public GameObject createBuilding(Races race, BuildingTypes type, Vector3 position, Quaternion rotation, BuildingVariant variant = BuildingVariant.REAL)
         {
-            string prefab = getPrefab(race, type, variant);
+            string prefab = getPrefab(race, type, (int)variant);
             return UnityEngine.Object.Instantiate((GameObject)Resources.Load(prefab, typeof(GameObject)), position, rotation) as GameObject;
         }
     }

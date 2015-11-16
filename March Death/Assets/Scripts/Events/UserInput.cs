@@ -120,7 +120,7 @@ public partial class UserInput : MonoBehaviour
                 Select();
                 break;
             case Player.status.SELECTED_UNITS:
-                Deselect();
+                //Deselect(); when clicking two times over the same unit, there are two selections and two sounds
                 Select();
                 break;
             case Player.status.PLACING_BUILDING:
@@ -197,17 +197,29 @@ public partial class UserInput : MonoBehaviour
             // We just be sure that is a selectable object
             if (selectedObject)
             {
+                // if it is the unique selected element, return
+                if (sManager.UniqueSelected(selectedObject)) return;
+
                 if (sManager.CanBeSelected(selectedObject))
                 {
+                    Deselect();
                     sManager.SelectUnique(selectedObject);
                     player.setCurrently(Player.status.SELECTED_UNITS);
                 }
                 else
+                {
+                    Deselect();
                     player.setCurrently(Player.status.IDLE);
+                }
+
             }
             else
+            {
+                Deselect();
                 player.setCurrently(Player.status.IDLE);
+            }
         }
+        else Deselect();
     }
 
     private void Deselect()

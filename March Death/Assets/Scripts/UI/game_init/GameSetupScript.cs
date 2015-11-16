@@ -24,21 +24,22 @@ public class GameSetupScript : MonoBehaviour
     /// <summary>
     /// The message box rectangle.
     /// </summary>
-    private Rect messageBox = new Rect ((Screen.width - 200) / 2, (Screen.height - 300) / 2, 200, 150);
+    private Rect messageBox = new Rect((Screen.width - 200) / 2, (Screen.height - 300) / 2, 200, 150);
 
     // Use this for initialization
     void Start ()
     {
         info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
+        Debug.Log("info exists");
         raceSelected = false;
         showMsgBox = false;
     }
 
-    void OnGUI ()
+    void OnGUI()
     {
         if (showMsgBox)
         {
-            messageBox = GUI.Window (0, messageBox, DrawWindow, "Select Race");
+            messageBox = GUI.Window(0, messageBox, DrawWindow, "Select Race");
         }
     }
 
@@ -46,10 +47,10 @@ public class GameSetupScript : MonoBehaviour
     /// Draws the message box.
     /// </summary>
     /// <param name="window">Window.</param>
-    void DrawWindow (int window)
+    void DrawWindow(int window)
     {
-        GUI.Label (new Rect (5, 20, messageBox.width, 20), "Please, select a civilization");
-        if (GUI.Button (new Rect (5, 50, messageBox.width - 10, 20), "Ok"))
+        GUI.Label(new Rect(5, 20, messageBox.width, 20), "Please, select a civilization");
+        if (GUI.Button(new Rect(5, 50, messageBox.width - 10, 20), "Ok"))
         {
             showMsgBox = false;
         }
@@ -57,13 +58,17 @@ public class GameSetupScript : MonoBehaviour
 
     public void SetPlayerRaceToElf ()
     {
-        info.SetPlayerRace (Races.ELVES);
+        // HACK Even though info is initialized in Start(), it is null when it gets here
+        if (!info) info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
+        info.SetPlayerRace(Races.ELVES);
         raceSelected = true;
     }
 
-    public void SetPlayerRaceToHuman ()
+    public void SetPlayerRaceToHuman()
     {
-        info.SetPlayerRace (Races.MEN);
+        // HACK Even though info is initialized in Start(), it is null when it gets here
+        if (!info) info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
+        info.SetPlayerRace(Races.MEN);
         raceSelected = true;
     }
 
@@ -91,8 +96,8 @@ public class GameSetupScript : MonoBehaviour
         }
     }
 
-    public void Cancel ()
+    public void Cancel()
     {
-        Application.LoadLevel (0);
+        Application.LoadLevel(0);
     }
 }

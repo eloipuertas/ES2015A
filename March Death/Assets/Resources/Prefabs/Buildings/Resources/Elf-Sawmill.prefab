@@ -1827,7 +1827,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 173718}
-  m_LocalRotation: {x: -.0497172512, y: -.0185149629, z: .627283633, w: .776981771}
+  m_LocalRotation: {x: .408401221, y: .53631717, z: .478711843, w: .562501013}
   m_LocalPosition: {x: -3.46000004, y: 1.91612244, z: -4.98000002}
   m_LocalScale: {x: -7.33154726, y: -7.33155107, z: -7.3315506}
   m_Children: []
@@ -2005,7 +2005,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 115922}
-  m_LocalRotation: {x: .207251519, y: .082345143, z: .561577022, w: .796804368}
+  m_LocalRotation: {x: .207251549, y: .0823451504, z: .561577082, w: .796804488}
   m_LocalPosition: {x: 3.16649679e-10, y: .000632171868, z: 5.58793532e-11}
   m_LocalScale: {x: 1, y: 1.00000048, z: 1}
   m_Children:
@@ -2442,7 +2442,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 174826}
   m_LocalRotation: {x: 0, y: .707106829, z: 0, w: .707106709}
-  m_LocalPosition: {x: 228.085663, y: 79.0026245, z: 758.095154}
+  m_LocalPosition: {x: 760.770081, y: 79.0026245, z: 925.038086}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 468934}
@@ -3392,7 +3392,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 2161cea0c31b4034bb912f422d958e89, type: 2}
+  - {fileID: 2100000, guid: 37f134726c12a3443b9275df8d6356df, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
@@ -3587,7 +3587,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 2161cea0c31b4034bb912f422d958e89, type: 2}
+  - {fileID: 2100000, guid: ee8122f0405461f469349f90d761730f, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
@@ -3779,7 +3779,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 360d5b4afe1e57247bd3ff44dfd8b8b9, type: 2}
+  - {fileID: 2100000, guid: bf48377e4654d1c46b9edd5a7c599913, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
@@ -3878,7 +3878,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 360d5b4afe1e57247bd3ff44dfd8b8b9, type: 2}
+  - {fileID: 2100000, guid: bf48377e4654d1c46b9edd5a7c599913, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
@@ -4269,8 +4269,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 17, y: 0, z: 15}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 17, y: 5.5, z: 15}
+  m_Center: {x: 0, y: 2.20000005, z: .5}
 --- !u!95 &9581336
 Animator:
   serializedVersion: 3
@@ -4356,8 +4356,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: .00284743309, y: 6.68764114e-05, z: 0}
-    m_Extent: {x: .00696776249, y: .00999999885, z: .00873303041}
+    m_Center: {x: .00284767151, y: 6.68764114e-05, z: -9.53674316e-07}
+    m_Extent: {x: .00696786726, y: .00999999885, z: .00873310771}
   m_DirtyAABB: 0
 --- !u!137 &13726378
 SkinnedMeshRenderer:
@@ -5076,7 +5076,7 @@ NavMeshObstacle:
   m_MoveThreshold: .100000001
   m_Carve: 0
   m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0, z: .5}
   m_TimeToStationary: .5
 --- !u!1001 &100100000
 Prefab:
@@ -5139,7 +5139,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Size.y
-      value: .25
+      value: 5.5
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Extents.x
@@ -5152,6 +5152,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Center.y
+      value: 2.20000005
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

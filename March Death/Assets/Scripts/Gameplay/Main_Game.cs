@@ -42,19 +42,20 @@ public class Main_Game : MonoBehaviour
         bm.Inputs = inputs; 
     }
 
-    public GameInformation GetGameInformationObject ()
+    public GameInformation GetGameInformationObject()
     {
         return info;
     }
 
-    public void StartGame ()
+    public void StartGame()
     {
-        switch (info.getGameMode ()) {
-        case GameInformation.GameMode.CAMPAIGN:
-            LoadCampaign ();
-            break;
-        case GameInformation.GameMode.SKIRMISH:
-            break;
+        switch (info.getGameMode())
+        {
+            case GameInformation.GameMode.CAMPAIGN:
+                LoadCampaign();
+                break;
+            case GameInformation.GameMode.SKIRMISH:
+                break;
         }
     }
 
@@ -114,11 +115,7 @@ public class Main_Game : MonoBehaviour
     public void ClearGame()
     {
         GameObject obj;
-        // Unregisters events in the HUD
-        obj = GameObject.Find("HUD");
-        obj.GetComponentInChildren<InformationController>().Clear();
-        obj.GetComponentInChildren<EntityAbilitiesController>().Clear();
-        obj = GameObject.Find ("GameInformationObject").gameObject;
+        obj = GameObject.Find("GameInformationObject").gameObject;
         Destroy(obj);
     }
 

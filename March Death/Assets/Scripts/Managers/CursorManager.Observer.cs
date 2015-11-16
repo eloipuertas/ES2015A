@@ -70,13 +70,14 @@ namespace Managers
             /// Mainly here we check if the selection is not a building and then
             /// if the pointed entity is an enemy or not, if it is we show a sword if not, we show the pointer cursor
 
-            if (_player.selection.IsBuilding()) return;
-
-            
-            if (ItsEnemy())
+            if (_player.selection.IsBuilding())
+                _currentCursor = cursor.POINTER;
+            else if(ItsEnemy())
                 _currentCursor = cursor.SWORD;
             else
                 _currentCursor = cursor.POINTER;
+            
+                
 
         }
 
@@ -120,10 +121,15 @@ namespace Managers
         private bool ItsAlly(GameObject _object)
         {
             IGameEntity entity = _object.GetComponent<IGameEntity>();
-            if (entity.info.race == _player.race)
-                return true;
-            else
-                return false;
+            if (entity != null)
+            {
+
+                if (entity.info.race == _player.race)
+                    return true;
+                else
+                    return false;
+            }
+            else return false;
         }
 
         /// <summary>
@@ -148,15 +154,19 @@ namespace Managers
         private bool ItsEnemy(GameObject _object)
         {
             IGameEntity entity = _object.GetComponent<IGameEntity>();
-            /// if it's dead is not an enemy
-            if (entity.info.race != _player.race 
+            if (entity != null)
+            {
+
+                /// if it's dead is not an enemy
+                if (entity.info.race != _player.race 
                 && entity.status != EntityStatus.DEAD 
                 && entity.status != EntityStatus.DESTROYED)
                 return true;
-            else
-                return false;
+                else
+                    return false;
+            }
+            else return false;
         }
-
 
 
     }

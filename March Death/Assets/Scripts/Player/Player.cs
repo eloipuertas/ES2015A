@@ -28,9 +28,7 @@ public class Player : BasePlayer
 	//public ArrayList SelectedObjects = new ArrayList();
     public ArrayList SelectedObjects { get { return _selection.ToArrayList(); } }
 
-    private bool showMsgBox = false;
-    private Rect messageBox = new Rect((Screen.width - 200) / 2, (Screen.height - 300) / 2, 200, 150);
-    private string strStatus = "";
+    private bool isGameOverScreenDisplayed = false;
 
     // Use this for initialization
     public override void Start()
@@ -55,35 +53,43 @@ public class Player : BasePlayer
     {
         if (missionStatus.isGameOver())
         {
-            if (strStatus.Equals(""))
+            if (!isGameOverScreenDisplayed)
             {
-                strStatus = missionStatus.hasWon(playerId) ? "You win!" : "You loose";
-                showMsgBox = true;
+                GameObject gameOverDialog = null;
+                if (missionStatus.hasWon(playerId))
+                {
+                    switch (_selfRace)
+                    {
+                        case Storage.Races.MEN:
+                            gameOverDialog = (GameObject) Resources.Load("GameEndWinHuman");
+                            break;
+                        case Storage.Races.ELVES:
+                            gameOverDialog = (GameObject) Resources.Load("GameEndWinElf");
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (_selfRace)
+                    {
+                        case Storage.Races.MEN:
+                            gameOverDialog = (GameObject) Resources.Load("GameOver-Human");
+                            break;
+                        case Storage.Races.ELVES:
+                            gameOverDialog = (GameObject) Resources.Load("GameOver-Elf");
+                            break;
+                    }
+                }
+                Instantiate(gameOverDialog);
+                isGameOverScreenDisplayed = true;
             }
             _currently = status.TERMINATED;
         }
     }
 
-    void OnGUI()
+    void OnDestroy()
     {
-        if (showMsgBox)
-        {
-            messageBox = GUI.Window(0, messageBox, DrawWindow, "Game Over!");
-        }
-    }
-    
-    /// <summary>
-    /// Draws the message box.
-    /// </summary>
-    /// <param name="window">Window.</param>
-    void DrawWindow(int window)
-    {
-        GUI.Label(new Rect(5, 20, messageBox.width, 20), strStatus);
-        if (GUI.Button(new Rect(5, 120, messageBox.width - 10, 20), "Ok"))
-        {
-            showMsgBox = false;
-            Application.LoadLevel(0);
-        }
+        _currently = status.TERMINATED;
     }
 
     public override void removeEntity(IGameEntity entity)

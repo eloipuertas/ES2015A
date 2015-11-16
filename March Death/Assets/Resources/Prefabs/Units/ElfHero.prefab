@@ -395,7 +395,8 @@ GameObject:
   - 54: {fileID: 5400758}
   - 114: {fileID: 11444064}
   - 65: {fileID: 6567266}
-  - 195: {fileID: 19504876}
+  - 108: {fileID: 10812626}
+  - 195: {fileID: 19547402}
   m_Layer: 0
   m_Name: ElfHero
   m_TagString: Untagged
@@ -1508,7 +1509,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 174622}
-  m_LocalRotation: {x: -.180334717, y: .535685837, z: -.301847577, w: .767729282}
+  m_LocalRotation: {x: -.180334702, y: .535685778, z: -.301847547, w: .767729163}
   m_LocalPosition: {x: .000115991119, y: .000410139852, z: -.000862717337}
   m_LocalScale: {x: .999999881, y: 1.00000048, z: 1}
   m_Children:
@@ -2732,10 +2733,10 @@ Rigidbody:
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: .0500000007
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 122
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!65 &6567266
 BoxCollider:
@@ -2766,6 +2767,38 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!108 &10812626
+Light:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 126116}
+  m_Enabled: 1
+  serializedVersion: 6
+  m_Type: 3
+  m_Color: {r: 0, g: .764705896, b: .290060878, a: 1}
+  m_Intensity: 2.20000005
+  m_Range: 10
+  m_SpotAngle: 30
+  m_CookieSize: 10
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_Strength: 1
+    m_Bias: .0500000007
+    m_NormalBias: .400000006
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 1
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_Lightmapping: 4
+  m_BounceIntensity: 1
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
+  m_AreaSize: {x: .5, y: .5}
 --- !u!114 &11444064
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2790,6 +2823,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   race: 1
   type: 1
+  _distanceToTarget: 0
 --- !u!114 &11487308
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2801,6 +2835,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43c34b4ae45e2c94f90ae970db2ad9f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _collider: {fileID: 0}
 --- !u!137 &13791218
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
@@ -2919,7 +2954,7 @@ SkinnedMeshRenderer:
     m_Center: {x: .000412155408, y: -.00212718733, z: -.0015058443}
     m_Extent: {x: .0127404276, y: .0175349209, z: .0104838703}
   m_DirtyAABB: 0
---- !u!195 &19504876
+--- !u!195 &19547402
 NavMeshAgent:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -2964,7 +2999,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Constraints
-      value: 122
+      value: 126
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Size.y
@@ -2986,6 +3021,42 @@ Prefab:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: c2420a101d7484d5192fdf3db6b3cebc, type: 2}
+    - target: {fileID: 0}
+      propertyPath: m_Type
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_AreaSize.x
+      value: .5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_AreaSize.y
+      value: .5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Color.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Color.g
+      value: .764705896
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Color.b
+      value: .290060878
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Intensity
+      value: 2.20000005
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_DrawHalo
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_UseGravity
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 126116}
