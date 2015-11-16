@@ -161,6 +161,7 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 		} else if (_creationQueue.Count > 0) {			
 			_infoUnitToCreate = Info.get.of(info.race, (UnitTypes) _creationQueue.Dequeue());
 			_creationTimer = 0;
+			_creatingUnit = true;
 		}
 	}
 	
@@ -197,7 +198,6 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 	{
 		if (_creationQueue.Count < info.buildingAttributes.creationQueueCapacity) {
 			_creationQueue.Enqueue (type);
-			_creatingUnit = true;
 			return true;
 		} else {
 			Debug.LogWarning("Creation queue reached its limit");
