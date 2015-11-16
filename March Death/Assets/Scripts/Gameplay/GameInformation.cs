@@ -137,4 +137,9 @@ public class GameInformation : MonoBehaviour {
         game.AddPlayerInformation(player);
         game.SetWorldResources(5000, 5000, 5000);
     }
+
+    void OnDestroy()
+    {
+        Debug.Log("GameInformation destroyed");
+    }
 }
