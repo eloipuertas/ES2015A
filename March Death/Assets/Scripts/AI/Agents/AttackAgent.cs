@@ -5,7 +5,7 @@ namespace Assets.Scripts.AI.Agents
     public class AttackAgent : BaseAgent
     {
 		const int CONFIDENCE_NO_ENEMIES_AVALIABLE = 0;
-		const int CONFIDENCE_OWN_SQUAD_SUPREMACY = 5;
+		const int CONFIDENCE_OWN_SQUAD_SUPREMACY = 75;
 		const int CONFIDENCE_OWN_SQUAD_SUPREMACI_MAX_MULTITPLIER = 5;
 
 		float _maxUnitRange;
@@ -76,7 +76,22 @@ namespace Assets.Scripts.AI.Agents
         {
             if (ai.EnemyUnits.Count == 0)
                 return 0;
-            return 0;
+
+            float supremaciIndex = squad.getData<AttackData>().Value / squad.enemySquad.getData<AttackData>().Value;
+
+            supremaciIndex = supremaciIndex == Mathf.Infinity ? 0 : supremaciIndex;
+
+            Debug.Log("Supremaci index" + supremaciIndex);
+
+            if (supremaciIndex > 0f)
+            {
+                return Mathf.RoundToInt(Mathf.Min(supremaciIndex, CONFIDENCE_OWN_SQUAD_SUPREMACI_MAX_MULTITPLIER) * CONFIDENCE_OWN_SQUAD_SUPREMACY);
+            }
+            else
+            {
+                return 0;
+            }
+            
         }
     }
 

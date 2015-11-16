@@ -158,34 +158,27 @@ namespace Assets.Scripts.AI
             }
 
             float maxLongitudeOfBox = boudningBox.width > boudningBox.height ? boudningBox.width : boudningBox.height;
+            if (maxLongitudeOfBox < 1) maxLongitudeOfBox = 1f;
 
             //Smell what is near this position
-            enemySquad.units = ai.senses.getUnitsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 2 * _maxUnitRange, _enemyRace);
+            enemySquad.units = ai.senses.getUnitsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 3 * _maxUnitRange, _enemyRace);
 
             enemySquad.boudningBox = enemySquad.getSquadBoundingBox();
 
             //Calculate the Enemy units atack data
             ad = enemySquad.getData<AttackData>();
             val = 0;
-            if (ad.hasChanged)
+  
+            foreach (Unit u in enemySquad.units)
             {
-                foreach (Unit u in this.units)
-                {
-                    val += valOfUnit(u);
-                }
-                ad.Value = val;
-                ad.hasChanged = false;
+                val += valOfUnit(u);
             }
-            else
-            {
-                val = ad.Value;
-            }
-
+            ad.Value = val;
         }
 
         float valOfUnit(Unit u)
         {
-            return u.healthPercentage * (u.info.unitAttributes.resistance + u.info.unitAttributes.attackRate * u.info.unitAttributes.strength);
+            return u.healthPercentage / 100 * (u.info.unitAttributes.resistance + u.info.unitAttributes.attackRate * u.info.unitAttributes.strength);
         }
 
     }
