@@ -57,7 +57,7 @@ namespace Assets.Scripts.AI
             modules = new List<AIModule>();
             Army = new List<Unit>();
             rootBasePosition = new Vector3(706, 80, 765);
-            Army.Add(Info.get.createUnit(_selfRace, UnitTypes.HERO, rootBasePosition,Quaternion.Euler(0,0,0)).GetComponent<Unit>());
+            Army.Add(Info.get.createUnit(_selfRace, UnitTypes.HERO, rootBasePosition+new Vector3(30,0,30),Quaternion.Euler(0,0,0)).GetComponent<Unit>());
             Workers = new List<Unit>();
             Macro = new MacroManager(this);
 

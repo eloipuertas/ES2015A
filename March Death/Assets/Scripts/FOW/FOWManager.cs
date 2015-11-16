@@ -140,11 +140,11 @@ public class FOWManager : MonoBehaviour
                 foreach (FOWEntity e in entities)
                     if (e.IsActor)
                     {
-                        e.changeVisible(isThereinRect(e.Bounds, visible.visible));
+                        e.changeVisible(isThereinRect(e.Bounds, visible.visible, !e.IsOwnedByPlayer));
                     }
                     else
                     {
-                        e.changeVisible(isThereinRect(e.Bounds, visible.explored, !e.IsOwnedByPlayer));
+                        e.changeVisible(isThereinRect(e.Bounds, visible.explored));
                     }
                     
 
