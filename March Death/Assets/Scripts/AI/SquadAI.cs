@@ -158,11 +158,14 @@ namespace Assets.Scripts.AI
             }
 
             float maxLongitudeOfBox = boudningBox.width > boudningBox.height ? boudningBox.width : boudningBox.height;
+
+            //If we have only 1 unit we we need to change max longutude of the box to 1 because width of the rect is 0
             if (maxLongitudeOfBox < 1) maxLongitudeOfBox = 1f;
 
             //Smell what is near this position
             enemySquad.units = ai.senses.getUnitsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 3 * _maxUnitRange, _enemyRace);
 
+            //Get the enemy squad bounding box
             enemySquad.boudningBox = enemySquad.getSquadBoundingBox();
 
             //Calculate the Enemy units atack data

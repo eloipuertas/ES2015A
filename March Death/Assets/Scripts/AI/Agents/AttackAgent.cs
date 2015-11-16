@@ -77,10 +77,13 @@ namespace Assets.Scripts.AI.Agents
             if (ai.EnemyUnits.Count == 0)
                 return 0;
 
+            //Get the ratio of how better we are comparing us with the enemy army
             supremaciIndex = squad.getData<AttackData>().Value / squad.enemySquad.getData<AttackData>().Value;
 
+            //If is an infinity number we return 0
             supremaciIndex = supremaciIndex == Mathf.Infinity ? 0 : supremaciIndex;
 
+            //Return the formula explained on the Issue max(n, 5) * 75
             if (supremaciIndex > 0f)
             {
                 return Mathf.RoundToInt(Mathf.Min(supremaciIndex, CONFIDENCE_OWN_SQUAD_SUPREMACI_MAX_MULTITPLIER) * CONFIDENCE_OWN_SQUAD_SUPREMACY);
