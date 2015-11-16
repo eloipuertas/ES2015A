@@ -6,9 +6,10 @@ namespace Assets.Scripts.AI.Agents
 	public class AssistAgent : BaseAgent
 	{
 		Unit hero;
+        List<KeyValuePair<SquadAI, int>> requests;
         KeyValuePair<SquadAI, int> mostImportantRequest;
 
-		public AssistAgent(AIController ai, string name) : base(ai, name)
+        public AssistAgent(AIController ai, string name) : base(ai, name)
 		{
 			//Find our hero
 			foreach (Unit u in ai.Army)
@@ -18,6 +19,7 @@ namespace Assets.Scripts.AI.Agents
 					hero = u;
 				}
 			}
+            requests = new List<KeyValuePair<SquadAI, int>>();
 		}
 		
 		public override void controlUnits(SquadAI squad)
@@ -31,18 +33,39 @@ namespace Assets.Scripts.AI.Agents
 		
 		
 		public override int getConfidence(SquadAI squad)
-		{	
+		{
+            if (requests.Count == 0)
+            {
+                return 0;
+            }
+
 			int confidence;
+            mostImportantRequest = requests[0];
+            confidence = requests[0].Value;
+
+            //Go to help the closest request
+            foreach(KeyValuePair<SquadAI, int> request in requests)
+            {
+                if(Vector2.Distance(request.Key.boudningBox.center, squad.boudningBox.center) < 
+                    Vector2.Distance(mostImportantRequest.Key.boudningBox.center, squad.boudningBox.center))
+                {
+                    mostImportantRequest = request;
+                    confidence = request.Value;
+                }   
+            }
+
             confidence = extraConfidence;
 			return confidence;
 		}
 
         public void requestHelp(KeyValuePair<SquadAI, int> request)
         {
-            if(request.Value > mostImportantRequest.Value)
-            {
-                mostImportantRequest = request;
-            }
+            requests.Add(request);
+        }
+
+        public void clearRequests()
+        {
+            requests.Clear();
         }
 	}
 }

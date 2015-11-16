@@ -68,6 +68,7 @@ namespace Assets.Scripts.AI
 
                 bAgent.controlUnits(sq);
                 agents[AGENT_ASSIST].extraConfidence = 0;
+                ((AssistAgent)agents[AGENT_ASSIST]).clearRequests();
             }
         }
         /// <summary>
