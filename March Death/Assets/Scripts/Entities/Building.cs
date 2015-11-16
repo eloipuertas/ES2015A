@@ -197,6 +197,7 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 	{
 		if (buildingQueue.Count < info.buildingAttributes.creationQueueCapacity) {
 			buildingQueue.Enqueue (type);
+			_creatingUnit = true;
 			return true;
 		} else {
 			Debug.LogWarning("Creation queue reached its limit");
