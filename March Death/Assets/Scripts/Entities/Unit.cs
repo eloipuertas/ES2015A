@@ -12,7 +12,7 @@ using Storage;
 /// </summary>
 public class Unit : GameEntity<Unit.Actions>
 {
-    public enum Actions { MOVEMENT_START, MOVEMENT_END, DAMAGED, DIED };
+    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT };
     public enum Roles { PRODUCING, WANDERING };
 
     public Unit() { }
@@ -20,7 +20,9 @@ public class Unit : GameEntity<Unit.Actions>
     /// <summary>
     /// Interval between resources update in miliseconds
     /// </summary>
-    const float RESOURCES_UPDATE_INTERVAL = 5.0f;
+    const float RESOURCES_UPDATE_INTERVAL = 15.0f;
+
+    Statistics statistics;
 
     ///<sumary>
     /// Auto-unregister events when we are destroyed
@@ -130,6 +132,9 @@ public class Unit : GameEntity<Unit.Actions>
     protected override void onFatalWounds()
     {
         fire(Actions.DIED);
+
+        statistics.growth_speed *= -1;
+        fire(Actions.STAT_OUT, statistics);
     }
 
     /// <summary>
@@ -323,6 +328,21 @@ public class Unit : GameEntity<Unit.Actions>
         _navAgent = GetComponent<NavMeshAgent>();
         _navAgent.speed = _info.unitAttributes.movementRate;
         _navAgent.acceleration = info.unitAttributes.movementRate * 2.5f;
+
+        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
+        GameObject gameController = GameObject.Find("GameController");
+        ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
+
+        if (Player.getOwner(this).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
+        {
+            register(Actions.EAT, res_pl.onFoodConsumption);
+            register(Actions.STAT_OUT, res_pl.onStatisticsUpdate);
+            register(Actions.CREATED, res_pl.onStatisticsUpdate);
+        }
+
+        statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -10);
+
+        fire(Actions.CREATED, statistics);
     }
 
     /// <summary>
