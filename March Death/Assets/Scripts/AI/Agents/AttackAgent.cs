@@ -10,7 +10,7 @@ namespace Assets.Scripts.AI.Agents
 
 		float _maxUnitRange;
 		Storage.Races _enemyRace;
-
+        float supremaciIndex;
         float valOfCitizen;
         public AttackAgent(AIController ai, string name) : base(ai, name)
         {
@@ -77,11 +77,9 @@ namespace Assets.Scripts.AI.Agents
             if (ai.EnemyUnits.Count == 0)
                 return 0;
 
-            float supremaciIndex = squad.getData<AttackData>().Value / squad.enemySquad.getData<AttackData>().Value;
+            supremaciIndex = squad.getData<AttackData>().Value / squad.enemySquad.getData<AttackData>().Value;
 
             supremaciIndex = supremaciIndex == Mathf.Infinity ? 0 : supremaciIndex;
-
-            Debug.Log("Supremaci index" + supremaciIndex);
 
             if (supremaciIndex > 0f)
             {
