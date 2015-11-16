@@ -15,7 +15,10 @@ namespace Assets.Scripts.AI.Agents
         int conf;
         float supremaciIndex;
         float valOfCitizen;
-        public AttackAgent(AIController ai, string name) : base(ai, name)
+
+        AssistAgent assistAgent;
+
+        public AttackAgent(AIController ai, AssistAgent assist, string name) : base(ai, name)
         {
             valOfCitizen = 1f;
 			if (ai.race == Storage.Races.ELVES)
@@ -28,6 +31,8 @@ namespace Assets.Scripts.AI.Agents
 				_maxUnitRange = Storage.Info.get.of(Storage.Races.ELVES, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
 				_enemyRace = Storage.Races.ELVES;
 			}
+
+            assistAgent = assist;
         }
 
         public override void controlUnits(SquadAI squad)
@@ -58,14 +63,14 @@ namespace Assets.Scripts.AI.Agents
 
                 foreach(Unit u in squad.units)
                 {
-                    if (u.status != EntityStatus.DEAD && !u.attackTarget(bTar))
+                    if (u.status != EntityStatus.DEAD && ((Unit)u.getTarget()!= bTar))
                     {
-                        u.moveTo(bTar.transform.position);
-                        if(AIController.AI_DEBUG_ENABLED)
-                        {
-                            ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
-                        }
-                    }     
+                        u.attackTarget(bTar);
+                    }
+                    if (AIController.AI_DEBUG_ENABLED)
+                    {
+                        ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
+                    }
                 }
                     
             }

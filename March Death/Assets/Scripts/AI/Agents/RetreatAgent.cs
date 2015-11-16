@@ -13,10 +13,12 @@ namespace Assets.Scripts.AI.Agents
 
         private const int CONFIDENCE_IN_ENEMY_ATACK_RANGE = 75;
         private const int CONFIDENCE_HERO_IS_AT_FIFTY_PERCENT = 1000;
+        private const int CONFIDENCE_ASSIST_HELP_NEEDED = 400;
 
         Unit hero;
 
         AttackAgent attackAgent;
+        AssistAgent assistAgent;
 
         Rect enemySquadBoundingBox, ownSquadBoundingBox;
         Vector3 safeArea;
@@ -26,7 +28,7 @@ namespace Assets.Scripts.AI.Agents
 
         bool isHeroInDanger;
 
-        public RetreatAgent(AIController ai, AttackAgent aA, string name) : base(ai, name)
+        public RetreatAgent(AIController ai, AttackAgent aA, AssistAgent assist, string name) : base(ai, name)
         {
             attackAgent = aA;
             enemySquadBoundingBox = new Rect();
@@ -42,6 +44,8 @@ namespace Assets.Scripts.AI.Agents
                     hero = u;
                 }
             }
+
+            assistAgent = assist;
 
         }
 
@@ -124,7 +128,8 @@ namespace Assets.Scripts.AI.Agents
                         //If our hero is in range and is going to die
                         if(hero.healthPercentage < HERO_HEALTH_TOLERANCE_BEFORE_RETREAT && ownUnit.type == Storage.UnitTypes.HERO)
                         {
-							ai.Micro.agents[MicroManager.AGENT_ASSIST].addConfidence(400);
+						    assistAgent.addConfidence(CONFIDENCE_ASSIST_HELP_NEEDED);
+                            assistAgent.requestHelp(new KeyValuePair<SquadAI, int>(squad, CONFIDENCE_ASSIST_HELP_NEEDED));
                             return CONFIDENCE_HERO_IS_AT_FIFTY_PERCENT;      
                         }
 
