@@ -31,11 +31,12 @@ namespace Assets.Scripts.AI
             agents = new List<BaseAgent>();
             squads = new List<SquadAI>();
             this.ai = ai;
-            AttackAgent aA = new AttackAgent(ai, "Atack");
-            agents.Add(new ExplorerAgent(ai, "Explorer"));
+            AssistAgent assistAgent = new AssistAgent(ai, "Assist");
+            AttackAgent aA = new AttackAgent(ai, assistAgent, "Atack");
+            agents.Add(new ExplorerAgent(ai, assistAgent, "Explorer"));
             agents.Add(aA);
-            agents.Add(new RetreatAgent(ai, aA, "Retreat"));
-			agents.Add(new AssistAgent(ai, "Assist"));
+            agents.Add(new RetreatAgent(ai, aA, assistAgent, "Retreat"));
+			agents.Add(assistAgent);
             addSquad(ai.Army); //hero squad
         }
         /// <summary>
@@ -66,6 +67,7 @@ namespace Assets.Scripts.AI
                 }
 
                 bAgent.controlUnits(sq);
+                agents[AGENT_ASSIST].extraConfidence = 0;
             }
         }
         /// <summary>

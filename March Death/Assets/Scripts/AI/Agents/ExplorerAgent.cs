@@ -18,6 +18,8 @@ namespace Assets.Scripts.AI.Agents
         bool heroVisible;
 		bool allCivils;
 
+        AssistAgent assistAgent;
+
         FOWManager fowManager;
         /// <summary>
         /// Last position when we saw the enemy hero
@@ -29,7 +31,7 @@ namespace Assets.Scripts.AI.Agents
         int[,] dirHelper = new int[8,2]{ { 0, -1 }, { -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 } };
 		int confidence = 0;
         
-		public ExplorerAgent(AIController ai, String name) : base(ai, name)
+		public ExplorerAgent(AIController ai, AssistAgent assist, String name) : base(ai, name)
         {
             ActorSelector selector = new ActorSelector()
             {
@@ -41,6 +43,7 @@ namespace Assets.Scripts.AI.Agents
             heroVisible = false;
             fowManager = FOWManager.Instance;
             heroLastPos = Vector3.zero;
+            assistAgent = assist;
         }
 
         public override void controlUnits(SquadAI squad)
