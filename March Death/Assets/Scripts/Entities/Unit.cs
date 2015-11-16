@@ -12,7 +12,7 @@ using Storage;
 /// </summary>
 public class Unit : GameEntity<Unit.Actions>
 {
-    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED };
+    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STATS_OUT };
     public enum Roles { PRODUCING, WANDERING };
 
     public Unit() { }
@@ -131,7 +131,7 @@ public class Unit : GameEntity<Unit.Actions>
         fire(Actions.DIED);
 
         statistics.growth_speed *= -1;
-        fire(Actions.DIED, statistics);
+        fire(Actions.STATS_OUT, statistics);
     }
 
     /// <summary>
@@ -325,7 +325,7 @@ public class Unit : GameEntity<Unit.Actions>
         if (Player.getOwner(this).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
         {
             register(Actions.EAT, res_pl.onFoodConsumption);
-            register(Actions.DIED, res_pl.onStatisticsUpdate);
+            register(Actions.STATS_OUT, res_pl.onStatisticsUpdate);
             register(Actions.CREATED, res_pl.onStatisticsUpdate);
         }
 
