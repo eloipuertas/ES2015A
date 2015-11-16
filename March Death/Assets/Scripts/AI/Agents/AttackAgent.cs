@@ -6,11 +6,13 @@ namespace Assets.Scripts.AI.Agents
     {
 		const int CONFIDENCE_NO_ENEMIES_AVALIABLE = 0;
 		const int CONFIDENCE_OWN_SQUAD_SUPREMACY = 75;
+        const int CONFIDENCE_ENEMY_SQUAD_HAS_HERO = 500;
 		const int CONFIDENCE_OWN_SQUAD_SUPREMACI_MAX_MULTITPLIER = 5;
 
 		float _maxUnitRange;
 		Storage.Races _enemyRace;
 
+        int conf;
         float supremaciIndex;
         float valOfCitizen;
         public AttackAgent(AIController ai, string name) : base(ai, name)
@@ -80,7 +82,6 @@ namespace Assets.Scripts.AI.Agents
             if (ai.EnemyUnits.Count == 0)
                 return 0;
 
-
             //Get the ratio of how better we are comparing us with the enemy army
             supremaciIndex = squad.getData<AttackData>().Value / squad.enemySquad.getData<AttackData>().Value;
 
@@ -90,7 +91,18 @@ namespace Assets.Scripts.AI.Agents
             //Return the formula explained on the Issue max(n, 5) * 75
             if (supremaciIndex > 0f)
             {
-                return Mathf.RoundToInt(Mathf.Min(supremaciIndex, CONFIDENCE_OWN_SQUAD_SUPREMACI_MAX_MULTITPLIER) * CONFIDENCE_OWN_SQUAD_SUPREMACY);
+                conf = Mathf.RoundToInt(Mathf.Min(supremaciIndex, CONFIDENCE_OWN_SQUAD_SUPREMACI_MAX_MULTITPLIER) * CONFIDENCE_OWN_SQUAD_SUPREMACY);
+
+                //We need to check if the enemy squad has hero inside
+                foreach (Unit u in squad.enemySquad.units)
+                {
+                    if(u.type == Storage.UnitTypes.HERO)
+                    {
+                        conf += CONFIDENCE_ENEMY_SQUAD_HAS_HERO;
+                    }
+                }
+
+                return conf;
             }
 
             return 0;
