@@ -5,6 +5,11 @@ Context* ctx;
 bool monotonePartitioning = false;
 
 
+int pointerSize()
+{
+	return sizeof(void*);
+}
+
 void setMonotonePartitioning(bool enabled)
 {
 	monotonePartitioning = enabled;

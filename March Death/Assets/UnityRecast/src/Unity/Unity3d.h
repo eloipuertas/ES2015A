@@ -11,7 +11,7 @@
 #ifdef WIN32
 	#define DLL_EXPORT extern "C" __declspec(dllexport)
 #else
-	#define DLL_EXPORT extern "C"  __attribute__((declspec))
+	#define DLL_EXPORT extern "C"  __attribute__((cdecl))
 #endif
 
 // Externs
@@ -20,6 +20,7 @@ extern bool monotonePartitioning;
 
 
 // Config
+DLL_EXPORT unsigned char pointerSize();
 DLL_EXPORT void setMonotonePartitioning(bool enabled);
 DLL_EXPORT rcConfig* DefaultConfig(char* logpath);
 
