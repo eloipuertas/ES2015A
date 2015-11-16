@@ -89,6 +89,9 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
         _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.GOLD, gold));
     }
 
+    protected abstract void AddBuilding(IGameEntity entity);
+    protected abstract void AddUnit(IGameEntity entity);
+
     protected void InstantiateBuildings(List<Battle.PlayableEntity> buildings)
     {
         GameObject created;
@@ -103,12 +106,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
             created = _buildings.createBuilding(position, Quaternion.Euler(0,0,0),
                                         building.entityType.building,
                                         _selfRace);
-            addEntity(created.GetComponent<IGameEntity>());
-            /*if (building.entityType.building == Storage.BuildingTypes.STRONGHOLD &&
-                info.GetPlayerRace() == basePlayer.race)
-            {
-                cam.lookGameObject(created);
-            }*/
+            AddBuilding(created.GetComponent<IGameEntity>());
         }
     }
 
@@ -124,7 +122,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
             position.y = terrain.SampleHeight(position);
             created = Storage.Info.get.createUnit(_selfRace, unit.entityType.unit,
                                           position, Quaternion.Euler(0,0,0));
-            addEntity(created.GetComponent<IGameEntity>());
+            AddUnit(created.GetComponent<IGameEntity>());
         }
     }
 }

@@ -30,6 +30,8 @@ public class Player : BasePlayer
 
     private bool isGameOverScreenDisplayed = false;
 
+    private CameraController cam;
+
     // Use this for initialization
     public override void Start()
     {   
@@ -43,6 +45,8 @@ public class Player : BasePlayer
             _selfRace = info.GetPlayerRace();
             _selection.SetRace(race);
         
+            cam = GameObject.FindWithTag("MainCamera").GetComponent<CameraController>();
+
             Battle.PlayerInformation me = info.GetBattle().GetPlayerInformationList()[playerId - 1];
             InstantiateBuildings(me.GetBuildings());
             InstantiateUnits(me.GetUnits());
@@ -185,5 +189,21 @@ public class Player : BasePlayer
         {
             entity.registerFatalWounds(performBuildingDestroyed);
         }
+    }
+
+    protected override void AddBuilding(IGameEntity entity)
+    {
+        Storage.BuildingInfo bi;
+        addEntity(entity);
+        bi = (Storage.BuildingInfo) entity.info;
+        if (bi.type == Storage.BuildingTypes.STRONGHOLD)
+        {
+            cam.lookGameObject(entity.getGameObject());
+        }
+    }
+
+    protected override void AddUnit(IGameEntity entity)
+    {
+        addEntity(entity);
     }
 }

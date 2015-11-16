@@ -6,7 +6,6 @@ public class Main_Game : MonoBehaviour
 {
 
     private GameInformation info;
-    private CameraController cam;
     private Player user;
     Managers.BuildingsManager bm;
     Managers.SoundsManager sounds;
@@ -20,7 +19,6 @@ public class Main_Game : MonoBehaviour
         if (GameObject.Find ("GameInformationObject"))
             info = (GameInformation)GameObject.Find ("GameInformationObject").GetComponent ("GameInformation");
         //user = GameObject.Find ("GameController").GetComponent ("Player") as Player;
-        cam = GameObject.FindWithTag ("MainCamera").GetComponent<CameraController> ();
         //bm = GameObject.Find ("GameController").GetComponent<Managers.BuildingsManager> ();
         bm = new Managers.BuildingsManager();
         sounds = GameObject.Find("GameController").GetComponent<Managers.SoundsManager>();

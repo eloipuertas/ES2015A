@@ -225,6 +225,9 @@ namespace Assets.Scripts.AI
             }
         }
 
+        protected override void AddUnit(IGameEntity entity) { addEntity(entity); }
+        protected override void AddBuilding(IGameEntity entity) { addEntity(entity); }
+
         public void addToArmy(List<Unit> units)
         {
             foreach (Unit u in units)
