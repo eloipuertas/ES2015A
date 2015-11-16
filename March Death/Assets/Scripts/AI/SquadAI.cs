@@ -21,7 +21,7 @@ namespace Assets.Scripts.AI
         public BaseAgent lastAgent { get; set; }
         Dictionary<Type, AgentData> storage;
 
-        Rect boudningBox;
+        public Rect boudningBox;
         public float squadValue;
         public SquadAI enemySquad = null;
 
