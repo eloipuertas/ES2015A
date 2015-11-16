@@ -10,6 +10,7 @@ GameObject:
   - 4: {fileID: 490312}
   - 33: {fileID: 3386314}
   - 23: {fileID: 2346914}
+  - 114: {fileID: 11482744}
   m_Layer: 0
   m_Name: GHOST_establo_elf
   m_TagString: Untagged
@@ -60,6 +61,19 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 101984}
   m_Mesh: {fileID: 4300000, guid: 0ca4554dc0ec5024d9cf794204da7c30, type: 3}
+--- !u!114 &11482744
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 101984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc4dbd7bbbda4e14baa3f054762b3ca9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 1
+  type: 6
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -70,6 +84,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_LocalScale.y
       value: -561.963928
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: race
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: type
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

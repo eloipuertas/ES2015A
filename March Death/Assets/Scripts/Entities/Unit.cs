@@ -340,7 +340,7 @@ public class Unit : GameEntity<Unit.Actions>
             register(Actions.CREATED, res_pl.onStatisticsUpdate);
         }
 
-        statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -10);
+        statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -5);
 
         fire(Actions.CREATED, statistics);
     }
@@ -381,6 +381,12 @@ public class Unit : GameEntity<Unit.Actions>
             BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.GOLD, goldProduced);
             BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.GOLD, goldConsumed);
             BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.FOOD, foodConsumed);
+
+            Goods goods = new Goods(); // Generate the goods the units eat
+            goods.amount = 5;
+            goods.type = Goods.GoodsType.FOOD;
+
+            fire(Actions.EAT, goods);
         }
 
         // Status dependant functionality

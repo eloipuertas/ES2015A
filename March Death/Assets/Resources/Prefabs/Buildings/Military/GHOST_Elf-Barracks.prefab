@@ -10,6 +10,7 @@ GameObject:
   - 4: {fileID: 418014}
   - 33: {fileID: 3302198}
   - 23: {fileID: 2390918}
+  - 114: {fileID: 11427070}
   m_Layer: 0
   m_Name: GHOST_Elf-Barracks
   m_TagString: Untagged
@@ -60,13 +61,34 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 120442}
   m_Mesh: {fileID: 4300000, guid: 6e9ab9220daceb54bb6f2a7c600230ef, type: 3}
+--- !u!114 &11427070
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 120442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc4dbd7bbbda4e14baa3f054762b3ca9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 1
+  type: 5
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: race
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: type
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 120442}
