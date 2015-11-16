@@ -29,14 +29,14 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 	private float _totalBuildTime = 0;
 	private float _creationTimer = 0;
 	private int _woundsBuildControl = 0;
-	private UnitTypes _creatingUnitType;
+	private EntityInfo _infoUnitToCreate;
 	private bool _creatingUnit = false;
 	
 	private Vector3 _deploymentPoint;
 	private int _totalUnits = 0;
 	
 	// This queue will store the units that the building is creating.
-	private Queue buildingQueue = new Queue();
+	private Queue _creationQueue = new Queue();
 	
 	/// <summary>
 	/// When a wound is received, this is called
@@ -153,13 +153,13 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 			}
 		} else if (_creatingUnit) {
 			_creationTimer += Time.deltaTime;
-			
-			if (_creationTimer >= info.unitAttributes.creationTime) {
-				createUnit(_creatingUnitType);
+
+			if (_creationTimer >= _infoUnitToCreate.unitAttributes.creationTime) {
+				createUnit((UnitTypes)_infoUnitToCreate.entityType);
 				_creatingUnit = false;
 			}
-		} else if (buildingQueue.Count > 0) {
-			_creatingUnitType = (UnitTypes) buildingQueue.Dequeue();
+		} else if (_creationQueue.Count > 0) {			
+			_infoUnitToCreate = Info.get.of(info.race, (UnitTypes) _creationQueue.Dequeue());
 			_creationTimer = 0;
 		}
 	}
@@ -195,13 +195,46 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 	
 	public bool addUnitQueue(UnitTypes type)
 	{
-		if (buildingQueue.Count < info.buildingAttributes.creationQueueCapacity) {
-			buildingQueue.Enqueue (type);
+		if (_creationQueue.Count < info.buildingAttributes.creationQueueCapacity) {
+			_creationQueue.Enqueue (type);
 			_creatingUnit = true;
 			return true;
 		} else {
 			Debug.LogWarning("Creation queue reached its limit");
 			return false;
+		}
+	}
+	
+	/// <summary>
+	/// Returns creation percentage
+	/// </summary>
+	public float getcreationUnitPercentage()
+	{
+		return (_creationTimer * 100f) / _infoUnitToCreate.unitAttributes.creationTime;
+
+	}
+	
+	/// <summary>
+	/// Returns the number of units that are in the creationQueue
+	/// </summary>
+	public int getNumberElements()
+	{
+		return _creationQueue.Count;
+	}
+
+	
+	/// <summary>
+	/// Pops a unit from the queue, preventing it from being created
+	/// </summary>
+	public void cancelUnitQueue()
+	{
+		if (_creationQueue.Count > 0) {
+			IGameEntity entity = gameObject.GetComponent<IGameEntity> ();
+			UnitInfo unitInfo = Info.get.of (info.race, (UnitTypes) _creationQueue.Dequeue ());
+
+			Player.getOwner (entity).resources.SubstractAmount (WorldResources.Type.WOOD, unitInfo.resources.wood);
+			Player.getOwner (entity).resources.SubstractAmount (WorldResources.Type.METAL, unitInfo.resources.metal);
+			Player.getOwner (entity).resources.SubstractAmount (WorldResources.Type.FOOD, unitInfo.resources.food);
 		}
 	}
 	

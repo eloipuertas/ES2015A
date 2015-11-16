@@ -43,10 +43,10 @@ class CreateCivil : Ability
 			return 
 				
 				Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, unitInfo.resources.food) &&
-					Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, unitInfo.resources.metal) &&
-					Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, unitInfo.resources.wood);
+				Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, unitInfo.resources.metal) &&
+				Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, unitInfo.resources.wood);
 			//Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.GOLD, unitInfo.resources.gold) &&  
-			
+
 		}
 	}
 	
@@ -68,5 +68,10 @@ class CreateCivil : Ability
 		} else if (_entity.info.isBarrack) {
 			((Barrack)_entity).addUnitQueue (UnitTypes.CIVIL);
 		}
+		
+		UnitInfo unitInfo = Info.get.of(_entity.getRace(), UnitTypes.CIVIL);
+		Player.getOwner(_entity).resources.SubstractAmount(WorldResources.Type.WOOD, unitInfo.resources.wood);
+		Player.getOwner(_entity).resources.SubstractAmount(WorldResources.Type.METAL, unitInfo.resources.metal);
+		Player.getOwner(_entity).resources.SubstractAmount(WorldResources.Type.FOOD, unitInfo.resources.food);
 	}
 }
