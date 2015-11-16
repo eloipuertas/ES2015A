@@ -10,7 +10,9 @@ namespace Assets.Scripts.AI
 {
     public class SquadAI
     {
+
         const int ID_ENEMY_SQUAD = -1;
+
         public int Id { get; private set; }
         public List<Unit> units { get; private set; }
         /// <summary>
@@ -18,6 +20,7 @@ namespace Assets.Scripts.AI
         /// </summary>
         public BaseAgent lastAgent { get; set; }
         Dictionary<Type, AgentData> storage;
+
         Rect boudningBox;
         public float squadValue;
         public SquadAI enemySquad = null;
@@ -43,6 +46,7 @@ namespace Assets.Scripts.AI
                 _maxUnitRange = Storage.Info.get.of(Storage.Races.ELVES, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
                 _enemyRace = Storage.Races.ELVES;
             }
+
         }
         public void addUnit(Unit u)
         {
@@ -183,7 +187,6 @@ namespace Assets.Scripts.AI
         {
             return u.healthPercentage / 100 * (u.info.unitAttributes.resistance + u.info.unitAttributes.attackRate * u.info.unitAttributes.strength);
         }
-
     }
     /* Small class to save data for each agent on this squad
     Implements the following events:

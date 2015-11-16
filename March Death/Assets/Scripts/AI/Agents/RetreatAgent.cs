@@ -110,6 +110,8 @@ namespace Assets.Scripts.AI.Agents
                 return 0;
             }
 
+            //Get the squad bounding box
+            ownSquadBoundingBox = squad.getSquadBoundingBox();
 
             foreach (Unit enemyUnit in squad.enemySquad.units)
             {

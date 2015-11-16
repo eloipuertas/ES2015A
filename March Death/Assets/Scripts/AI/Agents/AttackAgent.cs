@@ -10,6 +10,7 @@ namespace Assets.Scripts.AI.Agents
 
 		float _maxUnitRange;
 		Storage.Races _enemyRace;
+
         float supremaciIndex;
         float valOfCitizen;
         public AttackAgent(AIController ai, string name) : base(ai, name)
@@ -26,6 +27,7 @@ namespace Assets.Scripts.AI.Agents
 				_enemyRace = Storage.Races.ELVES;
 			}
         }
+
         public override void controlUnits(SquadAI squad)
         {
             Vector3 Squadpos = Vector3.zero;
@@ -67,6 +69,7 @@ namespace Assets.Scripts.AI.Agents
             }
         }
         
+
 		/// <summary>
 		/// Gets the confidence of this squad.
 		/// </summary>
@@ -76,6 +79,7 @@ namespace Assets.Scripts.AI.Agents
         {
             if (ai.EnemyUnits.Count == 0)
                 return 0;
+
 
             //Get the ratio of how better we are comparing us with the enemy army
             supremaciIndex = squad.getData<AttackData>().Value / squad.enemySquad.getData<AttackData>().Value;
@@ -88,11 +92,9 @@ namespace Assets.Scripts.AI.Agents
             {
                 return Mathf.RoundToInt(Mathf.Min(supremaciIndex, CONFIDENCE_OWN_SQUAD_SUPREMACI_MAX_MULTITPLIER) * CONFIDENCE_OWN_SQUAD_SUPREMACY);
             }
-            else
-            {
-                return 0;
-            }
-            
+
+            return 0;
+
         }
     }
 
