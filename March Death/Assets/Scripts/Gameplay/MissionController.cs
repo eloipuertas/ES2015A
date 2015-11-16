@@ -5,8 +5,8 @@ public class MissionController : MonoBehaviour
 {
     //public enum Winner { NONE = 0, PLAYER = 1, PC = 2 }
 
-    private Dictionary<Storage.UnitTypes, uint> destroyedUnitsWinners = new Dictionary<Storage.UnitTypes, uint>();
-    private Dictionary<Storage.BuildingTypes, uint> destroyedBuildingsWinners = new Dictionary<Storage.BuildingTypes, uint>();
+    private Dictionary<Storage.UnitTypes, int> destroyedUnitsWinners = new Dictionary<Storage.UnitTypes, int>();
+    private Dictionary<Storage.BuildingTypes, int> destroyedBuildingsWinners = new Dictionary<Storage.BuildingTypes, int>();
 
     private Battle battle;
 
@@ -65,16 +65,16 @@ public class MissionController : MonoBehaviour
         return missions.ToArray();
     }
 
-    public bool HasWon(uint id)
+    public bool HasWon(int id)
     {
         float total;
         int playerScore = 0;
         total = destroyedUnitsWinners.Count + destroyedBuildingsWinners.Count;
-        foreach (uint i in destroyedUnitsWinners.Values)
+        foreach (int i in destroyedUnitsWinners.Values)
         {
             if (i == id) playerScore++;
         }
-        foreach (uint i in destroyedBuildingsWinners.Values)
+        foreach (int i in destroyedBuildingsWinners.Values)
         {
             if (i == id) playerScore++;
         }
@@ -91,10 +91,10 @@ public class MissionController : MonoBehaviour
     /// </summary>
     /// <param name="type">Type of unit.</param>
     /// <param name="caller">ID of the player (either human or PC).</param>
-    public void notifyUnitKilled(Storage.UnitTypes type, uint caller)
+    public void notifyUnitKilled(Storage.UnitTypes type, int caller)
     {
         bool notify = false;
-        uint winner;
+        int winner;
         if (destroyedUnitsWinners.TryGetValue(type, out winner))
         {
             if (winner == 0)    // If there is no winner
@@ -110,10 +110,10 @@ public class MissionController : MonoBehaviour
         }
     }
 
-    public void notifyBuildingDestroyed(Storage.BuildingTypes type, uint caller)
+    public void notifyBuildingDestroyed(Storage.BuildingTypes type, int caller)
     {
         bool notify = false;
-        uint winner;
+        int winner;
         if (destroyedBuildingsWinners.TryGetValue(type, out winner))
         {
             if (winner == 0)
@@ -129,6 +129,6 @@ public class MissionController : MonoBehaviour
         }
     }
 
-    public void notifyUnitCreated(Storage.UnitTypes type, uint caller) {}
-    public void notifyBuildingCreated(Storage.BuildingTypes type, uint caller) {}
+    public void notifyUnitCreated(Storage.UnitTypes type, int caller) {}
+    public void notifyBuildingCreated(Storage.BuildingTypes type, int caller) {}
 }

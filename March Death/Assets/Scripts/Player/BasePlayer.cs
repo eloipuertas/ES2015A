@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using Assets.Scripts.AI;
 
 public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
@@ -43,17 +43,21 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     public static Player player { get { return (Player)_player; } }
     public static AIController ia { get { return (AIController)_ia; } }
 
-    private static uint instances = 0;
-    protected uint playerId = 0;
+    protected int playerId = 0;
+    public int PlayerID { set { playerId = value; } }
 
     protected MissionStatus missionStatus;
 
     protected bool _initialized = false;
 
+    Terrain terrain;
+
     public virtual void Start ()
     {
         Debug.Log("BasePlayer START");GameObject gameController = GameObject.FindGameObjectWithTag("GameController");
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
+        terrain = GameObject.Find("Terrain").GetComponent<Terrain>();
+        _buildings = gameController.GetComponent<Main_Game>().BuildingsMgr;
 
         _info = gameInformationObject.GetComponent<GameInformation>();
         _player = gameController.GetComponent<Player>();
@@ -76,19 +80,51 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
 
     void Update () {}
 
-    public void SetInitialResources(uint wood, uint food, uint metal)
+    public void SetInitialResources(uint wood, uint food, uint metal, uint gold)
     {
         // TODO Consider adding a maximum capacity
         _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.FOOD, food));
         _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.WOOD, wood));
         _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.METAL, metal));
+        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.GOLD, gold));
     }
 
-    protected void AcquirePlayerID()
+    protected void InstantiateBuildings(List<Battle.PlayableEntity> buildings)
     {
-        if (playerId == 0)
+        GameObject created;
+        Vector3 position;
+        foreach (Battle.PlayableEntity building in buildings)
         {
-            playerId = ++instances;
+            position = new Vector3();
+            position.x = building.position.X;
+            position.z = building.position.Y;
+            // HACK Without the addition, Construction Grid detects the terrain as it not being flat
+            position.y = 1 + terrain.SampleHeight(position);
+            created = _buildings.createBuilding(position, Quaternion.Euler(0,0,0),
+                                        building.entityType.building,
+                                        _selfRace);
+            addEntity(created.GetComponent<IGameEntity>());
+            /*if (building.entityType.building == Storage.BuildingTypes.STRONGHOLD &&
+                info.GetPlayerRace() == basePlayer.race)
+            {
+                cam.lookGameObject(created);
+            }*/
+        }
+    }
+
+    protected void InstantiateUnits(List<Battle.PlayableEntity> units)
+    {
+        GameObject created;
+        Vector3 position;
+        foreach (Battle.PlayableEntity unit in units)
+        {
+            position = new Vector3();
+            position.x = unit.position.X;
+            position.z = unit.position.Y;
+            position.y = terrain.SampleHeight(position);
+            created = Storage.Info.get.createUnit(_selfRace, unit.entityType.unit,
+                                          position, Quaternion.Euler(0,0,0));
+            addEntity(created.GetComponent<IGameEntity>());
         }
     }
 }

@@ -94,7 +94,10 @@ namespace Assets.Scripts.AI
                     aiDebug = AIDebugSystem.CreateComponent(gameObject, this);
                 }
 
-                AcquirePlayerID();
+                Battle.PlayerInformation me = info.GetBattle().GetPlayerInformationList()[playerId - 1];
+                InstantiateBuildings(me.GetBuildings());
+                InstantiateUnits(me.GetUnits());
+                SetInitialResources(me.GetResources().Wood, me.GetResources().Food, me.GetResources().Metal, me.GetResources().Gold);
                 missionStatus = new MissionStatus(playerId);
             }
         }

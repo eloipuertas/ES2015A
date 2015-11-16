@@ -37,13 +37,17 @@ public class Player : BasePlayer
         {
             _initialized = true;
             Debug.Log("Player Start");base.Start();
-            _buildings = GetComponent<Main_Game>().BuildingsMgr;
+            //_buildings = GetComponent<Main_Game>().BuildingsMgr;
             _selection = GetComponent<Managers.SelectionManager>();
             //request the race of the player
             _selfRace = info.GetPlayerRace();
             _selection.SetRace(race);
         
-            AcquirePlayerID();
+            Battle.PlayerInformation me = info.GetBattle().GetPlayerInformationList()[playerId - 1];
+            InstantiateBuildings(me.GetBuildings());
+            InstantiateUnits(me.GetUnits());
+            SetInitialResources(me.GetResources().Wood, me.GetResources().Food, me.GetResources().Metal, me.GetResources().Gold);
+            gameObject.AddComponent<ResourcesPlacer>();
             missionStatus = new MissionStatus(playerId);
         }
     }
