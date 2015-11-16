@@ -372,6 +372,7 @@ GameObject:
   - 114: {fileID: 11469132}
   - 208: {fileID: 20875752}
   - 65: {fileID: 6555804}
+  - 114: {fileID: 11462334}
   m_Layer: 0
   m_Name: elf_stable
   m_TagString: Untagged
@@ -1778,6 +1779,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8fedea892f030418970e7ce2a2bc2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &11462334
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 184050}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3aa7bd748c483ad44a9454c6c5f8639b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 1
+  type: 6
 --- !u!114 &11469132
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2457,6 +2471,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_LocalScale.y
       value: 1.45000005
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: race
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: type
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

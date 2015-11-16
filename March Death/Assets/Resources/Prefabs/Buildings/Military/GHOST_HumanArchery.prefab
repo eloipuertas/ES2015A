@@ -10,6 +10,7 @@ GameObject:
   - 4: {fileID: 427934}
   - 33: {fileID: 3362742}
   - 23: {fileID: 2348794}
+  - 114: {fileID: 11431982}
   m_Layer: 0
   m_Name: GHOST_HumanArchery
   m_TagString: Untagged
@@ -60,13 +61,30 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 116568}
   m_Mesh: {fileID: 4300000, guid: 833479f94c28c3f4e9f7bcd2ce5f6f40, type: 3}
+--- !u!114 &11431982
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 116568}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc4dbd7bbbda4e14baa3f054762b3ca9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 0
+  type: 4
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: type
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 116568}

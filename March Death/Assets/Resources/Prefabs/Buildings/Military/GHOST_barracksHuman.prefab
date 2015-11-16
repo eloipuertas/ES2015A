@@ -10,6 +10,7 @@ GameObject:
   - 4: {fileID: 481602}
   - 33: {fileID: 3387986}
   - 23: {fileID: 2349598}
+  - 114: {fileID: 11431014}
   m_Layer: 0
   m_Name: GHOST_barracksHuman
   m_TagString: Untagged
@@ -60,13 +61,30 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 144930}
   m_Mesh: {fileID: 4300000, guid: 6c8f9dfda80ba534eb572dcf0f405274, type: 3}
+--- !u!114 &11431014
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 144930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc4dbd7bbbda4e14baa3f054762b3ca9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 0
+  type: 5
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: type
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 144930}
