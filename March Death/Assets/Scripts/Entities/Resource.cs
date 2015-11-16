@@ -278,21 +278,21 @@ public class Resource : Building<Resource.Actions>
 			goods.amount = amount;
 			
 			// TODO: 
-			// BUG: Null reference when we try to add material amount to player.
+			// BUG: No added amount ( Only for not IA player )
 			
 			if (type.Equals(BuildingTypes.FARM))
 			{
-				//Player.getOwner(_entity).resources.AddAmount(WorldResources.Type.FOOD, amount); 
-				goods.type = Goods.GoodsType.FOOD;
+				BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.FOOD, amount); 
+				goods.type = Goods.GoodsType.FOOD; 
 			}
 			else if(type.Equals(BuildingTypes.MINE))
 			{
-				//BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.METAL, amount);
+				BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.METAL, amount);
 				goods.type = Goods.GoodsType.METAL;
 			}
 			else
 			{
-				// BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.WOOD, amount);
+				BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.WOOD, amount);
 				goods.type = Goods.GoodsType.WOOD;
 			}
 			fire(Actions.COLLECTION, goods);

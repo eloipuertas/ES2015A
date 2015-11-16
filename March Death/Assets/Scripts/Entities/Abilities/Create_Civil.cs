@@ -42,10 +42,10 @@ class CreateCivil : Ability
 			
 			return 
 				
-				Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, unitInfo.resources.food) &&
+				//Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, unitInfo.resources.food) &&
 				Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, unitInfo.resources.metal) &&
 				Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, unitInfo.resources.wood) &&
-				_entity.status == EntityStatus.IDLE;
+				((_entity.status == EntityStatus.IDLE)|| (_entity.status == EntityStatus.WORKING));
 			//Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.GOLD, unitInfo.resources.gold) &&  
 
 		}
@@ -61,9 +61,7 @@ class CreateCivil : Ability
 	public override void enable()
 	{
 		base.enable();
-		
-		IGameEntity entity;
-		
+
 		if (_entity.info.isResource) {
 			((Resource)_entity).addUnitQueue (UnitTypes.CIVIL);
 		} else if (_entity.info.isBarrack) {
