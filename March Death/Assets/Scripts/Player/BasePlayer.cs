@@ -48,8 +48,6 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
 
     protected MissionStatus missionStatus;
 
-    protected bool _initialized = false;
-
     Terrain terrain;
 
     public virtual void Start ()
