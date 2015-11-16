@@ -39,30 +39,26 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/dep/fastlz
 )
 
-add_library(Recast SHARED
-  ${EPS_SRCS}
-)
-
-message(INFO "${CMAKE_SIZEOF_VOID_P}")
-
-if (BUILD_32_BITS)
-    if (APPLE)
-         set(COMPILE_FLAGS "-m32 -arch i386")
-         set(LINK_FLAGS "-m32 -arch i386")
-    elseif (UNIX)
-        set(COMPILE_FLAGS "${COMPILE_FLAGS} -m32")
-        set(LINK_FLAGS "${LINK_FLAGS} -m32")
-    endif()
-elseif (APPLE)
-    set(COMPILE_FLAGS "-m64 -arch x86_64")
-    set(LINK_FLAGS "-m64 -arch x86_64")
+if (APPLE)
+    set(MACOSX_BUNDLE_BUNDLE_NAME TEST)
+    add_library(Recast MACOSX_BUNDLE ${EPS_SRCS})
+    set_target_properties(TEST PROPERTIES MACOSX_BUNDLE TRUE)
+else()
+    add_library(Recast SHARED ${EPS_SRCS})
 endif()
 
-if (APPLE OR BUILD_32_BITS)
+if (BUILD_32_BITS AND NOT WIN)
+    set(COMPILE_FLAGS "${COMPILE_FLAGS} -m32")
+    set(LINK_FLAGS "${LINK_FLAGS} -m32")
+elseif (NOT WIN)
+    set(COMPILE_FLAGS "${COMPILE_FLAGS} -m64")
+    set(LINK_FLAGS "${LINK_FLAGS} -m64")
+endif()
+
+if (NOT WIN OR BUILD_32_BITS)
     set_target_properties(Recast PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS}" LINK_FLAGS "${LINK_FLAGS}")
 endif()
 
 target_link_libraries(Recast
   FastLZ
 )
-
