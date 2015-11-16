@@ -194,37 +194,34 @@ namespace Assets.Scripts.AI
 
         // TODO: Should it be handled with events??
         public override void removeEntity(IGameEntity entity) { }
-        public override void addEntity(IGameEntity newEntity)
+        public override void addEntity(IGameEntity newEntity) { }
+
+        protected override void AddUnit(IGameEntity entity)
         {
-            if (newEntity.info.isArmy)
-            {
-                Army.Add((Unit) newEntity);
-            }
-            else if (newEntity.info.isBuilding)
-            {
-                buildPosition = newEntity.getTransform().position + new Vector3(0,0,30);
-                if (newEntity.info.isBarrack)
-                {
-                    // TODO rootBasePosition should be initialized elsewhere
-                    if (!isRootBasePositionInitialized)
-                    {
-                        if (((BuildingInfo) newEntity.info).type == BuildingTypes.STRONGHOLD)
-                        {
-                            rootBasePosition = newEntity.getTransform().position;
-                            isRootBasePositionInitialized = !isRootBasePositionInitialized;
-                        }
-                    }
-                    return;
-                }
-                Resource build = (Resource) newEntity;
-                build.register(Resource.Actions.CREATE_UNIT, OnCivilCreated);
-                build.register(Resource.Actions.DESTROYED, OnBuildingDestroyed);
-            }
+            if (entity.info.isArmy) Army.Add((Unit) entity);
         }
 
-        protected override void AddUnit(IGameEntity entity) { addEntity(entity); }
-        protected override void AddBuilding(IGameEntity entity) { addEntity(entity); }
-
+        protected override void AddBuilding(IGameEntity entity)
+        {
+            buildPosition = entity.getTransform().position + new Vector3(0,0,30);
+            if (entity.info.isBarrack)
+            {
+                // TODO rootBasePosition should be initialized elsewhere
+                if (!isRootBasePositionInitialized)
+                {
+                    if (((BuildingInfo) entity.info).type == BuildingTypes.STRONGHOLD)
+                    {
+                        rootBasePosition = entity.getTransform().position;
+                        isRootBasePositionInitialized = !isRootBasePositionInitialized;
+                    }
+                }
+                return;
+            }
+            Resource build = (Resource) entity;
+            build.register(Resource.Actions.CREATE_UNIT, OnCivilCreated);
+            build.register(Resource.Actions.DESTROYED, OnBuildingDestroyed);
+        }
+        
         public void addToArmy(List<Unit> units)
         {
             foreach (Unit u in units)
