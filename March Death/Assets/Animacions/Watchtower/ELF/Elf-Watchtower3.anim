@@ -12,7 +12,33 @@ AnimationClip:
   m_UseHighQualityCurve: 1
   m_RotationCurves: []
   m_CompressedRotationCurves: []
-  m_PositionCurves: []
+  m_PositionCurves:
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: -3.50999999, y: .355280578, z: 1.32000005}
+        inSlope: {x: 0, y: 0, z: -.516000032}
+        outSlope: {x: -0, y: -0, z: -.516000032}
+        tangentMode: 0
+      - time: 3.33333325
+        value: {x: -3.50999999, y: .355280578, z: -.400000006}
+        inSlope: {x: 0, y: 0, z: -.516000032}
+        outSlope: {x: -0, y: -0, z: -0}
+        tangentMode: 0
+      - time: 3.86666656
+        value: {x: -3.50999999, y: .355280578, z: -.400000006}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: -0, y: -0, z: -.534939766}
+        tangentMode: 0
+      - time: 8.01666641
+        value: {x: -3.50999999, y: .355280578, z: -2.61999989}
+        inSlope: {x: 0, y: 0, z: -.534939766}
+        outSlope: {x: 0, y: 0, z: -.534939766}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path: AndamioTorre
   m_ScaleCurves: []
   m_FloatCurves:
   - curve:
@@ -232,6 +258,12 @@ AnimationClip:
     m_Extent: {x: 0, y: 0, z: 0}
   m_ClipBindingConstant:
     genericBindings:
+    - path: 884280371
+      attribute: 1
+      script: {fileID: 0}
+      classID: 4
+      customType: 0
+      isPPtrCurve: 0
     - path: 1862106076
       attribute: 3305885265
       script: {fileID: 0}
@@ -525,6 +557,93 @@ AnimationClip:
     attribute: m_Enabled
     path: Torre
     classID: 23
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: -3.50999999
+        inSlope: 0
+        outSlope: -0
+        tangentMode: 21
+      - time: 3.33333325
+        value: -3.50999999
+        inSlope: 0
+        outSlope: -0
+        tangentMode: 21
+      - time: 3.86666656
+        value: -3.50999999
+        inSlope: 0
+        outSlope: -0
+        tangentMode: 21
+      - time: 8.01666641
+        value: -3.50999999
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 21
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    attribute: m_LocalPosition.x
+    path: AndamioTorre
+    classID: 4
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: .355280578
+        inSlope: 0
+        outSlope: -0
+        tangentMode: 21
+      - time: 3.33333325
+        value: .355280578
+        inSlope: 0
+        outSlope: -0
+        tangentMode: 21
+      - time: 3.86666656
+        value: .355280578
+        inSlope: 0
+        outSlope: -0
+        tangentMode: 21
+      - time: 8.01666641
+        value: .355280578
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 21
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    attribute: m_LocalPosition.y
+    path: AndamioTorre
+    classID: 4
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 1.32000005
+        inSlope: -.516000032
+        outSlope: -.516000032
+        tangentMode: 21
+      - time: 3.33333325
+        value: -.400000006
+        inSlope: -.516000032
+        outSlope: -0
+        tangentMode: 21
+      - time: 3.86666656
+        value: -.400000006
+        inSlope: 0
+        outSlope: -.534939766
+        tangentMode: 21
+      - time: 8.01666641
+        value: -2.61999989
+        inSlope: -.534939766
+        outSlope: -.534939766
+        tangentMode: 21
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    attribute: m_LocalPosition.z
+    path: AndamioTorre
+    classID: 4
     script: {fileID: 0}
   m_EulerEditorCurves: []
   m_HasGenericRootTransform: 0
