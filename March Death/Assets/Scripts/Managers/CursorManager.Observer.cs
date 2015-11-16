@@ -121,10 +121,15 @@ namespace Managers
         private bool ItsAlly(GameObject _object)
         {
             IGameEntity entity = _object.GetComponent<IGameEntity>();
-            if (entity.info.race == _player.race)
-                return true;
-            else
-                return false;
+            if (entity != null)
+            {
+
+                if (entity.info.race == _player.race)
+                    return true;
+                else
+                    return false;
+            }
+            else return false;
         }
 
         /// <summary>
