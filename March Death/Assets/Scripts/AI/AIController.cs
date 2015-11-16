@@ -60,6 +60,11 @@ namespace Assets.Scripts.AI
             //rootBasePosition = new Vector3(706, 80, 765);
             //Army.Add(Info.get.createUnit(_selfRace, UnitTypes.HERO, rootBasePosition,Quaternion.Euler(0,0,0)).GetComponent<Unit>());
             Workers = new List<Unit>();
+
+            Battle.PlayerInformation me = info.GetBattle().GetPlayerInformationList()[playerId - 1];
+            InstantiateBuildings(me.GetBuildings());
+            InstantiateUnits(me.GetUnits());
+            SetInitialResources(me.GetResources().Wood, me.GetResources().Food, me.GetResources().Metal, me.GetResources().Gold);
             Macro = new MacroManager(this);
 
             //We need to implement som kind of senses for te AI so here they are 
@@ -91,10 +96,6 @@ namespace Assets.Scripts.AI
                 aiDebug = AIDebugSystem.CreateComponent(gameObject, this);
             }
 
-            Battle.PlayerInformation me = info.GetBattle().GetPlayerInformationList()[playerId - 1];
-            InstantiateBuildings(me.GetBuildings());
-            InstantiateUnits(me.GetUnits());
-            SetInitialResources(me.GetResources().Wood, me.GetResources().Food, me.GetResources().Metal, me.GetResources().Gold);
             missionStatus = new MissionStatus(playerId);
 
         }
