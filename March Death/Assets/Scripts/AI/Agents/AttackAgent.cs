@@ -99,6 +99,7 @@ namespace Assets.Scripts.AI.Agents
                     if(u.type == Storage.UnitTypes.HERO)
                     {
                         conf += CONFIDENCE_ENEMY_SQUAD_HAS_HERO;
+                        break;
                     }
                 }
 
