@@ -20,7 +20,7 @@ public class PathDetour : Utils.Singleton<PathDetour>
     public void Initialize(TileCacheAsset navmeshData)
     {
         // Is it already initialized?
-        Assert.IsTrue(TileCache.ToInt32() == 0);
+        //Assert.IsTrue(TileCache.ToInt32() == 0);
         Assert.IsTrue(Pathfinding.Detour.pointerSize() == IntPtr.Size);
 
         Pathfinding.Recast.DefaultConfig(Application.dataPath + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Recast.log");
@@ -34,7 +34,7 @@ public class PathDetour : Utils.Singleton<PathDetour>
 
     public uint AddObstacle(Pathfinding.DetourObstacle block)
     {
-        Assert.IsTrue(TileCache.ToInt32() != 0);
+        Assert.IsTrue(TileCache.ToInt64() != 0);
 
         Vector3[] blockVertices = block.Vertices();
         Vector3 pos = block.transform.position;

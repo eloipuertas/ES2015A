@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-[ExecuteInEditMode]
+//[ExecuteInEditMode]
 class DetourStarter : MonoBehaviour
 {
     public enum RenderMode { POLYS, DETAIL_POLYS, TILE_POLYS }

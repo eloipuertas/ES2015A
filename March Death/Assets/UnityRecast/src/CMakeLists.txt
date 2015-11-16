@@ -40,9 +40,9 @@ include_directories(
 )
 
 if (APPLE)
-    set(MACOSX_BUNDLE_BUNDLE_NAME TEST)
-    add_library(Recast MACOSX_BUNDLE ${EPS_SRCS})
-    set_target_properties(TEST PROPERTIES MACOSX_BUNDLE TRUE)
+    set(MACOSX_BUNDLE_BUNDLE_NAME Recast)
+    add_library(Recast SHARED ${EPS_SRCS})
+    set_target_properties(Recast PROPERTIES MACOSX_BUNDLE TRUE)
 else()
     add_library(Recast SHARED ${EPS_SRCS})
 endif()

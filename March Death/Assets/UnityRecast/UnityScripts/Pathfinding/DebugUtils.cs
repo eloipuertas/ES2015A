@@ -295,8 +295,8 @@ public static partial class RecastDebug
         int detailMeshCount = header.detailMeshCount;
         for (int i = 0; i < detailMeshCount; ++i)
         {
-            Pathfinding.PolyDetail pd = (Pathfinding.PolyDetail)Marshal.PtrToStructure(new IntPtr(tile.detailMeshes.ToInt32() + (polyDetailSize * i)), typeof(Pathfinding.PolyDetail));
-            Pathfinding.Poly poly = (Pathfinding.Poly)Marshal.PtrToStructure(new IntPtr(tile.polys.ToInt32() + (polySize * i)), typeof(Pathfinding.Poly));
+            Pathfinding.PolyDetail pd = (Pathfinding.PolyDetail)Marshal.PtrToStructure(new IntPtr(tile.detailMeshes.ToInt64() + (polyDetailSize * i)), typeof(Pathfinding.PolyDetail));
+            Pathfinding.Poly poly = (Pathfinding.Poly)Marshal.PtrToStructure(new IntPtr(tile.polys.ToInt64() + (polySize * i)), typeof(Pathfinding.Poly));
 
             Color col = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
 
