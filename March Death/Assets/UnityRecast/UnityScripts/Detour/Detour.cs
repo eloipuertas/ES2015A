@@ -9,6 +9,9 @@ namespace Pathfinding
     public static class Detour
     {
         [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int pointerSize();
+   
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool createNavmesh(ref Config cfg, ref PolyMesh pmesh, ref PolyMeshDetail dmesh, ref IntPtr navData, ref int dataSize);
 
         [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]

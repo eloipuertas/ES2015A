@@ -19,8 +19,6 @@ class DetourStarter : MonoBehaviour
     
     public void OnEnable()
     {
-
-        Debug.LogError(IntPtr.Size);
         PathDetour.get.Initialize(navmeshData);
 
         if (Application.isPlaying)

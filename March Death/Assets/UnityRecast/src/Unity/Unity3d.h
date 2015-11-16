@@ -20,7 +20,7 @@ extern bool monotonePartitioning;
 
 
 // Config
-DLL_EXPORT unsigned char pointerSize();
+DLL_EXPORT int pointerSize();
 DLL_EXPORT void setMonotonePartitioning(bool enabled);
 DLL_EXPORT rcConfig* DefaultConfig(char* logpath);
 

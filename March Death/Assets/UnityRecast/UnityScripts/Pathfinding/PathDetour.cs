@@ -21,6 +21,7 @@ public class PathDetour : Utils.Singleton<PathDetour>
     {
         // Is it already initialized?
         Assert.IsTrue(TileCache.ToInt32() == 0);
+        Assert.IsTrue(Pathfinding.Detour.pointerSize() == IntPtr.Size);
 
         Pathfinding.Recast.DefaultConfig(Application.dataPath + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Recast.log");
 
