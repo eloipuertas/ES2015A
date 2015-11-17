@@ -23,6 +23,7 @@ public class CameraController : MonoBehaviour
     private const float MOUSE_BOUNDS = 2f;
     private const float BASE_ACCELERATION = 80f;
     private const float MAX_ACCELERATION = 200f;
+    private const float CAMERA_MODIFIER = 3f;
 
     private Vector3 cameraOffset;
     public Vector3 getCameraOffset {
@@ -327,20 +328,20 @@ public class CameraController : MonoBehaviour
         switch (newOrientation)
         {
             case CameraOrientation.NORTH_WEST:
-                cameraOffset = new Vector3(-252.8f, 250.34f, -252.8f);
+                cameraOffset = new Vector3(-252.8f, 250.34f, -252.8f) / CAMERA_MODIFIER;
                 baseVerticalRotation = 45f;
                 numOffsets = 0;
                 break;
             case CameraOrientation.SOUTH_WEST:
-                cameraOffset = new Vector3(-252.8f, 250.34f, +252.8f);
+                cameraOffset = new Vector3(-252.8f, 250.34f, +252.8f) / CAMERA_MODIFIER;
                 numOffsets = 1;
                 break;
             case CameraOrientation.SOUTH_EST:
-                cameraOffset = new Vector3(+252.8f, 250.34f, +252.8f);
+                cameraOffset = new Vector3(+252.8f, 250.34f, +252.8f) / CAMERA_MODIFIER;
                 numOffsets = 2;
                 break;
             case CameraOrientation.NORTH_EST:
-                cameraOffset = new Vector3(+252.8f, 250.34f, -252.8f);
+                cameraOffset = new Vector3(+252.8f, 250.34f, -252.8f) / CAMERA_MODIFIER;
                 numOffsets = 3;
                 break;
             default:
