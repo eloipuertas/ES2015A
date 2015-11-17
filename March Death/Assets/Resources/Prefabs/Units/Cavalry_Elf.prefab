@@ -760,7 +760,7 @@ GameObject:
   - 54: {fileID: 5433442}
   - 114: {fileID: 11475070}
   - 114: {fileID: 11460316}
-  - 195: {fileID: 19504840}
+  - 114: {fileID: 11400834}
   m_Layer: 0
   m_Name: Cavalry_Elf
   m_TagString: Untagged
@@ -1935,7 +1935,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 109882}
-  m_LocalRotation: {x: .456877619, y: .627679288, z: -.371311754, w: .509322166}
+  m_LocalRotation: {x: .456877649, y: .627679348, z: -.371311784, w: .509322226}
   m_LocalPosition: {x: 3.2130627e-09, y: .000632175768, z: 6.33299357e-10}
   m_LocalScale: {x: 1.00000012, y: .999999821, z: .99999994}
   m_Children:
@@ -2137,7 +2137,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 124876}
-  m_LocalRotation: {x: -.522122383, y: .252127677, z: .16337882, w: .798202395}
+  m_LocalRotation: {x: -.522122443, y: .252127707, z: .163378835, w: .798202515}
   m_LocalPosition: {x: 5.21540644e-10, y: .00191103399, z: -5.28525557e-10}
   m_LocalScale: {x: .99999994, y: .99999994, z: .999999881}
   m_Children:
@@ -2959,7 +2959,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 146292}
-  m_LocalRotation: {x: .359111726, y: .715873778, z: -.283505648, w: .527435362}
+  m_LocalRotation: {x: .359111756, y: .715873837, z: -.283505678, w: .527435422}
   m_LocalPosition: {x: 5.02914155e-10, y: .000583659566, z: 2.23517413e-10}
   m_LocalScale: {x: 1, y: 1.00000024, z: 1.00000012}
   m_Children:
@@ -3436,7 +3436,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 126
+  m_Constraints: 122
   m_CollisionDetection: 0
 --- !u!65 &6515692
 BoxCollider:
@@ -3467,6 +3467,21 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11400834
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 142972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b09a9a421fcedee4ea755b7daade40c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Radius: 1.5
+  Height: 2
+  MaxSpeed: 2
+  MaxAcceleration: 2
 --- !u!114 &11460316
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3661,33 +3676,21 @@ SkinnedMeshRenderer:
     m_Center: {x: .00465481356, y: -.00827987399, z: .0056633288}
     m_Extent: {x: .0179273225, y: .0264393277, z: .0237431973}
   m_DirtyAABB: 0
---- !u!195 &19504840
-NavMeshAgent:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 142972}
-  m_Enabled: 1
-  m_Radius: .5
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: Radius
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Constraints
+      value: 122
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 142972}
