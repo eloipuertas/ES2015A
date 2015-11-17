@@ -64,7 +64,7 @@ namespace Assets.Scripts.AI
         }
         public void removeUnit(Unit u)
         {
-            units.Add(u);
+            units.Remove(u);
 
             foreach (AgentData agent in storage.Values)
                 if (agent != null)

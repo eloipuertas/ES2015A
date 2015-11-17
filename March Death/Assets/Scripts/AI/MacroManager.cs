@@ -32,7 +32,7 @@ namespace Assets.Scripts.AI
         /// </summary>
         public void MacroHigh()
         {
-            foreach (Resource r in ai.OwnBuildings)
+            foreach (Resource r in ai.OwnResources)
                 if (r.harvestUnits == 10) //TODO ask for the actual max
                     buildingPref.Add(r.type);
         }
@@ -46,7 +46,7 @@ namespace Assets.Scripts.AI
                 ai.CreateBuilding(buildingPref[0]);
                 buildingPref.RemoveAt(0);
             }
-            foreach(Resource r in ai.OwnBuildings)
+            foreach(Resource r in ai.OwnResources)
             {
                 if (r.harvestUnits < 10)
                     r.newCivilian();
