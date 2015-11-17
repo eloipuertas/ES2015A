@@ -49,7 +49,7 @@ namespace Assets.Scripts.AI
             foreach(Resource r in ai.OwnBuildings)
             {
                 if (r.harvestUnits < 10)
-                    r.createCivilian();
+                    r.newCivilian();
             }
         }
         /// <summary>

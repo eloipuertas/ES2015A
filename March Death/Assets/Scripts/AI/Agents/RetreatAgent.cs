@@ -13,22 +13,22 @@ namespace Assets.Scripts.AI.Agents
 
         private const int CONFIDENCE_IN_ENEMY_ATACK_RANGE = 75;
         private const int CONFIDENCE_HERO_IS_AT_FIFTY_PERCENT = 1000;
+        private const int CONFIDENCE_ASSIST_HELP_NEEDED = 400;
 
         Unit hero;
 
         AttackAgent attackAgent;
+        AssistAgent assistAgent;
 
         Rect enemySquadBoundingBox, ownSquadBoundingBox;
         Vector3 safeArea;
         float minDistanceBetweenHeroAndNearestEnemy;
-        private float _maxUnitRange;
-        private Storage.Races _enemyRace;
 
         private int confidence;
 
         bool isHeroInDanger;
 
-        public RetreatAgent(AIController ai, AttackAgent aA, string name) : base(ai, name)
+        public RetreatAgent(AIController ai, AttackAgent aA, AssistAgent assist, string name) : base(ai, name)
         {
             attackAgent = aA;
             enemySquadBoundingBox = new Rect();
@@ -45,16 +45,8 @@ namespace Assets.Scripts.AI.Agents
                 }
             }
 
-            if (ai.race == Storage.Races.ELVES)
-            {
-                _maxUnitRange = Storage.Info.get.of(Storage.Races.MEN, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
-                _enemyRace = Storage.Races.MEN;
-            }
-            else
-            {
-                _maxUnitRange = Storage.Info.get.of(Storage.Races.ELVES, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
-                _enemyRace = Storage.Races.ELVES;
-            }
+            assistAgent = assist;
+
         }
 
         public override void controlUnits(SquadAI squad)
@@ -63,10 +55,10 @@ namespace Assets.Scripts.AI.Agents
             isHeroInDanger = false;
 
             // Mirar on estan els enemics
-            enemySquadBoundingBox = getSquadBoundingBox(ai.EnemyUnits);
+			enemySquadBoundingBox = SquadAI.GetUnitListBoundingBox(ai.EnemyUnits);
             
             // Mirar on estic jo
-            ownSquadBoundingBox = getSquadBoundingBox(ai.Army);
+            ownSquadBoundingBox = squad.getSquadBoundingBox();
 
             // Intentar Veure on hauria d'anar una unitat per estar protegida
             recalcSafePoint();
@@ -100,7 +92,7 @@ namespace Assets.Scripts.AI.Agents
 
                 if (isHeroInDanger)
                 {
-                    SquadAI s = new SquadAI(0);
+                    SquadAI s = new SquadAI(0, ai);
                     s.addUnits(squadToAtackManager);
                     attackAgent.controlUnits(s);
                 }
@@ -123,14 +115,9 @@ namespace Assets.Scripts.AI.Agents
             }
 
             //Get the squad bounding box
-            ownSquadBoundingBox = getSquadBoundingBox(squad.units);
+            ownSquadBoundingBox = squad.getSquadBoundingBox();
 
-            float maxLongitudeOfBox = ownSquadBoundingBox.width > ownSquadBoundingBox.height ? ownSquadBoundingBox.width : ownSquadBoundingBox.height;
-            
-            //Smell what is near this position
-            Unit[] enemyUnitsNearUs = ai.senses.getUnitsOfRaceNearPosition(new Vector3(ownSquadBoundingBox.x, squad.units[0].transform.position.y, ownSquadBoundingBox.y), maxLongitudeOfBox * 2 * _maxUnitRange, _enemyRace);
-
-            foreach (Unit enemyUnit in enemyUnitsNearUs)
+            foreach (Unit enemyUnit in squad.enemySquad.units)
             {
                 foreach (Unit ownUnit in squad.units)
                 {
@@ -141,7 +128,8 @@ namespace Assets.Scripts.AI.Agents
                         //If our hero is in range and is going to die
                         if(hero.healthPercentage < HERO_HEALTH_TOLERANCE_BEFORE_RETREAT && ownUnit.type == Storage.UnitTypes.HERO)
                         {
-							ai.Micro.agents[MicroManager.AGENT_ASSIST].addConfidence(400);
+						    assistAgent.addConfidence(CONFIDENCE_ASSIST_HELP_NEEDED);
+                            assistAgent.requestHelp(new KeyValuePair<SquadAI, int>(squad, CONFIDENCE_ASSIST_HELP_NEEDED));
                             return CONFIDENCE_HERO_IS_AT_FIFTY_PERCENT;      
                         }
 
@@ -151,29 +139,6 @@ namespace Assets.Scripts.AI.Agents
             }
              
             return confidence;
-        }
-
-        /// <summary>
-        /// Returns the bounding box of an squad
-        /// </summary>
-        /// <param name="units"></param>
-        /// <returns></returns>
-        private Rect getSquadBoundingBox(List<Unit> units)
-        {
-            float minX = Mathf.Infinity;
-            float maxX = -Mathf.Infinity;
-            float minY = Mathf.Infinity;
-            float maxY = -Mathf.Infinity;
-
-            foreach (Unit u in units)
-            {
-                if (maxY < u.transform.position.z) maxY = u.transform.position.z;
-                if (minY > u.transform.position.z) minY = u.transform.position.z;
-                if (maxX < u.transform.position.x) maxX = u.transform.position.x;
-                if (minX > u.transform.position.x) minX = u.transform.position.x;
-            }
-
-            return new Rect(minX, minY, (maxX - minX) * 2, (maxY - minY) * 2);
         }
 
         /// <summary>

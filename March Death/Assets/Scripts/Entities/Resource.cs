@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -38,27 +38,6 @@ public class Resource : Building<Resource.Actions>
             return _createStatus;
         }
     }
-
-    /// <summary>
-    /// new civil creation spends some time. makingNewCivil is true if unit 
-    /// construction is in process, false otherwise.
-    /// </summary>
-    private bool _makingNewCivil = false;
-
-    /// <summary>
-    /// New civilian is being made.
-    /// </summary>
-    public bool HUD_newCivilBeingMade
-    {
-        get
-        {
-            return _makingNewCivil;
-        }
-    }
-    /// <summary>
-    /// tiem period spend making new civilian unit
-    /// </summary>
-    private float _constructionTime;
 
     /// <summary>
     /// Controls time elapsed since civil creation process was started
@@ -214,8 +193,6 @@ public class Resource : Building<Resource.Actions>
     private readonly object syncLock = new object();
     bool hasCreatedCivil = false;
 
-    bool once = false;
-
     List<GameObject> pendingProducers = new List<GameObject>();
     List<GameObject> pendingWanderers = new List<GameObject>();
 
@@ -324,16 +301,6 @@ public class Resource : Building<Resource.Actions>
         }         
     }
 
-    public void createCivilian()
-    {
-        if (!_makingNewCivil)
-        {
-            _makingNewCivil = true;
-            _createStatus = createCivilStatus.RUN;
-            endConstructionTime = Time.time + _constructionTime;
-        }
-        
-    }
     /// <summary>
     /// Method create civilian unit.
     /// If capacity limit of building is not reached unit is positioned inside 
@@ -342,72 +309,48 @@ public class Resource : Building<Resource.Actions>
     /// civilian sex is randomly selected(last parameter of createUnit method).
     /// </summary>
     /// <returns>civilian GameObject</returns>
-    private void newCivilian()
+    public void newCivilian()
     {
-
-        // TODO set desired rotation, now unit rotation equals building rotation!!
-        // TODO  ---create gameobject meetingPointInside and meetingPointOutside
-        // attached to resource building design--- just Waiting for designners team.
-
-        //---unComment next two lines when meeting point objects are created---
-        //GameObject meetingPointInside = this.GetComponent(meetingPointInside);
-        //GameObject meetingPointOutside = this.GetComponent(meetingPointOutside);
-
-        // only one civilian is placed inside building limits until designners team
-        // enabled some space to place units.
-
-        //if (harvestUnits < info.resourceAttributes.maxUnits)
-        if(harvestUnits < 1)
+        // If there's no workers, the next unit to be created will be a worker...
+        if (harvestUnits < 1)
         {
             // TODO get inside meeting point and calculate position
             //unitPosition = this.GetComponent(meetingPointInside).transform.position;
 
             // Units distributed in rows of 5 elements
-            
+
             _xDisplacement = harvestUnits % 5;
             _yDisplacement = harvestUnits / 5;
-            _unitPosition.Set(_center.x + _xDisplacement, _center.y , _center.z + _yDisplacement );
-            
+            _unitPosition.Set(_center.x + _xDisplacement, _center.y, _center.z + _yDisplacement);
+
             // Method createUnit from Info returns GameObject Instance;
             GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
 
             Unit civil = gob.GetComponent<Unit>();
-            civil.role = Unit.Roles.PRODUCING;            
+            civil.role = Unit.Roles.PRODUCING;
             BasePlayer.getOwner(this).addEntity(civil);
             fire(Actions.CREATE_UNIT, civil);
 
             totalUnits++;
             harvestUnits++;
             workersList.Add(civil);
-            
+            setStatus(EntityStatus.WORKING);
 
             _collectionRate += Info.get.of(race, UnitTypes.CIVIL).attributes.capacity;
         }
         else
         {
-            // TODO get outside meeting point and calculate position
-            _xDisplacement = (totalUnits - harvestUnits) % 5;
-            _yDisplacement = (totalUnits - harvestUnits) / 5;
-            _unitPosition.Set(_center.x + 10 + _xDisplacement, _center.y  , _center.z + 10 + _yDisplacement);
-            GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
-
-            Unit civil = gob.GetComponent<Unit>();
-            civil.role = Unit.Roles.WANDERING;
-
-            BasePlayer.getOwner(this).addEntity(civil);
-            fire(Actions.CREATE_UNIT, civil);
-
-            totalUnits++;
-
+            base.addUnitQueue(UnitTypes.CIVIL);
         }
+
         _createStatus = createCivilStatus.IDLE;
-        _makingNewCivil = false;
     }
+
 
     /// <summary>
     /// Recruit a Explorer from building. you need to do this to take away worker
-   ///  from building. production decrease when you remove workers
-   /// </summary>
+    ///  from building. production decrease when you remove workers
+    /// </summary>
     private void recruitExplorer(Unit worker)
     {
         if (harvestUnits > 0)
@@ -446,20 +389,6 @@ public class Resource : Building<Resource.Actions>
             setStatus(EntityStatus.WORKING);
         }
         Debug.Log(" You are trying to recruit worker but building capacity is full"); 
-    }
-
-    private WorldResources.Type getResourceType()
-    {
-        switch (type) {
-            case BuildingTypes.FARM:
-                return WorldResources.Type.FOOD;
-            case BuildingTypes.MINE:
-                return WorldResources.Type.METAL;
-            case BuildingTypes.SAWMILL:
-                return WorldResources.Type.WOOD;
-            default:
-                throw new Exception("That resource type does not exist!");
-        }
     }
 
     /// <summary>
@@ -577,8 +506,6 @@ public class Resource : Building<Resource.Actions>
         _unitRotation = transform.rotation;
         hasDefaultUnit = false;
         civilInfo = Info.get.of(this.race, UnitTypes.CIVIL);
-        _makingNewCivil = false;
-        _constructionTime = 10;
         _entity = this.GetComponent<IGameEntity>();
 
         // Call Building start
@@ -606,6 +533,21 @@ public class Resource : Building<Resource.Actions>
 
     }
 
+    private WorldResources.Type getResourceType()
+    {
+        switch (type)
+        {
+            case BuildingTypes.FARM:
+                return WorldResources.Type.FOOD;
+            case BuildingTypes.MINE:
+                return WorldResources.Type.METAL;
+            case BuildingTypes.SAWMILL:
+                return WorldResources.Type.WOOD;
+            default:
+                throw new Exception("That resource type does not exist!");
+        }
+    }
+
 
     // Update is called once per frame
     // when updated, collecting units load materials from store and send it to
@@ -622,12 +564,8 @@ public class Resource : Building<Resource.Actions>
             case EntityStatus.IDLE:
 
                 if (!hasDefaultUnit)
-                {
-                    if (!once) {
-                        fire(Actions.CREATED, statistics); once = true;
-                    }
-
-                    createCivilian();
+                {       
+                    fire(Actions.CREATED, statistics);
                     hasDefaultUnit = true;
                 }
                 break;
@@ -643,17 +581,15 @@ public class Resource : Building<Resource.Actions>
                 }
                 break;
         }
-        if (_createStatus == createCivilStatus.RUN)
-        {
-            if (Time.time > endConstructionTime)
-            {
-                _createStatus = createCivilStatus.DISABLED;
-                newCivilian();
-                setStatus(EntityStatus.WORKING);
-                
-            }
-
-        }
     
+    }
+
+    /// <summary>
+    /// When built, it's called
+    /// </summary>
+    protected override void onBuilt()
+    {
+        base.onBuilt();
+        newCivilian();
     }
 }

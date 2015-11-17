@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
@@ -118,7 +118,7 @@ public class Unit : GameEntity<Unit.Actions>
         moveTo(((GameObject)obj).transform.position);
     }
 
-    /// <summary>
+    /// <summary>a
     /// When a wound is received, this is called
     /// </summary>
     protected override void onReceiveDamage()
@@ -230,6 +230,11 @@ public class Unit : GameEntity<Unit.Actions>
 
         // TODO: Hack to get AI working
         return true;
+    }
+
+    public IGameEntity getTarget()
+    {
+        return _target;
     }
 
     public bool attackTarget(IGameEntity entity)
