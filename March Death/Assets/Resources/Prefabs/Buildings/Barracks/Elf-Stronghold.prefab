@@ -637,7 +637,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 154094}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 725.505005, y: 79.0026245, z: 906.735352}
+  m_LocalPosition: {x: 773.813599, y: 79.0026245, z: 887.987854}
   m_LocalScale: {x: 1.75, y: 1.75, z: 1.75}
   m_Children:
   - {fileID: 412240}
@@ -1890,8 +1890,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DebugOnEditor: 1
-  Position: {x: 2.5, y: 0, z: 2.5}
-  Size: {x: 40, y: 30, z: 27}
+  Position: {x: 2.5, y: 0, z: 2.25}
+  Size: {x: 60, y: 32, z: 45}
   CheckEverySeconds: 1
 --- !u!114 &11489768
 MonoBehaviour:
@@ -1937,7 +1937,7 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -1.28746033e-05, y: .00198459625, z: -.00115656853}
+    m_Center: {x: -1.28746033e-05, y: .00198459625, z: -.00115644932}
     m_Extent: {x: 3.03535762e-05, y: .0170720406, z: .0163537487}
   m_DirtyAABB: 0
 --- !u!183 &18330564
@@ -2185,6 +2185,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_LocalScale.z
       value: 1.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
