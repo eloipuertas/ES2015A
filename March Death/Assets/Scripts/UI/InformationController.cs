@@ -205,6 +205,18 @@ public partial class InformationController : MonoBehaviour {
 			unit.register(Unit.Actions.DAMAGED, onUnitDamaged);
 			unit.register(Unit.Actions.DIED, onUnitDied);
 		});
+
+		entity.doIfResource(resource =>
+		{
+			resource.register(Resource.Actions.DAMAGED, onUnitDamaged);
+			resource.register(Resource.Actions.DESTROYED, onUnitDied);
+		});
+
+		entity.doIfBarrack(building =>
+		{
+			building.register(Barrack.Actions.DAMAGED, onUnitDamaged);
+			building.register(Barrack.Actions.DESTROYED, onUnitDied);
+		});
 	}
 	
 	public void onUnitDeselected(System.Object obj)
