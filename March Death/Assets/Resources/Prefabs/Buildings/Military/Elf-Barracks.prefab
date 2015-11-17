@@ -363,7 +363,7 @@ GameObject:
   - 114: {fileID: 11414046}
   - 114: {fileID: 11496258}
   - 114: {fileID: 11447402}
-  - 114: {fileID: 11431148}
+  - 114: {fileID: 11416530}
   m_Layer: 0
   m_Name: Elf-Barracks
   m_TagString: Untagged
@@ -3890,7 +3890,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8fedea892f030418970e7ce2a2bc2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &11431148
+--- !u!114 &11416530
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -3898,7 +3898,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 119298}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b5e82104f3954c44a992850ac8a8053, type: 3}
+  m_Script: {fileID: 11500000, guid: 3aa7bd748c483ad44a9454c6c5f8639b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   race: 1
@@ -4266,6 +4266,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Constraints
       value: 126
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
