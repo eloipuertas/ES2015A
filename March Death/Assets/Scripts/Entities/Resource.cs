@@ -193,6 +193,8 @@ public class Resource : Building<Resource.Actions>
     private readonly object syncLock = new object();
     bool hasCreatedCivil = false;
 
+    private bool once = true;
+
     List<GameObject> pendingProducers = new List<GameObject>();
     List<GameObject> pendingWanderers = new List<GameObject>();
 
@@ -479,8 +481,11 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     public override void OnDestroy()
     {
-        statistics.growth_speed *= -1;
-        if(_info.isResource) fire(Actions.DEL_STATS, statistics);
+        if (_info.isResource)
+        {
+            statistics.growth_speed *= -1;
+            fire(Actions.DEL_STATS, statistics);
+        }
 
         foreach (Unit unit in workersList)
         {
@@ -570,19 +575,25 @@ public class Resource : Building<Resource.Actions>
 
                 if (!hasDefaultUnit)
                 {
-                    fire(Actions.CREATED, statistics);
                     hasDefaultUnit = true;
                 }
-                break;
+                break; 
 
             case EntityStatus.WORKING:
 
                 if (Time.time > _nextUpdate)
                 {
-                    _nextUpdate = Time.time + info.resourceAttributes.updateInterval;
-                    collect();
-                    produce();
+                    if (_info.isResource)
+                    {
+                        _nextUpdate = Time.time + info.resourceAttributes.updateInterval;
+                        collect();
+                        produce();
 
+                        if (once)
+                        {
+                            fire(Actions.CREATED, statistics); once = false;
+                        }
+                    }
                 }
                 break;
         }
