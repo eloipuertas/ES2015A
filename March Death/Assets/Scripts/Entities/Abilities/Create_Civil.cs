@@ -45,8 +45,9 @@ class CreateCivil : Ability
 				Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, unitInfo.resources.food) &&
 				Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, unitInfo.resources.metal) &&
 				Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, unitInfo.resources.wood) &&
-				_entity.status == EntityStatus.IDLE;
-			//Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.GOLD, unitInfo.resources.gold) &&  
+                //Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.GOLD, unitInfo.resources.gold) &&
+                ((_entity.status == EntityStatus.IDLE)|| (_entity.status == EntityStatus.WORKING));
+			  
 
 		}
 	}
@@ -57,22 +58,18 @@ class CreateCivil : Ability
 		_enabled = false;
 		base.disable();
 	}
-	
-	public override void enable()
-	{
-		base.enable();
-		
-		IGameEntity entity;
-		
-		if (_entity.info.isResource) {
-			((Resource)_entity).addUnitQueue (UnitTypes.CIVIL);
-		} else if (_entity.info.isBarrack) {
-			((Barrack)_entity).addUnitQueue (UnitTypes.CIVIL);
-		}
-		
-		UnitInfo unitInfo = Info.get.of(_entity.getRace(), UnitTypes.CIVIL);
-		Player.getOwner(_entity).resources.SubstractAmount(WorldResources.Type.WOOD, unitInfo.resources.wood);
-		Player.getOwner(_entity).resources.SubstractAmount(WorldResources.Type.METAL, unitInfo.resources.metal);
-		Player.getOwner(_entity).resources.SubstractAmount(WorldResources.Type.FOOD, unitInfo.resources.food);
-	}
+
+    public override void enable()
+    {
+        base.enable();
+
+        if (_entity.info.isResource)
+        {
+            ((Resource)_entity).addUnitQueue(UnitTypes.CIVIL);
+        }
+        else
+        {
+            Debug.Log("Civil Units must be generated only at Resource Buildings");
+        }
+    }
 }

@@ -1,16 +1,13 @@
 {
     "race": "ELVES",
-    "type": "MINE",
+    "type": "ARCHERY",
 
     "attributes": {
         "resistance": 3,
         "wounds": 50,
-        "capacity": 10,
         "timeToBuild": 30,
         "repairSpeed": 0.2,
-        "storeSize": 100,
         "maxUnits":  10,
-        "productionRate": 20,
         "updateInterval": 10,
         "sightRange": 50,
         "creationQueueCapacity": 5,
@@ -18,15 +15,15 @@
     },
 
     "resources": {
-        "wood": 100,
-        "metal": 20,
+        "wood": 50,
+        "metal": 70,
         "food": 50
     },
 
     "abilities":
     [
         {
-            "name":"Create Civil"
+            "name":"Create Thrown"
         },
         {
             "name":"Sell"
