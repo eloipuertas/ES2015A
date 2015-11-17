@@ -41,9 +41,7 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
     public override void Start()
     {
         base.Start();
-        if (IsActor)
-            activated = false;
-        else
+        if (!IsActor)
             Activate(false);
     }
     public Rect Bounds
@@ -87,6 +85,10 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
             foreach (Renderer r in GetComponentsInChildren<Renderer>())
             {
                 r.enabled = visible;
+            }
+            foreach(Light l in GetComponentsInChildren<Light>())
+            {
+                l.enabled = visible;
             }
         }
     }
