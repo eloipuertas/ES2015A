@@ -363,7 +363,7 @@ GameObject:
   - 114: {fileID: 11414046}
   - 114: {fileID: 11496258}
   - 208: {fileID: 20826386}
-  - 114: {fileID: 11412782}
+  - 114: {fileID: 11492808}
   m_Layer: 0
   m_Name: Elf-Barracks
   m_TagString: Untagged
@@ -3879,19 +3879,6 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &11412782
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 119298}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3aa7bd748c483ad44a9454c6c5f8639b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  race: 1
-  type: 5
 --- !u!114 &11414046
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3903,6 +3890,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8fedea892f030418970e7ce2a2bc2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &11492808
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 119298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b5e82104f3954c44a992850ac8a8053, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 1
+  type: 5
 --- !u!114 &11496258
 MonoBehaviour:
   m_ObjectHideFlags: 1
