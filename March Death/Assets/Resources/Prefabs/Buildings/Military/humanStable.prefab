@@ -82,8 +82,8 @@ GameObject:
   - 95: {fileID: 9521108}
   - 114: {fileID: 11474112}
   - 114: {fileID: 11428534}
-  - 208: {fileID: 20814296}
-  - 114: {fileID: 11487504}
+  - 114: {fileID: 11470724}
+  - 114: {fileID: 11471156}
   m_Layer: 0
   m_Name: humanStable
   m_TagString: Untagged
@@ -492,7 +492,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 114450}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 657.419922, y: 79.0026245, z: 930.143677}
+  m_LocalPosition: {x: 741.072449, y: 79.0026245, z: 892.498413}
   m_LocalScale: {x: 1.35000002, y: 1.35000002, z: 1.35000002}
   m_Children:
   - {fileID: 447764}
@@ -1135,7 +1135,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 122
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!65 &6585032
 BoxCollider:
@@ -1178,6 +1178,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider: {fileID: 0}
+--- !u!114 &11470724
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 114450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55673783568d5024f8240d70a3d2456f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DebugOnEditor: 1
+  Position: {x: 0, y: 0, z: 0}
+  Size: {x: 26, y: 12, z: 26}
+  CheckEverySeconds: 1
+--- !u!114 &11471156
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 114450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b5e82104f3954c44a992850ac8a8053, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 0
+  type: 6
 --- !u!114 &11474112
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1189,19 +1217,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8fedea892f030418970e7ce2a2bc2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &11487504
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 114450}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3aa7bd748c483ad44a9454c6c5f8639b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  race: 0
-  type: 6
 --- !u!137 &13740688
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
@@ -1234,7 +1249,7 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -.00115585327, y: .00198459625, z: 1.6272068e-05}
+    m_Center: {x: -.00115633011, y: .00198554993, z: 1.6272068e-05}
     m_Extent: {x: .016353596, y: .0170718636, z: 1.6268592e-09}
   m_DirtyAABB: 0
 --- !u!183 &18301798
@@ -1424,21 +1439,6 @@ Cloth:
     collisionSphereDistance: 3.40282347e+38
   m_CapsuleColliders: []
   m_SphereColliders: []
---- !u!208 &20814296
-NavMeshObstacle:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 114450}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: .5, y: .5, z: .5}
-  m_MoveThreshold: .100000001
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: .5
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -1465,6 +1465,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: type
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Constraints
+      value: 126
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
