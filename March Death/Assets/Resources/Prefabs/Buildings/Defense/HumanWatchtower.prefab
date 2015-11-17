@@ -115,7 +115,7 @@ GameObject:
   - 114: {fileID: 11409326}
   - 114: {fileID: 11420746}
   - 95: {fileID: 9506908}
-  - 208: {fileID: 20847264}
+  - 114: {fileID: 11454060}
   m_Layer: 0
   m_Name: HumanWatchtower
   m_TagString: Untagged
@@ -241,7 +241,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 184004}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 669.397705, y: 79.0026245, z: 926.745728}
+  m_LocalPosition: {x: 833.552429, y: 79.0026245, z: 924.375427}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 491852}
@@ -650,21 +650,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider: {fileID: 0}
---- !u!208 &20847264
-NavMeshObstacle:
+--- !u!114 &11454060
+MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 184004}
   m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: .5, y: .5, z: .5}
-  m_MoveThreshold: .100000001
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: .5
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55673783568d5024f8240d70a3d2456f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DebugOnEditor: 1
+  Position: {x: 0, y: 0, z: 0}
+  Size: {x: 12, y: 15, z: 12}
+  CheckEverySeconds: 1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

@@ -1339,7 +1339,7 @@ GameObject:
   - 114: {fileID: 11499442}
   - 114: {fileID: 11473934}
   - 114: {fileID: 11470110}
-  - 208: {fileID: 20884706}
+  - 114: {fileID: 11440100}
   m_Layer: 0
   m_Name: Elf-Sawmill
   m_TagString: Untagged
@@ -2005,7 +2005,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 115922}
-  m_LocalRotation: {x: .207251519, y: .082345143, z: .561577022, w: .796804368}
+  m_LocalRotation: {x: .207251549, y: .0823451504, z: .561577082, w: .796804488}
   m_LocalPosition: {x: 3.16649679e-10, y: .000632171868, z: 5.58793532e-11}
   m_LocalScale: {x: 1, y: 1.00000048, z: 1}
   m_Children:
@@ -2441,8 +2441,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 174826}
-  m_LocalRotation: {x: 0, y: .707106829, z: 0, w: .707106709}
-  m_LocalPosition: {x: 663.416565, y: 79.0026245, z: 944.201294}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 657.033203, y: 79.0026245, z: 900.069397}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 468934}
@@ -4257,7 +4257,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 126
+  m_Constraints: 122
   m_CollisionDetection: 0
 --- !u!65 &6562478
 BoxCollider:
@@ -4288,6 +4288,21 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11440100
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 174826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55673783568d5024f8240d70a3d2456f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DebugOnEditor: 1
+  Position: {x: 0, y: 0, z: .5}
+  Size: {x: 18, y: 9, z: 16}
+  CheckEverySeconds: 1
 --- !u!114 &11470110
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4356,8 +4371,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: .00284767151, y: 6.68764114e-05, z: -1.43051147e-06}
-    m_Extent: {x: .00696786726, y: .00999999885, z: .00873310771}
+    m_Center: {x: .00284671783, y: 6.68764114e-05, z: 0}
+    m_Extent: {x: .00696786772, y: .00999999885, z: .00873310957}
   m_DirtyAABB: 0
 --- !u!137 &13726378
 SkinnedMeshRenderer:
@@ -5063,21 +5078,6 @@ Cloth:
     collisionSphereDistance: 3.40282347e+38
   m_CapsuleColliders: []
   m_SphereColliders: []
---- !u!208 &20884706
-NavMeshObstacle:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 174826}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 8.5, y: .5, z: 7.5}
-  m_MoveThreshold: .100000001
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: .5}
-  m_TimeToStationary: .5
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -5115,11 +5115,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_LocalRotation.y
-      value: .707106829
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_LocalRotation.w
-      value: .707106709
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Constraints

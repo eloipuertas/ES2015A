@@ -218,7 +218,7 @@ GameObject:
   - 65: {fileID: 6596004}
   - 114: {fileID: 11421854}
   - 114: {fileID: 11434178}
-  - 208: {fileID: 20814164}
+  - 114: {fileID: 11409626}
   m_Layer: 0
   m_Name: Elf-Watchtower
   m_TagString: Untagged
@@ -341,7 +341,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 185688}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 716.643311, y: 79.0026245, z: 946.278687}
+  m_LocalPosition: {x: 661.837708, y: 79.0026245, z: 858.426514}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_Children:
   - {fileID: 480498}
@@ -758,7 +758,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 126
+  m_Constraints: 122
   m_CollisionDetection: 0
 --- !u!65 &6596004
 BoxCollider:
@@ -789,6 +789,21 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11409626
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 185688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55673783568d5024f8240d70a3d2456f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DebugOnEditor: 1
+  Position: {x: 0, y: 0, z: 0}
+  Size: {x: 15, y: 20, z: 15}
+  CheckEverySeconds: 1
 --- !u!114 &11421854
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -844,7 +859,7 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -.000771045685, y: .00132274628, z: 1.14440918e-05}
+    m_Center: {x: -.000771045685, y: .00132274628, z: 1.23977661e-05}
     m_Extent: {x: .0109024905, y: .0113815013, z: 2.18123075e-09}
   m_DirtyAABB: 0
 --- !u!183 &18313290
@@ -1034,21 +1049,6 @@ Cloth:
     collisionSphereDistance: 3.40282347e+38
   m_CapsuleColliders: []
   m_SphereColliders: []
---- !u!208 &20814164
-NavMeshObstacle:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 185688}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 3.75, y: 6.5, z: 3.75}
-  m_MoveThreshold: .100000001
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 6.5, z: 0}
-  m_TimeToStationary: .5
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

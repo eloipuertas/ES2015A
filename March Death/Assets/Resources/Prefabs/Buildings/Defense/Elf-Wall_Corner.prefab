@@ -217,7 +217,7 @@ GameObject:
   - 65: {fileID: 6578090}
   - 114: {fileID: 11451560}
   - 114: {fileID: 11483086}
-  - 208: {fileID: 20817328}
+  - 114: {fileID: 11447732}
   m_Layer: 0
   m_Name: Elf-Wall_Corner
   m_TagString: Untagged
@@ -348,7 +348,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 172170}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 703.623657, y: 79.0026245, z: 931.712952}
+  m_LocalPosition: {x: 717.989868, y: 79.0026245, z: 876.781738}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 490304}
@@ -1025,7 +1025,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 126
+  m_Constraints: 122
   m_CollisionDetection: 0
 --- !u!65 &6578090
 BoxCollider:
@@ -1056,6 +1056,21 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11447732
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 172170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55673783568d5024f8240d70a3d2456f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DebugOnEditor: 1
+  Position: {x: 2, y: 0, z: 2.5}
+  Size: {x: 20, y: 12, z: 18}
+  CheckEverySeconds: 1
 --- !u!114 &11451560
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1079,21 +1094,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider: {fileID: 0}
---- !u!208 &20817328
-NavMeshObstacle:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 172170}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 5.25, y: 4, z: 5}
-  m_MoveThreshold: .100000001
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 2, y: 4, z: 2.5}
-  m_TimeToStationary: .5
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
