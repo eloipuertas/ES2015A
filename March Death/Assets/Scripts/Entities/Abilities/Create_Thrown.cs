@@ -51,13 +51,13 @@ public class CreateThrown : Ability
     {
         base.enable();
 
-        if (_entity.info.isBarrack)
+        if (_entity.info.isArchery)
         {
             ((Barrack)_entity).addUnitQueue(UnitTypes.THROWN);
         }
-
-        Player.getOwner(_entity).resources.SubstractAmount(WorldResources.Type.WOOD, unitInfo.resources.wood);
-        Player.getOwner(_entity).resources.SubstractAmount(WorldResources.Type.METAL, unitInfo.resources.metal);
-        Player.getOwner(_entity).resources.SubstractAmount(WorldResources.Type.FOOD, unitInfo.resources.food);
+        else
+        {
+            Debug.Log("Thrown Units must ber generated only at Archery Building");
+        }
     }
 }

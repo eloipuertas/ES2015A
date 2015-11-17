@@ -11,12 +11,12 @@ public class CreateCavalry : Ability
     private UnitInfo unitInfo;
 
     public CreateCavalry(EntityAbility info, GameObject gameObject) :
-		base(info, gameObject)
-	{
+        base(info, gameObject)
+    {
         _entity = _gameObject.GetComponent<IGameEntity>();
         unitInfo = Info.get.of(_entity.getRace(), UnitTypes.CAVALRY);
     }
-    
+
     public override bool isActive
     {
         get
@@ -32,7 +32,7 @@ public class CreateCavalry : Ability
     public override bool isUsable
     {
         get
-        {  
+        {
             return
 
                 Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, unitInfo.resources.food) &&
@@ -50,14 +50,13 @@ public class CreateCavalry : Ability
     public override void enable()
     {
         base.enable();
-        
-        if (_entity.info.isBarrack)
+        if (_entity.info.isStable)
         {
-            ((Barrack)_entity).addUnitQueue(UnitTypes.CAVALRY);    
+            ((Barrack)_entity).addUnitQueue(UnitTypes.CAVALRY);
         }
-
-        Player.getOwner(_entity).resources.SubstractAmount(WorldResources.Type.WOOD, unitInfo.resources.wood);
-        Player.getOwner(_entity).resources.SubstractAmount(WorldResources.Type.METAL, unitInfo.resources.metal);
-        Player.getOwner(_entity).resources.SubstractAmount(WorldResources.Type.FOOD, unitInfo.resources.food);
+        else
+        {
+            Debug.Log("Cavalry Units must ber generated only at Stable Building");
+        }
     }
 }

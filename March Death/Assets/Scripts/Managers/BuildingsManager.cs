@@ -143,6 +143,8 @@ namespace Managers
                 finalBuilding.transform.position = newDestination;
 
                 //TODO : check another way to get the IGameEntity
+                
+               // IGameEntity entity = finalBuilding.gameObject.GetComponent<IGameEntity>(); // Esto no iria así ? (Ferran)
                 IGameEntity entity = (IGameEntity)finalBuilding.GetComponent<Unit>();
                 _player.addEntity(entity);
 

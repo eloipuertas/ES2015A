@@ -55,9 +55,9 @@ public class CreateHeavy : Ability
         {
             ((Barrack)_entity).addUnitQueue(UnitTypes.HEAVY);
         }
-
-        Player.getOwner(_entity).resources.SubstractAmount(WorldResources.Type.WOOD, unitInfo.resources.wood);
-        Player.getOwner(_entity).resources.SubstractAmount(WorldResources.Type.METAL, unitInfo.resources.metal);
-        Player.getOwner(_entity).resources.SubstractAmount(WorldResources.Type.FOOD, unitInfo.resources.food);
+        else
+        {
+            Debug.Log("Heavy Units must ber generated only at Barracks Building");
+        }
     }
 }
