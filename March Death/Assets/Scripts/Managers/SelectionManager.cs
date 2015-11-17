@@ -138,7 +138,14 @@ namespace Managers
         public void SelectTroop(string key)
         {
             Assert.IsTrue(_troops.ContainsKey(key));
-            _selectedEntities.Select(_troops[key].ToList());
+
+            List<Selectable> selected = _troops[key].ToList();
+
+            _selectedEntities.Select(selected);
+            
+            foreach(Selectable selectable in selected)
+                fire(Actions.SELECT, selectable.gameObject);
+
             _isTroop = true;
             Debug.Log("Selected troop: " + key);
         }
