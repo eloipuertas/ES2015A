@@ -241,7 +241,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 184004}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 833.552429, y: 79.0026245, z: 924.375427}
+  m_LocalPosition: {x: 760.903076, y: 79.0026245, z: 917.814697}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 491852}
@@ -297,7 +297,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 162084}
-  m_LocalRotation: {x: .642431676, y: .642431736, z: -.295434356, w: -.295434445}
+  m_LocalRotation: {x: .642431736, y: .642431796, z: -.295434386, w: -.295434475}
   m_LocalPosition: {x: -2.19273305, y: 8.16791153, z: -1.63739264}
   m_LocalScale: {x: 6.88587618, y: 91.1731644, z: 89.0733414}
   m_Children: []
@@ -596,7 +596,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 122
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!65 &6506922
 BoxCollider:
@@ -663,7 +663,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DebugOnEditor: 1
   Position: {x: 0, y: 0, z: 0}
-  Size: {x: 12, y: 15, z: 12}
+  Size: {x: 18, y: 20, z: 18}
   CheckEverySeconds: 1
 --- !u!1001 &100100000
 Prefab:
@@ -676,6 +676,10 @@ Prefab:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 1f8f7e9f33186a846a5bb32e952ec12b, type: 2}
+    - target: {fileID: 0}
+      propertyPath: m_Constraints
+      value: 126
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 184004}

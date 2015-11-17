@@ -379,7 +379,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 184938}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 783.85022, y: 79.0026245, z: 927.743958}
+  m_LocalPosition: {x: 741.521362, y: 79.0026245, z: 908.179321}
   m_LocalScale: {x: .75, y: .75, z: .75}
   m_Children:
   - {fileID: 429028}
@@ -742,7 +742,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 122
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!65 &6529026
 BoxCollider:
@@ -798,7 +798,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DebugOnEditor: 1
   Position: {x: 0, y: 0, z: 0}
-  Size: {x: 20, y: 12, z: 20}
+  Size: {x: 25, y: 20, z: 25}
   CheckEverySeconds: 1
 --- !u!114 &11458474
 MonoBehaviour:
@@ -856,7 +856,7 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: 0, y: 0, z: -3.05175781e-05}
+    m_Center: {x: .000244140625, y: 0, z: -6.10351562e-05}
     m_Extent: {x: 5.00004768, y: 1.97978835e-07, z: 5.00001192}
   m_DirtyAABB: 0
 --- !u!137 &13746868
@@ -891,7 +891,7 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: .000244140625, y: 0, z: 0}
+    m_Center: {x: 0, y: 0, z: 3.05175781e-05}
     m_Extent: {x: 5.00004625, y: 1.86075368e-07, z: 5.00001049}
   m_DirtyAABB: 0
 --- !u!183 &18310536
@@ -1478,6 +1478,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: type
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Constraints
+      value: 126
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

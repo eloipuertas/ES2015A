@@ -341,7 +341,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 185688}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 661.837708, y: 79.0026245, z: 858.426514}
+  m_LocalPosition: {x: 742.748108, y: 79.0026245, z: 907.254395}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_Children:
   - {fileID: 480498}
@@ -758,7 +758,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 122
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!65 &6596004
 BoxCollider:
@@ -770,8 +770,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 7.5, y: 13, z: 7.5}
-  m_Center: {x: 0, y: 6.5, z: 0}
+  m_Size: {x: 7.5, y: 10, z: 7.5}
+  m_Center: {x: 0, y: 5, z: 0}
 --- !u!95 &9563846
 Animator:
   serializedVersion: 3
@@ -802,7 +802,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DebugOnEditor: 1
   Position: {x: 0, y: 0, z: 0}
-  Size: {x: 15, y: 20, z: 15}
+  Size: {x: 20, y: 22, z: 20}
   CheckEverySeconds: 1
 --- !u!114 &11421854
 MonoBehaviour:
@@ -859,7 +859,7 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -.000771045685, y: .00132274628, z: 1.23977661e-05}
+    m_Center: {x: -.000771045685, y: .00132322311, z: 1.14440918e-05}
     m_Extent: {x: .0109024905, y: .0113815013, z: 2.18123075e-09}
   m_DirtyAABB: 0
 --- !u!183 &18313290
@@ -1055,7 +1055,11 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: m_Constraints
+      value: 126
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 185688}
