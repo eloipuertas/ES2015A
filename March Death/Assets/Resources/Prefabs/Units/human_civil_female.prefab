@@ -585,13 +585,13 @@ GameObject:
   m_Component:
   - 4: {fileID: 480520}
   - 95: {fileID: 9574720}
-  - 195: {fileID: 19542840}
   - 54: {fileID: 5408136}
   - 65: {fileID: 6588108}
   - 114: {fileID: 11478836}
   - 114: {fileID: 11479956}
   - 114: {fileID: 11427038}
   - 114: {fileID: 11475056}
+  - 114: {fileID: 11419000}
   m_Layer: 0
   m_Name: human_civil_female
   m_TagString: Untagged
@@ -2594,6 +2594,21 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11419000
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 148022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b09a9a421fcedee4ea755b7daade40c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Radius: .800000012
+  Height: 2
+  MaxSpeed: 2
+  MaxAcceleration: 2
 --- !u!114 &11427038
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2737,26 +2752,6 @@ SkinnedMeshRenderer:
     m_Center: {x: .00286134332, y: -.00255768467, z: .00489837956}
     m_Extent: {x: .00905114319, y: .0167502686, z: .0100818211}
   m_DirtyAABB: 0
---- !u!195 &19542840
-NavMeshAgent:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 148022}
-  m_Enabled: 1
-  m_Radius: .5
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

@@ -386,11 +386,11 @@ GameObject:
   - 95: {fileID: 9520340}
   - 114: {fileID: 11459572}
   - 65: {fileID: 6586910}
-  - 195: {fileID: 19587838}
   - 54: {fileID: 5437762}
   - 114: {fileID: 11405956}
   - 114: {fileID: 11448830}
   - 108: {fileID: 10894108}
+  - 114: {fileID: 11471552}
   m_Layer: 0
   m_Name: human_hero
   m_TagString: Untagged
@@ -2417,6 +2417,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8fedea892f030418970e7ce2a2bc2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &11471552
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 144398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b09a9a421fcedee4ea755b7daade40c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Radius: 2
+  Height: 2
+  MaxSpeed: 2
+  MaxAcceleration: 2
 --- !u!137 &13798704
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
@@ -2541,26 +2556,6 @@ SkinnedMeshRenderer:
     m_Center: {x: .000148897059, y: .00272225542, z: .00219796039}
     m_Extent: {x: .012248029, y: .013283344, z: .00734362379}
   m_DirtyAABB: 0
---- !u!195 &19587838
-NavMeshAgent:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 144398}
-  m_Enabled: 1
-  m_Radius: .5
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -2639,6 +2634,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_DrawHalo
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Radius
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

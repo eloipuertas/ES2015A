@@ -114,8 +114,11 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     private void onTargetHidden(System.Object obj)
     {
-        // Move to last known position (ie. current position)
-        moveTo(((GameObject)obj).transform.position);
+        if (_followingTarget || status == EntityStatus.ATTACKING)
+        {
+            // Move to last known position (ie. current position)
+            moveTo(((GameObject)obj).transform.position);
+        }
     }
 
     /// <summary>a
@@ -342,8 +345,8 @@ public class Unit : GameEntity<Unit.Actions>
         
         // Get DetourAgent and set basic variables
         _detourAgent = GetComponent<DetourAgent>();
-        _detourAgent.SetMaxSpeed(info.unitAttributes.movementRate);
-        _detourAgent.SetMaxAcceleration(info.unitAttributes.movementRate * 1.5f);
+        _detourAgent.SetMaxSpeed(info.unitAttributes.movementRate * 5);
+        _detourAgent.SetMaxAcceleration(20.5f);
     }
 
     /// <summary>
@@ -424,7 +427,14 @@ public class Unit : GameEntity<Unit.Actions>
         }
         else if (status == EntityStatus.MOVING)
         {
-            Debug.DrawLine(transform.position, _movePoint, Color.green);
+            if (_followingTarget)
+            {
+                Debug.DrawLine(transform.position, _movePoint, Color.black);
+            }
+            else
+            {
+                Debug.DrawLine(transform.position, _movePoint, Color.green);
+            }
         }
 #endif
     }

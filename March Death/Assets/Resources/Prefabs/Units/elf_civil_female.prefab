@@ -1152,12 +1152,12 @@ GameObject:
   m_Component:
   - 4: {fileID: 439352}
   - 95: {fileID: 9579298}
-  - 195: {fileID: 19593780}
   - 114: {fileID: 11454728}
   - 114: {fileID: 11486518}
   - 54: {fileID: 5480394}
   - 65: {fileID: 6589306}
   - 114: {fileID: 11410894}
+  - 114: {fileID: 11465022}
   m_Layer: 0
   m_Name: elf_civil_female
   m_TagString: Untagged
@@ -3490,7 +3490,7 @@ Animator:
   m_GameObject: {fileID: 179734}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 309c4674fd5544ced80cf75a8b2a88d3, type: 3}
-  m_Controller: {fileID: 9100000, guid: 370e747cdd8464c04b90c9ac500a197d, type: 2}
+  m_Controller: {fileID: 0}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -3520,6 +3520,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43c34b4ae45e2c94f90ae970db2ad9f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _collider: {fileID: 0}
+--- !u!114 &11465022
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 179734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b09a9a421fcedee4ea755b7daade40c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Radius: .800000012
+  Height: 2
+  MaxSpeed: 2
+  MaxAcceleration: 2
 --- !u!114 &11486518
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3533,6 +3549,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   race: 1
   type: 0
+  _distanceToTarget: 0
 --- !u!137 &13711704
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
@@ -4052,26 +4069,6 @@ SkinnedMeshRenderer:
     m_Center: {x: -.000157707371, y: .00662252586, z: -.000441905693}
     m_Extent: {x: .00506019872, y: .00506765768, z: .00424198247}
   m_DirtyAABB: 0
---- !u!195 &19593780
-NavMeshAgent:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 179734}
-  m_Enabled: 1
-  m_Radius: .5
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
