@@ -25,7 +25,9 @@ public class EntityAbilitiesController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+#if UNITY_5_2
         Physics.queriesHitTriggers = true;
+#endif
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
 
         //Register to selectable actions
