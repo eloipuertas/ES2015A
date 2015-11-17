@@ -480,7 +480,7 @@ public class Resource : Building<Resource.Actions>
     public override void OnDestroy()
     {
         statistics.growth_speed *= -1;
-        fire(Actions.DEL_STATS, statistics);
+        if(_info.isResource) fire(Actions.DEL_STATS, statistics);
 
         foreach (Unit unit in workersList)
         {
@@ -488,6 +488,37 @@ public class Resource : Building<Resource.Actions>
             harvestUnits--;
         }
             base.OnDestroy();
+    }
+
+    private WorldResources.Type ResourceFromBuilding(BuildingTypes type)
+    {
+        switch (type)
+        {
+            case BuildingTypes.FARM:
+                return WorldResources.Type.FOOD;
+            case BuildingTypes.MINE:
+                return WorldResources.Type.METAL;
+            case BuildingTypes.SAWMILL:
+                return WorldResources.Type.WOOD;
+            default:
+                throw new Exception("That resource type does not exist!");
+        }
+    }
+
+    private void SetupStatistics()
+    {
+        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
+        GameObject gameController = GameObject.Find("GameController");
+        ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
+
+        if (Player.getOwner(_entity).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
+        {
+            register(Actions.COLLECTION, res_pl.onCollection);
+            register(Actions.CREATED, res_pl.onStatisticsUpdate);
+            register(Actions.DEL_STATS, res_pl.onStatisticsUpdate);
+        }
+
+        statistics = _info.isResource ? new Statistics(ResourceFromBuilding(type), (int)info.resourceAttributes.updateInterval, 10) : null; // hardcoded, To modify, by now the collection rate is always 10, but theres no workers yet
     }
 
     /// <summary>
@@ -518,34 +549,8 @@ public class Resource : Building<Resource.Actions>
         base.Start();
         this.GetComponent<Rigidbody>().isKinematic = false;
 
-        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
-        GameObject gameController = GameObject.Find("GameController");
-        ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
+        SetupStatistics();
 
-        if (Player.getOwner(_entity).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
-        {
-            register(Actions.COLLECTION, res_pl.onCollection);
-            register(Actions.CREATED, res_pl.onStatisticsUpdate);
-            register(Actions.DEL_STATS, res_pl.onStatisticsUpdate);
-        }
-
-        statistics = new Statistics(getResourceType(), (int)info.resourceAttributes.updateInterval, 10); // hardcoded, To modify, by now the collection rate is always 10, but theres no workers yet
-
-    }
-
-    private WorldResources.Type getResourceType()
-    {
-        switch (type)
-        {
-            case BuildingTypes.FARM:
-                return WorldResources.Type.FOOD;
-            case BuildingTypes.MINE:
-                return WorldResources.Type.METAL;
-            case BuildingTypes.SAWMILL:
-                return WorldResources.Type.WOOD;
-            default:
-                throw new Exception("That resource type does not exist!");
-        }
     }
 
 
