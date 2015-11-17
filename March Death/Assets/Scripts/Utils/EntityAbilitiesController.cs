@@ -9,13 +9,23 @@ using System.IO;
 
 public class EntityAbilitiesController : MonoBehaviour
 {
+    //private static int Arial_Fifteen_Size_X = 10;
+    //private static int Arial_Fifteen_Size_y = 23;
+    private static float Arial_Fifteen_Size_X = 7.8f;
+    private static int Arial_Fifteen_Size_y = 18;
+    private static int HOVER_TEXT_SIZE = 15;
+    private static Color HOVER_TEXT_COLOR = Color.black;
+    private static Color HOVER_TEXT_BACKGROUND = Color.white;
+    private static float BACKGROUND_ALPHA = 0.5f;
 
     private static int Button_Rows = 3;
     private static int Button_Columns = 3;
+    private static Boolean showText = false;
 
     // Use this for initialization
     void Start()
     {
+        Physics.queriesHitTriggers = true;
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
 
         //Register to selectable actions
@@ -27,12 +37,22 @@ public class EntityAbilitiesController : MonoBehaviour
         {
             registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
         });
+
     }
 
     // Update is called once per frame
     void Update()
     {
 
+    }
+
+    void OnGUI()
+    {
+        //GUI.skin.label.fontSize = 15;
+        //GUI.skin.label.font= (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf"); 
+        //var textDimensions = GUI.skin.label.CalcSize(new GUIContent("A"));
+        //Debug.LogError("Dimensiones: " + textDimensions.x + ", " + textDimensions.y);
+        //Debug.LogError("Size of label: "+GUI.skin.label.fontSize);
     }
 
     public void onActorSelected(System.Object obj)
@@ -43,55 +63,15 @@ public class EntityAbilitiesController : MonoBehaviour
 
     public void onActorDeselected(System.Object obj)
     {
-        GameObject gameObject = (GameObject)obj;
-        IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-        unregisterEntity(entity);
         destroyButtons();
-    }
-
-    private void registerEntity(IGameEntity entity) {
-
-    	entity.doIfUnit(unit =>
-    	 {
-    		unit.register(Unit.Actions.DIED, onActorDeselected);
-    	});
-
-    	entity.doIfResource(resource =>
-    	{
-    		resource.register(Resource.Actions.DESTROYED, onActorDeselected);
-    	});
-
-    	entity.doIfBarrack(barrack =>
-    	{
-    		barrack.register(Barrack.Actions.DESTROYED, onActorDeselected);
-    	});
-    }
-
-    private void unregisterEntity(IGameEntity entity) {
-    	
-    	entity.doIfUnit(unit =>
-    	{
-    		unit.unregister(Unit.Actions.DIED, onActorDeselected);
-    	});
-
-    	entity.doIfResource(resource =>
-    	{
-    		resource.unregister(Resource.Actions.DESTROYED, onActorDeselected);
-    	});
-    	
-    	entity.doIfBarrack(barrack =>
-    	{
-    		barrack.unregister(Barrack.Actions.DESTROYED, onActorDeselected);
-    	});
     }
 
     void showActions(GameObject gameObject)
     {
         GameObject actionPanel = GameObject.Find("actions");
-
+        
         if (!actionPanel) return;
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-        registerEntity(entity);
         var rectTransform = actionPanel.GetComponent<RectTransform>();
         var size = rectTransform.sizeDelta;
         var globalScaleXY = new Vector2(rectTransform.lossyScale.x, rectTransform.lossyScale.y);
@@ -115,7 +95,6 @@ public class EntityAbilitiesController : MonoBehaviour
                     Debug.Log(abilityObj);
                     abilityObj.enable();
                 });
-
                 var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
                 buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Rows) + 1));
                 CreateButton(rectTransform, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
@@ -154,14 +133,31 @@ public class EntityAbilitiesController : MonoBehaviour
         var image = buttonObject.AddComponent<Image>();
         image.tag = "ActionButton";
         //image.transform.SetParent(panelTransform);
-        image.transform.localScale = panelTransform.localScale;
-        image.rectTransform.sizeDelta = 1.5f*extends;
-        image.transform.localPosition = center;
-        image.sprite = CreateSprite(ability);
-
+        image.rectTransform.localScale = panelTransform.localScale;
+        image.rectTransform.sizeDelta = 1.5f * extends;
+        image.rectTransform.position = center;
+        image.sprite = CreateSprite(ability, image.rectTransform.sizeDelta);
+        //Debug.LogError("Button position: " + center);
         var button = buttonObject.AddComponent<Button>();
         button.targetGraphic = image;
         button.onClick.AddListener(() => actionMethod());
+
+        var enterTrigger = buttonObject.AddComponent<EventTrigger>();
+        EventTrigger.Entry enterEntry = new EventTrigger.Entry();
+        enterEntry.eventID = EventTriggerType.PointerEnter;
+        enterEntry.callback = new EventTrigger.TriggerEvent();
+        UnityEngine.Events.UnityAction<BaseEventData> enterCall = new UnityEngine.Events.UnityAction<BaseEventData>(mouseEnter);
+        enterEntry.callback.AddListener(enterCall);
+        enterTrigger.triggers.Add(enterEntry);
+
+        var exitTrigger = buttonObject.AddComponent<EventTrigger>();
+        EventTrigger.Entry exitEntry = new EventTrigger.Entry();
+        exitEntry.eventID = EventTriggerType.PointerExit;
+        exitEntry.callback = new EventTrigger.TriggerEvent();
+        UnityEngine.Events.UnityAction<BaseEventData> exitCall = new UnityEngine.Events.UnityAction<BaseEventData>(mouseExit);
+        exitEntry.callback.AddListener(exitCall);
+        exitTrigger.triggers.Add(exitEntry);
+
 
         button.transform.SetParent(GameObject.Find("HUD/actions").transform); // We assign the parent to actions Canvas from the HUD
         button.GetComponent<RectTransform>().localPosition = new Vector3(button.GetComponent<RectTransform>().localPosition.x,
@@ -169,6 +165,70 @@ public class EntityAbilitiesController : MonoBehaviour
                                                                          0f);
 
         button.enabled = enabled;
+    }
+
+    public void mouseEnter(BaseEventData baseEvent)
+    {
+        PointerEventData data = baseEvent as PointerEventData;
+        GameObject panel = GameObject.Find("HUD/actions");
+
+        var panelTransform = panel.GetComponent<RectTransform>();
+        var panelSize = panelTransform.sizeDelta;
+        var panelGlobalScaleXY = new Vector2(panelTransform.lossyScale.x, panelTransform.lossyScale.y);
+        var panelExtents = Vector2.Scale(panelSize, panelGlobalScaleXY) / 2.0f;
+        var buttonExtents = new Vector2(panelExtents.x / Button_Columns, panelExtents.y / Button_Rows);
+        var panelPosition = panelTransform.position;
+        var panelOrigin = new Vector2(panelPosition.x - panelExtents.x, panelPosition.y + panelExtents.y);
+
+        var name = data.pointerEnter.name;
+        var button = GameObject.Find(name);
+        var buttonTransform = button.GetComponent<Image>().rectTransform;
+        var tooltip = new GameObject("tooltip");
+        var canvas = tooltip.AddComponent<Canvas>();
+        var tooltipTransform = tooltip.GetComponent<RectTransform>();
+        tooltip.AddComponent<GraphicRaycaster>();
+        tooltipTransform.position = buttonTransform.position;
+        tooltipTransform.localScale = panelTransform.localScale;
+        canvas.renderMode = RenderMode.ScreenSpaceCamera;
+
+        var desplazamiento = new Vector2(Screen.width / 4.0f, Screen.height / 4.0f);
+        var desplazamientoInterno = new Vector2(buttonTransform.position.x, buttonTransform.position .y) - panelOrigin;
+        var aspectRatio = Screen.width / Screen.height;
+
+        var imageObject = new GameObject("Background");
+        var image = imageObject.AddComponent<Image>();
+        var imageTransform = imageObject.GetComponent<RectTransform>();
+        imageTransform.SetParent(tooltipTransform);
+        imageTransform.localPosition = new Vector2((desplazamiento.x-buttonExtents.x) + (Math.Abs(desplazamientoInterno.x)-Math.Abs(buttonExtents.x)), -desplazamiento.y * aspectRatio - (Math.Abs(desplazamientoInterno.y) - Math.Abs(buttonExtents.y)));
+        imageTransform.localScale = panelTransform.localScale;
+        imageTransform.sizeDelta = new Vector2(Arial_Fifteen_Size_X * name.Length, Arial_Fifteen_Size_y);
+
+        var color = HOVER_TEXT_BACKGROUND;
+        color.a = BACKGROUND_ALPHA;
+        image.color = color;
+
+        var descripcion = new GameObject("Descripcion");
+        var text = descripcion.AddComponent<Text>();
+        var descripcionTransform = descripcion.GetComponent<RectTransform>();
+        descripcionTransform.SetParent(imageTransform);
+        descripcionTransform.localPosition = Vector3.zero;
+        descripcionTransform.sizeDelta = new Vector2(Arial_Fifteen_Size_X * name.Length, Arial_Fifteen_Size_y);
+        descripcionTransform.localScale = imageTransform.localScale;
+        Font ArialFont = (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf");
+        text.font = ArialFont;
+        text.material = ArialFont.material;
+        text.text = name;
+        text.fontSize = HOVER_TEXT_SIZE;
+        text.color = HOVER_TEXT_COLOR;
+        text.enabled = true;
+        
+        //text.supportRichText = true;
+    }
+
+    private void mouseExit(BaseEventData baseEvent)
+    {
+        var tooltip = GameObject.Find("tooltip");
+        Destroy(tooltip);
     }
 
     /// <summary>
@@ -179,49 +239,29 @@ public class EntityAbilitiesController : MonoBehaviour
         Debug.Log("Hello everybody!");
     }
 
-    Sprite CreateSprite2(String ability)
-    {
-        char separator = Path.DirectorySeparatorChar;
-        Sprite newImg = null;
-        Texture2D tex = null;
-        byte[] fileData;
-		
 
-        String sPath = Application.dataPath + separator + "Resources" + separator + "ActionButtons" + separator;
-        string sName = sPath + ability.Replace(" ","_") + ".png";
-        if (File.Exists(sName))
-        {
-            fileData = File.ReadAllBytes(sName);
-            tex = new Texture2D(100, 100, TextureFormat.RGB24, false);
-            tex.LoadImage(fileData);
-
-            newImg = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-        }
-        return newImg;
-    }
-
-
-    Sprite CreateSprite(String ability)
+    Sprite CreateSprite(String ability, Vector2 size)
     {
         Sprite newImg = null;
         char separator = Path.AltDirectorySeparatorChar;
 
-        Texture2D text;
+        Texture2D image;
 
         String file = "ActionButtons" + separator + ability.Replace(" ", "_");
-        text = Resources.Load(file) as Texture2D;
-        if (text)
+        image = Resources.Load(file) as Texture2D;
+        if (image)
         {
-            newImg = Sprite.Create(text, new Rect(0, 0, text.width, text.height), new Vector2(0.5f, 0.5f));
+            //newImg = Sprite.Create(image, new Rect(0, 0, image.width, image.height), new Vector2(center.x, center.y));
+            newImg = Sprite.Create(image, new Rect(0, 0, image.width, image.height), new Vector2(0.0f, 0.0f));
         }
 
         return newImg;
     }
 
-	void OnDestroy()
-	{
-		Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.SELECTED, onActorSelected);
-		Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.DESELECTED, onActorDeselected);
-	}
+    public void Clear()
+    {
+        Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.SELECTED, onActorSelected);
+        Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.DESELECTED, onActorDeselected);
+    }
 
 }

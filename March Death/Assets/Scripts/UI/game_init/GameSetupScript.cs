@@ -6,9 +6,10 @@ using Storage;
 /// <summary>
 /// Script to handle UI events for the game setup screen.
 /// </summary>
-public class GameSetupScript : MonoBehaviour {
+public class GameSetupScript : MonoBehaviour
+{
 
-	GameInformation info;
+    GameInformation info;
 
     /// <summary>
     /// Indicates whether the player has selected their civilization or not
@@ -26,7 +27,8 @@ public class GameSetupScript : MonoBehaviour {
     private Rect messageBox = new Rect((Screen.width - 200) / 2, (Screen.height - 300) / 2, 200, 150);
 
     // Use this for initialization
-    void Start () {
+    void Start ()
+    {
         info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
         Debug.Log("info exists");
         raceSelected = false;
@@ -54,7 +56,7 @@ public class GameSetupScript : MonoBehaviour {
         }
     }
 
-    public void SetPlayerRaceToElf()
+    public void SetPlayerRaceToElf ()
     {
         // HACK Even though info is initialized in Start(), it is null when it gets here
         if (!info) info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
@@ -78,15 +80,15 @@ public class GameSetupScript : MonoBehaviour {
 
     public void StartGame()
     {
-
-		if (raceSelected)
+        if (raceSelected)
         {
-			GameObject menuMusic = GameObject.Find("BackgroundMusic");
-			if (menuMusic) {
-				Destroy (menuMusic);
-			}
+            GameObject menuMusic = GameObject.Find ("BackgroundMusic");
+            if (menuMusic)
+            {
+                Destroy (menuMusic);
+            }
             SetGameMode();
-            Application.LoadLevel("ES2015A");
+            Application.LoadLevel(3);
         }
         else
         {
@@ -96,10 +98,6 @@ public class GameSetupScript : MonoBehaviour {
 
     public void Cancel()
     {
-		Application.LoadLevel(0);
+        Application.LoadLevel(0);
     }
-
-	void OnMouseEnter(){
-
-	}
 }

@@ -64,7 +64,8 @@ namespace Assets.Scripts.AI
                     ai.aiDebug.setControllingAgent(bAgent.agentName, bVal);
                 }
 
-                bAgent.controlUnits(sq);
+                if (!ai.FinishPlaying) bAgent.controlUnits(sq);
+                else break;
             }
         }
         /// <summary>

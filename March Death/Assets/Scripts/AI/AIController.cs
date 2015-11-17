@@ -37,6 +37,7 @@ namespace Assets.Scripts.AI
 
         Vector3 buildPosition;
         public Vector3 rootBasePosition;
+        private bool isRootBasePositionInitialized;
         public List<Unit> Army { get; set; }
         public List<Unit> Workers { get; set; }
         public AISenses senses;
@@ -46,7 +47,7 @@ namespace Assets.Scripts.AI
 
         public override void Start()
         {
-            base.Start();
+            Debug.Log("AI Start");base.Start();
 
             _selfRace = info.GetPlayerRace() == Races.MEN ? Races.ELVES : Races.MEN;
 
@@ -56,9 +57,14 @@ namespace Assets.Scripts.AI
             OwnBuildings = new List<IGameEntity>();
             modules = new List<AIModule>();
             Army = new List<Unit>();
-            rootBasePosition = new Vector3(706, 80, 765);
-            Army.Add(Info.get.createUnit(_selfRace, UnitTypes.HERO, rootBasePosition+new Vector3(30,0,30),Quaternion.Euler(0,0,0)).GetComponent<Unit>());
+            //rootBasePosition = new Vector3(706, 80, 765);
+            //Army.Add(Info.get.createUnit(_selfRace, UnitTypes.HERO, rootBasePosition,Quaternion.Euler(0,0,0)).GetComponent<Unit>());
             Workers = new List<Unit>();
+
+            Battle.PlayerInformation me = info.GetBattle().GetPlayerInformationList()[playerId - 1];
+            InstantiateBuildings(me.GetBuildings());
+            InstantiateUnits(me.GetUnits());
+            SetInitialResources(me.GetResources().Wood, me.GetResources().Food, me.GetResources().Metal, me.GetResources().Gold);
             Macro = new MacroManager(this);
 
             //We need to implement som kind of senses for te AI so here they are 
@@ -73,8 +79,9 @@ namespace Assets.Scripts.AI
             timers = new float[modules.Count];
             for (int i = 0; i < modules.Count; i++)
                 timers[i] = 0;
-            buildPosition = new Vector3(706, 80, 765);
-            rootBasePosition = new Vector3(706, 80, 765);
+            //buildPosition = new Vector3(706, 80, 765);
+            //rootBasePosition = new Vector3(706, 80, 765);
+            isRootBasePositionInitialized = false;
 
             ActorSelector selector = new ActorSelector()
             {
@@ -89,8 +96,8 @@ namespace Assets.Scripts.AI
                 aiDebug = AIDebugSystem.CreateComponent(gameObject, this);
             }
 
-            AcquirePlayerID();
             missionStatus = new MissionStatus(playerId);
+
         }
         void Update()
         {
@@ -189,6 +196,33 @@ namespace Assets.Scripts.AI
         // TODO: Should it be handled with events??
         public override void removeEntity(IGameEntity entity) { }
         public override void addEntity(IGameEntity newEntity) { }
+
+        protected override void AddUnit(IGameEntity entity)
+        {
+            if (entity.info.isArmy) Army.Add((Unit) entity);
+        }
+
+        protected override void AddBuilding(IGameEntity entity)
+        {
+            buildPosition = entity.getTransform().position + new Vector3(0,0,30);
+            if (entity.info.isBarrack)
+            {
+                // TODO rootBasePosition should be initialized elsewhere
+                if (!isRootBasePositionInitialized)
+                {
+                    if (((BuildingInfo) entity.info).type == BuildingTypes.STRONGHOLD)
+                    {
+                        rootBasePosition = entity.getTransform().position;
+                        isRootBasePositionInitialized = !isRootBasePositionInitialized;
+                    }
+                }
+                return;
+            }
+            Resource build = (Resource) entity;
+            build.register(Resource.Actions.CREATE_UNIT, OnCivilCreated);
+            build.register(Resource.Actions.DESTROYED, OnBuildingDestroyed);
+        }
+        
         public void addToArmy(List<Unit> units)
         {
             foreach (Unit u in units)

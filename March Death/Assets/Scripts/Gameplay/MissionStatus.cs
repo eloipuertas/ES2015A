@@ -7,13 +7,13 @@ public class MissionStatus
     private Dictionary<Storage.UnitTypes, uint[]> units;
     private Dictionary<WorldResources.Type, uint[]> resources;
 
-    private uint owner;
+    private int owner;
 
     private MissionController controller;
 
     private static readonly int ACCUMULATE = 0;
 
-    public MissionStatus(uint owner)
+    public MissionStatus(int owner)
     {
         Battle.MissionDefinition[] list;
         controller = GameObject.FindWithTag("GameController").GetComponent<MissionController>();
@@ -171,7 +171,7 @@ public class MissionStatus
         return controller.IsGameOver();
     }
 
-    public bool hasWon(uint owner)
+    public bool hasWon(int owner)
     {
         return controller.HasWon(owner);
     }
