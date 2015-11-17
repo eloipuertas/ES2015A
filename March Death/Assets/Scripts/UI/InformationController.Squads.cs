@@ -19,7 +19,7 @@ public partial class InformationController : MonoBehaviour {
 
 	ArrayList squadButtons = new ArrayList();
 
-		private void ReloadSquadGenerationButton() 
+	private void ReloadSquadGenerationButton() 
 	{
 		DestroyGenerateSquadButton ();
 		if (squadButtons.Count < MAX_SQUADS_BUTTONS) {
@@ -50,6 +50,7 @@ public partial class InformationController : MonoBehaviour {
 		{
 			//TODO, here we'll create a new squad with selcted units
 			addNewSquadButton(squadButtons.Count);
+            player.selection.NewTroop((squadButtons.Count).ToString());
 			ReloadSquadGenerationButton();
 		});
 
@@ -63,11 +64,12 @@ public partial class InformationController : MonoBehaviour {
 		Vector2 buttonCenter = new Vector2();
 		buttonCenter.x = squadsInitialPoint.x + squadsButtonSize.x / 2 + (squadsButtonSize.x * (i % squadsColumns));
 		buttonCenter.y = squadsInitialPoint.y + (squadsButtonSize.y / 2) - squadsButtonSize.y * line;
-		String text = "" + (i + 1);
-		UnityAction squadAction = new UnityAction(() => 
+		string text = "" + (i + 1);
+        UnityAction squadAction = new UnityAction(() => 
 		{
-			//TODO, here we'll select all units for this squad
-		});
+            player.selection.SelectTroop(text);
+            player.setCurrently(Player.status.SELECTED_UNITS);
+        });
 
 		GameObject button = CreateCustomButton(buttonCenter, squadsButtonSize, "SquadButton", text, actionMethod: squadAction);
 		squadButtons.Add(button);
