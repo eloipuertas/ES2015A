@@ -36,7 +36,6 @@ public class Player : BasePlayer
     public override void Start()
     {   
         Debug.Log("Player Start");base.Start();
-        //_buildings = GetComponent<Main_Game>().BuildingsMgr;
         _selection = GetComponent<Managers.SelectionManager>();
         //request the race of the player
         _selfRace = info.GetPlayerRace();

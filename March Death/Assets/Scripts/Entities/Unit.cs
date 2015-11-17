@@ -429,7 +429,7 @@ public class Unit : GameEntity<Unit.Actions>
         {
             if (_followingTarget)
             {
-                Debug.DrawLine(transform.position, _movePoint, Color.black);
+                Debug.DrawLine(transform.position, _movePoint, Color.blue);
             }
             else
             {
