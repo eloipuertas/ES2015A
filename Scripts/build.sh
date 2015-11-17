@@ -45,7 +45,7 @@ mv Lib/libRecast.so ../../Plugins/x86_64/Recast.so
 cd ..
 
 echo -e "\nAttempting to build Recast/Detour for Linux [32 bits]"
-cd March\ Death/Assets/UnityRecast
+rm -rf Build
 mkdir Build
 cd Build
 cmake -DBUILD_32_BITS ..
