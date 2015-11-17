@@ -23,11 +23,8 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     public T DAMAGED { get; set; }
     public T DESTROYED { get; set; }
 
-    private float buildTime1 = 0;
-    private float buildTime2 = 0;
-    private float buildTime3 = 0;
-
-    bool hasConstructionFinished = false;
+	private float totalBuildTime = 0;
+	private int woundsBuildControl = 0;
 
 
     /// <summary>
@@ -91,7 +88,11 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
         // Setup base
         base.Start();
 
-        activateFOWEntity();
+		activateFOWEntity();
+		_woundsReceived = info.buildingAttributes.wounds;
+		woundsBuildControl = info.buildingAttributes.wounds;
+
+		//return (info.buildingAttributes.wounds - _woundsReceived) * 100f / info.buildingAttributes.wounds;
 
         // Set the status
         setStatus(EntityStatus.BUILDING_PHASE_1);
@@ -104,32 +105,29 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     {
         base.Update();
 
-        switch (status)
-        {
-            case EntityStatus.BUILDING_PHASE_1:
-                if (buildTime1 >= 3)
-                    setStatus(EntityStatus.BUILDING_PHASE_2);
-                else
-                    buildTime1 += Time.deltaTime;
-                break;
+		// Control the building phases, as well as wounds while being built.
+		// TODO: Figure out a better condition... 
+		if (status == EntityStatus.BUILDING_PHASE_3 || status == EntityStatus.BUILDING_PHASE_2 || status == EntityStatus.BUILDING_PHASE_1) {
+			totalBuildTime += Time.deltaTime;
+			float buildingPercentage = (totalBuildTime) / info.buildingAttributes.timeToBuild;
+			int woundsBuilt = (int) ((1 - buildingPercentage) * info.buildingAttributes.wounds);
+			int diffWounds =  woundsBuildControl - woundsBuilt;
 
-            case EntityStatus.BUILDING_PHASE_2:
-                if (buildTime2 >= 10)
-                    setStatus(EntityStatus.BUILDING_PHASE_3);
-                else
-                    buildTime2 += Time.deltaTime;
-                break;
+			if (diffWounds > 0) {
+				// We are substracting wounds instead of a new value because the building might be under attack while is being built.
+				_woundsReceived -= diffWounds;
+				woundsBuildControl = woundsBuilt;
+			}
 
-            case EntityStatus.BUILDING_PHASE_3:
-                if (buildTime3 >= 3)
-                {
-                    hasConstructionFinished = true;
-                    setStatus(EntityStatus.IDLE);
-                }
-                else
-                    buildTime3 += Time.deltaTime;
-                break;
-        }
+			// TODO: What if we have more than 3 phases... maybe we should add the number of phases in the JSON, instead of harcoding it...
+			if (buildingPercentage > 0.33 && buildingPercentage <=0.66) {
+				setStatus(EntityStatus.BUILDING_PHASE_2);			
+			} else if (buildingPercentage > 0.66 && buildingPercentage < 1) {
+				setStatus(EntityStatus.BUILDING_PHASE_3);				
+			} else if (buildingPercentage >= 1) {
+				setStatus(EntityStatus.IDLE);				
+			}
+		}
     }
 
     /// <summary>

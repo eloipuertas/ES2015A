@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.AI.Agents
@@ -10,15 +7,12 @@ namespace Assets.Scripts.AI.Agents
     public class RetreatAgent : BaseAgent
     {
 
-        private const float HERO_HEALTH_TOLERANCE_BEFORE_RETREAT = 40f;
+        private const float HERO_HEALTH_TOLERANCE_BEFORE_RETREAT = 50f;
         private const float HERO_MIN_DISTANCE_WITH_ENEMIES_WHERE_IN_DANGER = 200f;
         private const float AI_MULTIPLIER_FACTOR = 8f;
 
-        private const int DEFCON1 = 100000;
-        private const int DEFCON2 = 10000;
-        private const int DEFCON3 = 1000;
-        private const int DEFCON4 = 100;
-        private const int DEFCON5 = 10;
+        private const int CONFIDENCE_IN_ENEMY_ATACK_RANGE = 75;
+        private const int CONFIDENCE_HERO_IS_AT_FIFTY_PERCENT = 1000;
 
         Unit hero;
 
@@ -27,6 +21,10 @@ namespace Assets.Scripts.AI.Agents
         Rect enemySquadBoundingBox, ownSquadBoundingBox;
         Vector3 safeArea;
         float minDistanceBetweenHeroAndNearestEnemy;
+        private float _maxUnitRange;
+        private Storage.Races _enemyRace;
+
+        private int confidence;
 
         bool isHeroInDanger;
 
@@ -47,9 +45,19 @@ namespace Assets.Scripts.AI.Agents
                 }
             }
 
+            if (ai.race == Storage.Races.ELVES)
+            {
+                _maxUnitRange = Storage.Info.get.of(Storage.Races.MEN, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
+                _enemyRace = Storage.Races.MEN;
+            }
+            else
+            {
+                _maxUnitRange = Storage.Info.get.of(Storage.Races.ELVES, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
+                _enemyRace = Storage.Races.ELVES;
+            }
         }
 
-        public override void controlUnits(List<Unit> units)
+        public override void controlUnits(SquadAI squad)
         {
 
             isHeroInDanger = false;
@@ -89,13 +97,18 @@ namespace Assets.Scripts.AI.Agents
                         ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
                     }
                 }
-                
-                if(isHeroInDanger) attackAgent.controlUnits(squadToAtackManager);
+
+                if (isHeroInDanger)
+                {
+                    SquadAI s = new SquadAI(0);
+                    s.addUnits(squadToAtackManager);
+                    attackAgent.controlUnits(s);
+                }
             }
         }
 
 
-        public override int getConfidence(List<Unit> units)
+        public override int getConfidence(SquadAI squad)
         {
             if (ai.EnemyUnits.Count == 0)
                 return 0;
@@ -109,25 +122,35 @@ namespace Assets.Scripts.AI.Agents
                 return 0;
             }
 
-            foreach (Unit u in ai.EnemyUnits)
+            //Get the squad bounding box
+            ownSquadBoundingBox = getSquadBoundingBox(squad.units);
+
+            float maxLongitudeOfBox = ownSquadBoundingBox.width > ownSquadBoundingBox.height ? ownSquadBoundingBox.width : ownSquadBoundingBox.height;
+            
+            //Smell what is near this position
+            Unit[] enemyUnitsNearUs = ai.senses.getUnitsOfRaceNearPosition(new Vector3(ownSquadBoundingBox.x, squad.units[0].transform.position.y, ownSquadBoundingBox.y), maxLongitudeOfBox * 2 * _maxUnitRange, _enemyRace);
+
+            foreach (Unit enemyUnit in enemyUnitsNearUs)
             {
-                float distance = Vector3.Distance(u.transform.position, hero.transform.position);
-                if (distance < minDistanceBetweenHeroAndNearestEnemy)
-                    minDistanceBetweenHeroAndNearestEnemy = distance;
-            } 
-
-            float val = 0;
-
-            //Heuristic calculus
-            foreach (Unit u in ai.Army) {
-                if (u.type == Storage.UnitTypes.HERO && u.healthPercentage < HERO_HEALTH_TOLERANCE_BEFORE_RETREAT &&
-                    minDistanceBetweenHeroAndNearestEnemy < HERO_MIN_DISTANCE_WITH_ENEMIES_WHERE_IN_DANGER)
+                foreach (Unit ownUnit in squad.units)
                 {
-                    val += DEFCON1;
+                    float distance = Vector3.Distance(enemyUnit.transform.position, ownUnit.transform.position);
+                    //HACK: Change this magic number before intefore integration.
+                    if (distance < enemyUnit.currentAttackRange() + 5)
+                    {
+                        //If our hero is in range and is going to die
+                        if(hero.healthPercentage < HERO_HEALTH_TOLERANCE_BEFORE_RETREAT && ownUnit.type == Storage.UnitTypes.HERO)
+                        {
+							ai.Micro.agents[MicroManager.AGENT_ASSIST].addConfidence(400);
+                            return CONFIDENCE_HERO_IS_AT_FIFTY_PERCENT;      
+                        }
+
+                        confidence = CONFIDENCE_IN_ENEMY_ATACK_RANGE;
+                    }
                 }
             }
-
-            return Mathf.RoundToInt(val * AI_MULTIPLIER_FACTOR);
+             
+            return confidence;
         }
 
         /// <summary>
@@ -165,5 +188,6 @@ namespace Assets.Scripts.AI.Agents
             //safeArea = new Vector3(ownSquadCenter.x - safePointxzDirection.x * 30, ai.Army[0].transform.position.y, ownSquadCenter.y - safePointxzDirection.y * 10);
 
         }
+
     }
 }

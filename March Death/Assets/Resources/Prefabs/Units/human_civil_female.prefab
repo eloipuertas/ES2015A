@@ -591,6 +591,7 @@ GameObject:
   - 114: {fileID: 11478836}
   - 114: {fileID: 11479956}
   - 114: {fileID: 11427038}
+  - 114: {fileID: 11475056}
   m_Layer: 0
   m_Name: human_civil_female
   m_TagString: Untagged
@@ -2559,10 +2560,10 @@ Rigidbody:
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: .0500000007
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 122
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!65 &6588108
 BoxCollider:
@@ -2604,6 +2605,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8fedea892f030418970e7ce2a2bc2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &11475056
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 148022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: caa19c7f960625f4b83094529589a1c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsActor: 1
+  Range: 0
 --- !u!114 &11478836
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2615,6 +2629,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43c34b4ae45e2c94f90ae970db2ad9f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _collider: {fileID: 0}
 --- !u!114 &11479956
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2628,6 +2643,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   race: 0
   type: 0
+  _distanceToTarget: 0
 --- !u!137 &13795118
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
@@ -2752,6 +2768,14 @@ Prefab:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 8102579d8514b46f492dff264a8fe5d7, type: 2}
+    - target: {fileID: 0}
+      propertyPath: m_Constraints
+      value: 126
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_UseGravity
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 148022}

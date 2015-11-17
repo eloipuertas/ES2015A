@@ -2186,7 +2186,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 164648}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 245.475052, y: 79.0026245, z: 768.437195}
+  m_LocalPosition: {x: 662.698792, y: 78.9942017, z: 873.144653}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 463892}
@@ -2928,8 +2928,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 15, y: 0, z: 15}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 15, y: 6, z: 15}
+  m_Center: {x: 0, y: 2.95000005, z: 0}
 --- !u!95 &9588076
 Animator:
   serializedVersion: 3
@@ -3016,7 +3016,7 @@ SkinnedMeshRenderer:
   m_RootBone: {fileID: 0}
   m_AABB:
     m_Center: {x: .00284719467, y: 6.68764114e-05, z: 0}
-    m_Extent: {x: .00696776109, y: .00999999512, z: .00873303227}
+    m_Extent: {x: .00696786586, y: .00999999512, z: .00873310957}
   m_DirtyAABB: 0
 --- !u!137 &13771510
 SkinnedMeshRenderer:
@@ -3762,7 +3762,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Size.y
-      value: .25
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Size.z
@@ -3774,7 +3774,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Center.y
-      value: .0250000004
+      value: 2.95000005
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: race

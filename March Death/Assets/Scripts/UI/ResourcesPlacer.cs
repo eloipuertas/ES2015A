@@ -97,7 +97,7 @@ public class ResourcesPlacer : MonoBehaviour
         {
             if (player.race == Races.ELVES)
             {
-                res_stats[i].text = "" + _statistics[i] + "/s";
+                res_stats[i].text = "" + System.Math.Round(_statistics[i],2) + "/s";
                 res_stats[i].color = _statistics[i] >= 0 ? Color.gray : Color.red;
             }
         }

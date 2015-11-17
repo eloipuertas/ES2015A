@@ -28,11 +28,13 @@ public interface IGameEntity : IBaseActor
 
     UnityEngine.Transform getTransform();
     UnityEngine.GameObject getGameObject();
+    UnityEngine.Vector3 closestPointTo(UnityEngine.Vector3 point);
+
     Ability getAbility(string name);
 
     Races getRace();
     E getType<E>() where E : struct, IConvertible;
-    void Destroy();
+    void Destroy(bool immediately = false);
 
     IKeyGetter registerFatalWounds(Action<System.Object> func);
     IKeyGetter unregisterFatalWounds(Action<System.Object> func);

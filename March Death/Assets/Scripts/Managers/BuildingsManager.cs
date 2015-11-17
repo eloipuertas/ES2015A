@@ -3,7 +3,7 @@ using System.Collections;
 using Utils;
 namespace Managers
 {
-    public class BuildingsManager : MonoBehaviour
+    public class BuildingsManager
     {
         public enum Place { ABLE, NOT_ABLE }
         private Place _currentPlace = Place.ABLE;
@@ -32,11 +32,12 @@ namespace Managers
         float yoffset = 1f;
 
         // Use this for initialization
-        void Start()
+        //void Start()
+        public BuildingsManager()
         {
-            _player = GetComponent<Player>();
-            _inputs = GetComponent<UserInput>();
-            grid = GetComponent<ConstructionGrid>();
+            //player = GetComponent<Player>();
+            //inputs = etComponent<UserInput>();
+            grid = GameObject.FindWithTag("GameController").GetComponent<ConstructionGrid>();
             cursor = CursorManager.Instance;
             // alpha components for the colors
             red.a = 0.5f;
@@ -54,7 +55,7 @@ namespace Managers
         }
 
         // Update is called once per frame
-        void Update()
+        public void Update()
         {
             if (_newBuilding.placing)
             {
@@ -155,7 +156,7 @@ namespace Managers
         public GameObject createBuilding(Vector3 position, Quaternion rotation,
                                          Storage.BuildingTypes type, Storage.Races race)
         {
-            GameObject obj = null;if (grid == null) Debug.LogError("Grid is null");
+            GameObject obj = null;
             position = grid.discretizeMapCoords(position);
             if (grid.isNewPositionAbleForConstrucction(position))
             {
@@ -237,7 +238,7 @@ namespace Managers
         /// </summary>
         private void _finishPlacing()
         {
-            Destroy(_newBuilding.ghost);
+            GameObject.Destroy(_newBuilding.ghost);
             _newBuilding.placing = false;
             _newBuilding.continuousConstruction = false;
             _currentPlace = Place.ABLE;

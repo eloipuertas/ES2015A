@@ -133,13 +133,21 @@ public class FOWManager : MonoBehaviour
                 //Reveal the area around the revealer entities
                 foreach (FOWEntity e in entities)
                 {
-                    if (e.IsRevealer)
+                    if (e.IsActor)
                         reveal(e);
                 }
                 //Hide or show the other entities
                 foreach (FOWEntity e in entities)
-                    e.changeVisible(isThereinRect(e.Bounds,visible.visible,!e.IsOwnedByPlayer));
-            
+                    if (e.IsActor)
+                    {
+                        e.changeVisible(isThereinRect(e.Bounds, visible.visible, !e.IsOwnedByPlayer));
+                    }
+                    else
+                    {
+                        e.changeVisible(isThereinRect(e.Bounds, visible.explored));
+                    }
+                    
+
                 fowTex.SetPixels32(pixels);
                 fowTex.Apply();
             }
@@ -185,14 +193,16 @@ public class FOWManager : MonoBehaviour
 
                         if (table[n].b > 0)
                         {
-                            pixels[n2].g = (byte)Mathf.Max(pixels[n2].g, table[n].g, 255);
                             if (table[n].b == 255)
                             {
                                 pixels[n2].b = (byte)Mathf.Max(pixels[n2].b, table[n].b);
+                                pixels[n2].g = (byte)Mathf.Max(pixels[n2].g, table[n].g);
                             }
                             else
                             {
-                                pixels[n2].b = (byte)Mathf.Max(pixels[n2].b, Mathf.Min(table[n].b + Mathf.RoundToInt(offset.x * (x - range) + offset.y * (y - range)), 255));
+                                int valOff = Mathf.RoundToInt(offset.x * (x - range) + offset.y * (y - range));
+                                pixels[n2].b = (byte)Mathf.Max(pixels[n2].b, Mathf.Min(table[n].b + valOff, 255));
+                                pixels[n2].g = (byte)Mathf.Max(pixels[n2].g, Mathf.Min(table[n].g + valOff, 255));
                             }
                         }
                     }

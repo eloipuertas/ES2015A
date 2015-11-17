@@ -30,18 +30,27 @@ public class Player : BasePlayer
 
     private bool isGameOverScreenDisplayed = false;
 
+    private CameraController cam;
+
     // Use this for initialization
     public override void Start()
     {   
-        base.Start();
-        _buildings = GetComponent<Managers.BuildingsManager>();
+        Debug.Log("Player Start");base.Start();
+        //_buildings = GetComponent<Main_Game>().BuildingsMgr;
         _selection = GetComponent<Managers.SelectionManager>();
         //request the race of the player
         _selfRace = info.GetPlayerRace();
         _selection.SetRace(race);
         
-        AcquirePlayerID();
+        cam = GameObject.FindWithTag("MainCamera").GetComponent<CameraController>();
+
+        Battle.PlayerInformation me = info.GetBattle().GetPlayerInformationList()[playerId - 1];
+        InstantiateBuildings(me.GetBuildings());
+        InstantiateUnits(me.GetUnits());
+        SetInitialResources(me.GetResources().Wood, me.GetResources().Food, me.GetResources().Metal, me.GetResources().Gold);
+        gameObject.AddComponent<ResourcesPlacer>();
         missionStatus = new MissionStatus(playerId);
+
     }
 
     // Update is called once per frame
@@ -177,5 +186,21 @@ public class Player : BasePlayer
         {
             entity.registerFatalWounds(performBuildingDestroyed);
         }
+    }
+
+    protected override void AddBuilding(IGameEntity entity)
+    {
+        Storage.BuildingInfo bi;
+        addEntity(entity);
+        bi = (Storage.BuildingInfo) entity.info;
+        if (bi.type == Storage.BuildingTypes.STRONGHOLD)
+        {
+            cam.lookGameObject(entity.getGameObject());
+        }
+    }
+
+    protected override void AddUnit(IGameEntity entity)
+    {
+        addEntity(entity);
     }
 }

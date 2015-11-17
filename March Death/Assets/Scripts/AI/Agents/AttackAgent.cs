@@ -13,14 +13,14 @@ namespace Assets.Scripts.AI.Agents
         {
             valOfCitizen = 1f;
         }
-        public override void controlUnits(List<Unit> units)
+        public override void controlUnits(SquadAI squad)
         {
             Vector3 Squadpos = Vector3.zero;
-            if (units.Count > 0)
+            if (squad.units.Count > 0)
             {
                 //We assume our squad is mostly together 
                 //TODO: Stop assuming members of the same squad are close
-                Squadpos = units[0].transform.position;
+                Squadpos = squad.units[0].transform.position;
             }
             if (ai.EnemyUnits.Count > 0)
             {
@@ -39,7 +39,7 @@ namespace Assets.Scripts.AI.Agents
                     }
                 }
 
-                foreach(Unit u in units)
+                foreach(Unit u in squad.units)
                 {
                     if (u.status != EntityStatus.DEAD && !u.attackTarget(bTar))
                     {
@@ -61,14 +61,23 @@ namespace Assets.Scripts.AI.Agents
             else
                 return u.healthPercentage * (u.info.unitAttributes.resistance + u.info.unitAttributes.attackRate * u.info.unitAttributes.strength);
         }
-        public override int getConfidence(List<Unit> units)
+        public override int getConfidence(SquadAI squad)
         {
             if (ai.EnemyUnits.Count == 0)
                 return 0;
-            //TODO: Recalc our army value only when it changes
+            AttackData ad = squad.getData<AttackData>();
+
             float val = 0;
-            foreach (Unit u in ai.Army)
-                val += valOfUnit(u);
+            if (ad.hasChanged)
+            {
+                foreach (Unit u in squad.units)
+                    val += valOfUnit(u);
+                ad.Value = val;
+                ad.hasChanged = false;
+            }
+            else
+                val = ad.Value;
+
             foreach (Unit u in ai.EnemyUnits)
                 val -= valOfUnit(u);
             if (val < 0)
@@ -82,6 +91,23 @@ namespace Assets.Scripts.AI.Agents
                 }
             }
             return Mathf.RoundToInt(val*8);
+        }
+    }
+    class AttackData : AgentData
+    {
+        public float Value { get; set; }
+        public bool hasChanged { get; set; }
+        public AttackData()
+        {
+            hasChanged = true;
+        }
+        public override void OnUnitJoined(Unit u)
+        {
+            hasChanged = true;
+        }
+        public override void OnUnitLeft(Unit u)
+        {
+            hasChanged = true;
         }
     }
 }

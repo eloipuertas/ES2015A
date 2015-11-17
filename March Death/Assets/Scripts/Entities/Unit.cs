@@ -12,7 +12,7 @@ using Storage;
 /// </summary>
 public class Unit : GameEntity<Unit.Actions>
 {
-    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STATS_OUT };
+    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT };
     public enum Roles { PRODUCING, WANDERING };
 
     public Unit() { }
@@ -20,7 +20,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// <summary>
     /// Interval between resources update in miliseconds
     /// </summary>
-    const int RESOURCES_UPDATE_INTERVAL = 20;
+    const float RESOURCES_UPDATE_INTERVAL = 15.0f;
 
     Statistics statistics;
 
@@ -39,7 +39,9 @@ public class Unit : GameEntity<Unit.Actions>
     /// If in battle, this is the target and last attack time
     /// </summary>
     private IGameEntity _target = null;
-    private float _distanceToTarget = 0;
+    public float _distanceToTarget = 0;
+    private Vector3 _attackPoint;
+    private Vector3 _closestPointToTarget;
 
     /// <summary>
     /// Set to true if we are following our target (ie. attacking but not in range)
@@ -103,8 +105,9 @@ public class Unit : GameEntity<Unit.Actions>
     private void onTargetDied(System.Object obj)
     {
         // TODO: Our target died, select next? Do nothing?
-        stopAttack();
-	}
+        setStatus(EntityStatus.IDLE);
+        _target = null;
+    }
 
     /// <summary>
     /// Callback issued when a target hides in the FOW
@@ -131,7 +134,7 @@ public class Unit : GameEntity<Unit.Actions>
         fire(Actions.DIED);
 
         statistics.growth_speed *= -1;
-        fire(Actions.STATS_OUT, statistics);
+        fire(Actions.STAT_OUT, statistics);
     }
 
     /// <summary>
@@ -191,7 +194,13 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     private void updateDistanceToTarget()
     {
-        _distanceToTarget = Vector3.Distance(_target.getTransform().position, transform.position);
+        _attackPoint = closestPointTo(_target.getTransform().position);
+        _attackPoint.y = transform.position.y;
+
+        _closestPointToTarget = _target.closestPointTo(transform.position);
+        _closestPointToTarget.y = _target.getTransform().position.y;
+
+        _distanceToTarget = Vector3.Distance(_attackPoint, _closestPointToTarget);
     }
 
     /// <summary>
@@ -209,19 +218,7 @@ public class Unit : GameEntity<Unit.Actions>
             // Register for DEAD/DESTROYED and HIDDEN
             _auto += entity.registerFatalWounds(onTargetDied);
             _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
-
-            // if target has changed, hide old target health
-            Selectable selectable = null;
-            if (_target != null) {
-            	selectable = _target.getGameObject().GetComponent<Selectable>();
-            	selectable.NotAttackedEntity();
-            }
-
             _target = entity;
-            
-            // Show target health
-            selectable = _target.getGameObject().GetComponent<Selectable>();
-            selectable.AttackedEntity();
 
             // Update distance for immediate usage (ie. canDoRangedAttack)
             updateDistanceToTarget();
@@ -235,6 +232,24 @@ public class Unit : GameEntity<Unit.Actions>
         return true;
     }
 
+    public bool attackTarget(IGameEntity entity)
+    {
+        if (entity.info.isUnit)
+        {
+            return attackTarget((Unit)entity);
+        }
+        else if (entity.info.isBarrack)
+        {
+            return attackTarget((Barrack)entity);
+        }
+        else if (entity.info.isResource)
+        {
+            return attackTarget((Resource)entity);
+        }
+
+        throw new ArgumentException("Unkown entity type to attack");
+    }
+
     /// <summary>
     /// Stops attacking the target and goes back to an IDLE state
     /// </summary>
@@ -242,10 +257,6 @@ public class Unit : GameEntity<Unit.Actions>
     {
         if (_target != null)
         {
-            // Hide target health
-            Selectable selectable = _target.getGameObject().GetComponent<Selectable>();
-            selectable.NotAttackedEntity();
-
             // Unregister all events
             _auto -= _target.unregisterFatalWounds(onTargetDied);
             _auto -= _target.getGameObject().GetComponent<FOWEntity>().unregister(FOWEntity.Actions.HIDDEN, onTargetHidden);
@@ -279,7 +290,7 @@ public class Unit : GameEntity<Unit.Actions>
         }
         
         _followingTarget = false;
-        stopAttack();
+        _target = null;
         _hasPath = false;
         _movePoint = movePoint;
         setStatus(EntityStatus.MOVING);
@@ -325,11 +336,11 @@ public class Unit : GameEntity<Unit.Actions>
         if (Player.getOwner(this).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
         {
             register(Actions.EAT, res_pl.onFoodConsumption);
-            register(Actions.STATS_OUT, res_pl.onStatisticsUpdate);
+            register(Actions.STAT_OUT, res_pl.onStatisticsUpdate);
             register(Actions.CREATED, res_pl.onStatisticsUpdate);
         }
 
-        statistics = new Statistics(WorldResources.Type.FOOD , RESOURCES_UPDATE_INTERVAL, -10);
+        statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -5);
 
         fire(Actions.CREATED, statistics);
     }
@@ -350,10 +361,8 @@ public class Unit : GameEntity<Unit.Actions>
 
         // Calculate food consumption
         float resourcesElapsed = Time.time - _lastResourcesUpdate;
-        //Debug.Log("res_elapsed: " + resourcesElapsed + " INTERVAL: " + RESOURCES_UPDATE_INTERVAL); // RAUL_DEB
         if (resourcesElapsed > RESOURCES_UPDATE_INTERVAL)
         {
-
             _lastResourcesUpdate = Time.time;
 
             // Food is always consumed
@@ -369,13 +378,13 @@ public class Unit : GameEntity<Unit.Actions>
             }
 
             // Update this unit resources
-            //BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.GOLD, goldProduced); // <-- this causes EXCEPTION, GOLD does not exist
-            //BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.GOLD, goldConsumed);
+            BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.GOLD, goldProduced);
+            BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.GOLD, goldConsumed);
             BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.FOOD, foodConsumed);
 
-            Goods goods = new Goods();
+            Goods goods = new Goods(); // Generate the goods the units eat
+            goods.amount = 5;
             goods.type = Goods.GoodsType.FOOD;
-            goods.amount = 10;
 
             fire(Actions.EAT, goods);
         }
@@ -388,7 +397,7 @@ public class Unit : GameEntity<Unit.Actions>
                 if (_target != null)
                 {
                     // Look at it
-                    faceTo(_target.getTransform().position);
+                    faceTo(_closestPointToTarget);
 
                     // Check if we are still in range
                     if (_distanceToTarget > currentAttackRange())
@@ -405,6 +414,18 @@ public class Unit : GameEntity<Unit.Actions>
                 }
                 break;
         }
+
+#if UNITY_EDITOR
+        if (status == EntityStatus.ATTACKING)
+        {
+            Debug.DrawLine(transform.position, _target.getTransform().position, Color.yellow);
+            Debug.DrawLine(_attackPoint, _closestPointToTarget, Color.red);
+        }
+        else if (status == EntityStatus.MOVING)
+        {
+            Debug.DrawLine(transform.position, _movePoint, Color.green);
+        }
+#endif
     }
 
     /// <summary>
@@ -421,7 +442,7 @@ public class Unit : GameEntity<Unit.Actions>
                 if (_followingTarget)
                 {
                     // Update destination only if target has moved
-                    Vector3 destination = _target.getTransform().position;
+                    Vector3 destination = _closestPointToTarget;
                     if (destination != _movePoint)
                     {
                         _hasPath = false;
@@ -432,6 +453,7 @@ public class Unit : GameEntity<Unit.Actions>
                     // If we are already close enough, stop and attack
                     if (_distanceToTarget <= currentAttackRange())
                     {
+                        _navAgent.SetDestination(transform.position);
                         _navAgent.ResetPath();
                         setStatus(EntityStatus.ATTACKING);
                         return;
