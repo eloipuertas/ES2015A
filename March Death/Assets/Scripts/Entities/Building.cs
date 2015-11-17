@@ -29,7 +29,7 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 	private float _totalBuildTime = 0;
 	private float _creationTimer = 0;
 	private int _woundsBuildControl = 0;
-	private EntityInfo _infoUnitToCreate;
+	private UnitInfo _infoUnitToCreate;
 	private bool _creatingUnit = false;
 	
 	private Vector3 _deploymentPoint;
@@ -155,7 +155,7 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 			_creationTimer += Time.deltaTime;
 
 			if (_creationTimer >= _infoUnitToCreate.unitAttributes.creationTime) {
-				createUnit((UnitTypes)_infoUnitToCreate.entityType);
+				createUnit((UnitTypes)_infoUnitToCreate.type);
 				_creatingUnit = false;
 			}
 		} else if (_creationQueue.Count > 0) {			
