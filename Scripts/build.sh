@@ -35,13 +35,23 @@ echo "Attempting to start dummy audio driver"
 sudo modprobe snd-dummy
 
 # Build navmesh first
-echo -e "\nAttempting to build Recast/Detour for Linux"
+echo -e "\nAttempting to build Recast/Detour for Linux [64 bits]"
 cd March\ Death/Assets/UnityRecast
 mkdir Build
 cd Build
 cmake ..
-make -j2
-cp -f Lib/libRecast.so ../../Plugins/x86_64/Recast.so
+make
+mv Lib/libRecast.so ../../Plugins/x86_64/Recast.so
+cd ..
+
+echo -e "\nAttempting to build Recast/Detour for Linux [32 bits]"
+cd March\ Death/Assets/UnityRecast
+mkdir Build
+cd Build
+cmake -DBUILD_32_BITS ..
+make
+mv Lib/libRecast.so ../../Plugins/x86/Recast.so
+
 cd $HOME/ES2015A
 
 # Build Unity project
