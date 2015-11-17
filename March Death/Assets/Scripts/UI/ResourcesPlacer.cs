@@ -130,7 +130,7 @@ public class ResourcesPlacer : MonoBehaviour
     {
         if (ige.info.isBuilding)
         {
-            if (ige.info.isBarrack) return true;
+            if (!(ige.info.isBarrack || ige.info.isResource)) return true;
             return false;
         }
         else
