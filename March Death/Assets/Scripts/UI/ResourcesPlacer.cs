@@ -191,7 +191,10 @@ public class ResourcesPlacer : MonoBehaviour
     {
         Goods goods = (Goods)obj;
         Debug.Log("Let's eat an amount of: " + goods.amount + " on: " + goods.type);
-        player.resources.SubstractAmount(t[0], goods.amount); // t[0] is FOOD
+        if (player != null && goods != null)
+        {
+            player.resources.SubstractAmount(t[0], goods.amount); // t[0] is FOOD
+        }
 
         updateAmounts();
     }
