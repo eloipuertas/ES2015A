@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using System.IO;
 
 namespace Pathfinding
 {
     public class DetourCrowd : MonoBehaviour
     {
+		public PolyMeshAsset polymesh;
+		public TileCacheAsset navmeshData;
+
         public int MaxAgents = 1024;
         public float AgentMaxRadius = 2;
 
@@ -34,7 +38,8 @@ namespace Pathfinding
 
         public void OnEnable()
         {
-            crowd = Detour.Crowd.createCrowd(MaxAgents, AgentMaxRadius, PathDetour.get.NavMesh);
+			PathDetour.get.Initialize(navmeshData);
+			crowd = Detour.Crowd.createCrowd(MaxAgents, AgentMaxRadius, PathDetour.get.NavMesh);
             positions = new float[MaxAgents * 3];
             velocities = new float[MaxAgents * 3];
             targetStates = new byte[MaxAgents];

@@ -243,7 +243,7 @@ namespace Pathfinding
             asset.tilesHeader = new TileCacheAsset.TileCacheTileHeader[asset.header.numTiles];
             for (uint i = 0; i < asset.header.numTiles; ++i)
             {
-                asset.tilesHeader[i] = (TileCacheAsset.TileCacheTileHeader)Marshal.PtrToStructure(new IntPtr(tilesHeader.ToInt32() + (structSize * i)), typeof(TileCacheAsset.TileCacheTileHeader));
+                asset.tilesHeader[i] = (TileCacheAsset.TileCacheTileHeader)Marshal.PtrToStructure(new IntPtr(tilesHeader.ToInt64() + (structSize * i)), typeof(TileCacheAsset.TileCacheTileHeader));
             }
 
             // Copy data
@@ -261,7 +261,7 @@ namespace Pathfinding
                 IntPtr tilePtr = TileCache.getTileCacheTile(tileCache, (int)i);
                 CompressedTile tile = (CompressedTile)Marshal.PtrToStructure(tilePtr, typeof(CompressedTile));
 
-                asset.tilesHeader[i] = (TileCacheAsset.TileCacheTileHeader)Marshal.PtrToStructure(new IntPtr(tilesHeader.ToInt32() + (structSize * i)), typeof(TileCacheAsset.TileCacheTileHeader));
+                asset.tilesHeader[i] = (TileCacheAsset.TileCacheTileHeader)Marshal.PtrToStructure(new IntPtr(tilesHeader.ToInt64() + (structSize * i)), typeof(TileCacheAsset.TileCacheTileHeader));
 
                 if (asset.tilesHeader[i].dataSize > 0)
                 {

@@ -46,7 +46,7 @@ DLL_EXPORT float* getObstacles(dtTileCache* tc, int& nobstacles);
 
 // Crowd
 DLL_EXPORT dtCrowd* createCrowd(int maxAgents, float maxRadius, dtNavMesh* navmesh);
-DLL_EXPORT int addAgent(dtCrowd* crowd, const float* p, float radius, float height);
+DLL_EXPORT int addAgent(dtCrowd* crowd, float* p, float radius, float height);
 DLL_EXPORT dtCrowdAgent* getAgent(dtCrowd* crowd, int idx);
 DLL_EXPORT void updateAgent(dtCrowd* crowd, int idx, float maxAcceleration, float maxSpeed);
 DLL_EXPORT void removeAgent(dtCrowd* crowd, int idx);

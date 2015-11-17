@@ -539,7 +539,7 @@ dtCrowd* createCrowd(int maxAgents, float maxRadius, dtNavMesh* navmesh)
 	return crowd;
 }
 
-int addAgent(dtCrowd* crowd, const float* p, float radius, float height)
+int addAgent(dtCrowd* crowd, float* p, float radius, float height)
 {
 	dtCrowdAgentParams ap;
 	memset(&ap, 0, sizeof(ap));
@@ -550,7 +550,7 @@ int addAgent(dtCrowd* crowd, const float* p, float radius, float height)
 	ap.collisionQueryRange = ap.radius * 12.0f;
 	ap.pathOptimizationRange = ap.radius * 30.0f;
 	ap.updateFlags = 0;
-	
+
 	//if (m_toolParams.m_anticipateTurns)
 		ap.updateFlags |= DT_CROWD_ANTICIPATE_TURNS;
 	//if (m_toolParams.m_optimizeVis)
@@ -564,8 +564,8 @@ int addAgent(dtCrowd* crowd, const float* p, float radius, float height)
 
 	ap.obstacleAvoidanceType = (unsigned char)2;
 	ap.separationWeight = 1;
-
-	return crowd->addAgent(p, &ap);
+	int r =  crowd->addAgent(p, &ap);
+	return r;
 }
 
 dtCrowdAgent* getAgent(dtCrowd* crowd, int idx)
