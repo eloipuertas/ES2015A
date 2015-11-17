@@ -41,10 +41,10 @@ mkdir Build
 cd Build
 cmake ..
 make
-cp Lib/libRecast.so /usr/lib/Recast.so
-cp Lib/libRecast.so /usr/lib64/Recast.so # Should not work
-cp Lib/libRecast.so /usr/lib64/libRecast.so # Should not work
-mv Lib/libRecast.so /usr/lib/libRecast.so
+sudo -E cp Lib/libRecast.so /usr/lib/Recast.so
+sudo -E mv Lib/libRecast.so /usr/lib/libRecast.so
+sudo -E chmod 0777 /usr/lib/Recast.so
+sudo -E chmod 0777 /usr/lib/libRecast.so
 #mv Lib/libRecast.so ../../Plugins/x86_64/Recast.so
 cd ..
 
@@ -52,10 +52,12 @@ echo -e "\nAttempting to build Recast/Detour for Linux [32 bits]"
 rm -rf Build
 mkdir Build
 cd Build
-cmake -DBUILD_32_BITS ..
+cmake -DBUILD_32_BITS=ON ..
 make
-cp Lib/libRecast.so /usr/lib32/Recast.so
-mv Lib/libRecast.so /usr/lib32/libRecast.so
+sudo -E cp Lib/libRecast.so /usr/lib32/Recast.so
+sudo -E mv Lib/libRecast.so /usr/lib32/libRecast.so
+sudo -E chmod 0777 /usr/lib32/Recast.so
+sudo -E chmod 0777 /usr/lib32/libRecast.so
 #mv Lib/libRecast.so ../../Plugins/x86/Recast.so
 
 cd $HOME/ES2015A
