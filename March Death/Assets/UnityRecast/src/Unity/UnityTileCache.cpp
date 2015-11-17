@@ -83,7 +83,7 @@ static int rasterizeTileLayers(Context* ctx, TileCacheHolder* holder,
 		memset(rc.triareas, 0, ntris*sizeof(unsigned char));
 		rcMarkWalkableTriangles(ctx, tcfg.walkableSlopeAngle,
 			verts, nverts, tris, ntris, rc.triareas);
-		
+
 		rcRasterizeTriangles(ctx, verts, nverts, tris, rc.triareas, ntris, *rc.solid, tcfg.walkableClimb);
 	}
 
@@ -185,7 +185,7 @@ static int rasterizeTileLayers(Context* ctx, TileCacheHolder* holder,
 	return n;
 }
 
-bool handleTileCacheBuild(rcConfig* cfg, ExtendedConfig* ecfg, InputGeometry* geom, 
+bool handleTileCacheBuild(rcConfig* cfg, ExtendedConfig* ecfg, InputGeometry* geom,
 	dtTileCache*& tileCache, dtNavMesh*& navMesh, dtNavMeshQuery*& navQuery)
 {
 	TileCacheHolder* holder = new TileCacheHolder();
@@ -351,7 +351,7 @@ void getTileCacheHeaders(TileCacheSetHeader& header, TileCacheTileHeader*& tiles
 	}
 	memcpy(&header.cacheParams, tileCache->getParams(), sizeof(dtTileCacheParams));
 	memcpy(&header.meshParams, navMesh->getParams(), sizeof(dtNavMeshParams));
-	
+
 	// Allocate memory
 	int n = 0;
 	tilesHeader = new TileCacheTileHeader[header.numTiles];
@@ -626,7 +626,6 @@ void setMoveTarget(dtNavMeshQuery* navquery, dtCrowd* crowd, int idx, float* p, 
 			const dtCrowdAgent* ag = crowd->getAgent(idx);
 			if (ag && ag->active)
 			{
-				ctx->log(RC_LOG_ERROR, "DebugMove: Requesting move for %x (%d)", ag, idx);
 				crowd->requestMoveTarget(idx, targetRef, targetPos);
 			}
 		}
