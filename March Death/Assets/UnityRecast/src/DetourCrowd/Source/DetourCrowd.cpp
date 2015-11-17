@@ -29,7 +29,6 @@
 #include "DetourMath.h"
 #include "DetourAssert.h"
 #include "DetourAlloc.h"
-#include "Unity3d.h"
 
 
 dtCrowd* dtAllocCrowd()
@@ -508,7 +507,6 @@ int dtCrowd::addAgent(const float* pos, const dtCrowdAgentParams* params)
 {
 	// Find empty slot.
 	int idx = -1;
-	ctx->log(RC_LOG_ERROR, "In 1");
 	for (int i = 0; i < m_maxAgents; ++i)
 	{
 		if (!m_agents[i].active)
@@ -517,27 +515,24 @@ int dtCrowd::addAgent(const float* pos, const dtCrowdAgentParams* params)
 			break;
 		}
 	}
-	ctx->log(RC_LOG_ERROR, "In 2 %d", idx);
 	if (idx == -1)
 		return -1;
 	
-	dtCrowdAgent* ag = &m_agents[idx];	
-
-	ctx->log(RC_LOG_ERROR, "In 3 %x", ag);
+	dtCrowdAgent* ag = &m_agents[idx];
 	updateAgentParameters(idx, params);
 	
 	// Find nearest position on navmesh and place the agent there.
 	float nearest[3];
 	dtPolyRef ref = 0;
 	dtVcopy(nearest, pos);
-	ctx->log(RC_LOG_ERROR, "In 4 %x\t%d", m_navquery, ag->params.queryFilterType);
+
 	dtStatus status = m_navquery->findNearestPoly(pos, m_ext, &m_filters[ag->params.queryFilterType], &ref, nearest);
 	if (dtStatusFailed(status))
 	{
 		dtVcopy(nearest, pos);
 		ref = 0;
 	}
-	ctx->log(RC_LOG_ERROR, "In 5 %d", ref);
+	
 	ag->corridor.reset(ref, nearest);
 	ag->boundary.reset();
 	ag->partial = false;
@@ -552,7 +547,6 @@ int dtCrowd::addAgent(const float* pos, const dtCrowdAgentParams* params)
 	dtVcopy(ag->npos, nearest);
 	
 	ag->desiredSpeed = 0;
-	ctx->log(RC_LOG_ERROR, "In 6 ");
 	if (ref)
 		ag->state = DT_CROWDAGENT_STATE_WALKING;
 	else

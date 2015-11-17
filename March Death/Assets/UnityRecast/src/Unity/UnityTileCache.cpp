@@ -408,8 +408,6 @@ bool loadFromTileCacheHeaders(TileCacheSetHeader* header, TileCacheTileHeader* t
 		return false;
 	}
 
-	ctx->log(RC_LOG_ERROR, "We have %d tiles", header->numTiles);
-
 	// Read tiles.
 	int n = 0;
 	int start = 0;
@@ -456,11 +454,6 @@ dtMeshTile* getTile(dtNavMesh* navmesh, int i)
 
 dtObstacleRef addObstacle(dtTileCache* tileCache, float* pos, float* verts, int nverts, int height)
 {
-	for (int i = 0; i < nverts; ++i)
-	{
-		ctx->log(RC_LOG_ERROR, "Vert: (%.3f, %.3f, %.3f)", verts[i * 3 + 0], verts[i * 3 + 1], verts[i * 3 + 2]);
-	}
-
 	dtObstacleRef ref;
 	tileCache->addObstacle(pos, verts, nverts, height, &ref);
 	return ref;
@@ -488,8 +481,6 @@ float* getObstacles(dtTileCache* tc, int& nobstacles)
 
 			float bmin[3], bmax[3];
 			tc->getObstacleBounds(ob, bmin, bmax);
-			ctx->log(RC_LOG_ERROR, "BMIN: (%.3f, %.3f, %.3f)", bmin[0], bmin[1], bmin[2]);
-			ctx->log(RC_LOG_ERROR, "BMAX: (%.3f, %.3f, %.3f)", bmax[0], bmax[1], bmax[2]);
 		}
 
 		return vertices;
@@ -629,8 +620,6 @@ void setMoveTarget(dtNavMeshQuery* navquery, dtCrowd* crowd, int idx, float* p, 
 		dtPolyRef targetRef;
 		float targetPos[3] = { 0, 0, 0 };
 		dtStatus status = navquery->findNearestPoly(p, ext, filter, &targetRef, targetPos);
-
-		ctx->log(RC_LOG_ERROR, "DebugMove: %d -> (%d,%d,%d) [%d]", targetRef, targetPos[0], targetPos[1], targetPos[2], status);
 
 		if (idx != -1)
 		{

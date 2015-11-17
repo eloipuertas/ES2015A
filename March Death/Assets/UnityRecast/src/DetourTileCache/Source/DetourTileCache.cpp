@@ -384,8 +384,6 @@ dtStatus dtTileCache::addObstacle(const float* pos, const float radius, const fl
 	return DT_SUCCESS;
 }
 
-#include "Unity3d.h"
-
 dtStatus dtTileCache::addObstacle(const float* pos, const float* convexHullVertices, int numConvexHullVertices, const float height, dtObstacleRef* result)
 {
 	if (m_nreqs >= MAX_REQUESTS)
@@ -412,7 +410,6 @@ dtStatus dtTileCache::addObstacle(const float* pos, const float* convexHullVerti
 	for (int i = 0; i < ob->nverts; i++)
 	{
 		dtVcopy(&ob->verts[i * 3], &convexHullVertices[i * 3]);
-		ctx->log(RC_LOG_ERROR, "Vert: (%.3f, %.3f, %.3f)", ob->verts[i * 3 + 0], ob->verts[i * 3 + 1], ob->verts[i * 3 + 2]);
 	}
 
 	ObstacleRequest* req = &m_reqs[m_nreqs++];
