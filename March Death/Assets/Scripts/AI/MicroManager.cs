@@ -1,4 +1,4 @@
-using Assets.Scripts.AI.Agents;
+﻿using Assets.Scripts.AI.Agents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +37,8 @@ namespace Assets.Scripts.AI
             agents.Add(aA);
             agents.Add(new RetreatAgent(ai, aA, assistAgent, "Retreat"));
 			agents.Add(assistAgent);
-            addSquad(ai.Army); //hero squad
+            squads.Add(new SquadAI(1, ai));
+            squads.Add(new SquadAI(2, ai));
         }
         /// <summary>
         /// Called pretty fast, it's just like Update()
@@ -124,6 +125,8 @@ namespace Assets.Scripts.AI
         {
             //TODO: placeholder until we know how to split the squads
             squads[0].addUnit(u);
+            if (u.type == Storage.UnitTypes.HERO)
+                squads[1].addUnit(u);
         }
     }
 }
