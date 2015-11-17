@@ -936,13 +936,13 @@ GameObject:
   m_Component:
   - 4: {fileID: 413624}
   - 95: {fileID: 9507248}
-  - 195: {fileID: 19596346}
   - 114: {fileID: 11405552}
   - 114: {fileID: 11403732}
   - 54: {fileID: 5451292}
   - 114: {fileID: 11436026}
   - 65: {fileID: 6555024}
   - 114: {fileID: 11496920}
+  - 114: {fileID: 11445160}
   m_Layer: 0
   m_Name: human_light_army
   m_TagString: Untagged
@@ -3042,7 +3042,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 126
+  m_Constraints: 122
   m_CollisionDetection: 0
 --- !u!65 &6555024
 BoxCollider:
@@ -3111,6 +3111,21 @@ MonoBehaviour:
   race: 0
   type: 2
   _distanceToTarget: 0
+--- !u!114 &11445160
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 162952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b09a9a421fcedee4ea755b7daade40c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Radius: 1.5
+  Height: 2
+  MaxSpeed: 2
+  MaxAcceleration: 2
 --- !u!114 &11496920
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3725,26 +3740,6 @@ SkinnedMeshRenderer:
     m_Center: {x: -4.88794176e-05, y: -.00623472314, z: -.000337640638}
     m_Extent: {x: .00383570511, y: .0100899031, z: .00306321215}
   m_DirtyAABB: 0
---- !u!195 &19596346
-NavMeshAgent:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 162952}
-  m_Enabled: 1
-  m_Radius: .5
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -3756,6 +3751,14 @@ Prefab:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 5f5d2f2b33e974a0883c8b6f780df087, type: 2}
+    - target: {fileID: 0}
+      propertyPath: m_Constraints
+      value: 122
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Radius
+      value: 1.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 162952}

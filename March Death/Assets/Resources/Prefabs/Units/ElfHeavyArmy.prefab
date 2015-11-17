@@ -452,8 +452,8 @@ GameObject:
   - 114: {fileID: 11435526}
   - 114: {fileID: 11490816}
   - 65: {fileID: 6592668}
-  - 195: {fileID: 19558266}
   - 54: {fileID: 5476376}
+  - 114: {fileID: 11413646}
   m_Layer: 0
   m_Name: ElfHeavyArmy
   m_TagString: Untagged
@@ -2620,7 +2620,7 @@ Rigidbody:
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: .0500000007
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 122
@@ -2654,6 +2654,21 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11413646
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 140960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b09a9a421fcedee4ea755b7daade40c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Radius: 1.5
+  Height: 2
+  MaxSpeed: 2
+  MaxAcceleration: 2
 --- !u!114 &11435526
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2667,6 +2682,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   race: 1
   type: 3
+  _distanceToTarget: 0
 --- !u!114 &11490696
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2689,6 +2705,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43c34b4ae45e2c94f90ae970db2ad9f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _collider: {fileID: 0}
 --- !u!137 &13756572
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
@@ -2785,33 +2802,21 @@ SkinnedMeshRenderer:
     m_Center: {x: -5.13661653e-05, y: -.0022223019, z: -.000847076066}
     m_Extent: {x: .00982652791, y: .0169388987, z: .00505817402}
   m_DirtyAABB: 0
---- !u!195 &19558266
-NavMeshAgent:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 140960}
-  m_Enabled: 1
-  m_Radius: .5
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: m_UseGravity
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Radius
+      value: 1.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 140960}
