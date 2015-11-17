@@ -45,7 +45,7 @@ public class Player : BasePlayer
         _selection.SetRace(race);
         
         cam = GameObject.FindWithTag("MainCamera").GetComponent<CameraController>();
-        events = GameObject.FindWithTag("GameController").GetComponent<EventsNotifier>();
+        events = GameObject.Find("ScreenMessages").GetComponent<EventsNotifier>();
 
         Battle.PlayerInformation me = info.GetBattle().GetPlayerInformationList()[playerId - 1];
         InstantiateBuildings(me.GetBuildings());

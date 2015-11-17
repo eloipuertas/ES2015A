@@ -49,18 +49,21 @@ public class EventsNotifier : MonoBehaviour {
     void Start()
     {
         text = gameObject.GetComponent<GUIText>();
+        text.transform.position = Vector3.zero;
+        text.pixelOffset = new Vector2(0.05f, 0.95f);
         trimming = new Queue<int>();
         messages = new System.Text.StringBuilder();
-        countdown = TIME_TO_UPDATE;
+        countdown = float.NegativeInfinity;
     }
 	
     // Update is called once per frame
     void Update()
     {
+        if (countdown == float.NegativeInfinity) return;
         countdown -= Time.deltaTime;
         if (countdown <= 0.0f)
         {
-            messages.Remove(0, trimming.Dequeue() + 1);
+            messages.Remove(0, trimming.Dequeue());
             countdown = TIME_TO_UPDATE;
         }
         text.text = messages.ToString();
@@ -68,6 +71,7 @@ public class EventsNotifier : MonoBehaviour {
 
     private void AppendMessage(string what)
     {
+        if (countdown == float.NegativeInfinity) countdown = TIME_TO_UPDATE;
         trimming.Enqueue(what.Length);
         messages.AppendLine(what);
     }
@@ -151,32 +155,37 @@ public class EventsNotifier : MonoBehaviour {
     public void DisplayNotEnoughResources(WorldResources.Type type) {}
     public void DisplayTroopCreated(string info) {}
 
-    public void DisplayUnderAttack(GameObject obj)
+    public void DisplayUnderAttack(System.Object obj)
     {
-        DisplayUnderAttack(obj.transform.position);
+        GameObject g = (GameObject) obj;
+        DisplayUnderAttack(g.transform.position);
     }
 
-    public void DisplayBuildingDestroyed(GameObject obj)
+    public void DisplayBuildingDestroyed(System.Object obj)
     {
-        IGameEntity entity = obj.GetComponent<IGameEntity>();
+        GameObject g = (GameObject) obj;
+        IGameEntity entity = g.GetComponent<IGameEntity>();
         DisplayBuildingDestroyed(((Storage.BuildingInfo) entity.info).type);
     }
 
-    public void DisplayBuildingCreated(GameObject obj)
+    public void DisplayBuildingCreated(System.Object obj)
     {
-        IGameEntity entity = obj.GetComponent<IGameEntity>();
+        GameObject g = (GameObject) obj;
+        IGameEntity entity = g.GetComponent<IGameEntity>();
         DisplayBuildingCreated(((Storage.BuildingInfo) entity.info).type);
     }
 
-    public void DisplayUnitCreated(GameObject obj)
+    public void DisplayUnitCreated(System.Object obj)
     {
-        Unit entity = (Unit) obj.GetComponent<IGameEntity>();
+        GameObject g = (GameObject) obj;
+        Unit entity = (Unit) g.GetComponent<IGameEntity>();
         DisplayUnitCreated(entity.type);
     }
 
-    public void DisplayUnitDead(GameObject obj)
+    public void DisplayUnitDead(System.Object obj)
     {
-        Unit entity = (Unit) obj.GetComponent<IGameEntity>();
+        GameObject g = (GameObject) obj;
+        Unit entity = (Unit) g.GetComponent<IGameEntity>();
         DisplayUnitDead(entity.type);
     }
 }
