@@ -48,6 +48,7 @@ GameObject:
   - 114: {fileID: 11493160}
   - 114: {fileID: 11460192}
   - 208: {fileID: 20867870}
+  - 114: {fileID: 11420508}
   m_Layer: 0
   m_Name: HumanWall
   m_TagString: Untagged
@@ -383,6 +384,19 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11420508
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 132442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b5e82104f3954c44a992850ac8a8053, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 0
+  type: 7
 --- !u!114 &11460192
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -439,6 +453,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Size.x
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: type
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

@@ -31,6 +31,7 @@ GameObject:
   - 114: {fileID: 11479966}
   - 95: {fileID: 9507586}
   - 208: {fileID: 20839568}
+  - 114: {fileID: 11407296}
   m_Layer: 0
   m_Name: HumanWallCorner
   m_TagString: Untagged
@@ -394,6 +395,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8fedea892f030418970e7ce2a2bc2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &11407296
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 122366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b5e82104f3954c44a992850ac8a8053, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 0
+  type: 8
 --- !u!114 &11479966
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -436,6 +450,10 @@ Prefab:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 77fb903484d1b0d40a56329901413dd6, type: 2}
+    - target: {fileID: 0}
+      propertyPath: type
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 122366}
