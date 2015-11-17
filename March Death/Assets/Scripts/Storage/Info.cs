@@ -39,9 +39,8 @@ namespace Storage
 
             // Buildings prefabs
             parsePrefabs<Resource, BuildingTypes>("Prefabs/Buildings/Resources", buildingPrefabs);
-			parsePrefabs<Resource, BuildingTypes>("Prefabs/Buildings/Military", buildingPrefabs);
+			parsePrefabs<Barrack, BuildingTypes>("Prefabs/Buildings/Military", buildingPrefabs);
             parsePrefabs<Barrack, BuildingTypes>("Prefabs/Buildings/Barracks", buildingPrefabs);
-
 
             // Ghosts prefabs (MUST BE DONE AFTER REALS!)
             parsePrefabs<GhostBuilding, BuildingTypes>("Prefabs/Buildings/Resources", buildingPrefabs);

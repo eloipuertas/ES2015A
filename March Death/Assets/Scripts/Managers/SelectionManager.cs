@@ -48,12 +48,12 @@ namespace Managers
             // firstly it checks if an entity can be selected
             //if (!CanBeSelected(selectable)) return;
             Assert.IsTrue(CanBeSelected(selectable));
-            
+
 
             _isTroop = false;
 
              if( _selectedEntities.Count > 0 ) _selectedEntities.Clear();
-                
+
             _selectedEntities.Select(selectable);
             fire(Actions.SELECT, selectable.gameObject);
 
@@ -61,8 +61,8 @@ namespace Managers
         }
 
         /// <summary>
-        /// Creates a new troop from the currently selected elements. 
-        /// Returns true if the troop is created succesfully , returns false if not. 
+        /// Creates a new troop from the currently selected elements.
+        /// Returns true if the troop is created succesfully , returns false if not.
         /// A troop should have more than one element, if not, will return false
         /// </summary>
         /// <param name="key">a key for the troop</param>
@@ -198,7 +198,7 @@ namespace Managers
         }
 
         /// <summary>
-        /// Deletes the troop specified by parameter.  
+        /// Deletes the troop specified by parameter.
         /// First it checks if the current selection is a troop. This ehaviour may change
         /// </summary>
         /// <param name="key"></param>
@@ -241,7 +241,7 @@ namespace Managers
 
             }
             Debug.Log("Moving there");
-            
+
         }
 
 
@@ -254,25 +254,12 @@ namespace Managers
         {
             foreach (Selectable selected in _selectedEntities.ToArray())
             {
-                
+
                 if (selected.entity.info.isUnit)
                 {
                     Unit unit = selected.GetComponent<Unit>();
-                    if (enemy.info.isUnit)
-                    {
-                        unit.attackTarget((Unit)enemy);
-                        fire(Actions.ATTACK, selected.gameObject);
-                    }
-                    else if (enemy.info.isBarrack)
-                    {
-                        unit.attackTarget((Barrack)enemy);
-                        fire(Actions.ATTACK, selected.gameObject);
-                    }
-                    else if (enemy.info.isResource)
-                    {
-                        unit.attackTarget((Resource)enemy);
-                        fire(Actions.ATTACK, selected.gameObject);
-                    }
+                    unit.attackTarget(enemy);
+                    fire(Actions.ATTACK, selected.gameObject);
                 }
             }
             Debug.Log("attacking");
