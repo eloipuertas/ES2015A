@@ -136,6 +136,19 @@ class TestEnvironment : SingletonMono<TestEnvironment>
         }
     }
 
+    private bool Wait(float t)
+    {
+        // Give some margin time
+        if (_elapsedTime <= t)
+        {
+            _elapsedTime += Time.deltaTime;
+            return false;
+        }
+
+        _elapsedTime = 0;
+        return true;
+    }
+
     void Update()
     {
         if (testingEnabled)
@@ -143,12 +156,7 @@ class TestEnvironment : SingletonMono<TestEnvironment>
             switch (state)
             {
                 case States.IN_MENU:
-                    if (_elapsedTime <= 1.0f)
-                    {
-                        _elapsedTime += Time.deltaTime;
-                        return;
-                    }
-                    _elapsedTime = 0;
+                    if (!Wait(1)) return;
 
                     RunAllTests(States.IN_RACES_SELECT, () =>
                     {
@@ -157,12 +165,7 @@ class TestEnvironment : SingletonMono<TestEnvironment>
                     break;
 
                 case States.IN_RACES_SELECT:
-                    if (_elapsedTime <= 1.0f)
-                    {
-                        _elapsedTime += Time.deltaTime;
-                        return;
-                    }
-                    _elapsedTime = 0;
+                    if (!Wait(1)) return;
 
                     RunAllTests(States.PRE_GAME_CHECKING, () =>
                     {
@@ -177,6 +180,8 @@ class TestEnvironment : SingletonMono<TestEnvironment>
                 case States.PRE_GAME_CHECKING:
                     // Hack to make camera stop moving
                     Camera.main.GetComponent<CameraController>().setCameraSpeed(0);
+
+                    if (!Wait(1)) return;
 
                     RunAllTests(States.IN_GAME);
                     break;

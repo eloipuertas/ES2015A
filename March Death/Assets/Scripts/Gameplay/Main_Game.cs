@@ -48,6 +48,8 @@ public class Main_Game : MonoBehaviour
             case GameInformation.GameMode.SKIRMISH:
                 break;
         }
+
+        BasePlayer.Setup();
     }
 
     private void LoadCampaign ()

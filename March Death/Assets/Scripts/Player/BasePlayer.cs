@@ -21,7 +21,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     /// <summary>
     /// The buildings manager
     /// </summary>
-    protected Managers.BuildingsManager _buildings;
+    protected static Managers.BuildingsManager _buildings;
     public Managers.BuildingsManager buildings { get { return _buildings; } }
 
 
@@ -52,15 +52,18 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
 
     public virtual void Start ()
     {
-        Debug.Log("BasePlayer START");GameObject gameController = GameObject.FindGameObjectWithTag("GameController");
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
         terrain = GameObject.Find("Terrain").GetComponent<Terrain>();
-        _buildings = gameController.GetComponent<Main_Game>().BuildingsMgr;
+        _info = gameInformationObject.GetComponent<GameInformation>();        
+    }
 
-        _info = gameInformationObject.GetComponent<GameInformation>();
+    public static void Setup()
+    {
+        GameObject gameController = GameObject.FindGameObjectWithTag("GameController");
+
+        _buildings = gameController.GetComponent<Main_Game>().BuildingsMgr;        
         _player = gameController.GetComponent<Player>();
         _ia = gameController.GetComponent<AIController>();
-        
     }
 
     public abstract void removeEntity(IGameEntity entity);
