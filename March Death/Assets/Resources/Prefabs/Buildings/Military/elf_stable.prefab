@@ -371,8 +371,8 @@ GameObject:
   - 114: {fileID: 11432486}
   - 114: {fileID: 11469132}
   - 65: {fileID: 6555804}
-  - 114: {fileID: 11462334}
   - 114: {fileID: 11480850}
+  - 114: {fileID: 11416494}
   m_Layer: 0
   m_Name: elf_stable
   m_TagString: Untagged
@@ -1768,6 +1768,19 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11416494
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 184050}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b5e82104f3954c44a992850ac8a8053, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 1
+  type: 6
 --- !u!114 &11432486
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1779,19 +1792,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8fedea892f030418970e7ce2a2bc2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &11462334
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 184050}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3aa7bd748c483ad44a9454c6c5f8639b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  race: 1
-  type: 6
 --- !u!114 &11469132
 MonoBehaviour:
   m_ObjectHideFlags: 1
