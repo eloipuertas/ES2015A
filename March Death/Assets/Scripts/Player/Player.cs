@@ -28,6 +28,8 @@ public class Player : BasePlayer
 	//public ArrayList SelectedObjects = new ArrayList();
     public ArrayList SelectedObjects { get { return _selection.ToArrayList(); } }
 
+    private EventsNotifier events;
+
     private bool isGameOverScreenDisplayed = false;
 
     private CameraController cam;
@@ -43,6 +45,7 @@ public class Player : BasePlayer
         _selection.SetRace(race);
         
         cam = GameObject.FindWithTag("MainCamera").GetComponent<CameraController>();
+        events = GameObject.FindWithTag("GameController").GetComponent<EventsNotifier>();
 
         Battle.PlayerInformation me = info.GetBattle().GetPlayerInformationList()[playerId - 1];
         InstantiateBuildings(me.GetBuildings());
@@ -100,6 +103,7 @@ public class Player : BasePlayer
     public override void removeEntity(IGameEntity entity)
     {
         _activeEntities.Remove(entity);
+        unregisterEventDisplayMessages(entity);
     }
 
     /// <summary>
@@ -110,6 +114,7 @@ public class Player : BasePlayer
     public override void addEntity(IGameEntity newEntity)
     {
         _activeEntities.Add(newEntity);
+        registerEventDisplayMessage(newEntity);
         Debug.Log(_activeEntities.Count + " entities");
     }
 
@@ -176,6 +181,10 @@ public class Player : BasePlayer
         }
     }
 
+    /// <summary>
+    /// Registers events for when an enemy game entity is killed or destroyed.
+    /// </summary>
+    /// <param name="entity">Enemy game entity.</param>
     public void registerGameEntityActions(IGameEntity entity)
     {
         if (entity.info.isUnit)
@@ -202,5 +211,60 @@ public class Player : BasePlayer
     protected override void AddUnit(IGameEntity entity)
     {
         addEntity(entity);
+    }
+
+    /// <summary>
+    /// Registers the events that display a message to the user.
+    /// </summary>
+    /// <param name="entity">Game entity that triggers the event.</param>
+    private void registerEventDisplayMessage(IGameEntity entity)
+    {
+        if (entity.info.isBuilding)
+        {
+            if (entity.info.isBarrack)
+            {
+                Barrack barrack = (Barrack) entity;
+                barrack.register(Barrack.Actions.DAMAGED, events.DisplayUnderAttack);
+                barrack.register(Barrack.Actions.DESTROYED, events.DisplayBuildingDestroyed);
+            }
+            else 
+            {
+                Resource resourcesBuilding = (Resource) entity;
+                resourcesBuilding.register(Resource.Actions.DAMAGED, events.DisplayUnderAttack);
+                resourcesBuilding.register(Resource.Actions.DESTROYED, events.DisplayBuildingDestroyed);
+                resourcesBuilding.register(Resource.Actions.CREATED, events.DisplayBuildingCreated);
+                resourcesBuilding.register(Resource.Actions.CREATE_UNIT, events.DisplayUnitCreated);
+            }
+        }
+        else if (entity.info.isUnit)
+        {
+            Unit unit = (Unit) entity;  // TODO Should the unit creation be registered here or before?
+            unit.register(Unit.Actions.DAMAGED, events.DisplayUnderAttack);
+            unit.register(Unit.Actions.DIED, events.DisplayUnitDead);
+        }
+    }
+
+    private void unregisterEventDisplayMessages(IGameEntity entity)
+    {
+        if (entity.info.isBarrack)
+        {
+            Barrack barrack = (Barrack) entity;
+            barrack.unregister(Barrack.Actions.DAMAGED, events.DisplayUnderAttack);
+            barrack.unregister(Barrack.Actions.DESTROYED, events.DisplayBuildingDestroyed);
+        }
+        else if (entity.info.isResource)
+        {
+            Resource resourcesBuilding = (Resource) entity;
+            resourcesBuilding.unregister(Resource.Actions.DAMAGED, events.DisplayUnderAttack);
+            resourcesBuilding.unregister(Resource.Actions.DESTROYED, events.DisplayBuildingDestroyed);
+            resourcesBuilding.unregister(Resource.Actions.CREATED, events.DisplayBuildingCreated);
+            resourcesBuilding.unregister(Resource.Actions.CREATE_UNIT, events.DisplayUnitCreated);
+        }
+        else if (entity.info.isUnit)
+        {
+            Unit unit = (Unit) entity;
+            unit.unregister(Unit.Actions.DIED, events.DisplayUnitDead);
+            unit.unregister(Unit.Actions.DAMAGED, events.DisplayUnderAttack);
+        }
     }
 }
