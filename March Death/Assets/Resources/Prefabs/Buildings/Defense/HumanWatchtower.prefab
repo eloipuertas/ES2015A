@@ -116,6 +116,7 @@ GameObject:
   - 114: {fileID: 11420746}
   - 95: {fileID: 9506908}
   - 114: {fileID: 11454060}
+  - 114: {fileID: 11440990}
   m_Layer: 0
   m_Name: HumanWatchtower
   m_TagString: Untagged
@@ -297,7 +298,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 162084}
-  m_LocalRotation: {x: .642431736, y: .642431796, z: -.295434386, w: -.295434475}
+  m_LocalRotation: {x: .642431676, y: .642431736, z: -.295434356, w: -.295434445}
   m_LocalPosition: {x: -2.19273305, y: 8.16791153, z: -1.63739264}
   m_LocalScale: {x: 6.88587618, y: 91.1731644, z: 89.0733414}
   m_Children: []
@@ -650,6 +651,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider: {fileID: 0}
+--- !u!114 &11440990
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 184004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b5e82104f3954c44a992850ac8a8053, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 0
+  type: 9
 --- !u!114 &11454060
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -679,6 +693,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Constraints
       value: 126
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: type
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

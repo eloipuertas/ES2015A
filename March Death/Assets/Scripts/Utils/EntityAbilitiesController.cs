@@ -171,6 +171,11 @@ public class EntityAbilitiesController : MonoBehaviour
 
     public void mouseEnter(BaseEventData baseEvent)
     {
+        var oldTooltip = GameObject.Find("tooltip");
+        if (oldTooltip)
+        {
+            Destroy(oldTooltip);
+        }
         PointerEventData data = baseEvent as PointerEventData;
         GameObject panel = GameObject.Find("HUD/actions");
 
@@ -230,7 +235,7 @@ public class EntityAbilitiesController : MonoBehaviour
     private void mouseExit(BaseEventData baseEvent)
     {
         var tooltip = GameObject.Find("tooltip");
-        Destroy(tooltip);
+        Destroy(tooltip);  
     }
 
     /// <summary>

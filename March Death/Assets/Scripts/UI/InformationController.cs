@@ -156,7 +156,7 @@ public partial class InformationController : MonoBehaviour
 			selectable.SelectOnlyMe();
 		});
 		
-		return CreateCustomButton(buttonCenter, multiselectionButtonSize, "MultiSelectionButton", entity.info.name.ToString (), buttonImage: GetImageForEntity (entity), actionMethod: selectUnique);
+		return CreateCustomButton(buttonCenter, multiselectionButtonSize, "MultiSelectionButton", "", buttonImage: GetImageForEntity (entity), actionMethod: selectUnique);
 	}
 
 	private void DestroyButtons()
@@ -200,6 +200,18 @@ public partial class InformationController : MonoBehaviour
 		                {
 			unit.register(Unit.Actions.DAMAGED, onUnitDamaged);
 			unit.register(Unit.Actions.DIED, onUnitDied);
+		});
+
+		entity.doIfResource(resource =>
+		{
+			resource.register(Resource.Actions.DAMAGED, onUnitDamaged);
+			resource.register(Resource.Actions.DESTROYED, onUnitDied);
+		});
+
+		entity.doIfBarrack(building =>
+		{
+			building.register(Barrack.Actions.DAMAGED, onUnitDamaged);
+			building.register(Barrack.Actions.DESTROYED, onUnitDied);
 		});
 	}
 	
@@ -252,7 +264,7 @@ public partial class InformationController : MonoBehaviour
 	}
 
 	private Sprite GetImageForEntity(IGameEntity entity) {
-		char separator = Path.DirectorySeparatorChar;
+		char separator = '/';
 		string path = IMAGES_PATH + separator + entity.getRace () + "_" + entity.info.name;
 		Texture2D texture = (Texture2D)Resources.Load (path);
 		if (texture) {
