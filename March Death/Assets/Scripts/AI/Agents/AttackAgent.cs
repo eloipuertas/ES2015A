@@ -41,8 +41,7 @@ namespace Assets.Scripts.AI.Agents
             if (squad.units.Count > 0)
             {
                 //We assume our squad is mostly together 
-                //TODO: Stop assuming members of the same squad are close
-                Squadpos = squad.units[0].transform.position;
+                Squadpos = squad.boudningBox.center;
             }
             if (ai.EnemyUnits.Count > 0)
             {
@@ -54,6 +53,8 @@ namespace Assets.Scripts.AI.Agents
                     float val = -Vector3.Distance(u.transform.position, Squadpos);
                     if (u.type == Storage.UnitTypes.HERO)
                         val += 10;
+                    if (u.healthPercentage < 20)
+                        val += 5;
                     if (val < bVal)
                     {
                         bVal = val;
