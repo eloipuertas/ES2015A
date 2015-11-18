@@ -61,18 +61,15 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
     /// <param name="isVisible">The new visibilty state</param>
     public void changeVisible(bool isVisible)
     {
-        if (IsRevealed != isVisible)
+        if (IsActor)
         {
-            if (IsActor)
-            {
-                fire((isVisible) ? Actions.DISCOVERED : Actions.HIDDEN);
-            }
-            if (!IsOwnedByPlayer)
-            {
-                changeRenders(isVisible);
-            }
-            IsRevealed = isVisible;
+            fire((isVisible) ? Actions.DISCOVERED : Actions.HIDDEN);
         }
+        if ((IsActor && !IsOwnedByPlayer) || (!IsActor && IsRevealed))
+        {
+            changeRenders(isVisible);
+        }
+        IsRevealed = isVisible;
     }
     /// <summary>
     /// Enables/Disables the renderers of this object.

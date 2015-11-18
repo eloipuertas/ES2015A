@@ -1115,7 +1115,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Terrain: {fileID: 112888544}
   Quality: .5
-  NotFullyOpaque: 1
+  NotFullyOpaque: 0
   Enabled: 1
 --- !u!1001 &113424090
 Prefab:
@@ -13806,6 +13806,10 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2371864, guid: f6ff0b9c437c3f84995000e8e2215039, type: 2}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f6ff0b9c437c3f84995000e8e2215039, type: 2}
   m_IsPrefabParent: 0
@@ -17466,6 +17470,18 @@ Prefab:
     - target: {fileID: 135380, guid: e1a45064ae7229d41acf0d16eb92332a, type: 2}
       propertyPath: m_Name
       value: palm1_nature (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2389764, guid: e1a45064ae7229d41acf0d16eb92332a, type: 2}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11462374, guid: e1a45064ae7229d41acf0d16eb92332a, type: 2}
+      propertyPath: IsActor
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11462374, guid: e1a45064ae7229d41acf0d16eb92332a, type: 2}
+      propertyPath: Range
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e1a45064ae7229d41acf0d16eb92332a, type: 2}
