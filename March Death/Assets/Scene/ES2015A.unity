@@ -8497,10 +8497,10 @@ GameObject:
   - 114: {fileID: 865109080}
   - 114: {fileID: 865109083}
   - 114: {fileID: 865109082}
-  - 114: {fileID: 865109084}
   - 114: {fileID: 865109085}
   - 114: {fileID: 865109086}
   - 114: {fileID: 865109087}
+  - 114: {fileID: 865109084}
   m_Layer: 0
   m_Name: GameController
   m_TagString: GameController
@@ -8564,9 +8564,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 865109079}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 91b53282ead45724997ad050f83ff605, type: 3}
+  m_Script: {fileID: 11500000, guid: c92c5793a0e40cf488e71afa6b7e264c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  polymesh: {fileID: 11400000, guid: 26535da75e2ef5843a869e7e30a2d766, type: 2}
+  navmeshData: {fileID: 11400000, guid: 31f0d35e0a029574cab2ed55992032c7, type: 2}
+  MaxAgents: 1024
+  AgentMaxRadius: 2
 --- !u!114 &865109085
 MonoBehaviour:
   m_ObjectHideFlags: 0
