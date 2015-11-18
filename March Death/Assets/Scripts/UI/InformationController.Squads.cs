@@ -50,7 +50,7 @@ public partial class InformationController : MonoBehaviour {
 		{
 			//TODO, here we'll create a new squad with selcted units
 			addNewSquadButton(squadButtons.Count);
-            player.selection.NewTroop((squadButtons.Count).ToString());
+            BasePlayer.player.selection.NewTroop((squadButtons.Count).ToString());
 			ReloadSquadGenerationButton();
 		});
 
@@ -67,8 +67,8 @@ public partial class InformationController : MonoBehaviour {
 		string text = "" + (i + 1);
         UnityAction squadAction = new UnityAction(() => 
 		{
-            player.selection.SelectTroop(text);
-            player.setCurrently(Player.status.SELECTED_UNITS);
+            BasePlayer.player.selection.SelectTroop(text);
+            BasePlayer.player.setCurrently(Player.status.SELECTED_UNITS);
         });
 
 		GameObject button = CreateCustomButton(buttonCenter, squadsButtonSize, "SquadButton", text, actionMethod: squadAction);
