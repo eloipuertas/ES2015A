@@ -214,12 +214,12 @@ public class AIDebugSystem : MonoBehaviour {
                     toRemove = new List<int>();
                 toRemove.Add(u.Key);
             }
-            if(toRemove!= null)
-            {
-                foreach(int key in toRemove)
-                    registeredUnits.Remove(key);
-            }
-        }        
+        }
+        if (toRemove != null)
+        {
+            foreach (int key in toRemove)
+                registeredUnits.Remove(key);
+        }
     }
 
     /// <summary>
