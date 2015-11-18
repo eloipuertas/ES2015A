@@ -49,12 +49,16 @@ public partial class UserInput : MonoBehaviour
     Rect rectActions;
     Rect rectInformation;
 
+    void Awake()
+    {
+        cursor = CursorManager.Instance;
+        cursor.SetInputs(this);
+    }
+
     // Use this for initialization
     void Start()
     {
         player = GetComponent<Player>();
-        cursor = CursorManager.Instance;
-        cursor.SetInputs(this);
         selectionTexture = (Texture2D)Resources.Load("SelectionTexture");
 
         cursorAttack = (Texture2D)Resources.Load("cursor_attack");
