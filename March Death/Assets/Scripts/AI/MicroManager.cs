@@ -124,9 +124,10 @@ namespace Assets.Scripts.AI
         public void assignUnit(Unit u)
         {
             //TODO: placeholder until we know how to split the squads
-            squads[0].addUnit(u);
             if (u.type == Storage.UnitTypes.HERO)
                 squads[1].addUnit(u);
+            else
+                squads[0].addUnit(u);
         }
     }
 }

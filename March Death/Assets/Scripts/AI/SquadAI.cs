@@ -132,8 +132,10 @@ namespace Assets.Scripts.AI
 		}
 
         public void recalculateSquadValues()
-        {   
+        {
 
+            if (units.Count == 0)
+                return;
             //Recalculate the atack data of the squad    
             AttackData ad = getData<AttackData>();
             float val = 0;

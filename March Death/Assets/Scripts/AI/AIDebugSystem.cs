@@ -200,6 +200,7 @@ public class AIDebugSystem : MonoBehaviour {
     /// </summary>
     public void showAIInfoOverUnits()
     {
+        List<int> toRemove=null;
         foreach(KeyValuePair<int, Unit> u in registeredUnits)
         {
             try
@@ -209,7 +210,14 @@ public class AIDebugSystem : MonoBehaviour {
             }
             catch (Exception ex)
             {
-                registeredUnits.Remove(u.Key);
+                if(toRemove== null)
+                    toRemove = new List<int>();
+                toRemove.Add(u.Key);
+            }
+            if(toRemove!= null)
+            {
+                foreach(int key in toRemove)
+                    registeredUnits.Remove(key);
             }
         }        
     }
