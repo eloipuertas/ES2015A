@@ -29,14 +29,14 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     private float _totalBuildTime = 0;
     private float _creationTimer = 0;
     private int _woundsBuildControl = 0;
-    private EntityInfo _infoUnitToCreate;
+    private UnitInfo _infoUnitToCreate;
     private bool _creatingUnit = false;
 
     private Vector3 _deploymentPoint;
     private int _totalUnits = 0;
 
     // This queue will store the units that the building is creating.
-    private Queue _creationQueue = new Queue();
+    private Queue<UnitTypes> _creationQueue = new Queue<UnitTypes>();
 
     /// <summary>
     /// When a wound is received, this is called
@@ -160,13 +160,13 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 
             if (_creationTimer >= _infoUnitToCreate.unitAttributes.creationTime)
             {
-                createUnit((UnitTypes)_infoUnitToCreate.entityType);
+                createUnit(_infoUnitToCreate.type);
                 _creatingUnit = false;
             }
         }
         else if (_creationQueue.Count > 0)
         {
-            _infoUnitToCreate = Info.get.of(info.race, (UnitTypes)_creationQueue.Dequeue());
+            _infoUnitToCreate = Info.get.of(info.race, _creationQueue.Dequeue());
             _creationTimer = 0;
             _creatingUnit = true;
         }

@@ -3,60 +3,11 @@ using System.Collections;
 using System;
 using Storage;
 
-public class CreateCavalry : Ability
+public class CreateCavalry : CreateUnit
 {
-    private bool _enabled = false;
-    private IGameEntity _entity;
-    private GameObject cavalry;
-    private UnitInfo unitInfo;
+    protected override UnitTypes type { get { return UnitTypes.CAVALRY; } }
 
     public CreateCavalry(EntityAbility info, GameObject gameObject) :
         base(info, gameObject)
-    {
-        _entity = _gameObject.GetComponent<IGameEntity>();
-        unitInfo = Info.get.of(_entity.getRace(), UnitTypes.CAVALRY);
-    }
-
-    public override bool isActive
-    {
-        get
-        {
-            return _enabled;
-        }
-    }
-    /// <summary>
-    /// Ability is not usable if player hasn't enough materials to spend in 
-    /// unit construction or build is under construction.
-    // Best way to check if building is finished is to check building status.
-    /// </summary>
-    public override bool isUsable
-    {
-        get
-        {
-            return
-
-                Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, unitInfo.resources.food) &&
-                Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, unitInfo.resources.metal) &&
-                Player.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, unitInfo.resources.wood) &&
-                _entity.status == EntityStatus.IDLE;
-        }
-    }
-    public override void disable()
-    {
-        _enabled = false;
-        base.disable();
-    }
-
-    public override void enable()
-    {
-        base.enable();
-        if (_entity.info.isStable)
-        {
-            ((Barrack)_entity).addUnitQueue(UnitTypes.CAVALRY);
-        }
-        else
-        {
-            Debug.Log("Cavalry Units must ber generated only at Stable Building");
-        }
-    }
+    { }
 }

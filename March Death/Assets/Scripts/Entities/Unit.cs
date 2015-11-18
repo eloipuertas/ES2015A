@@ -475,7 +475,7 @@ public class Unit : GameEntity<Unit.Actions>
                         _detourAgent.MoveTo(destination);
                         _movePoint = destination;
                     }
-
+                    
                     // If we are already close enough, stop and attack
                     if (_distanceToTarget <= currentAttackRange())
                     {

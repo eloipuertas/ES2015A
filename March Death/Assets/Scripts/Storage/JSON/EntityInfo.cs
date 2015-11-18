@@ -82,29 +82,10 @@ namespace Storage
         {
             get
             {
-                return (((BuildingInfo)this).type == BuildingTypes.BARRACK);
+                return isBuilding && !isResource;
             }
         }
-        /// <summary>
-        /// Returns true if the entity is an archery building, false otherwise
-        /// </summary>
-        public bool isArchery
-        {
-            get
-            {
-                 return (((BuildingInfo)this).type == BuildingTypes.ARCHERY);
-            }
-        }
-        /// <summary>
-        /// Returns true if the entity is stable building, false otherwise
-        /// </summary>
-        public bool isStable
-        {
-            get
-            {
-                return (((BuildingInfo)this).type == BuildingTypes.STABLE);
-            }
-        }
+
         /// <summary>
         /// If this info describes a unit, returns the UnitAttributes class, otherwise it returns null
         /// It should always be used either by first checking isUnit, or checking if returned value is not null

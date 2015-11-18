@@ -35,6 +35,7 @@ class Sell : Ability
 
     public override void enable()
     {
+        _gameObject.GetComponent<IGameEntity>().Destroy(true);
         _enabled = true;
         base.enable();
     }
