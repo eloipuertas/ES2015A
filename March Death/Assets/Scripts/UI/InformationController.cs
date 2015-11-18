@@ -8,10 +8,8 @@ using System.IO;
 using System.Collections.Generic;
 using UnityEngine.Events;
 
-public partial class InformationController : MonoBehaviour {
-	
-	private Player player;
-	
+public partial class InformationController : MonoBehaviour
+{	
 	private const string IMAGES_PATH = "InformationImages";
 	
 	//objects for one unit information
@@ -32,9 +30,7 @@ public partial class InformationController : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
-		GameObject gameInformationObject = GameObject.Find("GameInformationObject");
-		player = GameObject.FindGameObjectWithTag("GameController").GetComponent("Player") as Player;
-		
+		GameObject gameInformationObject = GameObject.Find("GameInformationObject");		
 		
 		//Register to selectable actions
 		Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.SELECTED, onUnitSelected, new ActorSelector()
@@ -120,7 +116,7 @@ public partial class InformationController : MonoBehaviour {
 	
 	private void ShowMultipleInformation() 
 	{
-		ArrayList selectedObjects = player.getSelectedObjects();
+		ArrayList selectedObjects = BasePlayer.player.getSelectedObjects();
 		for (int i = 0; i < selectedObjects.Count && i < multiselectionColumns * multiselectionRows; i++)
 		{
 			double lineDivision = (double)(i / multiselectionColumns);
@@ -186,7 +182,7 @@ public partial class InformationController : MonoBehaviour {
 		GameObject gameObject = (GameObject) obj;
 		
 		//Check if is simple click or multiple
-		if (player.SelectedObjects.Count > 1)
+		if (BasePlayer.player.SelectedObjects.Count > 1)
 		{
 			HideInformation();
 			ShowMultipleInformation();
@@ -212,11 +208,11 @@ public partial class InformationController : MonoBehaviour {
 		GameObject gameObject = (GameObject)obj;
 		
 		//Check if is simple click or multiple
-		if (player.SelectedObjects.Count > 1)
+		if (BasePlayer.player.SelectedObjects.Count > 1)
 		{
 			ShowMultipleInformation();
 			
-		} else if (player.SelectedObjects.Count == 1)
+		} else if (BasePlayer.player.SelectedObjects.Count == 1)
 		{
 			DestroyButtons();
 			ShowInformation(gameObject);

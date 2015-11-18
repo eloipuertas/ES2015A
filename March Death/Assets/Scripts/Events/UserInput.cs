@@ -54,7 +54,6 @@ public partial class UserInput : MonoBehaviour
     {
         player = GetComponent<Player>();
         cursor = CursorManager.Instance;
-        cursor.SetPlayer(player);
         cursor.SetInputs(this);
         selectionTexture = (Texture2D)Resources.Load("SelectionTexture");
 
