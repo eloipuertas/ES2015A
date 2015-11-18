@@ -61,7 +61,7 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
     /// <param name="isVisible">The new visibilty state</param>
     public void changeVisible(bool isVisible)
     {
-        if (IsActor)
+        if (IsActor && IsRevealed!=isVisible)
         {
             fire((isVisible) ? Actions.DISCOVERED : Actions.HIDDEN);
         }
