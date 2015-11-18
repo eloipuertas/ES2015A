@@ -19,6 +19,10 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public Races getRace() { return race; }
     public abstract E getType<E>() where E : struct, IConvertible;
 
+    protected Collider _collider;
+    protected Pathfinding.DetourObstacle _obstacle;
+    protected Terrain _terrain;
+
     /// <summary>
     /// Called when Start has been called
     /// </summary>
@@ -147,6 +151,25 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         return gameObject;
     }
 
+    private static readonly Vector3 COLLIDER_CORRECTION_FACTOR = new Vector3(3f, 0, 3f);
+    public Vector3 closestPointTo(Vector3 point)
+    {
+        Vector3 colliderPoint = _collider.ClosestPointOnBounds(point);
+
+        if (_obstacle == null)
+        {
+            return colliderPoint;
+        }
+        else
+        {
+            Vector3 direction = (colliderPoint - point).normalized;
+            Vector3 size = (transform.rotation * _obstacle.Size) - COLLIDER_CORRECTION_FACTOR;
+            Vector3 factor = Vector3.Scale(direction, size - _collider.bounds.size);
+
+            return colliderPoint - factor;
+        }
+    }
+
     protected List<Ability> _abilities = new List<Ability>();
     public Ability getAbility(string name)
     {
@@ -236,6 +259,29 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public virtual void Start()
     {
         setupAbilities();
+
+        _obstacle = GetComponent<Pathfinding.DetourObstacle>();
+        _collider = GetComponent<Collider>();
+        _terrain = Terrain.activeTerrain;
+    }
+
+    public void Destroy(bool immediately = false)
+    {
+        // TODO: Should this be automatically handled with events?
+        FOWManager.Instance.removeEntity(this.GetComponent<FOWEntity>());
+
+        // TODO: Should this be automatically handled with events?
+        Selectable selectable = GetComponent<Selectable>();
+        if (selectable.currentlySelected)
+        {
+            selectable.DeselectMe();
+        }
+
+        // TODO: Should this be automatically handled with events?
+        BasePlayer.getOwner(this).removeEntity(this);
+
+        // Play dead and/or destroy
+        Destroy(this.gameObject, immediately ? 0.0f : 5.0f);
     }
 
     public override void Update()
@@ -243,25 +289,6 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         foreach (Ability ability in _abilities)
         {
             ability.Update();
-        }
-
-        if (status == EntityStatus.DEAD || status == EntityStatus.DESTROYED)
-        {
-            // TODO: Should this be automatically handled with events?
-            FOWManager.Instance.removeEntity(this.GetComponent<FOWEntity>());
-
-            // TODO: Should this be automatically handled with events?
-            Selectable selectable = GetComponent<Selectable>();
-            if (selectable.currentlySelected)
-            {
-                selectable.DeselectMe();
-            }
-
-            // TODO: Should this be automatically handled with events?
-            BasePlayer.getOwner(this).removeEntity(this);
-
-            // Destroy us
-            Destroy(this.gameObject);
         }
     }
 
@@ -347,7 +374,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public void receiveAttack(Unit from, bool isRanged)
     {
         // Do not attack dead targets
-        if (_status == EntityStatus.DEAD || _status == EntityStatus.DESTROYED)
+        if (status == EntityStatus.DEAD || status == EntityStatus.DESTROYED)
         {
             throw new InvalidOperationException("Can not receive damage while not alive");
         }
@@ -361,10 +388,11 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         }
 
         // Check if we are dead
-        if (_woundsReceived == info.unitAttributes.wounds)
+        if (_woundsReceived == info.attributes.wounds)
         {
-            _status = info.isUnit ? EntityStatus.DEAD : EntityStatus.DESTROYED;
+            setStatus(info.isUnit ? EntityStatus.DEAD : EntityStatus.DESTROYED);
             onFatalWounds();
+            Destroy();
         }
 
         // If we are a unit and doing nothing, attack back
@@ -384,6 +412,24 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         {
             callIfTrue(unit);
         }
+    }
+
+    public void doIfResource(Action<Resource> callIfTrue)
+    {
+    	Resource resource = this as Resource;
+    	if (resource != null)
+    	{
+    		callIfTrue(resource);
+    	}
+    }
+
+    public void doIfBarrack(Action<Barrack> callIfTrue)
+    {
+    	Barrack barrack = this as Barrack;
+    	if (barrack != null)
+    	{
+    		callIfTrue(barrack);
+    	}
     }
 
     protected void setStatus(EntityStatus status)

@@ -15,11 +15,14 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public IGameEntity entity;
     public Collider _collider;
     private GameObject controller;
+    private GameObject plane;
 
     public bool currentlySelected { get; set; }
     private float healthRatio = 1f;
     private float _lastHealth = 0f;
     private bool entityMoving = true;
+    private bool _changedVisible = false;
+
     public Storage.Races race {
         get { return player.race; }
     }
@@ -35,8 +38,6 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         currentlySelected = false;
         controller = GameObject.Find("GameController");
         player = controller.GetComponent<Player>();
-        selectedBox = SelectionOverlay.CreateTexture();
-        entity = GetComponent<IGameEntity>();
         _collider = GetComponent<Collider>();
         selectedRect = SelectionOverlay.CalculateBox(_collider);
     }
@@ -45,12 +46,25 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
         base.Start();
         fire(Actions.CREATED, this.gameObject);
+        entity = GetComponent<IGameEntity>();
+        bool ownUnit = entity.info.race == player.race;
+        selectedBox = SelectionOverlay.CreateTexture(ownUnit);
+
+        plane = SelectionOverlay.getPlane(gameObject);
     }
 
     public override void Update() { }
 
     protected virtual void LateUpdate()
     {
+        if (!(currentlySelected ^ _changedVisible))
+        {
+            if (currentlySelected) plane = SelectionOverlay.getPlane(gameObject);
+            else Destroy(plane, 0f); _lastHealth = 100f;
+
+            _changedVisible = !currentlySelected;
+        }
+
         if (currentlySelected)
         {
             selectedRect = SelectionOverlay.CalculateBox(_collider);
@@ -59,19 +73,14 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
             {
                 _lastHealth = entity.healthPercentage;
                 healthRatio = _lastHealth / 100f;
-                SelectionOverlay.UpdateTexture(selectedBox, healthRatio);
+                SelectionOverlay.UpdateTexture(plane, selectedBox, healthRatio);
             }
+            plane.transform.position = this.gameObject.transform.position + SelectionOverlay.getOffset(_collider);
         }
+
     }
 
-    protected virtual void OnGUI()
-    {
-        if (currentlySelected)
-        {
-            DrawSelection();
-        }
-    }
-
+    protected virtual void OnGUI(){}
 
 
     /// <summary>
@@ -110,9 +119,21 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         fire(Actions.DESELECTED);
     }
 
-
-    private void DrawSelection()
+    /// <summary>
+    /// Set as selected to show health bar
+    /// ! Use only for rival units
+    /// </summary>
+    public virtual void AttackedEntity()
     {
-        GUI.DrawTexture(selectedRect, selectedBox);
+    	this.currentlySelected = true;
+    }
+
+    /// <summary>
+    ///  Hides health bar
+    /// ! Use only for rival units
+    /// </summary>
+    public virtual void NotAttackedEntity()
+    {
+    	this.currentlySelected = false;
     }
 }

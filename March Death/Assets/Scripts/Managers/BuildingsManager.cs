@@ -3,7 +3,7 @@ using System.Collections;
 using Utils;
 namespace Managers
 {
-    public class BuildingsManager : MonoBehaviour
+    public class BuildingsManager
     {
         public enum Place { ABLE, NOT_ABLE }
         private Place _currentPlace = Place.ABLE;
@@ -12,31 +12,32 @@ namespace Managers
         private UserInput _inputs;
         public Player Player { set { _player = value; } }
         public UserInput Inputs { set { _inputs = value; } }
-
         private CursorManager cursor;
         private ConstructionGrid grid;
         private Color red = Color.red;
         private Color green = Color.green;
-        private struct NewBuilgind
+        private struct NewBuilding
         {
             public GameObject ghost;
             public GameObject building;
             public Storage.Races race;
             public Storage.BuildingTypes type;
             public bool placing;
+            public bool continuousConstruction;
             public Material material;
 
         }
 
-        private NewBuilgind _newBuilding;
+        private NewBuilding _newBuilding;
         float yoffset = 1f;
 
         // Use this for initialization
-        void Start()
+        //void Start()
+        public BuildingsManager()
         {
-            _player = GetComponent<Player>();
-            _inputs = GetComponent<UserInput>();
-            grid = GetComponent<ConstructionGrid>();
+            //player = GetComponent<Player>();
+            //inputs = etComponent<UserInput>();
+            grid = GameObject.FindWithTag("GameController").GetComponent<ConstructionGrid>();
             cursor = CursorManager.Instance;
             // alpha components for the colors
             red.a = 0.5f;
@@ -47,18 +48,45 @@ namespace Managers
 
         private void InitBuildingStruct()
         {
+            
             _newBuilding.placing = false;
             _newBuilding.ghost = null;
+            _newBuilding.continuousConstruction = false;
         }
 
         // Update is called once per frame
-        void Update()
+        public void Update()
         {
             if (_newBuilding.placing)
             {
                 relocate();
+                CheckKeyboard();
             }
 
+        }
+
+        /// <summary>
+        /// Keyboard shorcuts when placing buildings
+        /// </summary>
+        private void CheckKeyboard()
+        {
+            // Toggles placing buildings continuously
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                _newBuilding.continuousConstruction = !_newBuilding.continuousConstruction;
+                if (_newBuilding.continuousConstruction)
+                    Debug.Log("Continuous building construction enabled");
+                else
+                    Debug.Log("Continuous building construction disabled");
+            }
+
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                //Rotates 90º Y axis
+                ApplyRotation();
+                
+                Debug.Log("Building current y rotation: " + _newBuilding.ghost.transform.rotation.y + " º");
+            }
         }
 
 
@@ -66,18 +94,28 @@ namespace Managers
         /// Starts creating a building, required the name of the building ex: 'elf-farm'
         /// </summary>
         /// <param name="name"></param>
-        public void createBuilding(Storage.Races race, Storage.BuildingTypes type )
+        public void createBuilding(Storage.Races race, Storage.BuildingTypes type , bool continuousConstruction = false)
         {
-            if (!_newBuilding.placing)
+            if (!_newBuilding.placing && isAffordable(race, type))
             {
                 _newBuilding.race = race;
                 _newBuilding.type = type;
                 _newBuilding.ghost = CreateGhostBuilding(race, type);
                 _newBuilding.material = _newBuilding.ghost.GetComponent<Renderer>().material;
                 _newBuilding.placing = true;
+                _newBuilding.continuousConstruction = continuousConstruction;
                 _player.setCurrently(Player.status.PLACING_BUILDING);
             }
 
+        }
+
+        public bool isAffordable(Storage.Races race, Storage.BuildingTypes type)
+        {
+            Storage.BuildingInfo i = Storage.Info.get.of(race, type);
+
+            return (_player.resources.getAmount(WorldResources.Type.FOOD) >= i.resources.food &&
+                    _player.resources.getAmount(WorldResources.Type.WOOD) >= i.resources.wood &&
+                    _player.resources.getAmount(WorldResources.Type.METAL) >= i.resources.metal);
         }
 
 
@@ -89,11 +127,8 @@ namespace Managers
         /// <returns></returns>
         private GameObject CreateGhostBuilding(Storage.Races race, Storage.BuildingTypes type)
         {
-            //TODO : (hermetico) change shared ghost
-            GameObject ghost = (GameObject)Resources.Load("Prefabs/Buildings/Resources/GHOST_Elf-Farm", typeof(GameObject));
-            ghost = (GameObject)Instantiate(ghost, new Vector3(0, 0, 0), Quaternion.identity);
+            GameObject ghost = Storage.Info.get.createBuilding(race, type, new Vector3(0, 0, 0), Quaternion.identity, Storage.Info.BuildingVariant.GHOST);
             return ghost;
-
         }
 
 
@@ -106,6 +141,29 @@ namespace Managers
         private GameObject CreateFinalBuilding(Storage.Races race, Storage.BuildingTypes type)
         {
             return Storage.Info.get.createBuilding(race, type);
+        }
+
+        /// <summary>
+        /// Creates a building in the given position.
+        /// </summary>
+        /// <returns>The building, if the position is available for 
+        /// construction, or <code>null</code>.</returns>
+        /// 
+        /// <param name="position">The position of the building.</param>
+        /// <param name="rotation">The rotation of the building.</param>
+        /// <param name="type">The type of building.</param>
+        /// <param name="race">The race this building belongs to.</param>
+        public GameObject createBuilding(Vector3 position, Quaternion rotation,
+                                         Storage.BuildingTypes type, Storage.Races race)
+        {
+            GameObject obj = null;
+            position = grid.discretizeMapCoords(position);
+            if (grid.isNewPositionAbleForConstrucction(position))
+            {
+                obj = Storage.Info.get.createBuilding(race, type, position, rotation);
+                grid.reservePosition(position);
+            }
+            return obj;
         }
 
 
@@ -134,22 +192,29 @@ namespace Managers
             if (newDestination == _inputs.invalidPosition) return false;
 
             // alter the color if is not a valid location
-            if (checkLocation(newDestination))
+            if (checkLocation(newDestination) && isAffordable(_newBuilding.race, _newBuilding.type))
             {
 
                 GameObject finalBuilding = CreateFinalBuilding(_newBuilding.race, _newBuilding.type);
                 //TODO : (hermetico) restar recursos necesarios para crear el building
                 grid.reservePosition(newDestination);
                 finalBuilding.transform.position = newDestination;
+                finalBuilding.transform.rotation = _newBuilding.ghost.transform.rotation;
 
                 //TODO : check another way to get the IGameEntity
+                
+               // IGameEntity entity = finalBuilding.gameObject.GetComponent<IGameEntity>(); // Esto no iria así ? (Ferran)
                 IGameEntity entity = (IGameEntity)finalBuilding.GetComponent<Unit>();
                 _player.addEntity(entity);
 
-                // remaining operations
-                _finishPlacing();
-
-                return true;
+                if (!_newBuilding.continuousConstruction)
+                {
+                    // remaining operations
+                    _finishPlacing();
+                    return true;
+                }
+                else
+                    return false;
             }
             else
                 return false;
@@ -175,11 +240,23 @@ namespace Managers
         /// </summary>
         private void _finishPlacing()
         {
-            Destroy(_newBuilding.ghost);
+            GameObject.Destroy(_newBuilding.ghost);
             _newBuilding.placing = false;
+            _newBuilding.continuousConstruction = false;
+            _currentPlace = Place.ABLE;
 
         }
 
+
+        /// <summary>
+        /// Applyes the rotation to the ghost building
+        /// </summary>
+        /// <param name="rotation"></param>
+        private void ApplyRotation(float rotation = 90)
+        {
+            Vector3 _rotation = new Vector3(0f, rotation, 0f);
+            _newBuilding.ghost.transform.Rotate(_rotation);
+        }
 
         /// <summary>
         /// returns a vector with the position after apply an offset and discretyze the position
@@ -196,6 +273,8 @@ namespace Managers
             return toLocation;
 
         }
+
+
         /// <summary>
         /// Moves the building to the mouse position
         /// </summary>
@@ -208,7 +287,7 @@ namespace Managers
 
             // 2. check and move alter the color if is not a valid location
             _newBuilding.ghost.transform.position = newDestination;
-            if (checkLocation(newDestination))
+            if (checkLocation(newDestination) && isAffordable(_newBuilding.race, _newBuilding.type))
             {
                 _currentPlace = Place.ABLE;
                 _newBuilding.material.color = green;

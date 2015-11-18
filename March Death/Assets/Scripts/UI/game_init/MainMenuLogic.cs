@@ -10,32 +10,25 @@ public class MainMenuLogic : MonoBehaviour {
 	static readonly Color YELLOW = new Color(1.0f, 0.92f, 0.016f, 1f); //YELLOW
 
 	bool bStillInside = false;
-	public AudioSource[] sounds;
-	public AudioSource hoverAudio;
-	public AudioSource clickAudio;
 
-	// Use this for initialization
-	void Start () {
-        TestEnvironment.Instance.Init();
-        /*
-        if (!(sounds.Length > 0))
+    public static MainMenuLogic instance = null;
+    // Use this for initialization
+    void Start()
+    {
+        if (instance == null)
         {
-            sounds = GetComponents<AudioSource>();
-            hoverAudio = sounds[0];
-            clickAudio = sounds[1];
+            instance = this;
+            TestEnvironment.Instance.Init();
+            Cursor.visible = true;
         }
-        */
-		Cursor.visible = true;
+    }
 
-	}
+    /* MOUSE OVER */
 
-	/* MOUSE OVER */
-
-	/* This method changes the color of the object we are over on entering */
-	void OnMouseEnter(){
+    /* This method changes the color of the object we are over on entering */
+    void OnMouseEnter(){
 		GetComponent<Renderer> ().material.color = YELLOW;
 		bStillInside = true;
-		hoverAudio.Play ();
 	}
 
 	/* This method changes the color of the object we are over on exiting */
@@ -48,7 +41,6 @@ public class MainMenuLogic : MonoBehaviour {
 
 	/* This method changes the color of the object we are clicking */
 	void OnMouseDown() {
-		clickAudio.Play ();
 		GetComponent<Renderer>().material.color = DOWN_CLICK;
 	}
 
@@ -65,5 +57,17 @@ public class MainMenuLogic : MonoBehaviour {
 			else if(this.CompareTag("bTutorial")) { Application.LoadLevel(1); }
 			else { Application.Quit (); }
 		}
+	}
+
+	public void play(){
+		Application.LoadLevel (2);
+	}
+
+	public void tutorial(){
+		Application.LoadLevel (1);
+	}
+
+	public void quit(){
+		Application.Quit ();
 	}
 }

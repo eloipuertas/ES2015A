@@ -117,8 +117,37 @@ public static class MinimapOverlays
         {
             for (int j = 0; j < Height_Marker; j++)
             {
-                if (i == 0 || i == 1 || j == 0 || j == 1 || i == Width_Marker - 1 || i == Width_Marker - 2 || j == Height_Marker - 1
-                    || j == Height_Marker - 2)
+                if (i == 0 || i == 1 || j == 0 || j == 1 || j==2 || i == Width_Marker - 1 || i == Width_Marker - 2 || j == Height_Marker - 1 
+                    || j == Height_Marker - 2 || j == Height_Marker - 3)
+                {
+                    texToReturn.SetPixel(i, j, borderColour);
+                }
+                else
+                {
+                    texToReturn.SetPixel(i, j, Color.clear);
+                }
+            }
+        }
+
+        texToReturn.Apply();
+        return texToReturn;
+    }
+
+    /// <summary>
+    /// Creates a texture for the marker of the map.
+    /// </summary>
+    /// <param name="borderColour"></param>
+    /// <returns></returns>
+    public static Texture2D CreateTextureAttackMarker(Color borderColour)
+    {
+        Texture2D texToReturn = new Texture2D(Width_Marker, Height_Marker, TextureFormat.ARGB32, false);
+
+        for (int i = 0; i < Width_Marker; i++)
+        {
+            for (int j = 0; j < Height_Marker; j++)
+            {
+                if (i == 0 || i == 1 || j == 0 || j == 1 || j== 2 || i == Width_Marker - 1 || i == Width_Marker - 2 || j == Height_Marker - 1
+                    || j == Height_Marker - 2 || j == Height_Marker - 3)
                 {
                     texToReturn.SetPixel(i, j, borderColour);
                 }
@@ -144,7 +173,7 @@ public static class MinimapOverlays
             }
 
         }
-
+        
         texToReturn.Apply();
         return texToReturn;
     }

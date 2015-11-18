@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 6b97bc61895d7e64f97f5cbfe62fcffb
-timeCreated: 1446475167
+guid: 048a97ecb8a0c4115b7439840216cbc7
+timeCreated: 1447500787
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
@@ -52,8 +52,8 @@ ModelImporter:
     100088: heel.02.R_end
     100090: heel.L
     100092: heel.R
-    100094: hips
-    100096: //RootNode
+    100094: //RootNode
+    100096: hips
     100098: metarig
     100100: neck
     100102: palm.01.L
@@ -134,8 +134,8 @@ ModelImporter:
     400088: heel.02.R_end
     400090: heel.L
     400092: heel.R
-    400094: hips
-    400096: //RootNode
+    400094: //RootNode
+    400096: hips
     400098: metarig
     400100: neck
     400102: palm.01.L
@@ -179,7 +179,7 @@ ModelImporter:
     7400012: metarig|Idle
     7400014: metarig|idle_continuacion
     7400016: metarig|Walk
-    7400018: Sphere|fight
+    7400018: Sphere|idle_continuacion
     9500000: //RootNode
     13700000: Sphere
   materials:
@@ -1536,7 +1536,7 @@ ModelImporter:
       name: metarig|idle_continuacion
       takeName: metarig|idle_continuacion
       firstFrame: 0
-      lastFrame: 59
+      lastFrame: 42
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -1913,10 +1913,10 @@ ModelImporter:
       maskType: 0
       maskSource: {instanceID: 0}
     - serializedVersion: 16
-      name: Sphere|fight
-      takeName: Sphere|fight
+      name: Sphere|idle_continuacion
+      takeName: Sphere|idle_continuacion
       firstFrame: 0
-      lastFrame: 34
+      lastFrame: 42
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

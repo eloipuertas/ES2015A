@@ -43,7 +43,7 @@ abstract class Create : Ability
 
     public override void enable()
     {
-		GameObject.Find("GameController").GetComponent<BuildingsManager>().createBuilding(_entity.info.race, _type);
+		GameObject.Find("GameController").GetComponent<Main_Game>().BuildingsMgr.createBuilding(_entity.info.race, _type);
         base.enable();
     }
 }

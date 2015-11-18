@@ -13,7 +13,6 @@ namespace Managers {
         }
 
         protected CursorManager() { }
-        private Player _player;
         private UserInput _inputs;
         private cursor _currentCursor = cursor.DEFAULT;
         private int _numCursors = 4;
@@ -66,16 +65,6 @@ namespace Managers {
                 _currentCursor = newCursor;
                 cursorChanged = true;
             }
-        }
-
-
-        /// <summary>
-        /// Injects the player to observe statuses
-        /// </summary>
-        /// <param name="player"></param>
-        public void SetPlayer(Player player)
-        {
-            _player = player;
         }
 
         /// <summary>

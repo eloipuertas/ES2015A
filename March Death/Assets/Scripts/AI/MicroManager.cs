@@ -15,19 +15,30 @@ namespace Assets.Scripts.AI
 {
     public class MicroManager
     {
+		public const int AGENT_ATACK = 0;
+		public const int AGENT_EXPLORER = 1;
+		public const int AGENT_RETREAT = 2;
+		public const int AGENT_ASSIST = 3;
+
         AIController ai;
         /// <summary>
         /// Commite of agents who will each vote at what to do with every squad
         /// </summary>
         public List<BaseAgent> agents;
+        public List<SquadAI> squads;
         public MicroManager(AIController ai)
         {
             agents = new List<BaseAgent>();
+            squads = new List<SquadAI>();
             this.ai = ai;
-            agents.Add(new ExplorerAgent(ai, "Explorer"));
-            AttackAgent aA = new AttackAgent(ai, "Atack");
+            AssistAgent assistAgent = new AssistAgent(ai, "Assist");
+            AttackAgent aA = new AttackAgent(ai, assistAgent, "Atack");
+            agents.Add(new ExplorerAgent(ai, assistAgent, "Explorer"));
             agents.Add(aA);
-            agents.Add(new RetreatAgent(ai, aA, "Retreat"));
+            agents.Add(new RetreatAgent(ai, aA, assistAgent, "Retreat"));
+			agents.Add(assistAgent);
+            squads.Add(new SquadAI(1, ai));
+            squads.Add(new SquadAI(2, ai));
         }
         /// <summary>
         /// Called pretty fast, it's just like Update()
@@ -36,12 +47,13 @@ namespace Assets.Scripts.AI
         {
             float bVal = float.MinValue;
             BaseAgent bAgent = agents[0];
-            float val;
-            foreach(List<Unit> lu in SplitInGroups(ai.Army))
+            int val;
+            foreach(SquadAI sq in squads)
             {
+                sq.recalculateSquadValues();
                 foreach(BaseAgent a in agents)
                 {
-                    val = a.getConfidence(lu) * a.modifier + getError();
+                    val = a.getConfidence(sq);
                     if(AIController.AI_DEBUG_ENABLED) ai.aiDebug.setAgentConfidence(a.agentName, val);
                     if (val > bVal)
                     {
@@ -49,13 +61,15 @@ namespace Assets.Scripts.AI
                         bAgent = a;
                     }
                 }
-
+                sq.lastAgent = bAgent;
                 if(AIController.AI_DEBUG_ENABLED)
                 {
                     ai.aiDebug.setControllingAgent(bAgent.agentName, bVal);
                 }
 
-                bAgent.controlUnits(lu);
+                bAgent.controlUnits(sq);
+                agents[AGENT_ASSIST].extraConfidence = 0;
+                ((AssistAgent)agents[AGENT_ASSIST]).clearRequests();
             }
         }
         /// <summary>
@@ -70,17 +84,12 @@ namespace Assets.Scripts.AI
                 return 6 / (ai.DifficultyLvl+1);
             return 0;
         }
-        /// <summary>
-        /// Splits units in different groups which will handled by different agents
-        /// </summary>
-        /// <param name="units"></param>
-        /// <returns></returns>
-        private List<List<Unit>> SplitInGroups(List<Unit> units)
+        private void addSquad(List<Unit> units)
         {
-            List<List<Unit>> squads= new List<List<Unit>>();
-            //TODO, cluster by position or something faster
-            squads.Add(units);
-            return squads;
+            //Squad id 0 is used by temp squads
+            SquadAI s = new SquadAI(squads.Count + 1, ai);
+            s.addUnits(units);
+            squads.Add(s);
         }
         public void setPersonality(List<float> rates)
         {
@@ -100,6 +109,25 @@ namespace Assets.Scripts.AI
         {
             for (int i = 0; i < agents.Count; i++)
                 agents[i].modifier = rate;
+        }
+
+        public void OnUnitDead(Unit u)
+        {
+            foreach (SquadAI s in squads)
+                if (s.units.Contains(u))
+                    s.removeUnit(u);
+        }
+        /// <summary>
+        /// Function tasked with deciding which squad should take care of the new created units
+        /// </summary>
+        /// <param name="u"></param>
+        public void assignUnit(Unit u)
+        {
+            //TODO: placeholder until we know how to split the squads
+            if (u.type == Storage.UnitTypes.HERO)
+                squads[1].addUnit(u);
+            else
+                squads[0].addUnit(u);
         }
     }
 }

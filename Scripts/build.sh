@@ -26,104 +26,68 @@ echo "Monkey-patching ProjectSettings and AudioManager assets"
 sed -i 's/displayResolutionDialog: 1/displayResolutionDialog: 0/g' March\ Death/ProjectSettings/ProjectSettings.asset
 sed -i 's/m_DisableAudio: 0/m_DisableAudio: 1/g'  March\ Death/ProjectSettings/AudioManager.asset
 
-if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+# OSX can't be built from linux
+BUILD_OSX=0
+# Takes too much time
+BUILD_WIN=0
 
-    echo "Attempting to build $project for Windows"
-    travis_wait /Applications/Unity/Unity.app/Contents/MacOS/Unity \
+echo "Attempting to start dummy audio driver"
+sudo modprobe snd-dummy
+
+# Build navmesh first
+echo -e "\nAttempting to build Recast/Detour for Linux [64 bits]"
+cd March\ Death/Assets/UnityRecast
+mkdir Build
+cd Build
+cmake ..
+make
+sudo -E cp Lib/libRecast.so /usr/lib/Recast.so
+sudo -E mv Lib/libRecast.so /usr/lib/libRecast.so
+sudo -E chmod 0777 /usr/lib/Recast.so
+sudo -E chmod 0777 /usr/lib/libRecast.so
+#mv Lib/libRecast.so ../../Plugins/x86_64/Recast.so
+cd ..
+
+echo -e "\nAttempting to build Recast/Detour for Linux [32 bits]"
+rm -rf Build
+mkdir Build
+cd Build
+cmake -DBUILD_32_BITS=ON ..
+make
+sudo -E cp Lib/libRecast.so /usr/lib32/Recast.so
+sudo -E mv Lib/libRecast.so /usr/lib32/libRecast.so
+sudo -E chmod 0777 /usr/lib32/Recast.so
+sudo -E chmod 0777 /usr/lib32/libRecast.so
+#mv Lib/libRecast.so ../../Plugins/x86/Recast.so
+
+cd $HOME/ES2015A
+
+# Build Unity project
+echo -e "\nAttempting to build $project for Linux"
+sudo -E xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' \
+    $UNITY_ROOT/Editor/Unity \
       -batchmode \
       -nographics \
       -silent-crashes \
-      -logFile $(pwd)/unity.log \
-      -projectPath "$(pwd)/March Death" \
-      -buildWindowsPlayer "$BUILD_DIR/windows/$project" \
+      -logFile /dev/stdout \
+      -projectPath "$HOME/ES2015A/March Death" \
+      -buildLinuxUniversalPlayer "$BUILD_DIR/linux/$project" \
       -quit
 
-    BUILD_WIN=$?
+BUILD_LINUX=$?
 
-    if [ $BUILD_WIN == 0 ]; then
+if [ $BUILD_LINUX == 0 ]; then
 
-        echo "Attempting to build $project for OS X"
-        travis_wait /Applications/Unity/Unity.app/Contents/MacOS/Unity \
-          -batchmode \
-          -nographics \
-          -silent-crashes \
-          -logFile $(pwd)/unity.log \
-          -projectPath "$(pwd)/March Death" \
-          -buildOSXUniversalPlayer "$BUILD_DIR/osx/$project" \
-          -quit
-
-        BUILD_OSX=$?
-
-        if [ $BUILD_OSX == 0 ]; then
-
-            echo "Attempting to build $project for Linux"
-            travis_wait /Applications/Unity/Unity.app/Contents/MacOS/Unity \
-              -batchmode \
-              -nographics \
-              -silent-crashes \
-              -logFile $(pwd)/unity.log \
-              -projectPath "$(pwd)/March Death" \
-              -buildLinuxUniversalPlayer "$BUILD_DIR/linux/$project" \
-              -quit
-
-            BUILD_LINUX=$?
-
-            if [ $BUILD_LINUX == 0 ]; then
-
-              ln -s $BUILD_DIR/linux/$project.x86_64 $BUILD_DIR/linux/$project
-
-            fi
-
-        fi
-
-    fi
-
-else
-
-    # OSX can't be built from linux
-    BUILD_OSX=0
-    # Takes too much time
-    BUILD_WIN=0
-
-    echo "Attempting to start dummy audio driver"
-    sudo modprobe snd-dummy
-
-    echo -e "\nAttempting to build $project for Linux"
-    sudo -E xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' \
-        $UNITY_ROOT/Editor/Unity \
-          -batchmode \
-          -nographics \
-          -silent-crashes \
-          -logFile /dev/stdout \
-          -projectPath "$HOME/ES2015A/March Death" \
-          -buildLinuxUniversalPlayer "$BUILD_DIR/linux/$project" \
-          -quit
-
-    BUILD_LINUX=$?
-
-    if [ $BUILD_LINUX == 0 ]; then
-
-        sudo -E ln -s $BUILD_DIR/linux/$project.x86_64 $BUILD_DIR/linux/$project
-
-    fi
+    sudo -E ln -s $BUILD_DIR/linux/$project.x86_64 $BUILD_DIR/linux/$project
 
 fi
 
 if [ "$TRAVIS_BRANCH" == "devel-travis_cache" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     echo -e "\n\033[32;1mUpload to cache server\033[0m\n"
     (touch $HOME/.RSYNC_LOCK; \
-        echo -e "\t> Temp"    && \
-            sudo -E tar -zcf "$(pwd)/Temp.tar.gz" "$HOME/ES2015A/March Death/Temp"       && \
-            sudo -E rsync -a --delete-after "$(pwd)/Temp.tar.gz"    ${CACHE_HOST}; \
-        echo -e "\t> Obj"     && \
-            sudo -E tar -zcf "$(pwd)/Obj.tar.gz" "$HOME/ES2015A/March Death/Obj"         && \
-            sudo -E rsync -a --delete-after "$(pwd)/Obj.tar.gz"     ${CACHE_HOST}; \
         echo -e "\t> Library" && \
             sudo -E tar -zcf "$(pwd)/Library.tar.gz" "$HOME/ES2015A/March Death/Library" && \
-            sudo -E rsync -a --delete-after "$(pwd)/Library.tar.gz" ${CACHE_HOST}; \
-        echo -e "\t> Build"   && \
-            sudo -E tar -zcf "$(pwd)/Build.tar.gz" "$BUILD_DIR"                          && \
-            sudo -E rsync -a --delete-after "$(pwd)/Build.tar.gz"   ${CACHE_HOST}; \
+            sudo -E rsync -a "$(pwd)/Library.tar.gz" ${CACHE_HOST}; \
     rm $HOME/.RSYNC_LOCK) &
 fi
 
@@ -136,5 +100,11 @@ echo -e "\n\033[31;1mBuild Failed\033[0m\n"
 echo -e "\tWindows: ${BUILD_WIN}\n"
 echo -e "\tOS X: ${BUILD_OSX}\n"
 echo -e "\tLinux: ${BUILD_LINUX}\n"
+
+# Notify on github
+COMMIT_AUTHOR=`git log -1 | grep -Po "(?<=Author: ).*(?= <)"`
+curl -i -X POST -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/json" \
+    https://api.github.com/repos/eloipuertas/ES2015A/issues/193/comments \
+    -d "{\"body\":\"Commit failed to **build**.\n\nCommit by: @${COMMIT_AUTHOR}\nBranch: ${TRAVIS_BRANCH}\nCommit hash: ${TRAVIS_COMMIT}\nDetailed log: https://travis-ci.org/eloipuertas/ES2015A/builds/${TRAVIS_BUILD_ID}\"}" > /dev/null
 
 exit 1

@@ -12,7 +12,7 @@ namespace SceneLoader
         private GameObject informationObject = null;
         private GameInformation gameInfo;
 
-        void Start()
+        void Awake()
         {
             if (LoadRequiredComponents()) LoadSceneContext();
         }
@@ -30,6 +30,8 @@ namespace SceneLoader
                 informationObject = new GameObject("GameInformationObject");
                 informationObject.AddComponent<GameInformation>();
                 gameInfo = informationObject.GetComponent<GameInformation>();
+
+                gameInfo.setGameMode(GameInformation.GameMode.CAMPAIGN);
             }
 
             return true;

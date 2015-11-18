@@ -17,7 +17,7 @@ namespace Managers
         }
 
         private void Observe() {
-            switch (_player.currently)
+            switch (BasePlayer.player.currently)
             {
                 case Player.status.IDLE:
                     CheckIdle();
@@ -67,22 +67,28 @@ namespace Managers
         /// </summary>
         private void CheckSelected()
         {
-            ///Mainly here we check if the pointed entity is an enemy or not, if it is we show a sword if not, we show the pointer cursor
-            if (ItsEnemy())
+            /// Mainly here we check if the selection is not a building and then
+            /// if the pointed entity is an enemy or not, if it is we show a sword if not, we show the pointer cursor
+
+            if (BasePlayer.player.selection.IsBuilding())
+                _currentCursor = cursor.POINTER;
+            else if(ItsEnemy())
                 _currentCursor = cursor.SWORD;
             else
                 _currentCursor = cursor.POINTER;
+            
+                
 
         }
 
 
         /// <summary>
-        /// PErforms decission when the player is placing a building
+        /// Performs decission when the player is placing a building
         /// </summary>
         private void CheckPlacing()
         {
-            ///MAinly we check if the current position of the building es valid or not
-            switch (_player.buildings.currentPlace)
+            ///Mainly we check if the current position of the building es valid or not
+            switch (BasePlayer.player.buildings.currentPlace)
             {
                 case BuildingsManager.Place.ABLE:
                     _currentCursor = cursor.POINTER;
@@ -115,10 +121,15 @@ namespace Managers
         private bool ItsAlly(GameObject _object)
         {
             IGameEntity entity = _object.GetComponent<IGameEntity>();
-            if (entity.info.race == _player.race)
-                return true;
-            else
-                return false;
+            if (entity != null)
+            {
+
+                if (entity.info.race == BasePlayer.player.race)
+                    return true;
+                else
+                    return false;
+            }
+            else return false;
         }
 
         /// <summary>
@@ -143,12 +154,19 @@ namespace Managers
         private bool ItsEnemy(GameObject _object)
         {
             IGameEntity entity = _object.GetComponent<IGameEntity>();
-            if (entity.info.race != _player.race)
-                return true;
-            else
-                return false;
-        }
+            if (entity != null)
+            {
 
+                /// if it's dead is not an enemy
+                if (entity.info.race != BasePlayer.player.race 
+                && entity.status != EntityStatus.DEAD 
+                && entity.status != EntityStatus.DESTROYED)
+                return true;
+                else
+                    return false;
+            }
+            else return false;
+        }
 
 
     }

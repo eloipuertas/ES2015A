@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.AI.Agents
@@ -10,27 +7,26 @@ namespace Assets.Scripts.AI.Agents
     public class RetreatAgent : BaseAgent
     {
 
-        private const float HERO_HEALTH_TOLERANCE_BEFORE_RETREAT = 40f;
+        private const float HERO_HEALTH_TOLERANCE_BEFORE_RETREAT = 50f;
         private const float HERO_MIN_DISTANCE_WITH_ENEMIES_WHERE_IN_DANGER = 200f;
         private const float AI_MULTIPLIER_FACTOR = 8f;
 
-        private const int DEFCON1 = 100000;
-        private const int DEFCON2 = 10000;
-        private const int DEFCON3 = 1000;
-        private const int DEFCON4 = 100;
-        private const int DEFCON5 = 10;
-
-        Unit hero;
+        private const int CONFIDENCE_IN_ENEMY_ATACK_RANGE = 75;
+        private const int CONFIDENCE_HERO_IS_AT_FIFTY_PERCENT = 1000;
+        private const int CONFIDENCE_ASSIST_HELP_NEEDED = 400;
 
         AttackAgent attackAgent;
+        AssistAgent assistAgent;
 
         Rect enemySquadBoundingBox, ownSquadBoundingBox;
         Vector3 safeArea;
         float minDistanceBetweenHeroAndNearestEnemy;
 
+        private int confidence;
+
         bool isHeroInDanger;
 
-        public RetreatAgent(AIController ai, AttackAgent aA, string name) : base(ai, name)
+        public RetreatAgent(AIController ai, AttackAgent aA, AssistAgent assist, string name) : base(ai, name)
         {
             attackAgent = aA;
             enemySquadBoundingBox = new Rect();
@@ -38,50 +34,28 @@ namespace Assets.Scripts.AI.Agents
             isHeroInDanger = false;
             minDistanceBetweenHeroAndNearestEnemy = 0f;
 
-            //Find our hero
-            foreach (Unit u in ai.Army)
-            {
-                if (u.type == Storage.UnitTypes.HERO)
-                {
-                    hero = u;
-                }
-            }
+            assistAgent = assist;
 
         }
 
-        public override void controlUnits(List<Unit> units)
+        public override void controlUnits(SquadAI squad)
         {
-
-            isHeroInDanger = false;
-
             // Mirar on estan els enemics
-            enemySquadBoundingBox = getSquadBoundingBox(ai.EnemyUnits);
+			enemySquadBoundingBox = squad.enemySquad.boudningBox;
             
             // Mirar on estic jo
-            ownSquadBoundingBox = getSquadBoundingBox(ai.Army);
+            ownSquadBoundingBox = squad.boudningBox;
 
             // Intentar Veure on hauria d'anar una unitat per estar protegida
             recalcSafePoint();
 
-            // A list to select who is going to atack
-            List<Unit> squadToAtackManager = new List<Unit>();
-
             if (ai.EnemyUnits.Count > 0)
             {
-                foreach (Unit u in ai.Army)
+                foreach (Unit u in squad.units)
                 {
                     if (u.status != EntityStatus.DEAD)
                     {
-                        //If hero is going to die we need to do something
-                        if(u.type == Storage.UnitTypes.HERO && u.healthPercentage < HERO_HEALTH_TOLERANCE_BEFORE_RETREAT)
-                        {
-                            u.moveTo(safeArea);
-                            isHeroInDanger = true;
-                        }
-                        else
-                        {
-                            squadToAtackManager.Add(u);
-                        }
+                        u.moveTo(safeArea);
                     }
 
                     if (AIController.AI_DEBUG_ENABLED)
@@ -89,68 +63,42 @@ namespace Assets.Scripts.AI.Agents
                         ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
                     }
                 }
-                
-                if(isHeroInDanger) attackAgent.controlUnits(squadToAtackManager);
+                assistAgent.addConfidence(CONFIDENCE_ASSIST_HELP_NEEDED);
+                assistAgent.requestHelp(new KeyValuePair<SquadAI, int>(squad, CONFIDENCE_ASSIST_HELP_NEEDED));
             }
         }
 
 
-        public override int getConfidence(List<Unit> units)
+        public override int getConfidence(SquadAI squad)
         {
             if (ai.EnemyUnits.Count == 0)
                 return 0;
             
             minDistanceBetweenHeroAndNearestEnemy = 0;
-            
-            //Calculate the min distance between enemies and our hero
 
-            if(hero == null)
+            //Get the squad bounding box
+            ownSquadBoundingBox = squad.boudningBox;
+
+            foreach (Unit enemyUnit in squad.enemySquad.units)
             {
-                return 0;
-            }
-
-            foreach (Unit u in ai.EnemyUnits)
-            {
-                float distance = Vector3.Distance(u.transform.position, hero.transform.position);
-                if (distance < minDistanceBetweenHeroAndNearestEnemy)
-                    minDistanceBetweenHeroAndNearestEnemy = distance;
-            } 
-
-            float val = 0;
-
-            //Heuristic calculus
-            foreach (Unit u in ai.Army) {
-                if (u.type == Storage.UnitTypes.HERO && u.healthPercentage < HERO_HEALTH_TOLERANCE_BEFORE_RETREAT &&
-                    minDistanceBetweenHeroAndNearestEnemy < HERO_MIN_DISTANCE_WITH_ENEMIES_WHERE_IN_DANGER)
+                foreach (Unit ownUnit in squad.units)
                 {
-                    val += DEFCON1;
+                    float distance = Vector3.Distance(enemyUnit.transform.position, ownUnit.transform.position);
+                    //HACK: Change this magic number before intefore integration.
+                    if (distance < enemyUnit.currentAttackRange() + 10)
+                    {
+                        //If our hero is in range and is going to die
+                        if(ownUnit.type == Storage.UnitTypes.HERO && ownUnit.healthPercentage < HERO_HEALTH_TOLERANCE_BEFORE_RETREAT)
+                        {
+                            return CONFIDENCE_HERO_IS_AT_FIFTY_PERCENT;      
+                        }
+
+                        confidence = CONFIDENCE_IN_ENEMY_ATACK_RANGE;
+                    }
                 }
             }
-
-            return Mathf.RoundToInt(val * AI_MULTIPLIER_FACTOR);
-        }
-
-        /// <summary>
-        /// Returns the bounding box of an squad
-        /// </summary>
-        /// <param name="units"></param>
-        /// <returns></returns>
-        private Rect getSquadBoundingBox(List<Unit> units)
-        {
-            float minX = Mathf.Infinity;
-            float maxX = -Mathf.Infinity;
-            float minY = Mathf.Infinity;
-            float maxY = -Mathf.Infinity;
-
-            foreach (Unit u in units)
-            {
-                if (maxY < u.transform.position.z) maxY = u.transform.position.z;
-                if (minY > u.transform.position.z) minY = u.transform.position.z;
-                if (maxX < u.transform.position.x) maxX = u.transform.position.x;
-                if (minX > u.transform.position.x) minX = u.transform.position.x;
-            }
-
-            return new Rect(minX, minY, (maxX - minX) * 2, (maxY - minY) * 2);
+             
+            return confidence;
         }
 
         /// <summary>
@@ -158,12 +106,12 @@ namespace Assets.Scripts.AI.Agents
         /// </summary>
         private void recalcSafePoint()
         {
-            Vector2 enemySquadCenter = enemySquadBoundingBox.center;
-            Vector2 ownSquadCenter = ownSquadBoundingBox.center;
-            Vector2 safePointxzDirection = enemySquadCenter - ownSquadCenter;
-            safeArea = ai.rootBasePosition;
-            //safeArea = new Vector3(ownSquadCenter.x - safePointxzDirection.x * 30, ai.Army[0].transform.position.y, ownSquadCenter.y - safePointxzDirection.y * 10);
-
+            Vector2 esc = enemySquadBoundingBox.center;
+            Vector2 osc = ownSquadBoundingBox.center;
+            Vector2 safePointxzDirection = (esc - osc);
+            safePointxzDirection.Normalize();
+            safeArea = new Vector3(osc.x - safePointxzDirection.x * 30, ai.Army[0].transform.position.y, osc.y - safePointxzDirection.y * 30);
         }
+
     }
 }

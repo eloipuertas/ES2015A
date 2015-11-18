@@ -10,6 +10,7 @@ GameObject:
   - 4: {fileID: 493776}
   - 33: {fileID: 3378678}
   - 23: {fileID: 2364512}
+  - 114: {fileID: 11476478}
   m_Layer: 0
   m_Name: GHOST_HumanMine
   m_TagString: Untagged
@@ -25,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 160526}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 310.639587, y: 79.0026245, z: 805.189819}
-  m_LocalScale: {x: 628.599121, y: 628.599121, z: 3.77159524}
+  m_LocalScale: {x: 785.748901, y: 785.748901, z: 4.71449375}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -60,6 +61,19 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 160526}
   m_Mesh: {fileID: 4300000, guid: 76ef07e7d4bee564fa75cf9f8f813fbc, type: 3}
+--- !u!114 &11476478
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 160526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc4dbd7bbbda4e14baa3f054762b3ca9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 0
+  type: 2
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -71,6 +85,18 @@ Prefab:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 35d6f0567f9dd8947b154a07bf732bdb, type: 2}
+    - target: {fileID: 0}
+      propertyPath: m_LocalScale.x
+      value: 785.748901
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_LocalScale.y
+      value: 785.748901
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_LocalScale.z
+      value: 4.71449375
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 160526}

@@ -15,7 +15,15 @@ namespace Utils.UnitTests
             }
         }
 
-        public override void run()
+        public override TestEnvironment.States RunAt
+        {
+            get
+            {
+                return TestEnvironment.States.PRE_GAME_CHECKING;
+            }
+        }
+
+        public override void Run(float deltaTime)
         {
             if (BasePlayer.player.activeEntities.Count != 2)
             {

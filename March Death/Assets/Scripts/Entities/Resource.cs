@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -7,7 +7,7 @@ using Storage;
 
 public class Resource : Building<Resource.Actions>
 {
-    public enum Actions { DAMAGED, DESTROYED, COLLECTION, CREATE_UNIT };
+    public enum Actions { CREATED, DAMAGED, DESTROYED, COLLECTION, CREATE_UNIT, DEL_STATS};
 
     /// <summary>
     /// civilian creation waste some time. When units are being created status
@@ -15,26 +15,35 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     public enum createCivilStatus { IDLE, RUN, DISABLED };
 
+    public Statistics statistics;
+
     // Constructor
     public Resource() { }
+
+    private IGameEntity _entity;
 
     private createCivilStatus _createStatus;
 
     /// <summary>
-    /// status of the create civilian option. 
+    /// status of the create civilian option.
     /// RUN when civilian unit is being created
     /// IDLE when option is availabe.
     /// DISABLE when option is disabled.
     /// </summary>
-    /// 
-    public createCivilStatus newCivilStatus
+    ///
+    public createCivilStatus buttonCivilStatus
     {
         get
         {
             return _createStatus;
         }
     }
-        
+
+    /// <summary>
+    /// Controls time elapsed since civil creation process was started
+    /// </summary>
+    private float endConstructionTime;
+
     /// <summary>
     ///  Next update time
     /// </summary>
@@ -57,7 +66,7 @@ public class Resource : Building<Resource.Actions>
     /// <summary>
     ///  units currently working and collecting this resource
     /// </summary>
-    /// 
+    ///
     public int harvestUnits { get; private set; }
 
     /// <summary>
@@ -78,7 +87,7 @@ public class Resource : Building<Resource.Actions>
         get
         {
             return harvestUnits;
-        } 
+        }
    }
 
     /// <summary>
@@ -149,13 +158,13 @@ public class Resource : Building<Resource.Actions>
     private Vector3 meetingPointOutsidePosition;
 
     /// <summary>
-    /// when you create a civilian some displacement is needed to avoid units 
+    /// when you create a civilian some displacement is needed to avoid units
     /// overlap. this is the x-axis displacement
     /// </summary>
     private int _xDisplacement;
 
     /// <summary>
-    /// when you create a civilian some displace is needed to avoid units 
+    /// when you create a civilian some displace is needed to avoid units
     /// overlap. this is the y-axis displacement
     /// </summary>
     private int _yDisplacement;
@@ -168,13 +177,13 @@ public class Resource : Building<Resource.Actions>
         get
         {
             return transform.position;
-        }     
+        }
     }
     /// <summary>
     /// current player
     /// </summary>
     private Player player;
-    
+
     /// <summary>
     /// check if starter unit was created. We need to wait until resource is built
     /// </summary>
@@ -183,6 +192,9 @@ public class Resource : Building<Resource.Actions>
 
     private readonly object syncLock = new object();
     bool hasCreatedCivil = false;
+
+    private bool once = true;
+
     List<GameObject> pendingProducers = new List<GameObject>();
     List<GameObject> pendingWanderers = new List<GameObject>();
 
@@ -203,16 +215,16 @@ public class Resource : Building<Resource.Actions>
 
     /// <summary>
     /// civilians units collect resources each production cicle.
-    /// the sum of units capacity is the total amount of materials they can 
-    /// take from the store and send to player. 
+    /// the sum of units capacity is the total amount of materials they can
+    /// take from the store and send to player.
     /// </summary>
     private void collect()
     {
-        
+
         if (_collectionRate > _stored)
         {
             // collect all stored resources
-            _collectedAmount = _stored;           
+            _collectedAmount = _stored;
             _stored = 0;
         }
         else
@@ -227,14 +239,14 @@ public class Resource : Building<Resource.Actions>
     }
 
     /// <summary>
-    /// after civilians sends last batch produced they are able to take the 
+    /// after civilians sends last batch produced they are able to take the
     /// new production and store it for the next production cycle
     /// </summary>
     private void produce()
     {
         float remainingSpace = info.resourceAttributes.storeSize - _stored;
 
-        // Production rate bigger than remaining store space means we will 
+        // Production rate bigger than remaining store space means we will
         // lose part or whole production!!
 
         if (info.resourceAttributes.productionRate >= remainingSpace)
@@ -250,113 +262,97 @@ public class Resource : Building<Resource.Actions>
 
     /// <summary>
     /// New goods produced are sent to player.
-    /// Method triger an event sending object goods with amount of materials 
+    /// Method triger an event sending object goods with amount of materials
     /// transferred. gold production is sent too.
     /// </summary>
     /// <param name="amount">materials amount produced</param>
-    /// 
+    ///
     /// TODO: now we are using two diferent ways to increase player resources
     /// 1- Create classe goods and send it to player using event.
     /// 2- Direct use of addAmount method.
-    /// 
+    ///
     /// we must change this behaviour, only one way will be the right one.
 
     private void sendResource(float amount)
     {
+
         if (amount  > 0.0)
         {
             Goods goods = new Goods();
             goods.amount = amount;
 
+            // TODO:
+            // BUG: Null reference when we try to add material amount to player.
+
             if (type.Equals(BuildingTypes.FARM))
             {
-                BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.FOOD, amount);
+                BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.FOOD, amount);
                 goods.type = Goods.GoodsType.FOOD;
             }
             else if(type.Equals(BuildingTypes.MINE))
             {
-                BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.METAL, amount);
+                BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.METAL, amount);
                 goods.type = Goods.GoodsType.METAL;
             }
             else
             {
-                BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.WOOD, amount);
+                BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.WOOD, amount);
                 goods.type = Goods.GoodsType.WOOD;
             }
             fire(Actions.COLLECTION, goods);
-        }         
+        }
     }
+
     /// <summary>
     /// Method create civilian unit.
-    /// If capacity limit of building is not reached unit is positioned inside 
-    /// building limits otherwise unit is positioned outside, 
+    /// If capacity limit of building is not reached unit is positioned inside
+    /// building limits otherwise unit is positioned outside,
     /// just at desired meeting Point.
     /// civilian sex is randomly selected(last parameter of createUnit method).
     /// </summary>
     /// <returns>civilian GameObject</returns>
-    public void createCivilian()
+    public void newCivilian()
     {
-        // TODO set desired rotation, now unit rotation equals building rotation!!
-        // TODO  ---create gameobject meetingPointInside and meetingPointOutside
-        // attached to resource building design--- just Waiting for designners team.
-
-        //---unComment next two lines when meeting point objects are created---
-        //GameObject meetingPointInside = this.GetComponent(meetingPointInside);
-        //GameObject meetingPointOutside = this.GetComponent(meetingPointOutside);
-
-        // only one civilian is placed inside building limits until designners team
-        // enabled some space to place units.
-
-        //if (harvestUnits < info.resourceAttributes.maxUnits)
-        if(harvestUnits < 1)
+        // If there's no workers, the next unit to be created will be a worker...
+        if (harvestUnits < 1)
         {
             // TODO get inside meeting point and calculate position
             //unitPosition = this.GetComponent(meetingPointInside).transform.position;
 
             // Units distributed in rows of 5 elements
-            
+
             _xDisplacement = harvestUnits % 5;
             _yDisplacement = harvestUnits / 5;
-            _unitPosition.Set(_center.x + _xDisplacement, _center.y , _center.z + _yDisplacement );
-            
+            _unitPosition.Set(_center.x + _xDisplacement, _center.y, _center.z + _yDisplacement);
+
             // Method createUnit from Info returns GameObject Instance;
             GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
 
             Unit civil = gob.GetComponent<Unit>();
-            civil.role = Unit.Roles.PRODUCING;            
+            civil.role = Unit.Roles.PRODUCING;
             BasePlayer.getOwner(this).addEntity(civil);
             fire(Actions.CREATE_UNIT, civil);
 
             totalUnits++;
             harvestUnits++;
             workersList.Add(civil);
+            setStatus(EntityStatus.WORKING);
 
             _collectionRate += Info.get.of(race, UnitTypes.CIVIL).attributes.capacity;
         }
         else
         {
-            // TODO get outside meeting point and calculate position
-            _xDisplacement = (totalUnits - harvestUnits) % 5;
-            _yDisplacement = (totalUnits - harvestUnits) / 5;
-            _unitPosition.Set(_center.x + 10 + _xDisplacement, _center.y  , _center.z + 10 + _yDisplacement);
-            GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
-
-            Unit civil = gob.GetComponent<Unit>();
-            civil.role = Unit.Roles.WANDERING;
-
-            BasePlayer.getOwner(this).addEntity(civil);
-            fire(Actions.CREATE_UNIT, civil);
-
-            totalUnits++;
-
+            base.addUnitQueue(UnitTypes.CIVIL);
         }
 
+        _createStatus = createCivilStatus.IDLE;
     }
+
 
     /// <summary>
     /// Recruit a Explorer from building. you need to do this to take away worker
-   ///  from building. production decrease when you remove workers
-   /// </summary>
+    ///  from building. production decrease when you remove workers
+    /// </summary>
     private void recruitExplorer(Unit worker)
     {
         if (harvestUnits > 0)
@@ -381,6 +377,7 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     private void recruitWorker(Unit explorer)
     {
+
         if (harvestUnits < info.resourceAttributes.maxUnits)
         {
             _collectionRate -= explorer.info.attributes.capacity;
@@ -389,20 +386,24 @@ public class Resource : Building<Resource.Actions>
             explorer.role = Unit.Roles.PRODUCING;
             workersList.Add(explorer);
         }
-        Debug.Log(" You are trying to recruit worker but building capacity is full"); 
+        if (harvestUnits == 1)
+        {
+            setStatus(EntityStatus.WORKING);
+        }
+        Debug.Log(" You are trying to recruit worker but building capacity is full");
     }
 
     /// <summary>
-    /// when collider interact with other gameobject method checks if 
+    /// when collider interact with other gameobject method checks if
     /// gameobject is a civilian unit. Civilians units are recruited as workers
-    /// while limit of workers are not reached.  
+    /// while limit of workers are not reached.
     /// </summary>
     /// <param name="other">collider gameobject interacting with our own collider</param>
     void OnTriggerEnter(Collider other)
     {
-        
+
         // space enough to hold new civil
-        
+
         if (harvestUnits < info.resourceAttributes.maxUnits)
         {
             IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
@@ -418,7 +419,7 @@ public class Resource : Building<Resource.Actions>
     }
 
     /// <summary>
-    /// If unit inside building is attacked and killed we must recalculate 
+    /// If unit inside building is attacked and killed we must recalculate
     /// collection rate and current harvestUnits. No harvestUnits means no
    ///  production or collection so IDLE status.
     /// </summary>
@@ -461,7 +462,7 @@ public class Resource : Building<Resource.Actions>
                 {
                     recruitExplorer((Unit)entity);
                 }
-            }  
+            }
         }
     }
 
@@ -471,7 +472,7 @@ public class Resource : Building<Resource.Actions>
     /// <param name="unit"></param>
     private void onUnitDestroy(Unit unit)
     {
-        
+
     }
 
 
@@ -479,20 +480,58 @@ public class Resource : Building<Resource.Actions>
     /// When building is destroyed civilian workers turns into explorers
     /// </summary>
     public override void OnDestroy()
-    {        
+    {
+        if (_info.isResource)
+        {
+            statistics.growth_speed *= -1;
+            fire(Actions.DEL_STATS, statistics);
+        }
+
         foreach (Unit unit in workersList)
         {
             unit.role = Unit.Roles.WANDERING;
             harvestUnits--;
         }
-            base.OnDestroy();
+
+        base.OnDestroy();
+    }
+
+    private WorldResources.Type ResourceFromBuilding(BuildingTypes type)
+    {
+        switch (type)
+        {
+            case BuildingTypes.FARM:
+                return WorldResources.Type.FOOD;
+            case BuildingTypes.MINE:
+                return WorldResources.Type.METAL;
+            case BuildingTypes.SAWMILL:
+                return WorldResources.Type.WOOD;
+            default:
+                throw new Exception("That resource type does not exist!");
+        }
+    }
+
+    private void SetupStatistics()
+    {
+        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
+        GameObject gameController = GameObject.Find("GameController");
+        ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
+
+        if (Player.getOwner(_entity).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
+        {
+            register(Actions.COLLECTION, res_pl.onCollection);
+            register(Actions.CREATED, res_pl.onStatisticsUpdate);
+            register(Actions.DEL_STATS, res_pl.onStatisticsUpdate);
+        }
+
+        statistics = _info.isResource ? new Statistics(ResourceFromBuilding(type), (int)info.resourceAttributes.updateInterval, 10) : null; // hardcoded, To modify, by now the collection rate is always 10, but theres no workers yet
     }
 
     /// <summary>
     /// Object initialization
     /// </summary>
     override public void Awake()
-    {       
+    {
         _nextUpdate = 0;
         _stored = 0;
         _collectionRate = 0;
@@ -504,6 +543,7 @@ public class Resource : Building<Resource.Actions>
         _unitRotation = transform.rotation;
         hasDefaultUnit = false;
         civilInfo = Info.get.of(this.race, UnitTypes.CIVIL);
+        _entity = this.GetComponent<IGameEntity>();
 
         // Call Building start
         base.Awake();
@@ -513,6 +553,10 @@ public class Resource : Building<Resource.Actions>
     {
         // Setup base
         base.Start();
+        this.GetComponent<Rigidbody>().isKinematic = false;
+
+        SetupStatistics();
+
     }
 
 
@@ -532,21 +576,37 @@ public class Resource : Building<Resource.Actions>
 
                 if (!hasDefaultUnit)
                 {
-                    createCivilian();
                     hasDefaultUnit = true;
                 }
-                break;
+                break; 
 
             case EntityStatus.WORKING:
 
                 if (Time.time > _nextUpdate)
                 {
-                    _nextUpdate = Time.time + info.resourceAttributes.updateInterval;
-                    collect();
-                    produce();          
+                    if (_info.isResource)
+                    {
+                        _nextUpdate = Time.time + info.resourceAttributes.updateInterval;
+                        collect();
+                        produce();
+
+                        if (once)
+                        {
+                            fire(Actions.CREATED, statistics); once = false;
+                        }
+                    }
                 }
                 break;
         }
-    
+
+    }
+
+    /// <summary>
+    /// When built, it's called
+    /// </summary>
+    protected override void onBuilt()
+    {
+        base.onBuilt();
+        newCivilian();
     }
 }
