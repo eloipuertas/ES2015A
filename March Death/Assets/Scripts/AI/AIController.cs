@@ -58,12 +58,13 @@ namespace Assets.Scripts.AI
             OwnBarracks = new List<Barrack>();
             modules = new List<AIModule>();
             Army = new List<Unit>();
-            rootBasePosition = new Vector3(706, 80, 765);
-            buildPosition = new Vector3(706, 80, 765);
             Workers = new List<Unit>();
 
             Battle.PlayerInformation me = info.GetBattle().GetPlayerInformationList()[playerId - 1];
             SetInitialResources(me.GetResources().Wood, me.GetResources().Food, me.GetResources().Metal, me.GetResources().Gold);
+            Battle.PlayableEntity.EntityPosition pos = me.GetBuildings()[0].position;
+            rootBasePosition = new Vector3(pos.X, 80, pos.Y);
+            buildPosition = rootBasePosition;
             Macro = new MacroManager(this);
 
             //We need to implement som kind of senses for te AI so here they are 
@@ -185,7 +186,9 @@ namespace Assets.Scripts.AI
         {
             if (u.info.isCivil)
             {
-                Workers.Add(u);
+                //Workers.Add(u);
+                //The line above is correct, but we still don't have enemy units so let's just put everything into the army and wipe the floor with the player
+                addToArmy(u);
             }
             else
             {

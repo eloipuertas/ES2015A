@@ -152,13 +152,16 @@ public partial class UserInput : MonoBehaviour
             else // let's find what it is, check if is own unit or rival
             {
                 IGameEntity entity = hitObject.GetComponent<IGameEntity>();
-
-                if ( (entity.info.race != player.race) 
-                    && entity.status != EntityStatus.DEAD 
-                    && entity.status != EntityStatus.DESTROYED) 
+                //if entity == null it means it's a nonactor, like a tree
+                if(entity != null)
                 {
-                    player.registerGameEntityActions(entity);
-                    sManager.AttackTo(entity);
+                    if ((entity.info.race != player.race)
+                    && entity.status != EntityStatus.DEAD
+                    && entity.status != EntityStatus.DESTROYED)
+                    {
+                        player.registerGameEntityActions(entity);
+                        sManager.AttackTo(entity);
+                    }
                 }
             }
         }

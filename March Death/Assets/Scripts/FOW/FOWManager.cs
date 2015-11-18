@@ -135,18 +135,7 @@ public class FOWManager : MonoBehaviour
                 {
                     if (e.IsActor)
                         reveal(e);
-                }
-                //Hide or show the other entities
-                foreach (FOWEntity e in entities)
-                    if (e.IsActor)
-                    {
-                        e.changeVisible(isThereinRect(e.Bounds, visible.visible, !e.IsOwnedByPlayer));
-                    }
-                    else
-                    {
-                        e.changeVisible(isThereinRect(e.Bounds, visible.explored));
-                    }
-                    
+                }                   
 
                 fowTex.SetPixels32(pixels);
                 fowTex.Apply();
@@ -157,6 +146,19 @@ public class FOWManager : MonoBehaviour
         {
             cFrame++;
         }
+    }
+    void LateUpdate()
+    {
+        //Hide or show the other entities
+        foreach (FOWEntity e in entities)
+            if (e.IsActor)
+            {
+                e.changeVisible(isThereinRect(e.Bounds, visible.visible, !e.IsOwnedByPlayer));
+            }
+            else
+            {
+                e.changeVisible(isThereinRect(e.Bounds, visible.explored));
+            }
     }
     /// <summary>
     /// Reveals an area around the entity passed as paramater
