@@ -31,10 +31,9 @@ namespace Storage
             // JSON
             parseJSONFiles<UnitInfo, UnitTypes>("Data/Units", unitStore, EntityType.UNIT);
             parseJSONFiles<ResourceInfo, BuildingTypes>("Data/Buildings/Resources", buildingStore, EntityType.BUILDING);
-	    parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Military", buildingStore, EntityType.BUILDING);
+	        parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Military", buildingStore, EntityType.BUILDING);
             parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Defense", buildingStore, EntityType.BUILDING);
             parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Barracks", buildingStore, EntityType.BUILDING);
-            parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Archery", buildingStore, EntityType.BUILDING);
             parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Stable", buildingStore, EntityType.BUILDING);
             
 

@@ -13,9 +13,8 @@ GameObject:
   - 65: {fileID: 6502738}
   - 114: {fileID: 11490614}
   - 114: {fileID: 11462450}
-  - 208: {fileID: 20862012}
-  - 114: {fileID: 11452380}
   - 114: {fileID: 11411648}
+  - 114: {fileID: 11491578}
   m_Layer: 0
   m_Name: Elf-Wall
   m_TagString: Untagged
@@ -400,21 +399,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   race: 1
   type: 7
---- !u!114 &11452380
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 125640}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55673783568d5024f8240d70a3d2456f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DebugOnEditor: 1
-  Position: {x: 0, y: 0, z: 0}
-  Size: {x: 15, y: 8, z: 20}
-  CheckEverySeconds: 1
 --- !u!114 &11462450
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -438,21 +422,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8fedea892f030418970e7ce2a2bc2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!208 &20862012
-NavMeshObstacle:
+--- !u!114 &11491578
+MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 125640}
   m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 3, y: 2.5, z: 7.5}
-  m_MoveThreshold: .100000001
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 2.5, z: 0}
-  m_TimeToStationary: .5
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55673783568d5024f8240d70a3d2456f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DebugOnEditor: 1
+  Position: {x: 0, y: 0, z: 0}
+  Size: {x: 15, y: 8, z: 20}
+  CheckEverySeconds: 1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -467,6 +451,18 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: type
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Size.x
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Size.y
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Size.z
+      value: 20
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
