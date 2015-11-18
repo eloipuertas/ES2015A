@@ -31,7 +31,8 @@ namespace Storage
             // JSON
             parseJSONFiles<UnitInfo, UnitTypes>("Data/Units", unitStore, EntityType.UNIT);
             parseJSONFiles<ResourceInfo, BuildingTypes>("Data/Buildings/Resources", buildingStore, EntityType.BUILDING);
-			parseJSONFiles<ResourceInfo, BuildingTypes>("Data/Buildings/Military", buildingStore, EntityType.BUILDING);
+	    parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Military", buildingStore, EntityType.BUILDING);
+            parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Defense", buildingStore, EntityType.BUILDING);
             parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Barracks", buildingStore, EntityType.BUILDING);
 
             // Unit prefabs
@@ -40,11 +41,14 @@ namespace Storage
             // Buildings prefabs
             parsePrefabs<Resource, BuildingTypes>("Prefabs/Buildings/Resources", buildingPrefabs);
 			parsePrefabs<Barrack, BuildingTypes>("Prefabs/Buildings/Military", buildingPrefabs);
+            parsePrefabs<Barrack, BuildingTypes>("Prefabs/Buildings/Defense", buildingPrefabs);
             parsePrefabs<Barrack, BuildingTypes>("Prefabs/Buildings/Barracks", buildingPrefabs);
+
 
             // Ghosts prefabs (MUST BE DONE AFTER REALS!)
             parsePrefabs<GhostBuilding, BuildingTypes>("Prefabs/Buildings/Resources", buildingPrefabs);
 			parsePrefabs<GhostBuilding, BuildingTypes>("Prefabs/Buildings/Military", buildingPrefabs);
+            parsePrefabs<GhostBuilding, BuildingTypes>("Prefabs/Buildings/Defense", buildingPrefabs);
             parsePrefabs<GhostBuilding, BuildingTypes>("Prefabs/Buildings/Barracks", buildingPrefabs);
         }
 
