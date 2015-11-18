@@ -202,6 +202,8 @@ namespace Managers
                 finalBuilding.transform.rotation = _newBuilding.ghost.transform.rotation;
 
                 //TODO : check another way to get the IGameEntity
+                
+               // IGameEntity entity = finalBuilding.gameObject.GetComponent<IGameEntity>(); // Esto no iria así ? (Ferran)
                 IGameEntity entity = (IGameEntity)finalBuilding.GetComponent<Unit>();
                 _player.addEntity(entity);
 

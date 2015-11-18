@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 using System;
+=======
+﻿using System;
+>>>>>>> devel_d
 using Storage;
 
 using UnityEngine;

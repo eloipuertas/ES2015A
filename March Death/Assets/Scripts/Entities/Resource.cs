@@ -7,7 +7,7 @@ using Storage;
 
 public class Resource : Building<Resource.Actions>
 {
-    public enum Actions { CREATED, DAMAGED, DESTROYED, COLLECTION, CREATE_UNIT , DEL_STATS};
+    public enum Actions { CREATED, DAMAGED, DESTROYED, COLLECTION, CREATE_UNIT, DEL_STATS};
 
     /// <summary>
     /// civilian creation waste some time. When units are being created status
@@ -286,17 +286,17 @@ public class Resource : Building<Resource.Actions>
 
             if (type.Equals(BuildingTypes.FARM))
             {
-                //Player.getOwner(_entity).resources.AddAmount(WorldResources.Type.FOOD, amount);
+                BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.FOOD, amount);
                 goods.type = Goods.GoodsType.FOOD;
             }
             else if(type.Equals(BuildingTypes.MINE))
             {
-                //BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.METAL, amount);
+                BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.METAL, amount);
                 goods.type = Goods.GoodsType.METAL;
             }
             else
             {
-                // BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.WOOD, amount);
+                BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.WOOD, amount);
                 goods.type = Goods.GoodsType.WOOD;
             }
             fire(Actions.COLLECTION, goods);
@@ -492,7 +492,8 @@ public class Resource : Building<Resource.Actions>
             unit.role = Unit.Roles.WANDERING;
             harvestUnits--;
         }
-            base.OnDestroy();
+
+        base.OnDestroy();
     }
 
     private WorldResources.Type ResourceFromBuilding(BuildingTypes type)
