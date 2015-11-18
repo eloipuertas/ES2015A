@@ -219,6 +219,7 @@ GameObject:
   - 114: {fileID: 11421854}
   - 114: {fileID: 11434178}
   - 114: {fileID: 11409626}
+  - 114: {fileID: 11427206}
   m_Layer: 0
   m_Name: Elf-Watchtower
   m_TagString: Untagged
@@ -815,6 +816,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8fedea892f030418970e7ce2a2bc2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &11427206
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 185688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b5e82104f3954c44a992850ac8a8053, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 1
+  type: 9
 --- !u!114 &11434178
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1059,6 +1073,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Constraints
       value: 126
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: type
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: race
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
