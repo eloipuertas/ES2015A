@@ -79,6 +79,16 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
         return ia;
     }
 
+    public static BasePlayer getOwner(Storage.Races race)
+    {
+        if (race == info.GetPlayerRace())
+        {
+            return player;
+        }
+
+        return ia;
+    }
+
     void Update () {}
 
     public void SetInitialResources(uint wood, uint food, uint metal, uint gold)
