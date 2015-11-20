@@ -58,16 +58,12 @@ public class GameSetupScript : MonoBehaviour
 
     public void SetPlayerRaceToElf ()
     {
-        // HACK Even though info is initialized in Start(), it is null when it gets here
-        if (!info) info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
         info.SetPlayerRace(Races.ELVES);
         raceSelected = true;
     }
 
     public void SetPlayerRaceToHuman()
     {
-        // HACK Even though info is initialized in Start(), it is null when it gets here
-        if (!info) info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
         info.SetPlayerRace(Races.MEN);
         raceSelected = true;
     }

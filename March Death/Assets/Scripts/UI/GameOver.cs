@@ -2,7 +2,13 @@ using UnityEngine;
 
 public class GameOver : MonoBehaviour
 {
-    void Start() {}
+    Main_Game mg;
+
+    void Start()
+    {
+        mg = GameObject.FindWithTag("GameController").GetComponent<Main_Game>();
+    }
+
     void Update() {}
 
     /// <summary>
@@ -18,6 +24,7 @@ public class GameOver : MonoBehaviour
     /// </summary>
     public void RestartGame()
     {
+        mg.ClearGame();
         Application.LoadLevel(2);
     }
 }
