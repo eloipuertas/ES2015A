@@ -5,3 +5,8 @@ VideoJoc Curs Enginyeria Software 2015
 
 [Link a la web del joc](http://eloipuertas.github.io/ES2015A)
 
+Configuració recomanada per desenvolupar i modificar aquest joc:
+* Unity 5.2
+* Windows:
+  * Microsoft Visual C++ 2013 Redistributable (x64) - 12.0.30501
+
