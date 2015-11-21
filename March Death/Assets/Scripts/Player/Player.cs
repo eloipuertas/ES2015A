@@ -114,7 +114,7 @@ public class Player : BasePlayer
     public override void addEntity(IGameEntity newEntity)
     {
         _activeEntities.Add(newEntity);
-        registerEventDisplayMessage(newEntity);
+        if (newEntity != null) registerEventDisplayMessage(newEntity);
         Debug.Log(_activeEntities.Count + " entities");
     }
 

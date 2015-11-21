@@ -37,7 +37,7 @@ public class EventsNotifier : MonoBehaviour {
     private readonly string ARCHERY_LOST = "You have lost your archery building.";
     private readonly string BARRACK_LOST = "You have lost a barrack.";
 
-    private const float TIME_TO_UPDATE = 5f;
+    private const float TIME_TO_UPDATE = 10f;
 
     private float countdown;
 
@@ -45,12 +45,18 @@ public class EventsNotifier : MonoBehaviour {
     private Queue<int> trimming;
     private System.Text.StringBuilder messages;
 
+    private Camera mainCam;
+
+    void Awake()
+    {
+        mainCam = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
+    }
+
     // Use this for initialization
     void Start()
     {
         text = gameObject.GetComponent<GUIText>();
-        text.transform.position = Vector3.zero;
-        text.pixelOffset = new Vector2(0.05f, 0.95f);
+        text.transform.position = mainCam.ViewportToScreenPoint(new Vector3(0.02f, 0.95f, 20));
         trimming = new Queue<int>();
         messages = new System.Text.StringBuilder();
         countdown = float.NegativeInfinity;
@@ -67,6 +73,11 @@ public class EventsNotifier : MonoBehaviour {
             countdown = TIME_TO_UPDATE;
         }
         text.text = messages.ToString();
+    }
+
+    void OnGUI()
+    {
+        //GUI.Label(new Rect(20, 20, Screen.width/8.0f, Screen.height/5.0f), messages.ToString());
     }
 
     private void AppendMessage(string what)
