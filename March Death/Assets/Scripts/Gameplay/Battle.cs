@@ -35,8 +35,9 @@ public class Battle
         /// <summary>
         /// The type of building or unit this entity represents.
         /// </summary>
-        public EntityTypeUnion entityType;
+        public EntityTypeUnion type;
         public EntityPosition position;
+        public Storage.EntityType entityType;
     }
 
     public enum MissionType
@@ -86,7 +87,8 @@ public class Battle
         public void AddBuilding(Storage.BuildingTypes type, float x, float y)
         {
             PlayableEntity e = new PlayableEntity();
-            e.entityType.building = type;
+            e.type.building = type;
+            e.entityType = Storage.EntityType.BUILDING;
             e.position.X = x;
             e.position.Y = y;
             buildings.Add(e);
@@ -101,7 +103,8 @@ public class Battle
         public void AddUnit(Storage.UnitTypes type, float x, float y)
         {
             PlayableEntity e = new PlayableEntity();
-            e.entityType.unit = type;
+            e.type.unit = type;
+            e.entityType = Storage.EntityType.UNIT;
             e.position.X = x;
             e.position.Y = y;
             units.Add(e);
