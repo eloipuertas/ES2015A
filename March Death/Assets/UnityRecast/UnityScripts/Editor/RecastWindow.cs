@@ -18,11 +18,9 @@ namespace Pathfinding
         static TerrainData terrain;
         static Vector3 terrainPos;
         static Config config;
+        static ExtendedConfig ecfg = new ExtendedConfig();
 
         static bool ConfigLoaded = false;
-        static float AgentHeight;
-        static float AgentMaxClimb;
-        static float AgentRadius;
         static float EdgeLen;
         static float RegionMinSize;
         static float RegionMergeSize;
@@ -56,9 +54,9 @@ namespace Pathfinding
                 IntPtr ptr = Recast.DefaultConfig(Application.dataPath + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Recast.log");
                 config = (Config)Marshal.PtrToStructure(ptr, typeof(Config));
 
-                AgentHeight = config.walkableHeight * config.ch;
-                AgentMaxClimb = config.walkableClimb * config.ch;
-                AgentRadius = config.walkableRadius * config.ch;
+                ecfg.AgentHeight = config.walkableHeight * config.ch;
+                ecfg.AgentMaxClimb = config.walkableClimb * config.ch;
+                ecfg.AgentRadius = config.walkableRadius * config.ch;
                 EdgeLen = config.maxEdgeLen * config.cs;
                 RegionMinSize = (float)Math.Sqrt(config.minRegionArea);
                 RegionMergeSize = (float)Math.Sqrt(config.mergeRegionArea);
@@ -102,13 +100,14 @@ namespace Pathfinding
             config.cs = EditorGUILayout.FloatField("Cell Size", config.cs);
             config.ch = EditorGUILayout.FloatField("Cell Height", config.ch);
             config.tileSize = EditorGUILayout.IntField("Tile Size", config.tileSize);
+            ecfg.MaxObstacles = EditorGUILayout.IntField("Max Obstacles", ecfg.MaxObstacles);
 
 
             // AGENT
             GUILayout.Label("Agent Settings", EditorStyles.boldLabel);
-            AgentHeight = EditorGUILayout.FloatField("Height", AgentHeight);
-            AgentMaxClimb = EditorGUILayout.FloatField("Max Climb", AgentMaxClimb);
-            AgentRadius = EditorGUILayout.FloatField("Radius", AgentRadius);
+            ecfg.AgentHeight = EditorGUILayout.FloatField("Height", ecfg.AgentHeight);
+            ecfg.AgentMaxClimb = EditorGUILayout.FloatField("Max Climb", ecfg.AgentMaxClimb);
+            ecfg.AgentRadius = EditorGUILayout.FloatField("Radius", ecfg.AgentRadius);
             config.walkableSlopeAngle = EditorGUILayout.FloatField("Max Slope Angle", config.walkableSlopeAngle);
 
             // EDGE
@@ -120,7 +119,7 @@ namespace Pathfinding
 
             // QUALITY
             GUILayout.Label("Quality Settings", EditorStyles.boldLabel);
-            config.maxVertsPerPoly = EditorGUILayout.IntField("Max verts per poly", config.maxVertsPerPoly);            
+            config.maxVertsPerPoly = EditorGUILayout.IntField("Max verts per poly", config.maxVertsPerPoly);
             DetailSampleDist = EditorGUILayout.FloatField("Detail Sample List", DetailSampleDist);
             DetailSampleMaxError = EditorGUILayout.FloatField("Detail Sample Max Error", DetailSampleMaxError);
 
@@ -214,13 +213,6 @@ namespace Pathfinding
                 ntris = ntris
             };
 
-            ExtendedConfig ecfg = new ExtendedConfig()
-            {
-                AgentHeight = AgentHeight,
-                AgentMaxClimb = AgentMaxClimb,
-                AgentRadius = AgentRadius
-            };
-
             UpdateProgress(0.5f);
 
             IntPtr tileCache = new IntPtr(0);
@@ -272,7 +264,7 @@ namespace Pathfinding
 
             // Save asset
             CustomAssetUtility.SaveAsset<TileCacheAsset>(asset);
-            
+
             // Close window
             UpdateProgress(0f);
             EditorUtility.ClearProgressBar();
@@ -290,9 +282,9 @@ namespace Pathfinding
 
             UpdateProgress(0.25f);
 
-            config.walkableHeight = (int)Math.Ceiling(AgentHeight / config.ch);
-            config.walkableClimb = (int)Math.Floor(AgentMaxClimb / config.ch);
-            config.walkableRadius = (int)Math.Ceiling(AgentRadius / config.cs);
+            config.walkableHeight = (int)Math.Ceiling(ecfg.AgentHeight / config.ch);
+            config.walkableClimb = (int)Math.Floor(ecfg.AgentMaxClimb / config.ch);
+            config.walkableRadius = (int)Math.Ceiling(ecfg.AgentRadius / config.cs);
             config.maxEdgeLen = (int)(EdgeLen / config.cs);
             config.minRegionArea = (int)Math.Pow(RegionMinSize, 2);
             config.mergeRegionArea = (int)Math.Pow(RegionMergeSize, 2);
@@ -301,13 +293,13 @@ namespace Pathfinding
 
             // Generate Recast
             Recast.handleBuild(ref config, verts, nverts, tris, ntris);
-            
+
             // Fetch navmeshes
             IntPtr polyPtr = Recast.getPolyMesh();
             IntPtr detailPtr = Recast.getPolyMeshDetail();
             PolyMesh mesh = (PolyMesh)Marshal.PtrToStructure(polyPtr, typeof(PolyMesh));
             PolyMeshDetail detail = (PolyMeshDetail)Marshal.PtrToStructure(detailPtr, typeof(PolyMeshDetail));
-                        
+
             UpdateProgress(0.5f);
 
             // Create asset

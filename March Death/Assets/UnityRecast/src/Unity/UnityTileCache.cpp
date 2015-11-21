@@ -248,7 +248,7 @@ bool handleTileCacheBuild(rcConfig* cfg, ExtendedConfig* ecfg, InputGeometry* ge
 	tcparams.walkableClimb = ecfg->AgentMaxClimb;
 	tcparams.maxSimplificationError = cfg->maxSimplificationError;
 	tcparams.maxTiles = tw * th * EXPECTED_LAYERS_PER_TILE;
-	tcparams.maxObstacles = 128;
+	tcparams.maxObstacles = ecfg->MaxObstacles;
 
 	tileCache = dtAllocTileCache();
 	if (!tileCache)
