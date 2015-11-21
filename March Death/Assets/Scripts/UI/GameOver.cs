@@ -11,12 +11,18 @@ public class GameOver : MonoBehaviour
 
     void Update() {}
 
+    void loadLevel(int level)
+    {
+        mg.ClearGame();
+        Application.LoadLevel(level);
+    }
+
     /// <summary>
     /// Loads the main menu.
     /// </summary>
     public void ReturnToMainMenu()
     {
-        Application.LoadLevel(0);
+        loadLevel(0);
     }
 
     /// <summary>
@@ -24,7 +30,6 @@ public class GameOver : MonoBehaviour
     /// </summary>
     public void RestartGame()
     {
-        mg.ClearGame();
-        Application.LoadLevel(2);
+        loadLevel(2);
     }
 }
