@@ -8,8 +8,10 @@
 #include "UnityClasses.h"
 #include "DetourCrowd.h"
 
-#ifdef WIN32
+#if defined(WIN32)
 	#define DLL_EXPORT extern "C" __declspec(dllexport)
+#elif defined(__GNUC__) && !defined(__clang__)
+	#define DLL_EXPORT extern "C"
 #else
 	#define DLL_EXPORT extern "C"  __attribute__((cdecl))
 #endif
@@ -46,9 +48,9 @@ DLL_EXPORT float* getObstacles(dtTileCache* tc, int& nobstacles);
 
 // Crowd
 DLL_EXPORT dtCrowd* createCrowd(int maxAgents, float maxRadius, dtNavMesh* navmesh);
-DLL_EXPORT int addAgent(dtCrowd* crowd, float* p, float radius, float height);
+DLL_EXPORT int addAgent(dtCrowd* crowd, float* p, dtCrowdAgentParams* ap);
 DLL_EXPORT dtCrowdAgent* getAgent(dtCrowd* crowd, int idx);
-DLL_EXPORT void updateAgent(dtCrowd* crowd, int idx, float maxAcceleration, float maxSpeed);
+DLL_EXPORT void updateAgent(dtCrowd* crowd, int idx, dtCrowdAgentParams* ap);
 DLL_EXPORT void removeAgent(dtCrowd* crowd, int idx);
 DLL_EXPORT void setMoveTarget(dtNavMeshQuery* navquery, dtCrowd* crowd, int idx, float* p, bool adjust);
 DLL_EXPORT void resetPath(dtCrowd* crowd, int idx);

@@ -230,7 +230,7 @@ public class Unit : GameEntity<Unit.Actions>
             }
 
             _target = entity;
-            
+
             // Show target health
             selectable = _target.getGameObject().GetComponent<Selectable>();
             selectable.AttackedEntity();
@@ -358,11 +358,12 @@ public class Unit : GameEntity<Unit.Actions>
         statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -5);
 
         fire(Actions.CREATED, statistics);
-        
+
         // Get DetourAgent and set basic variables
         _detourAgent = GetComponent<DetourAgent>();
-        _detourAgent.SetMaxSpeed(info.unitAttributes.movementRate * 5);
-        _detourAgent.SetMaxAcceleration(20.5f);
+        _detourAgent.MaxSpeed = info.unitAttributes.movementRate * 5;
+        _detourAgent.MaxAcceleration = info.unitAttributes.movementRate * 20;
+        _detourAgent.UpdateParams();
     }
 
     /// <summary>
@@ -475,7 +476,7 @@ public class Unit : GameEntity<Unit.Actions>
                         _detourAgent.MoveTo(destination);
                         _movePoint = destination;
                     }
-                    
+
                     // If we are already close enough, stop and attack
                     if (_distanceToTarget <= currentAttackRange())
                     {
@@ -499,7 +500,7 @@ public class Unit : GameEntity<Unit.Actions>
                         Debug.LogWarning("NavMesh not stopped at attack range... AttackRange = " + currentAttackRange());
                     }
                 }
-                
+
                 break;
         }
     }

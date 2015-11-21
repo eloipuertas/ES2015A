@@ -56,9 +56,9 @@ namespace Pathfinding
             return new Vector3(p[off + 0], p[off + 1], p[off + 2]);
         }
 
-        public int AddAgent(DetourAgent agent, float radius, float height)
+        public int AddAgent(DetourAgent agent, CrowdAgentParams ap)
         {
-            int idx = Detour.Crowd.addAgent(crowd, ToFloat(agent.transform.position), radius, height);
+            int idx = Detour.Crowd.addAgent(crowd, ToFloat(agent.transform.position), ref ap);
             if (idx != -1)
             {
                 agents.Add(idx, agent);
@@ -67,9 +67,9 @@ namespace Pathfinding
             return idx;
         }
 
-        public void SetAgentParemeters(int idx, float maxAcceleration, float maxSpeed)
+        public void UpdateAgentParemeters(int idx, CrowdAgentParams ap)
         {
-            Detour.Crowd.updateAgent(crowd, idx, maxAcceleration, maxSpeed);
+            Detour.Crowd.updateAgent(crowd, idx, ref ap);
         }
 
         public void RemoveAgent(int idx)
