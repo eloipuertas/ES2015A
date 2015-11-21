@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace Pathfinding
 {
-    [RequireComponent(typeof(IGameEntity))]
     public class DetourAgent : MonoBehaviour
     {
         public enum CrowdAgentState
@@ -45,6 +44,7 @@ namespace Pathfinding
         {
             get
             {
+                // TODO: Adaptative target distance
                 _lastKnownDistance = (transform.position - targetPoint).sqrMagnitude;
                 if (_lastKnownDistance > 50f)
                     return true;
@@ -53,14 +53,25 @@ namespace Pathfinding
             }
         }
 
+        public void AddToCrowd()
+        {
+            idx = DetourCrowd.Instance.AddAgent(this, Radius, Height);
+        }
+
+        public void RemoveFromCrowd()
+        {
+            DetourCrowd.Instance.RemoveAgent(idx);
+            idx = -1;
+        }
+
         public void Start()
         {
-            idx = DetourCrowd.Instance.AddAgent(GetComponent<IGameEntity>(), Radius, Height);
+            AddToCrowd();
         }
 
         public void OnDestroy()
         {
-            DetourCrowd.Instance.RemoveAgent(idx);
+            RemoveFromCrowd();
         }
 
         public void SetMaxSpeed(float maxSpeed)

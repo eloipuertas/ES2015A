@@ -56,12 +56,12 @@ namespace Pathfinding
             return new Vector3(p[off + 0], p[off + 1], p[off + 2]);
         }
 
-        public int AddAgent(IGameEntity entity, float radius, float height)
+        public int AddAgent(DetourAgent agent, float radius, float height)
         {
-            int idx = Detour.Crowd.addAgent(crowd, ToFloat(entity.getTransform().position), radius, height);
+            int idx = Detour.Crowd.addAgent(crowd, ToFloat(agent.transform.position), radius, height);
             if (idx != -1)
             {
-                agents.Add(idx, entity.getGameObject().GetComponent<DetourAgent>());
+                agents.Add(idx, agent);
             }
 
             return idx;
@@ -98,7 +98,7 @@ namespace Pathfinding
                 agent.Velocity = ToVector3(velocities, entry.Key * 3);
                 agent.State = (DetourAgent.CrowdAgentState)states[entry.Key];
                 agent.TargetState = (DetourAgent.MoveRequestState)targetStates[entry.Key];
-                
+
                 if (agent.Velocity.sqrMagnitude != 0)
                 {
                     Vector3 newPosition = ToVector3(positions, entry.Key * 3);
