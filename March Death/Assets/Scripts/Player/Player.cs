@@ -223,18 +223,17 @@ public class Player : BasePlayer
             if (entity.info.isBarrack)
             {
                 Barrack barrack = (Barrack) entity;
-                // TODO Add CREATED event
                 barrack.register(Barrack.Actions.DAMAGED, events.DisplayUnderAttack);
                 barrack.register(Barrack.Actions.DESTROYED, events.DisplayBuildingDestroyed);
                 barrack.register(Barrack.Actions.CREATE_UNIT, events.DisplayUnitCreated);
+                barrack.register(Barrack.Actions.BUILDING_FINISHED, events.DisplayBuildingCreated);
             }
             else 
             {
                 Resource resourcesBuilding = (Resource) entity;
                 resourcesBuilding.register(Resource.Actions.DAMAGED, events.DisplayUnderAttack);
                 resourcesBuilding.register(Resource.Actions.DESTROYED, events.DisplayBuildingDestroyed);
-                // TODO Modify the behaviour of CREATED (i.e. do not fire it if it sends a statistics object)
-                //resourcesBuilding.register(Resource.Actions.CREATED, events.DisplayBuildingCreated);
+                resourcesBuilding.register(Resource.Actions.BUILDING_FINISHED, events.DisplayBuildingCreated);
                 resourcesBuilding.register(Resource.Actions.CREATE_UNIT, events.DisplayUnitCreated);
             }
         }
@@ -254,13 +253,14 @@ public class Player : BasePlayer
             barrack.unregister(Barrack.Actions.DAMAGED, events.DisplayUnderAttack);
             barrack.unregister(Barrack.Actions.DESTROYED, events.DisplayBuildingDestroyed);
             barrack.unregister(Barrack.Actions.CREATE_UNIT, events.DisplayUnitCreated);
+            barrack.unregister(Barrack.Actions.BUILDING_FINISHED, events.DisplayBuildingCreated);
         }
         else if (entity.info.isResource)
         {
             Resource resourcesBuilding = (Resource) entity;
             resourcesBuilding.unregister(Resource.Actions.DAMAGED, events.DisplayUnderAttack);
             resourcesBuilding.unregister(Resource.Actions.DESTROYED, events.DisplayBuildingDestroyed);
-            //resourcesBuilding.unregister(Resource.Actions.CREATED, events.DisplayBuildingCreated);
+            resourcesBuilding.unregister(Barrack.Actions.BUILDING_FINISHED, events.DisplayBuildingCreated);
             resourcesBuilding.unregister(Resource.Actions.CREATE_UNIT, events.DisplayUnitCreated);
         }
         else if (entity.info.isUnit)
