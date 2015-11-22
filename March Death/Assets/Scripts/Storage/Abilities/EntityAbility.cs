@@ -20,6 +20,7 @@ namespace Storage
 
     public class EntityAbility
     {
+        public string ability = "";
         public string name = "";
         public string tooltip = "";
 

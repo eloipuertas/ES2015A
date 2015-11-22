@@ -31,7 +31,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     /// </summary>
     protected Managers.SelectionManager _selection;
     public Managers.SelectionManager selection { get { return _selection; } }
-     
+
 
 
 
@@ -54,14 +54,14 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     {
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
         terrain = GameObject.Find("Terrain").GetComponent<Terrain>();
-        _info = gameInformationObject.GetComponent<GameInformation>();        
+        _info = gameInformationObject.GetComponent<GameInformation>();
     }
 
     public static void Setup()
     {
         GameObject gameController = GameObject.FindGameObjectWithTag("GameController");
 
-        _buildings = gameController.GetComponent<Main_Game>().BuildingsMgr;        
+        _buildings = gameController.GetComponent<Main_Game>().BuildingsMgr;
         _player = gameController.GetComponent<Player>();
         _ia = gameController.GetComponent<AIController>();
     }
@@ -107,7 +107,14 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
             created = _buildings.createBuilding(position, Quaternion.Euler(0,0,0),
                                         building.entityType.building,
                                         _selfRace);
-            AddBuilding(created.GetComponent<IGameEntity>());
+
+            IGameEntity entity = created.GetComponent<IGameEntity>();
+            if (building.hasStatus)
+            {
+                entity.DefaultStatus = building.status;
+            }
+
+            AddBuilding(entity);
         }
     }
 

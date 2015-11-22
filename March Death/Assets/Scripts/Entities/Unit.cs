@@ -16,6 +16,19 @@ public class Unit : GameEntity<Unit.Actions>
     public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT };
     public enum Roles { PRODUCING, WANDERING };
 
+    private EntityStatus _defaultStatus = EntityStatus.IDLE;
+    public override EntityStatus DefaultStatus
+    {
+        get
+        {
+            return _defaultStatus;
+        }
+        set
+        {
+            _defaultStatus = value;
+        }
+    }
+
     public Unit() { }
 
     /// <summary>
@@ -230,7 +243,7 @@ public class Unit : GameEntity<Unit.Actions>
             }
 
             _target = entity;
-            
+
             // Show target health
             selectable = _target.getGameObject().GetComponent<Selectable>();
             selectable.AttackedEntity();
@@ -340,7 +353,7 @@ public class Unit : GameEntity<Unit.Actions>
         base.Start();
 
         // Set the status
-        setStatus(EntityStatus.IDLE);
+        setStatus(DefaultStatus);
 
         activateFOWEntity();
 
@@ -358,7 +371,7 @@ public class Unit : GameEntity<Unit.Actions>
         statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -5);
 
         fire(Actions.CREATED, statistics);
-        
+
         // Get DetourAgent and set basic variables
         _detourAgent = GetComponent<DetourAgent>();
         _detourAgent.SetMaxSpeed(info.unitAttributes.movementRate * 5);
@@ -475,7 +488,7 @@ public class Unit : GameEntity<Unit.Actions>
                         _detourAgent.MoveTo(destination);
                         _movePoint = destination;
                     }
-                    
+
                     // If we are already close enough, stop and attack
                     if (_distanceToTarget <= currentAttackRange())
                     {
@@ -499,7 +512,7 @@ public class Unit : GameEntity<Unit.Actions>
                         Debug.LogWarning("NavMesh not stopped at attack range... AttackRange = " + currentAttackRange());
                     }
                 }
-                
+
                 break;
         }
     }

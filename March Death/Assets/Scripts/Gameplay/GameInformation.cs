@@ -16,12 +16,12 @@ public class GameInformation : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-    
+
     }
-    
+
     // Update is called once per frame
     void Update () {
-    
+
     }
 
     void Awake()
@@ -126,13 +126,13 @@ public class GameInformation : MonoBehaviour {
         t.unit = UnitTypes.HERO;
         game.AddMission(Battle.MissionType.DESTROY, 1, EntityType.UNIT, t, 0, true, "");
         Battle.PlayerInformation player = new Battle.PlayerInformation(Races.MEN);
-        player.AddBuilding(BuildingTypes.STRONGHOLD, 801.4f, 753.6f);
+        player.AddBuilding(BuildingTypes.STRONGHOLD, 801.4f, 753.6f, EntityStatus.IDLE);
         player.AddUnit(UnitTypes.HERO, 801.4f, 785f);
         player.SetInitialResources(2000, 2000, 2000, 2000);
         game.AddPlayerInformation(player);
         player = new Battle.PlayerInformation(Races.ELVES);
         player.AddUnit(UnitTypes.HERO, 650, 835);
-        player.AddBuilding(BuildingTypes.STRONGHOLD, 590, 792);
+        player.AddBuilding(BuildingTypes.STRONGHOLD, 590, 792, EntityStatus.IDLE);
         player.SetInitialResources(2000, 2000, 2000, 2000);
         game.AddPlayerInformation(player);
         game.SetWorldResources(5000, 5000, 5000);

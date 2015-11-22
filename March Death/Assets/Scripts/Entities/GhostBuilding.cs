@@ -13,6 +13,9 @@ public class GhostBuilding : GameEntity<GhostBuilding.Actions>
     public BuildingTypes type;
     public override E getType<E>() { return (E)Convert.ChangeType(type, typeof(E)); }
 
+
+    public override EntityStatus DefaultStatus { get; set; }
+
     public override IKeyGetter registerFatalWounds(Action<object> func)
     {
         throw new NotImplementedException();
@@ -58,4 +61,3 @@ public class GhostBuilding : GameEntity<GhostBuilding.Actions>
         // Do nothing, not even call parent!
     }
 }
-
