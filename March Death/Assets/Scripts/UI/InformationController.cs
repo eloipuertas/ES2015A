@@ -8,10 +8,8 @@ using System.IO;
 using System.Collections.Generic;
 using UnityEngine.Events;
 
-public partial class InformationController : MonoBehaviour {
-	
-	private Player player;
-	
+public partial class InformationController : MonoBehaviour
+{	
 	private const string IMAGES_PATH = "InformationImages";
 	
 	//objects for one unit information
@@ -32,9 +30,7 @@ public partial class InformationController : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
-		GameObject gameInformationObject = GameObject.Find("GameInformationObject");
-		player = GameObject.FindGameObjectWithTag("GameController").GetComponent("Player") as Player;
-		
+		GameObject gameInformationObject = GameObject.Find("GameInformationObject");		
 		
 		//Register to selectable actions
 		Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.SELECTED, onUnitSelected, new ActorSelector()
@@ -120,7 +116,7 @@ public partial class InformationController : MonoBehaviour {
 	
 	private void ShowMultipleInformation() 
 	{
-		ArrayList selectedObjects = player.getSelectedObjects();
+		ArrayList selectedObjects = BasePlayer.player.getSelectedObjects();
 		for (int i = 0; i < selectedObjects.Count && i < multiselectionColumns * multiselectionRows; i++)
 		{
 			double lineDivision = (double)(i / multiselectionColumns);
@@ -160,7 +156,7 @@ public partial class InformationController : MonoBehaviour {
 			selectable.SelectOnlyMe();
 		});
 		
-		return CreateCustomButton(buttonCenter, multiselectionButtonSize, "MultiSelectionButton", entity.info.name.ToString (), buttonImage: GetImageForEntity (entity), actionMethod: selectUnique);
+		return CreateCustomButton(buttonCenter, multiselectionButtonSize, "MultiSelectionButton", "", buttonImage: GetImageForEntity (entity), actionMethod: selectUnique);
 	}
 
 	private void DestroyButtons()
@@ -186,7 +182,7 @@ public partial class InformationController : MonoBehaviour {
 		GameObject gameObject = (GameObject) obj;
 		
 		//Check if is simple click or multiple
-		if (player.SelectedObjects.Count > 1)
+		if (BasePlayer.player.SelectedObjects.Count > 1)
 		{
 			HideInformation();
 			ShowMultipleInformation();
@@ -205,6 +201,18 @@ public partial class InformationController : MonoBehaviour {
 			unit.register(Unit.Actions.DAMAGED, onUnitDamaged);
 			unit.register(Unit.Actions.DIED, onUnitDied);
 		});
+
+		entity.doIfResource(resource =>
+		{
+			resource.register(Resource.Actions.DAMAGED, onUnitDamaged);
+			resource.register(Resource.Actions.DESTROYED, onUnitDied);
+		});
+
+		entity.doIfBarrack(building =>
+		{
+			building.register(Barrack.Actions.DAMAGED, onUnitDamaged);
+			building.register(Barrack.Actions.DESTROYED, onUnitDied);
+		});
 	}
 	
 	public void onUnitDeselected(System.Object obj)
@@ -212,11 +220,11 @@ public partial class InformationController : MonoBehaviour {
 		GameObject gameObject = (GameObject)obj;
 		
 		//Check if is simple click or multiple
-		if (player.SelectedObjects.Count > 1)
+		if (BasePlayer.player.SelectedObjects.Count > 1)
 		{
 			ShowMultipleInformation();
 			
-		} else if (player.SelectedObjects.Count == 1)
+		} else if (BasePlayer.player.SelectedObjects.Count == 1)
 		{
 			DestroyButtons();
 			ShowInformation(gameObject);
@@ -256,7 +264,7 @@ public partial class InformationController : MonoBehaviour {
 	}
 
 	private Sprite GetImageForEntity(IGameEntity entity) {
-		char separator = Path.DirectorySeparatorChar;
+		char separator = '/';
 		string path = IMAGES_PATH + separator + entity.getRace () + "_" + entity.info.name;
 		Texture2D texture = (Texture2D)Resources.Load (path);
 		if (texture) {

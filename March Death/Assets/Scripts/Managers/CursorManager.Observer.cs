@@ -17,7 +17,7 @@ namespace Managers
         }
 
         private void Observe() {
-            switch (_player.currently)
+            switch (BasePlayer.player.currently)
             {
                 case Player.status.IDLE:
                     CheckIdle();
@@ -70,7 +70,7 @@ namespace Managers
             /// Mainly here we check if the selection is not a building and then
             /// if the pointed entity is an enemy or not, if it is we show a sword if not, we show the pointer cursor
 
-            if (_player.selection.IsBuilding())
+            if (BasePlayer.player.selection.IsBuilding())
                 _currentCursor = cursor.POINTER;
             else if(ItsEnemy())
                 _currentCursor = cursor.SWORD;
@@ -88,7 +88,7 @@ namespace Managers
         private void CheckPlacing()
         {
             ///Mainly we check if the current position of the building es valid or not
-            switch (_player.buildings.currentPlace)
+            switch (BasePlayer.player.buildings.currentPlace)
             {
                 case BuildingsManager.Place.ABLE:
                     _currentCursor = cursor.POINTER;
@@ -124,7 +124,7 @@ namespace Managers
             if (entity != null)
             {
 
-                if (entity.info.race == _player.race)
+                if (entity.info.race == BasePlayer.player.race)
                     return true;
                 else
                     return false;
@@ -158,7 +158,7 @@ namespace Managers
             {
 
                 /// if it's dead is not an enemy
-                if (entity.info.race != _player.race 
+                if (entity.info.race != BasePlayer.player.race 
                 && entity.status != EntityStatus.DEAD 
                 && entity.status != EntityStatus.DESTROYED)
                 return true;

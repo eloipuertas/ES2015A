@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utils;
 using Storage;
+using Pathfinding;
 
 
 /// <summary>
@@ -67,8 +68,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// <summary>
     /// NavAgent, used fot map navigation
     /// </summary>
-    private NavMeshAgent _navAgent;
-    private bool _hasPath = false;
+    private DetourAgent _detourAgent;
 
     /// <summary>
     /// Can this unit perform ranged attacks?
@@ -114,8 +114,11 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     private void onTargetHidden(System.Object obj)
     {
-        // Move to last known position (ie. current position)
-        moveTo(((GameObject)obj).transform.position);
+        if (_followingTarget || status == EntityStatus.ATTACKING)
+        {
+            // Move to last known position (ie. current position)
+            moveTo(((GameObject)obj).transform.position);
+        }
     }
 
     /// <summary>
@@ -197,7 +200,7 @@ public class Unit : GameEntity<Unit.Actions>
         _attackPoint = closestPointTo(_target.getTransform().position);
         _attackPoint.y = transform.position.y;
 
-        _closestPointToTarget = _target.closestPointTo(transform.position);
+        _closestPointToTarget = _target.closestPointTo(_attackPoint);
         _closestPointToTarget.y = _target.getTransform().position.y;
 
         _distanceToTarget = Vector3.Distance(_attackPoint, _closestPointToTarget);
@@ -218,7 +221,19 @@ public class Unit : GameEntity<Unit.Actions>
             // Register for DEAD/DESTROYED and HIDDEN
             _auto += entity.registerFatalWounds(onTargetDied);
             _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
+
+            // if target has changed, hide old target health
+            Selectable selectable = null;
+            if (_target != null) {
+            	selectable = _target.getGameObject().GetComponent<Selectable>();
+            	selectable.NotAttackedEntity();
+            }
+
             _target = entity;
+            
+            // Show target health
+            selectable = _target.getGameObject().GetComponent<Selectable>();
+            selectable.AttackedEntity();
 
             // Update distance for immediate usage (ie. canDoRangedAttack)
             updateDistanceToTarget();
@@ -230,6 +245,11 @@ public class Unit : GameEntity<Unit.Actions>
 
         // TODO: Hack to get AI working
         return true;
+    }
+
+    public IGameEntity getTarget()
+    {
+        return _target;
     }
 
     public bool attackTarget(IGameEntity entity)
@@ -257,6 +277,10 @@ public class Unit : GameEntity<Unit.Actions>
     {
         if (_target != null)
         {
+            // Hide target health
+            Selectable selectable = _target.getGameObject().GetComponent<Selectable>();
+            selectable.NotAttackedEntity();
+
             // Unregister all events
             _auto -= _target.unregisterFatalWounds(onTargetDied);
             _auto -= _target.getGameObject().GetComponent<FOWEntity>().unregister(FOWEntity.Actions.HIDDEN, onTargetHidden);
@@ -284,14 +308,10 @@ public class Unit : GameEntity<Unit.Actions>
     /// <param name="movePoint">Point to move to</param>
     public bool moveTo(Vector3 movePoint)
     {
-        if (!_navAgent.SetDestination(movePoint))
-        {
-            return false;
-        }
-        
+        _detourAgent.MoveTo(movePoint);
+
         _followingTarget = false;
         _target = null;
-        _hasPath = false;
         _movePoint = movePoint;
         setStatus(EntityStatus.MOVING);
         fire(Actions.MOVEMENT_START);
@@ -324,11 +344,6 @@ public class Unit : GameEntity<Unit.Actions>
 
         activateFOWEntity();
 
-        // Get NagMeshAgent and set basic variables
-        _navAgent = GetComponent<NavMeshAgent>();
-        _navAgent.speed = _info.unitAttributes.movementRate;
-        _navAgent.acceleration = info.unitAttributes.movementRate * 2.5f;
-
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
         GameObject gameController = GameObject.Find("GameController");
         ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
@@ -343,6 +358,11 @@ public class Unit : GameEntity<Unit.Actions>
         statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -5);
 
         fire(Actions.CREATED, statistics);
+        
+        // Get DetourAgent and set basic variables
+        _detourAgent = GetComponent<DetourAgent>();
+        _detourAgent.SetMaxSpeed(info.unitAttributes.movementRate * 5);
+        _detourAgent.SetMaxAcceleration(20.5f);
     }
 
     /// <summary>
@@ -423,7 +443,14 @@ public class Unit : GameEntity<Unit.Actions>
         }
         else if (status == EntityStatus.MOVING)
         {
-            Debug.DrawLine(transform.position, _movePoint, Color.green);
+            if (_followingTarget)
+            {
+                Debug.DrawLine(transform.position, _movePoint, Color.blue);
+            }
+            else
+            {
+                Debug.DrawLine(transform.position, _movePoint, Color.green);
+            }
         }
 #endif
     }
@@ -445,38 +472,31 @@ public class Unit : GameEntity<Unit.Actions>
                     Vector3 destination = _closestPointToTarget;
                     if (destination != _movePoint)
                     {
-                        _hasPath = false;
-                        _navAgent.SetDestination(destination);
+                        _detourAgent.MoveTo(destination);
                         _movePoint = destination;
                     }
-
+                    
                     // If we are already close enough, stop and attack
                     if (_distanceToTarget <= currentAttackRange())
                     {
-                        _navAgent.SetDestination(transform.position);
-                        _navAgent.ResetPath();
+                        _detourAgent.ResetPath();
+                        _followingTarget = false;
                         setStatus(EntityStatus.ATTACKING);
                         return;
                     }
                 }
 
-                if (!_navAgent.pathPending && (_hasPath || _navAgent.hasPath))
+                if (!_detourAgent.IsMoving)
                 {
-                    _hasPath = true;
-                    float dist = _navAgent.remainingDistance;
-
-                    // TODO: Stop condition is quite large, maybe it could be simplified
-                    if (dist != Mathf.Infinity && _navAgent.velocity.sqrMagnitude == 0f && _navAgent.pathStatus == NavMeshPathStatus.PathComplete && _navAgent.remainingDistance <= _navAgent.stoppingDistance)
+                    if (!_followingTarget)
                     {
-                        if (!_followingTarget)
-                        {
-                            setStatus(EntityStatus.IDLE);
-                            fire(Actions.MOVEMENT_END);
-                        }
-                        else
-                        {
-                            Debug.LogWarning("NavMesh not stopped at attack range... AttackRange = " + currentAttackRange());
-                        }
+                        _detourAgent.ResetPath();
+                        setStatus(EntityStatus.IDLE);
+                        fire(Actions.MOVEMENT_END);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("NavMesh not stopped at attack range... AttackRange = " + currentAttackRange());
                     }
                 }
                 

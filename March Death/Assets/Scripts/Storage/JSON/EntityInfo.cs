@@ -154,5 +154,6 @@ namespace Storage
                 return (BarrackAttributes)this.attributes;
             }
         }
+
     }
 }

@@ -1,9 +1,11 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 using Storage;
 using Utils;
+using System.Collections;
+
 
 /// <summary>
 /// Building base class. Extends actor (which in turn extends MonoBehaviour) to
@@ -22,10 +24,19 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     /// Precach some actions
     public T DAMAGED { get; set; }
     public T DESTROYED { get; set; }
+    public T CREATE_UNIT { get; set; }
 
-	private float totalBuildTime = 0;
-	private int woundsBuildControl = 0;
+    private float _totalBuildTime = 0;
+    private float _creationTimer = 0;
+    private int _woundsBuildControl = 0;
+    private UnitInfo _infoUnitToCreate;
+    private bool _creatingUnit = false;
 
+    private Vector3 _deploymentPoint;
+    private int _totalUnits = 0;
+
+    // This queue will store the units that the building is creating.
+    private Queue<UnitTypes> _creationQueue = new Queue<UnitTypes>();
 
     /// <summary>
     /// When a wound is received, this is called
@@ -67,14 +78,24 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 		}
 		base.OnDestroy();
 	}
-	
-	/// <summary>
+
+
+    /// <summary>
+    /// When built, it's called
+    /// </summary>
+    protected virtual void onBuilt()
+    {
+
+    }
+
+    /// <summary>
     /// Object initialization
     /// </summary>
     public override void Awake()
     {
         DAMAGED = (T)Enum.Parse(typeof(T), "DAMAGED", true);
         DESTROYED = (T)Enum.Parse(typeof(T), "DESTROYED", true);
+        CREATE_UNIT = (T)Enum.Parse(typeof(T), "CREATE_UNIT", true);
 
         // Call GameEntity start
         base.Awake();
@@ -88,11 +109,14 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
         // Setup base
         base.Start();
 
-		activateFOWEntity();
-		_woundsReceived = info.buildingAttributes.wounds;
-		woundsBuildControl = info.buildingAttributes.wounds;
 
-		//return (info.buildingAttributes.wounds - _woundsReceived) * 100f / info.buildingAttributes.wounds;
+        // Instead of adding 10 to the center of the building, we should check the actual size of the building....
+        _deploymentPoint = new Vector3(transform.position.x + 10, transform.position.y, transform.position.z + 10);
+        activateFOWEntity();
+        _woundsReceived = info.buildingAttributes.wounds;
+        _woundsBuildControl = info.buildingAttributes.wounds;
+
+        //return (info.buildingAttributes.wounds - _woundsReceived) * 100f / info.buildingAttributes.wounds;
 
         // Set the status
         setStatus(EntityStatus.BUILDING_PHASE_1);
@@ -105,29 +129,124 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     {
         base.Update();
 
-		// Control the building phases, as well as wounds while being built.
-		// TODO: Figure out a better condition... 
-		if (status == EntityStatus.BUILDING_PHASE_3 || status == EntityStatus.BUILDING_PHASE_2 || status == EntityStatus.BUILDING_PHASE_1) {
-			totalBuildTime += Time.deltaTime;
-			float buildingPercentage = (totalBuildTime) / info.buildingAttributes.timeToBuild;
-			int woundsBuilt = (int) ((1 - buildingPercentage) * info.buildingAttributes.wounds);
-			int diffWounds =  woundsBuildControl - woundsBuilt;
+        // Control the building phases, as well as wounds while being built.
+        // TODO: Figure out a better condition... 
+        if (status == EntityStatus.BUILDING_PHASE_3 || status == EntityStatus.BUILDING_PHASE_2 || status == EntityStatus.BUILDING_PHASE_1)
+        {
+            _totalBuildTime += Time.deltaTime;
+            float buildingPercentage = (_totalBuildTime) / info.buildingAttributes.creationTime;
+            int woundsBuilt = (int)((1 - buildingPercentage) * info.buildingAttributes.wounds);
+            int diffWounds = _woundsBuildControl - woundsBuilt;
 
-			if (diffWounds > 0) {
-				// We are substracting wounds instead of a new value because the building might be under attack while is being built.
-				_woundsReceived -= diffWounds;
-				woundsBuildControl = woundsBuilt;
-			}
-
+            if (diffWounds > 0)
+            {
+                // We are substracting wounds instead of a new value because the building might be under attack while is being built.
+                _woundsReceived -= diffWounds;
+                _woundsBuildControl = woundsBuilt;
+            }
+	
 			// TODO: What if we have more than 3 phases... maybe we should add the number of phases in the JSON, instead of harcoding it...
 			if (buildingPercentage > 0.33 && buildingPercentage <=0.66) {
 				setStatus(EntityStatus.BUILDING_PHASE_2);			
 			} else if (buildingPercentage > 0.66 && buildingPercentage < 1) {
 				setStatus(EntityStatus.BUILDING_PHASE_3);				
 			} else if (buildingPercentage >= 1) {
-				setStatus(EntityStatus.IDLE);				
-			}
-		}
+				setStatus(EntityStatus.IDLE);
+                onBuilt();
+            }
+		}else if (_creatingUnit)
+        {
+            _creationTimer += Time.deltaTime;
+
+            if (_creationTimer >= _infoUnitToCreate.unitAttributes.creationTime)
+            {
+                createUnit(_infoUnitToCreate.type);
+                _creatingUnit = false;
+            }
+        }
+        else if (_creationQueue.Count > 0)
+        {
+            _infoUnitToCreate = Info.get.of(info.race, _creationQueue.Dequeue());
+            _creationTimer = 0;
+            _creatingUnit = true;
+        }
+    }
+
+    /// <summary>
+    ///  x, y, z coordinates of our building
+    /// </summary>
+    private Vector3 _center
+    {
+        get
+        {
+            return transform.position;
+        }
+    }
+
+    protected void createUnit(UnitTypes type)
+    {
+
+        // TODO which position????
+        int xDisplacement = _totalUnits % 5;
+        int yDisplacement = _totalUnits / 5;
+        Vector3 unitPosition = new Vector3(_deploymentPoint.x + xDisplacement, _deploymentPoint.y, _deploymentPoint.z + yDisplacement);
+        GameObject gob = Info.get.createUnit(race, type, unitPosition, transform.rotation, -1);
+
+        Unit new_unit = gob.GetComponent<Unit>();
+        new_unit.role = Unit.Roles.WANDERING;
+
+        BasePlayer.getOwner(this).addEntity(new_unit);
+        fire(CREATE_UNIT, new_unit);
+
+        _totalUnits++;
+    }
+
+    public bool addUnitQueue(UnitTypes type)
+    {
+        if (_creationQueue.Count < info.buildingAttributes.creationQueueCapacity)
+        {
+            _creationQueue.Enqueue(type);
+            return true;
+        }
+        else
+        {
+            Debug.LogWarning("Creation queue reached its limit");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Returns creation percentage
+    /// </summary>
+    public float getcreationUnitPercentage()
+    {
+        return (_creationTimer * 100f) / _infoUnitToCreate.unitAttributes.creationTime;
+
+    }
+
+    /// <summary>
+    /// Returns the number of units that are in the creationQueue
+    /// </summary>
+    public int getNumberElements()
+    {
+        return _creationQueue.Count;
+    }
+
+
+    /// <summary>
+    /// Pops a unit from the queue, preventing it from being created
+    /// </summary>
+    public void cancelUnitQueue()
+    {
+        if (_creationQueue.Count > 0)
+        {
+            IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+            UnitInfo unitInfo = Info.get.of(info.race, (UnitTypes)_creationQueue.Dequeue());
+
+            Player.getOwner(entity).resources.AddAmount(WorldResources.Type.WOOD, unitInfo.resources.wood);
+            Player.getOwner(entity).resources.AddAmount(WorldResources.Type.METAL, unitInfo.resources.metal);
+            Player.getOwner(entity).resources.AddAmount(WorldResources.Type.FOOD, unitInfo.resources.food);
+        }
     }
 
     /// <summary>

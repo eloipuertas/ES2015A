@@ -1,0 +1,32 @@
+{
+    "race": "MEN",
+    "type": "STABLE",
+
+    "attributes": {
+        "resistance": 3,
+        "wounds": 50,
+        "timeToBuild": 30,
+        "repairSpeed": 0.2,
+        "maxUnits":  10,
+        "updateInterval": 10,
+        "sightRange": 50,
+        "creationQueueCapacity": 5,
+        "creationTime": 15
+    },
+
+    "resources": {
+        "wood": 60,
+        "metal": 40,
+        "food": 70
+    },
+
+    "abilities":
+    [
+        {
+            "name":"Create Cavalry"
+        },
+        {
+            "name":"Sell"
+        }
+    ]
+}

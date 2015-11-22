@@ -27,7 +27,8 @@ namespace Assets.Scripts.AI
         List<AIModule> modules;
         float[] timers;
         //TODO: change this when decided about what do we really need to keep about buildings 
-        public List<IGameEntity> OwnBuildings { get; set; }
+        public List<Resource> OwnResources { get; set; }
+        public List<Barrack> OwnBarracks { get; set; }
         public List<IGameEntity> EnemyBuildings { get; set; }
         public List<Unit> EnemyUnits { get; set; }
         /// <summary>
@@ -37,7 +38,6 @@ namespace Assets.Scripts.AI
 
         Vector3 buildPosition;
         public Vector3 rootBasePosition;
-        private bool isRootBasePositionInitialized;
         public List<Unit> Army { get; set; }
         public List<Unit> Workers { get; set; }
         public AISenses senses;
@@ -47,24 +47,24 @@ namespace Assets.Scripts.AI
 
         public override void Start()
         {
-            Debug.Log("AI Start");base.Start();
+            base.Start();
 
             _selfRace = info.GetPlayerRace() == Races.MEN ? Races.ELVES : Races.MEN;
 
             //Init lists
             EnemyUnits = new List<Unit>();
             EnemyBuildings = new List<IGameEntity>();
-            OwnBuildings = new List<IGameEntity>();
+            OwnResources = new List<Resource>();
+            OwnBarracks = new List<Barrack>();
             modules = new List<AIModule>();
             Army = new List<Unit>();
-            //rootBasePosition = new Vector3(706, 80, 765);
-            //Army.Add(Info.get.createUnit(_selfRace, UnitTypes.HERO, rootBasePosition,Quaternion.Euler(0,0,0)).GetComponent<Unit>());
             Workers = new List<Unit>();
 
             Battle.PlayerInformation me = info.GetBattle().GetPlayerInformationList()[playerId - 1];
-            InstantiateBuildings(me.GetBuildings());
-            InstantiateUnits(me.GetUnits());
             SetInitialResources(me.GetResources().Wood, me.GetResources().Food, me.GetResources().Metal, me.GetResources().Gold);
+            Battle.PlayableEntity.EntityPosition pos = me.GetBuildings()[0].position;
+            rootBasePosition = new Vector3(pos.X, 80, pos.Y);
+            buildPosition = rootBasePosition;
             Macro = new MacroManager(this);
 
             //We need to implement som kind of senses for te AI so here they are 
@@ -79,9 +79,10 @@ namespace Assets.Scripts.AI
             timers = new float[modules.Count];
             for (int i = 0; i < modules.Count; i++)
                 timers[i] = 0;
-            //buildPosition = new Vector3(706, 80, 765);
-            //rootBasePosition = new Vector3(706, 80, 765);
-            isRootBasePositionInitialized = false;
+
+
+            InstantiateBuildings(me.GetBuildings());
+            InstantiateUnits(me.GetUnits());
 
             ActorSelector selector = new ActorSelector()
             {
@@ -166,61 +167,77 @@ namespace Assets.Scripts.AI
         {
             GameObject g = Info.get.createBuilding(_selfRace, btype, buildPosition, Quaternion.Euler(0, 0, 0));
             buildPosition += new Vector3(0, 0, 20);
-            Resource build = (Resource)g.GetComponent<IGameEntity>();
-            build.register(Resource.Actions.CREATE_UNIT, OnCivilCreated);
-            build.register(Resource.Actions.DESTROYED, OnBuildingDestroyed);
-        }
-        void OnCivilCreated(System.Object obj)
-        {
-            Unit u = (Unit)obj;
-            Workers.Add(u);
-            u.register(Unit.Actions.DIED, OnUnitDead);
-        }
-        void OnBuildingDestroyed(System.Object obj)
-        {
-            GameObject g = (GameObject)obj;
-            Resource res = g.GetComponent<Resource>();
-            OwnBuildings.Remove(res);
-        }
-        void OnUnitDead(System.Object obj)
-        {
-            GameObject g = (GameObject)obj;
-            Unit u = g.GetComponent<Unit>();
-            if (Workers.Contains(u))
-                Workers.Remove(u);
-            if (Army.Contains(u))
-                Army.Remove(u);
-            Micro.OnUnitDead(u);
+            OnBuildingCreated(g.GetComponent<IGameEntity>());
         }
 
-        // TODO: Should it be handled with events??
-        public override void removeEntity(IGameEntity entity) { }
-        public override void addEntity(IGameEntity newEntity) { }
+        void OnBuildingCreated(IGameEntity entity)
+        {
+            if (entity.info.isResource)
+            {
+                OwnResources.Add((Resource)entity);
+            }
+            else
+            {
+                OwnBarracks.Add((Barrack)entity);
+            }
+        }
 
+        void OnUnitCreated(Unit u)
+        {
+            if (u.info.isCivil)
+            {
+                //Workers.Add(u);
+                //The line above is correct, but we still don't have enemy units so let's just put everything into the army and wipe the floor with the player
+                addToArmy(u);
+            }
+            else
+            {
+                addToArmy(u);
+            }
+        }
+        
+        public override void removeEntity(IGameEntity entity) {
+            if (entity.info.isBuilding)
+            {
+                if(entity.info.isResource)
+                {
+                    OwnResources.Remove((Resource)entity);
+                }
+                else
+                {
+                    OwnBarracks.Remove((Barrack)entity);
+                }
+            }
+            else
+            {
+                Unit u = (Unit)entity;
+                Micro.OnUnitDead(u);
+                if (entity.info.isArmy)
+                {
+                    if (Army.Contains(u))
+                        Army.Remove(u);
+                }
+                else
+                {
+                    if (Workers.Contains(u))
+                        Workers.Remove(u);
+                }
+            }
+        }
+        public override void addEntity(IGameEntity newEntity)
+        {
+            OnUnitCreated((Unit)newEntity);
+        }
+
+        //For some reasons AddUnit and AddBuilding only get created at the start
         protected override void AddUnit(IGameEntity entity)
         {
-            if (entity.info.isArmy) Army.Add((Unit) entity);
+            OnUnitCreated((Unit)entity);
         }
-
         protected override void AddBuilding(IGameEntity entity)
         {
             buildPosition = entity.getTransform().position + new Vector3(0,0,30);
-            if (entity.info.isBarrack)
-            {
-                // TODO rootBasePosition should be initialized elsewhere
-                if (!isRootBasePositionInitialized)
-                {
-                    if (((BuildingInfo) entity.info).type == BuildingTypes.STRONGHOLD)
-                    {
-                        rootBasePosition = entity.getTransform().position;
-                        isRootBasePositionInitialized = !isRootBasePositionInitialized;
-                    }
-                }
-                return;
-            }
-            Resource build = (Resource) entity;
-            build.register(Resource.Actions.CREATE_UNIT, OnCivilCreated);
-            build.register(Resource.Actions.DESTROYED, OnBuildingDestroyed);
+            OnBuildingCreated(entity);
         }
         
         public void addToArmy(List<Unit> units)

@@ -778,13 +778,13 @@ GameObject:
   m_Component:
   - 4: {fileID: 451242}
   - 95: {fileID: 9503738}
-  - 195: {fileID: 19580284}
   - 54: {fileID: 5419196}
   - 65: {fileID: 6566714}
   - 114: {fileID: 11456696}
   - 114: {fileID: 11439306}
   - 114: {fileID: 11439146}
   - 114: {fileID: 11458594}
+  - 114: {fileID: 11490766}
   m_Layer: 0
   m_Name: Thrown Army Human
   m_TagString: Untagged
@@ -2596,7 +2596,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!65 &6566714
 BoxCollider:
@@ -2677,6 +2677,21 @@ MonoBehaviour:
   race: 0
   type: 4
   _distanceToTarget: 0
+--- !u!114 &11490766
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 162384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b09a9a421fcedee4ea755b7daade40c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Radius: 1.5
+  Height: 2
+  MaxSpeed: 2
+  MaxAcceleration: 2
 --- !u!137 &13743502
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
@@ -2783,26 +2798,6 @@ SkinnedMeshRenderer:
     m_Center: {x: .00186953507, y: -.00311329588, z: .000470734201}
     m_Extent: {x: .0108390525, y: .0172266681, z: .00572978752}
   m_DirtyAABB: 0
---- !u!195 &19580284
-NavMeshAgent:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 162384}
-  m_Enabled: 1
-  m_Radius: .5
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -2841,6 +2836,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: type
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Constraints
+      value: 126
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Radius
+      value: 1.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

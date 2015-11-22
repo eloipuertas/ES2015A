@@ -41,9 +41,7 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
     public override void Start()
     {
         base.Start();
-        if (IsActor)
-            activated = false;
-        else
+        if (!IsActor)
             Activate(false);
     }
     public Rect Bounds
@@ -63,18 +61,15 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
     /// <param name="isVisible">The new visibilty state</param>
     public void changeVisible(bool isVisible)
     {
-        if (IsRevealed != isVisible)
+        if (IsActor && IsRevealed!=isVisible)
         {
-            if (IsActor)
-            {
-                fire((isVisible) ? Actions.DISCOVERED : Actions.HIDDEN);
-            }
-            if (!IsOwnedByPlayer)
-            {
-                changeRenders(isVisible);
-            }
-            IsRevealed = isVisible;
+            fire((isVisible) ? Actions.DISCOVERED : Actions.HIDDEN);
         }
+        if ((IsActor && !IsOwnedByPlayer) || (!IsActor && IsRevealed))
+        {
+            changeRenders(isVisible);
+        }
+        IsRevealed = isVisible;
     }
     /// <summary>
     /// Enables/Disables the renderers of this object.
@@ -87,6 +82,10 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
             foreach (Renderer r in GetComponentsInChildren<Renderer>())
             {
                 r.enabled = visible;
+            }
+            foreach(Light l in GetComponentsInChildren<Light>())
+            {
+                l.enabled = visible;
             }
         }
     }

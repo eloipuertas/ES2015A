@@ -28,7 +28,7 @@ public class AISenses : MonoBehaviour {
     /// <param name="radius"></param>
     /// <param name="race"></param>
     /// <returns></returns>
-    public Unit[] getUnitsOfRaceNearPosition(Vector3 position, float radius, Storage.Races race)
+    public List<Unit> getUnitsOfRaceNearPosition(Vector3 position, float radius, Storage.Races race)
     {
         GameObject[] foundGameObjects = getObjectsNearPosition(position, radius);
         List<Unit> unitsOfRace = new List<Unit>();
@@ -42,6 +42,6 @@ public class AISenses : MonoBehaviour {
                 unitsOfRace.Add(objUnit);
             }
         }
-        return unitsOfRace.ToArray();
+        return unitsOfRace;
     }
 }

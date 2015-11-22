@@ -8,7 +8,9 @@
         "capacity": 0,
         "timeToBuild": 60,
         "repairSpeed": 0.2,
-        "sightRange": 60
+        "sightRange": 60,
+        "creationQueueCapacity": 1,
+        "creationTime": 15
     },
 
     "resources": {
@@ -21,21 +23,35 @@
         {
             "name":"Create Farm"
         },
-
         {
             "name":"Create Mine"
         },
-
         {
             "name":"Create Sawmill"
         },
-		
+
 		{
             "name":"Create Archery"
         },
 
         {
             "name":"Create Barrack"
+        },
+
+		{
+            "name":"Create Stable"
+        },
+
+        {
+            "name":"Create Wall"
+        },
+
+		{
+            "name":"Create WallCorner"
+        },
+
+        {
+            "name":"Create Watchtower"
         }
     ]
 }

@@ -307,7 +307,7 @@ GameObject:
   - 114: {fileID: 11453762}
   - 114: {fileID: 11486498}
   - 114: {fileID: 11410420}
-  - 195: {fileID: 19548888}
+  - 114: {fileID: 11423654}
   m_Layer: 0
   m_Name: Male Human Civil
   m_TagString: Untagged
@@ -2652,7 +2652,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!65 &6581646
 BoxCollider:
@@ -2694,6 +2694,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8fedea892f030418970e7ce2a2bc2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &11423654
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 119096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b09a9a421fcedee4ea755b7daade40c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Radius: 1.5
+  Height: 2
+  MaxSpeed: 2
+  MaxAcceleration: 2
 --- !u!114 &11446134
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2834,26 +2849,6 @@ SkinnedMeshRenderer:
     m_Center: {x: -.000764635857, y: -.00171413179, z: .00162539259}
     m_Extent: {x: .00646516914, y: .0164162517, z: .0090327654}
   m_DirtyAABB: 0
---- !u!195 &19548888
-NavMeshAgent:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 119096}
-  m_Enabled: 1
-  m_Radius: .5
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -2892,6 +2887,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Size.z
       value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Radius
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Constraints
+      value: 126
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

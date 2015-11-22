@@ -11,5 +11,6 @@ namespace Storage
         public int resistance;
         public int wounds;
         public int sightRange;
+		public int creationTime = 10;
     }
 }

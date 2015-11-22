@@ -31,12 +31,14 @@ namespace Assets.Scripts.AI
             agents = new List<BaseAgent>();
             squads = new List<SquadAI>();
             this.ai = ai;
-            AttackAgent aA = new AttackAgent(ai, "Atack");
-            agents.Add(new ExplorerAgent(ai, "Explorer"));
+            AssistAgent assistAgent = new AssistAgent(ai, "Assist");
+            AttackAgent aA = new AttackAgent(ai, assistAgent, "Atack");
+            agents.Add(new ExplorerAgent(ai, assistAgent, "Explorer"));
             agents.Add(aA);
-            agents.Add(new RetreatAgent(ai, aA, "Retreat"));
-			agents.Add(new AssistAgent(ai, "Assist"));
-            addSquad(ai.Army); //hero squad
+            agents.Add(new RetreatAgent(ai, aA, assistAgent, "Retreat"));
+			agents.Add(assistAgent);
+            squads.Add(new SquadAI(1, ai));
+            squads.Add(new SquadAI(2, ai));
         }
         /// <summary>
         /// Called pretty fast, it's just like Update()
@@ -48,6 +50,7 @@ namespace Assets.Scripts.AI
             int val;
             foreach(SquadAI sq in squads)
             {
+                sq.recalculateSquadValues();
                 foreach(BaseAgent a in agents)
                 {
                     val = a.getConfidence(sq);
@@ -64,8 +67,9 @@ namespace Assets.Scripts.AI
                     ai.aiDebug.setControllingAgent(bAgent.agentName, bVal);
                 }
 
-                if (!ai.FinishPlaying) bAgent.controlUnits(sq);
-                else break;
+                bAgent.controlUnits(sq);
+                agents[AGENT_ASSIST].extraConfidence = 0;
+                ((AssistAgent)agents[AGENT_ASSIST]).clearRequests();
             }
         }
         /// <summary>
@@ -83,7 +87,7 @@ namespace Assets.Scripts.AI
         private void addSquad(List<Unit> units)
         {
             //Squad id 0 is used by temp squads
-            SquadAI s = new SquadAI(squads.Count + 1);
+            SquadAI s = new SquadAI(squads.Count + 1, ai);
             s.addUnits(units);
             squads.Add(s);
         }
@@ -120,7 +124,10 @@ namespace Assets.Scripts.AI
         public void assignUnit(Unit u)
         {
             //TODO: placeholder until we know how to split the squads
-            squads[0].addUnit(u);
+            if (u.type == Storage.UnitTypes.HERO)
+                squads[1].addUnit(u);
+            else
+                squads[0].addUnit(u);
         }
     }
 }

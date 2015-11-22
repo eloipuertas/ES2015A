@@ -1005,6 +1005,7 @@ GameObject:
   - 114: {fileID: 11483562}
   - 114: {fileID: 11484442}
   - 65: {fileID: 6501802}
+  - 114: {fileID: 11453938}
   m_Layer: 0
   m_Name: Elf_Archer
   m_TagString: Untagged
@@ -2822,6 +2823,21 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11453938
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 177216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b09a9a421fcedee4ea755b7daade40c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Radius: 1.5
+  Height: 2
+  MaxSpeed: 2
+  MaxAcceleration: 2
 --- !u!114 &11458808
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2998,6 +3014,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_UseGravity
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Constraints
+      value: 126
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Radius
+      value: 1.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

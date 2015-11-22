@@ -7,8 +7,6 @@ public class MiniMapController : MonoBehaviour
 
     private Camera _camera;
     private Camera mainCam;
-
-    private RenderTexture rt;
     
     // Minimap Rectangle
     Rect rect_marker;
@@ -54,8 +52,6 @@ public class MiniMapController : MonoBehaviour
 
         createMarker();
 
-        rt = new RenderTexture(Screen.width, Screen.height, 3);
-        _camera.targetTexture = rt;
     }
 
     /// <summary>
@@ -121,8 +117,6 @@ public class MiniMapController : MonoBehaviour
         }
         if (mainCam.aspect != aspect) {
             recalcViewport();
-            rt = new RenderTexture(Screen.width, Screen.height, 2);
-            _camera.targetTexture = rt;
             aspect = mainCam.aspect;
         }
     }
@@ -205,13 +199,13 @@ public class MiniMapController : MonoBehaviour
 		
 		switch (info.GetPlayerRace()) {
 		case Storage.Races.MEN:
-			viewPortPosX = 0.018f;
+			viewPortPosX = 0.021f;
 			viewPortPosY = 0.02f; // _prev = 0.007f
 			
 			// The minimap size
-			viewPortW = (1f / (float)Screen.width) * ((float)Screen.width / 4.9701f);  // _prev = 3.9701f
+			viewPortW = (1f / (float)Screen.width) * ((float)Screen.width / 5.6701f);  // _prev = 3.9701f
 			// the height will be the ratio of the hole for the map 140/201
-			viewPortH = (1f / (float)Screen.height) * (((float)Screen.width / 3.6701f) * (140f / 201f));
+			viewPortH = (1f / (float)Screen.height) * (((float)Screen.width / 4.0701f) * (140f / 201f));
 			break;
 		case Storage.Races.ELVES:
 			viewPortPosX = 0.018f;

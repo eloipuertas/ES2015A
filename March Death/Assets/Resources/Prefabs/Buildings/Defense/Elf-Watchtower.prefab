@@ -218,7 +218,8 @@ GameObject:
   - 65: {fileID: 6596004}
   - 114: {fileID: 11421854}
   - 114: {fileID: 11434178}
-  - 208: {fileID: 20814164}
+  - 114: {fileID: 11409626}
+  - 114: {fileID: 11427206}
   m_Layer: 0
   m_Name: Elf-Watchtower
   m_TagString: Untagged
@@ -341,7 +342,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 185688}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 716.643311, y: 79.0026245, z: 946.278687}
+  m_LocalPosition: {x: 742.748108, y: 79.0026245, z: 907.254395}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_Children:
   - {fileID: 480498}
@@ -770,8 +771,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 7.5, y: 13, z: 7.5}
-  m_Center: {x: 0, y: 6.5, z: 0}
+  m_Size: {x: 7.5, y: 10, z: 7.5}
+  m_Center: {x: 0, y: 5, z: 0}
 --- !u!95 &9563846
 Animator:
   serializedVersion: 3
@@ -789,6 +790,21 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11409626
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 185688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55673783568d5024f8240d70a3d2456f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DebugOnEditor: 1
+  Position: {x: 0, y: 0, z: 0}
+  Size: {x: 20, y: 22, z: 20}
+  CheckEverySeconds: 1
 --- !u!114 &11421854
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -800,6 +816,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8fedea892f030418970e7ce2a2bc2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &11427206
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 185688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b5e82104f3954c44a992850ac8a8053, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 1
+  type: 9
 --- !u!114 &11434178
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -844,7 +873,7 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -.000771045685, y: .00132274628, z: 1.14440918e-05}
+    m_Center: {x: -.000771045685, y: .00132322311, z: 1.14440918e-05}
     m_Extent: {x: .0109024905, y: .0113815013, z: 2.18123075e-09}
   m_DirtyAABB: 0
 --- !u!183 &18313290
@@ -1034,28 +1063,25 @@ Cloth:
     collisionSphereDistance: 3.40282347e+38
   m_CapsuleColliders: []
   m_SphereColliders: []
---- !u!208 &20814164
-NavMeshObstacle:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 185688}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 3.75, y: 6.5, z: 3.75}
-  m_MoveThreshold: .100000001
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 6.5, z: 0}
-  m_TimeToStationary: .5
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: m_Constraints
+      value: 126
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: type
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: race
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 185688}

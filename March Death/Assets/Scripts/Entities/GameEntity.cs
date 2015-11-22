@@ -20,6 +20,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public abstract E getType<E>() where E : struct, IConvertible;
 
     protected Collider _collider;
+    protected Pathfinding.DetourObstacle _obstacle;
     protected Terrain _terrain;
 
     /// <summary>
@@ -150,9 +151,23 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         return gameObject;
     }
 
+    private static readonly Vector3 COLLIDER_CORRECTION_FACTOR = new Vector3(3f, 0, 3f);
     public Vector3 closestPointTo(Vector3 point)
     {
-        return _collider.ClosestPointOnBounds(point);
+        Vector3 colliderPoint = _collider.ClosestPointOnBounds(point);
+
+        if (_obstacle == null)
+        {
+            return colliderPoint;
+        }
+        else
+        {
+            Vector3 direction = (colliderPoint - point).normalized;
+            Vector3 size = (transform.rotation * _obstacle.Size) - COLLIDER_CORRECTION_FACTOR;
+            Vector3 factor = Vector3.Scale(direction, size - _collider.bounds.size);
+
+            return colliderPoint - factor;
+        }
     }
 
     protected List<Ability> _abilities = new List<Ability>();
@@ -245,6 +260,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     {
         setupAbilities();
 
+        _obstacle = GetComponent<Pathfinding.DetourObstacle>();
         _collider = GetComponent<Collider>();
         _terrain = Terrain.activeTerrain;
     }

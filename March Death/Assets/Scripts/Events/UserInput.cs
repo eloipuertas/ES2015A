@@ -49,13 +49,16 @@ public partial class UserInput : MonoBehaviour
     Rect rectActions;
     Rect rectInformation;
 
+    void Awake()
+    {
+        cursor = CursorManager.Instance;
+        cursor.SetInputs(this);
+    }
+
     // Use this for initialization
     void Start()
     {
         player = GetComponent<Player>();
-        cursor = CursorManager.Instance;
-        cursor.SetPlayer(player);
-        cursor.SetInputs(this);
         selectionTexture = (Texture2D)Resources.Load("SelectionTexture");
 
         cursorAttack = (Texture2D)Resources.Load("cursor_attack");
@@ -153,13 +156,16 @@ public partial class UserInput : MonoBehaviour
             else // let's find what it is, check if is own unit or rival
             {
                 IGameEntity entity = hitObject.GetComponent<IGameEntity>();
-
-                if ( (entity.info.race != player.race) 
-                    && entity.status != EntityStatus.DEAD 
-                    && entity.status != EntityStatus.DESTROYED) 
+                //if entity == null it means it's a nonactor, like a tree
+                if(entity != null)
                 {
-                    player.registerGameEntityActions(entity);
-                    sManager.AttackTo(entity);
+                    if ((entity.info.race != player.race)
+                    && entity.status != EntityStatus.DEAD
+                    && entity.status != EntityStatus.DESTROYED)
+                    {
+                        player.registerGameEntityActions(entity);
+                        sManager.AttackTo(entity);
+                    }
                 }
             }
         }

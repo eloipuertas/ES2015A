@@ -34,6 +34,35 @@ BUILD_WIN=0
 echo "Attempting to start dummy audio driver"
 sudo modprobe snd-dummy
 
+# Build navmesh first
+echo -e "\nAttempting to build Recast/Detour for Linux [64 bits]"
+cd March\ Death/Assets/UnityRecast
+mkdir Build
+cd Build
+cmake ..
+make
+sudo -E cp Lib/libRecast.so /usr/lib/Recast.so
+sudo -E mv Lib/libRecast.so /usr/lib/libRecast.so
+sudo -E chmod 0777 /usr/lib/Recast.so
+sudo -E chmod 0777 /usr/lib/libRecast.so
+#mv Lib/libRecast.so ../../Plugins/x86_64/Recast.so
+cd ..
+
+echo -e "\nAttempting to build Recast/Detour for Linux [32 bits]"
+rm -rf Build
+mkdir Build
+cd Build
+cmake -DBUILD_32_BITS=ON ..
+make
+sudo -E cp Lib/libRecast.so /usr/lib32/Recast.so
+sudo -E mv Lib/libRecast.so /usr/lib32/libRecast.so
+sudo -E chmod 0777 /usr/lib32/Recast.so
+sudo -E chmod 0777 /usr/lib32/libRecast.so
+#mv Lib/libRecast.so ../../Plugins/x86/Recast.so
+
+cd $HOME/ES2015A
+
+# Build Unity project
 echo -e "\nAttempting to build $project for Linux"
 sudo -E xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' \
     $UNITY_ROOT/Editor/Unity \
