@@ -20,8 +20,6 @@ namespace Storage
         private Dictionary<Tuple<Races, BuildingTypes>, EntityInfo> buildingStore = new Dictionary<Tuple<Races, BuildingTypes>, EntityInfo>();
         private Dictionary<Tuple<Races, BuildingTypes>, List<string>> buildingPrefabs = new Dictionary<Tuple<Races, BuildingTypes>, List<string>>();
 
-        private List<EntityInfo> tooltipsQueue = new List<EntityInfo>();
-
         public enum BuildingVariant { REAL = 0, GHOST = 1 }
 
         /// <summary>
@@ -39,7 +37,8 @@ namespace Storage
             parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Stable", buildingStore, EntityType.BUILDING);
 
             // Tooltips
-            parseTooltips();
+            parseTooltips(buildingStore);
+            parseTooltips(unitStore);
 
             // Unit prefabs
             parsePrefabs<Unit, UnitTypes>("Prefabs/Units", unitPrefabs);
@@ -57,14 +56,14 @@ namespace Storage
             parsePrefabs<GhostBuilding, BuildingTypes>("Prefabs/Buildings/Barracks", buildingPrefabs);
         }
 
-        private void parseTooltips()
+        private void parseTooltips<Type>(Dictionary<Tuple<Races, Type>, EntityInfo> store)
         {
-            foreach (EntityInfo entityInfo in tooltipsQueue)
+            foreach (KeyValuePair<Tuple<Races, Type>, EntityInfo> entry in store)
             {
-                foreach (EntityAbility ability in entityInfo.abilities)
+                foreach (EntityAbility ability in entry.Value.abilities)
                 {
                     ability.SetupTooltip(this);
-                    ability.tooltip = ability.tooltip.FormatWith(entityInfo, @"\[\[", @"\]\]");
+                    ability.tooltip = ability.tooltip.FormatWith(entry.Value, @"\[\[", @"\]\]");
                     ability.tooltip = ability.tooltip.FormatWith(ability, @"\(\(", @"\)\)");
                 }
             }
@@ -87,7 +86,6 @@ namespace Storage
                 {
                     EntityInfo entityInfo = JsonConvert.DeserializeObject<JSONType>(json.text);
                     entityInfo.entityType = entityType;
-                    tooltipsQueue.Add(entityInfo);
 
                     Tuple<Races, EnumType> key = new Tuple<Races, EnumType>(entityInfo.race, entityInfo.getType<EnumType>());
 
@@ -126,10 +124,6 @@ namespace Storage
                     if (!store.ContainsKey(key))
                     {
                         store.Add(key, new List<string>());
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Intentional? Duplicated " + typeof(ComponentType) + " prefab ('" + component.getRace() + "', '" + component.getType<EnumType>() + "')");
                     }
 
                     store[key].Add(folder + "/" + gameObject.name);
