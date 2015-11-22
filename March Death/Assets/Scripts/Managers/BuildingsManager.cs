@@ -204,7 +204,7 @@ namespace Managers
                 //TODO : check another way to get the IGameEntity
                 
                // IGameEntity entity = finalBuilding.gameObject.GetComponent<IGameEntity>(); // Esto no iria así ? (Ferran)
-                IGameEntity entity = (IGameEntity)finalBuilding.GetComponent<Unit>();
+                IGameEntity entity = finalBuilding.GetComponent<IGameEntity>();
                 _player.addEntity(entity);
 
                 if (!_newBuilding.continuousConstruction)

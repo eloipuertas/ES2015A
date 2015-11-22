@@ -14,7 +14,7 @@ public class EventsNotifier : MonoBehaviour {
     private readonly string LIGHT_ARMY_CREATED = "Light army warrior ready.";
     private readonly string HEAVY_ARMY_CREATED = "Heavy army warrior ready.";
     private readonly string CAVALRY_CREATED = "Cavalry warrior ready.";
-    private readonly string ARCHER_CREATED = "Archer created.";
+    private readonly string ARCHER_CREATED = "Archer created.";  // TODO Change message: there are no archers
 
     // Building creation messages
     private readonly string BARRACK_CREATED = "Barrack created.";
@@ -54,6 +54,7 @@ public class EventsNotifier : MonoBehaviour {
     private const float TIME_TO_UPDATE = 5f;
 
     private float countdown;
+    private bool updateMessages;
 
     private GUIText text;
     private Queue<int> trimming;
@@ -69,25 +70,31 @@ public class EventsNotifier : MonoBehaviour {
     {
         trimming = new Queue<int>();
         messages = new System.Text.StringBuilder();
-        countdown = float.NegativeInfinity;
+        countdown = TIME_TO_UPDATE;
+        updateMessages = false;
     }
 	
     // Update is called once per frame
     void Update()
     {
-        if (countdown == float.NegativeInfinity) return;
-        countdown -= Time.deltaTime;
-        if (countdown <= 0.0f)
+        if (updateMessages)
         {
-            messages.Remove(0, trimming.Dequeue());
-            countdown = TIME_TO_UPDATE;
+            countdown -= Time.deltaTime;
+            if (countdown <= 0.0f)
+            {
+                try {messages.Remove(0, trimming.Dequeue());}
+                catch (System.InvalidOperationException e)
+                {Debug.LogError(e.Message);Debug.Log(trimming.Count);Debug.Log("Messages: " + messages.ToString());}
+                countdown = TIME_TO_UPDATE;
+                updateMessages = trimming.Count != 0;
+            }
+            text.text = messages.ToString();
         }
-        text.text = messages.ToString();
     }
 
     private void AppendMessage(string what)
     {
-        if (countdown == float.NegativeInfinity) countdown = TIME_TO_UPDATE;
+        if (!updateMessages) updateMessages = true;
         trimming.Enqueue(what.Length + 1);
         messages.Append(what);
         messages.Append("\n");
@@ -276,8 +283,7 @@ public class EventsNotifier : MonoBehaviour {
 
     public void DisplayUnitCreated(System.Object obj)
     {
-        GameObject g = (GameObject) obj;
-        Unit entity = (Unit) g.GetComponent<IGameEntity>();
+        Unit entity = (Unit) obj;
         DisplayUnitCreated(entity.type);
     }
 
