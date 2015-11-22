@@ -13,7 +13,7 @@ using Pathfinding;
 /// </summary>
 public class Unit : GameEntity<Unit.Actions>
 {
-    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT };
+    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT, TARGET_TERMINATED };
     public enum Roles { PRODUCING, WANDERING };
 
     public Unit() { }
@@ -106,6 +106,17 @@ public class Unit : GameEntity<Unit.Actions>
     {
         // TODO: Our target died, select next? Do nothing?
         setStatus(EntityStatus.IDLE);
+        Battle.PlayableEntity info = new Battle.PlayableEntity();
+        info.entityType = _target.info.entityType;
+        if (_target.info.isUnit)
+        {
+            info.type.unit = _target.getType<UnitTypes>();
+        }
+        else
+        {
+            info.type.building = _target.getType<BuildingTypes>();
+        }
+        fire(Actions.TARGET_TERMINATED, info);
         _target = null;
     }
 

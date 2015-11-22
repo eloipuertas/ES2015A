@@ -99,6 +99,7 @@ public class Player : BasePlayer
     public override void removeEntity(IGameEntity entity)
     {
         _activeEntities.Remove(entity);
+        unregisterGameEntityActions(entity);
     }
 
     /// <summary>
@@ -109,6 +110,7 @@ public class Player : BasePlayer
     public override void addEntity(IGameEntity newEntity)
     {
         _activeEntities.Add(newEntity);
+        registerGameEntityActions(newEntity);
         Debug.Log(_activeEntities.Count + " entities");
     }
 
@@ -151,27 +153,19 @@ public class Player : BasePlayer
         return (ArrayList) SelectedObjects.Clone();
     }
 
-    // <summary>
-    // Getter for the resources of the player.
-    // </summary>
-    //public Managers.ResourcesManager resources {get { return _resources; } }
-
-    private void performUnitDied(System.Object obj)
+    private void signalMissionUpdate(System.Object obj)
     {
-        IGameEntity e = ((GameObject) obj).GetComponent<IGameEntity>();
-        missionStatus.OnUnitKilled(((Unit) e).type);
-    }
-
-    private void performBuildingDestroyed(System.Object obj)
-    {
-        IGameEntity e = ((GameObject) obj).GetComponent<IGameEntity>();
-        if (e.info.isBarrack)
+        Battle.PlayableEntity e = (Battle.PlayableEntity) obj;
+        switch (e.entityType)
         {
-            missionStatus.OnBuildingDestroyed(((Barrack) e).type);
-        }
-        else if (e.info.isResource)
-        {
-            missionStatus.OnBuildingDestroyed(((Resource) e).type);
+            case Storage.EntityType.BUILDING:
+                missionStatus.OnBuildingDestroyed(e.type.building);
+                break;
+            case Storage.EntityType.UNIT:
+                missionStatus.OnUnitKilled(e.type.unit);
+                break;
+            case Storage.EntityType.RESOURCE:
+                break;
         }
     }
 
@@ -179,11 +173,17 @@ public class Player : BasePlayer
     {
         if (entity.info.isUnit)
         {
-            entity.registerFatalWounds(performUnitDied);
+            Unit unit = (Unit) entity;
+            unit.register(Unit.Actions.TARGET_TERMINATED, signalMissionUpdate);
         }
-        else if (entity.info.isBuilding)
+    }
+
+    public void unregisterGameEntityActions(IGameEntity entity)
+    {
+        if (entity.info.isUnit)
         {
-            entity.registerFatalWounds(performBuildingDestroyed);
+            Unit unit = (Unit) entity;
+            unit.unregister(Unit.Actions.TARGET_TERMINATED, signalMissionUpdate);
         }
     }
 
