@@ -14,14 +14,14 @@ public class EventsNotifier : MonoBehaviour {
     private readonly string LIGHT_ARMY_CREATED = "Light army warrior ready.";
     private readonly string HEAVY_ARMY_CREATED = "Heavy army warrior ready.";
     private readonly string CAVALRY_CREATED = "Cavalry warrior ready.";
-    private readonly string ARCHER_CREATED = "Archer created.";  // TODO Change message: there are no archers
+    private readonly string ARCHER_CREATED = "Shooter created.";
 
     // Building creation messages
     private readonly string BARRACK_CREATED = "Barrack created.";
     private readonly string FARM_CREATED = "Farm created.";
     private readonly string MINE_CREATED = "Mine created.";
     private readonly string SAWMILL_CREATED = "Sawmill created.";
-    private readonly string ARCHERY_CREATED = "Archery building created.";
+    private readonly string ARCHERY_CREATED = "Shooting range created.";
     private readonly string STABLE_CREATED = "Stable created.";
 
     // Resource related messages
@@ -47,9 +47,9 @@ public class EventsNotifier : MonoBehaviour {
     private readonly string FARM_LOST = "You have lost a farm.";
     private readonly string MINE_LOST = "You have lost a mine.";
     private readonly string SAWMILL_LOST = "You have lost a sawmill.";
-    private readonly string ARCHERY_LOST = "You have lost your archery building.";
+    private readonly string ARCHERY_LOST = "You have lost a shooting range.";
     private readonly string BARRACK_LOST = "You have lost a barrack.";
-    private readonly string STABLE_LOST = "Your stable is destroyed.";
+    private readonly string STABLE_LOST = "You have lost a stable.";
 
     private const float TIME_TO_UPDATE = 5f;
 
