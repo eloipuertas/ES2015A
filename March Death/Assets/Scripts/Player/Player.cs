@@ -225,6 +225,7 @@ public class Player : BasePlayer
                 Barrack barrack = (Barrack) entity;
                 barrack.register(Barrack.Actions.DAMAGED, events.DisplayUnderAttack);
                 barrack.register(Barrack.Actions.DESTROYED, events.DisplayBuildingDestroyed);
+                barrack.register(Barrack.Actions.CREATE_UNIT, events.DisplayUnitCreated);
             }
             else 
             {
@@ -232,12 +233,12 @@ public class Player : BasePlayer
                 resourcesBuilding.register(Resource.Actions.DAMAGED, events.DisplayUnderAttack);
                 resourcesBuilding.register(Resource.Actions.DESTROYED, events.DisplayBuildingDestroyed);
                 resourcesBuilding.register(Resource.Actions.CREATED, events.DisplayBuildingCreated);
+                resourcesBuilding.register(Resource.Actions.CREATE_UNIT, events.DisplayUnitCreated);
             }
         }
         else if (entity.info.isUnit)
         {
             Unit unit = (Unit) entity;
-            unit.register(Unit.Actions.CREATED, events.DisplayUnitCreated);
             unit.register(Unit.Actions.DAMAGED, events.DisplayUnderAttack);
             unit.register(Unit.Actions.DIED, events.DisplayUnitDead);
         }
@@ -250,6 +251,7 @@ public class Player : BasePlayer
             Barrack barrack = (Barrack) entity;
             barrack.unregister(Barrack.Actions.DAMAGED, events.DisplayUnderAttack);
             barrack.unregister(Barrack.Actions.DESTROYED, events.DisplayBuildingDestroyed);
+            barrack.unregister(Barrack.Actions.CREATE_UNIT, events.DisplayUnitCreated);
         }
         else if (entity.info.isResource)
         {
@@ -257,13 +259,13 @@ public class Player : BasePlayer
             resourcesBuilding.unregister(Resource.Actions.DAMAGED, events.DisplayUnderAttack);
             resourcesBuilding.unregister(Resource.Actions.DESTROYED, events.DisplayBuildingDestroyed);
             resourcesBuilding.unregister(Resource.Actions.CREATED, events.DisplayBuildingCreated);
+            resourcesBuilding.unregister(Resource.Actions.CREATE_UNIT, events.DisplayUnitCreated);
         }
         else if (entity.info.isUnit)
         {
             Unit unit = (Unit) entity;
             unit.unregister(Unit.Actions.DIED, events.DisplayUnitDead);
             unit.unregister(Unit.Actions.DAMAGED, events.DisplayUnderAttack);
-            unit.unregister(Unit.Actions.CREATED, events.DisplayUnitCreated);
         }
     }
 }
