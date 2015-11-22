@@ -1,6 +1,7 @@
 {
     "race": "ELVES",
     "type": "ARCHERY",
+    "name": "Archery",
 
     "attributes": {
         "resistance": 3,
@@ -24,11 +25,17 @@
     "abilities":
     [
         {
-            "name":"Create Thrown"
+            "name":"Create Thrown",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "UNIT",
+            "targetRace": "ELVES",
+            "targetUnit": "THROWN"
         },
 
         {
-            "name": "Sell"
+            "name": "Sell",
+            "tooltipFlags": "HIDE"
         }
     ]
 }

@@ -1,6 +1,7 @@
 {
     "race": "ELVES",
     "type": "STABLE",
+    "name": "Stable",
 
     "attributes": {
         "resistance": 3,
@@ -23,10 +24,16 @@
     "abilities":
     [
         {
-            "name":"Create Cavalry"
+            "name":"Create Cavalry",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "UNIT",
+            "targetRace": "ELVES",
+            "targetUnit": "CAVALRY"
         },
         {
-            "name":"Sell"
+            "name":"Sell",
+            "tooltipFlags": "HIDE"
         }
     ]
 }

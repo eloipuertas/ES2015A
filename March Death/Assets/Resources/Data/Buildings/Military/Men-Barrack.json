@@ -1,6 +1,7 @@
 {
     "race": "MEN",
     "type": "BARRACK",
+    "name": "Barrack",
 
     "attributes": {
         "resistance": 3,
@@ -24,14 +25,25 @@
     "abilities":
     [
         {
-            "name":"Create Light"
+            "name":"Create Light",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "UNIT",
+            "targetRace": "MEN",
+            "targetUnit": "LIGHT"
         },
         {
-            "name":"Create Heavy"
+            "name":"Create Heavy",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "UNIT",
+            "targetRace": "MEN",
+            "targetUnit": "HEAVY"
         },
 
         {
-            "name": "Sell"
+            "name": "Sell",
+            "tooltipFlags": "HIDE"
         }
     ]
 }

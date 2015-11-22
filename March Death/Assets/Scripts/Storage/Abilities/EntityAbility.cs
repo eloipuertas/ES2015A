@@ -12,9 +12,10 @@ namespace Storage
     [Flags]
     public enum TooltipFlag
     {
-        HIDE                = 0,
-        DISPLAY_COST        = 1,
-        DISPLAY_TARGET      = 2
+        HIDE                = 1,
+        SHOW                = 2,
+        DISPLAY_COST        = 4,
+        DISPLAY_TARGET      = 8
     };
 
     public class EntityAbility
@@ -69,8 +70,6 @@ namespace Storage
                     case EntityType.BUILDING:
                         BuildingInfo buildingTarget = info.of(targetRace, targetBuilding);
 
-                        attrs += "\n\nCan recruit:\n";
-
                         int i = 0;
                         foreach (EntityAbility ability in buildingTarget.abilities)
                         {
@@ -86,6 +85,11 @@ namespace Storage
 
                             attrs += ability.name;
                             ++i;
+                        }
+
+                        if (i > 0)
+                        {
+                            attrs = "\n\nCan recruit:\n" + attrs;
                         }
 
                         tooltip = "Create " + buildingTarget.name + " " + tooltip + attrs;

@@ -1,6 +1,7 @@
 {
     "race": "MEN",
     "type": "FARM",
+    "name": "Farm",
 
     "attributes": {
         "resistance": 3,
@@ -26,10 +27,16 @@
     "abilities":
     [
         {
-            "name":"Create Civil"
-        },		
+            "name":"Create Civil",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "UNIT",
+            "targetRace": "MEN",
+            "targetUnit": "CIVIL"
+        },
         {
-            "name": "Sell"
+            "name": "Sell",
+            "tooltipFlags": "HIDE"
         }
     ]
 }
