@@ -47,10 +47,17 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         base.Start();
         fire(Actions.CREATED, this.gameObject);
         entity = GetComponent<IGameEntity>();
-        bool ownUnit = entity.info.race == player.race;
-        selectedBox = SelectionOverlay.CreateTexture(ownUnit);
+		if (entity.info.isBuilding == true)
+		{
+			selectedBox = SelectionOverlay.CreateTexture(false);
+		} else 
+		{
+			bool ownUnit = entity.info.race == player.race;
+			selectedBox = SelectionOverlay.CreateTexture(ownUnit);
+		}
+        
 
-        plane = SelectionOverlay.getPlane(gameObject);
+		plane = SelectionOverlay.getPlane(gameObject, selectedBox);
     }
 
     public override void Update() { }
@@ -59,7 +66,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
         if (!(currentlySelected ^ _changedVisible))
         {
-            if (currentlySelected) plane = SelectionOverlay.getPlane(gameObject);
+            if (currentlySelected) plane = SelectionOverlay.getPlane(gameObject, selectedBox);
             else Destroy(plane, 0f); _lastHealth = 100f;
 
             _changedVisible = !currentlySelected;

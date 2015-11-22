@@ -101,7 +101,7 @@ public static class SelectionOverlay{
         return texToReturn;
     }
 
-    public static GameObject getPlane(GameObject gameObject)
+	public static GameObject getPlane(GameObject gameObject, Texture2D tex)
     {
         GameObject plane = new GameObject("Plane");
         Camera cam = GameObject.Find("Camera/Main Camera").GetComponent<Camera>();
@@ -115,7 +115,6 @@ public static class SelectionOverlay{
 
         MeshRenderer renderer = plane.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
         renderer.material.shader = Shader.Find("Particles/Additive");
-        Texture2D tex = CreateTexture(true);
 
         tex.Apply();
         renderer.material.mainTexture = tex;
