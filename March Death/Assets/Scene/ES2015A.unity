@@ -393,6 +393,7 @@ GameObject:
   - 114: {fileID: 865109085}
   - 114: {fileID: 865109088}
   - 114: {fileID: 865109089}
+  - 114: {fileID: 865109082}
   m_Layer: 0
   m_Name: GameController
   m_TagString: GameController
@@ -423,6 +424,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+--- !u!114 &865109082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 865109079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e3339337b18a0141a3a4dcbef71923a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &865109085
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -540,7 +552,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 497422, guid: d319607df9bc7d94f96333b387909003, type: 2}
       propertyPath: m_LocalPosition.y
-      value: -9.42280006
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 497422, guid: d319607df9bc7d94f96333b387909003, type: 2}
       propertyPath: m_LocalPosition.z
@@ -569,6 +581,14 @@ Prefab:
     - target: {fileID: 157604, guid: d319607df9bc7d94f96333b387909003, type: 2}
       propertyPath: m_Name
       value: ScreenMessages
+      objectReference: {fileID: 0}
+    - target: {fileID: 13284842, guid: d319607df9bc7d94f96333b387909003, type: 2}
+      propertyPath: m_PixelOffset.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 13284842, guid: d319607df9bc7d94f96333b387909003, type: 2}
+      propertyPath: m_PixelOffset.y
+      value: -10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d319607df9bc7d94f96333b387909003, type: 2}
@@ -767,7 +787,7 @@ Behaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1488202876}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!124 &1488202879
 Behaviour:
   m_ObjectHideFlags: 0

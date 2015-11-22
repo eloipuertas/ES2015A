@@ -50,13 +50,14 @@ public class EventsNotifier : MonoBehaviour {
     void Awake()
     {
         mainCam = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
+        text = GameObject.Find("ScreenMessages").GetComponent<GUIText>();
     }
 
     // Use this for initialization
     void Start()
     {
-        text = gameObject.GetComponent<GUIText>();
-        text.transform.position = mainCam.ViewportToScreenPoint(new Vector3(0.02f, 0.95f, 20));
+        //text = gameObject.GetComponent<GUIText>();
+        //text.transform.position = mainCam.ViewportToScreenPoint(new Vector3(0.02f, 0.95f, 20));
         trimming = new Queue<int>();
         messages = new System.Text.StringBuilder();
         countdown = float.NegativeInfinity;
@@ -87,13 +88,13 @@ public class EventsNotifier : MonoBehaviour {
         messages.AppendLine(what);
     }
 
-    public void DisplayUnderAttack(Vector3 where)
+    private void DisplayUnderAttack(Vector3 where)
     {
         AppendMessage(UNDER_ATTACK);
         // TODO Display information on the mini-map
     }
 
-    public void DisplayBuildingCreated(Storage.BuildingTypes type)
+    private void DisplayBuildingCreated(Storage.BuildingTypes type)
     {
         switch (type)
         {
@@ -108,7 +109,7 @@ public class EventsNotifier : MonoBehaviour {
         }
     }
 
-    public void DisplayUnitCreated(Storage.UnitTypes type)
+    private void DisplayUnitCreated(Storage.UnitTypes type)
     {
         switch (type)
         {
@@ -123,7 +124,7 @@ public class EventsNotifier : MonoBehaviour {
         }
     }
 
-    public void DisplayUnitDead(Storage.UnitTypes type)
+    private void DisplayUnitDead(Storage.UnitTypes type)
     {
         switch (type)
         {
@@ -137,7 +138,8 @@ public class EventsNotifier : MonoBehaviour {
                 break;
         }
     }
-    public void DisplayBuildingDestroyed(Storage.BuildingTypes type)
+
+    private void DisplayBuildingDestroyed(Storage.BuildingTypes type)
     {
         switch (type)
         {
@@ -162,9 +164,9 @@ public class EventsNotifier : MonoBehaviour {
         }
     }
 
-    public void DisplayResourceIsLow(WorldResources.Type type) {}
-    public void DisplayNotEnoughResources(WorldResources.Type type) {}
-    public void DisplayTroopCreated(string info) {}
+    private void DisplayResourceIsLow(WorldResources.Type type) {}
+    private void DisplayNotEnoughResources(WorldResources.Type type) {}
+    private void DisplayTroopCreated(string info) {}
 
     public void DisplayUnderAttack(System.Object obj)
     {
