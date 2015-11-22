@@ -233,12 +233,12 @@ public class Player : BasePlayer
                 resourcesBuilding.register(Resource.Actions.DAMAGED, events.DisplayUnderAttack);
                 resourcesBuilding.register(Resource.Actions.DESTROYED, events.DisplayBuildingDestroyed);
                 resourcesBuilding.register(Resource.Actions.CREATED, events.DisplayBuildingCreated);
-                resourcesBuilding.register(Resource.Actions.CREATE_UNIT, events.DisplayUnitCreated);
             }
         }
         else if (entity.info.isUnit)
         {
-            Unit unit = (Unit) entity;  // TODO Should the unit creation be registered here or before?
+            Unit unit = (Unit) entity;
+            unit.register(Unit.Actions.CREATED, events.DisplayUnitCreated);
             unit.register(Unit.Actions.DAMAGED, events.DisplayUnderAttack);
             unit.register(Unit.Actions.DIED, events.DisplayUnitDead);
         }
@@ -258,13 +258,13 @@ public class Player : BasePlayer
             resourcesBuilding.unregister(Resource.Actions.DAMAGED, events.DisplayUnderAttack);
             resourcesBuilding.unregister(Resource.Actions.DESTROYED, events.DisplayBuildingDestroyed);
             resourcesBuilding.unregister(Resource.Actions.CREATED, events.DisplayBuildingCreated);
-            resourcesBuilding.unregister(Resource.Actions.CREATE_UNIT, events.DisplayUnitCreated);
         }
         else if (entity.info.isUnit)
         {
             Unit unit = (Unit) entity;
             unit.unregister(Unit.Actions.DIED, events.DisplayUnitDead);
             unit.unregister(Unit.Actions.DAMAGED, events.DisplayUnderAttack);
+            unit.unregister(Unit.Actions.CREATED, events.DisplayUnitCreated);
         }
     }
 }
