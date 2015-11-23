@@ -19,11 +19,11 @@ public class CameraController : MonoBehaviour
     public enum CameraInteractionState { MOVING, STOPPED }
 
     private const float CAMERA_MAX_ZOOM = 5f;
-    private const float CAMERA_MIN_ZOOM = 100f;
+    private const float CAMERA_MIN_ZOOM = 80f;
     private const float MOUSE_BOUNDS = 2f;
     private const float BASE_ACCELERATION = 80f;
     private const float MAX_ACCELERATION = 200f;
-    private const float CAMERA_MODIFIER = 0.5432f;
+    private const float SHADOW_DISTANCE = 400f;
 
     private Vector3 cameraOffset;
     public Vector3 getCameraOffset {
@@ -31,7 +31,7 @@ public class CameraController : MonoBehaviour
             return cameraOffset;
         }
     }
-    private Vector3 lastLookedPoint, cameraOrigin;
+    private Vector3 lastLookedPoint;
     private GameObject followingGameObject;
     private GameObject cameraContainer;
     private bool isManualControlEnabled;
@@ -89,10 +89,9 @@ public class CameraController : MonoBehaviour
         map1bounds.minxyz = new Vector3(-63f, 250.34f, 130f);
         actual_state = CameraInteractionState.STOPPED;
         last_state = CameraInteractionState.STOPPED;
-        setCameraZoom(50f);
+        setCameraZoom(40f);
         setCameraSpeed(40f);
         lookAtPoint(new Vector3(896.4047f, 90.51f, 581.8263f));
-        cameraOrigin = transform.position;
     }
 
     void Update()
@@ -120,16 +119,6 @@ public class CameraController : MonoBehaviour
         //Ensures that camera is on the bounds of the map
         cameraContainer.transform.position = new Vector3(Mathf.Clamp(cameraContainer.transform.position.x, map1bounds.minxyz.x, map1bounds.maxxyz.x),
                     cameraContainer.transform.position.y, Mathf.Clamp(cameraContainer.transform.position.z, map1bounds.minxyz.z, map1bounds.maxxyz.z));
-        RaycastHit hit;
-
-        if (Physics.Raycast(transform.position, -Vector3.up, out hit))
-        {
-            float distanceToGround = hit.distance;
-            float newYToAdd = 60f - distanceToGround;
-            float factor = (cameraContainer.transform.position.y + newYToAdd) / cameraOrigin.y;
-            cameraContainer.transform.position *= factor;
-            Debug.Log(cameraContainer.transform.position + " Distance:" + distanceToGround);
-        }
     }
 
     /// <summary>
@@ -313,7 +302,7 @@ public class CameraController : MonoBehaviour
     /// </summary>
     private void setupCamera()
     {
-        cameraOffset = new Vector3(-60.67f, 60f, -60.67f) ;
+        cameraOffset = new Vector3(-141.554f, 140f, -141.554f);
         Vector3 desiredCameraPosition = new Vector3(transform.position.x, cameraOffset.y, transform.position.z);
         cameraContainer = new GameObject("Camera");
         transform.localEulerAngles = new Vector3(35f, 0f, 0f);
@@ -323,6 +312,7 @@ public class CameraController : MonoBehaviour
         cameraContainer.transform.position = desiredCameraPosition;
         Camera.main.orthographic = true;
         setCameraOrientation(CameraOrientation.SOUTH_WEST);
+        QualitySettings.shadowDistance = SHADOW_DISTANCE;
  
     }
 
@@ -340,20 +330,20 @@ public class CameraController : MonoBehaviour
         switch (newOrientation)
         {
             case CameraOrientation.NORTH_WEST:
-                cameraOffset = new Vector3(-60.67f, 60f, -60.67f) ;
+                cameraOffset = new Vector3(-141.554f, 140f, -141.554f) ;
                 baseVerticalRotation = 45f;
                 numOffsets = 0;
                 break;
             case CameraOrientation.SOUTH_WEST:
-                cameraOffset = new Vector3(-60.67f, 60f, +60.67f) ;
+                cameraOffset = new Vector3(-141.554f, 140f, +141.554f) ;
                 numOffsets = 1;
                 break;
             case CameraOrientation.SOUTH_EST:
-                cameraOffset = new Vector3(+60.67f, 60f, +60.67f) ;
+                cameraOffset = new Vector3(+141.554f, 140f, +141.554f) ;
                 numOffsets = 2;
                 break;
             case CameraOrientation.NORTH_EST:
-                cameraOffset = new Vector3(+60.67f, 60f, -60.67f) ;
+                cameraOffset = new Vector3(+141.554f, 140f, -141.554f) ;
                 numOffsets = 3;
                 break;
             default:
@@ -370,14 +360,15 @@ public class CameraController : MonoBehaviour
     /// <param name="newZoom"> A number between 5 (max zoom) and 100 (min zoom) </param>
     public void setCameraZoom(float newZoom)
     {
-        if(newZoom > 100 || newZoom < 5)
+        if(newZoom > CAMERA_MIN_ZOOM || newZoom < CAMERA_MAX_ZOOM)
         {
-            throw new InvalidOperationException("New camera zoom must be a positive float between 5 (max zoom) and 100 (min zoom)!");
+            throw new InvalidOperationException("New camera zoom must be a positive float between "+ CAMERA_MAX_ZOOM + " (max zoom) and " + CAMERA_MIN_ZOOM + " (min zoom)!");
         }
 
         float fov = Mathf.Clamp(newZoom, CAMERA_MAX_ZOOM, CAMERA_MIN_ZOOM);
         Camera.main.orthographicSize = fov;
-        _camera_zoom = fov;     
+        _camera_zoom = fov;
+        Debug.Log(fov);     
     }
 
 
@@ -476,5 +467,10 @@ public class CameraController : MonoBehaviour
     {
         stopFollowing();
         stopSmoothTravel();
+    }
+
+    public void OnGUI()
+    {
+        GUI.Label(new Rect(100 , 100, 200, 50), cameraContainer.transform.position.ToString());
     }
 }
