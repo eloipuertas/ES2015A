@@ -11,12 +11,19 @@ public class EntitySelection : MonoBehaviour {
     {
         selection = GetComponent<Projector>();
     }
+
 	// Use this for initialization
 	void Start ()
     {
-        selection.enabled = false;
+        config();
+        
 	}
-
+    private void config()
+    {
+        selection.enabled = false;
+        selection.transform.position = new Vector3(0, 50, 0);
+        selection.orthographicSize = 2;
+    }
 
     /// <summary>
     /// Sets the color for the current race
