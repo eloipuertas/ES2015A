@@ -16,6 +16,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public Collider _collider;
     private GameObject controller;
     private GameObject plane;
+    private EntitySelection _entitySelection;
 
     public bool currentlySelected { get; set; }
     private float healthRatio = 1f;
@@ -49,8 +50,9 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         entity = GetComponent<IGameEntity>();
         bool ownUnit = entity.info.race == player.race;
         selectedBox = SelectionOverlay.CreateTexture(ownUnit);
-
         plane = SelectionOverlay.getPlane(gameObject);
+
+        RetrieveLightSelection();
     }
 
     public override void Update() { }
@@ -107,6 +109,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public virtual void SelectEntity()
     {
         this.currentlySelected = true;
+        if (_entitySelection) _entitySelection.Enable();
         fire(Actions.SELECTED);
     }
 
@@ -116,6 +119,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public virtual void DeselectEntity()
     {
         this.currentlySelected = false;
+        if (_entitySelection) _entitySelection.Disable();
         fire(Actions.DESELECTED);
     }
 
@@ -135,5 +139,17 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public virtual void NotAttackedEntity()
     {
     	this.currentlySelected = false;
+    }
+
+    private void RetrieveLightSelection()
+    {
+        
+        GameObject selection = transform.FindChild("EntitySelection").gameObject;
+        if (selection)
+        {
+            _entitySelection = selection.GetComponent<EntitySelection>();
+            _entitySelection.SetColorRace(race);
+        }
+        else { _entitySelection = null; }
     }
 }
