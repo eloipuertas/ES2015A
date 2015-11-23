@@ -1,4 +1,4 @@
-Shader "Custom/ProjectorShader" {
+Shader "Custom/BasicProjectorShader" {
 	Properties {
 		_Color ("Tint Color", Color) = (1,1,1,1)
 		_Attenuation ("Falloff", Range(0.0, 1.0)) = 1.0
