@@ -2262,7 +2262,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 164202}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 664.819946, y: 79.0026245, z: 860.622437}
+  m_LocalPosition: {x: 658.478271, y: 79.0026245, z: 890.611816}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 442722}
@@ -3605,7 +3605,7 @@ Projector:
   m_AspectRatio: 1
   m_Orthographic: 1
   m_OrthographicSize: 2
-  m_Material: {fileID: 2100000, guid: ef2599f73f651a849bfb39e0ea28633b, type: 2}
+  m_Material: {fileID: 2100000, guid: d7e7703eede09674aa0385b976896c3e, type: 2}
   m_IgnoreLayers:
     serializedVersion: 2
     m_Bits: 311
@@ -4170,6 +4170,18 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_SpotAngle
       value: 38.0999985
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: emptyTex
+      value: 
+      objectReference: {fileID: 2800000, guid: f03f4eaa97f63d44c9e841b02d102b59, type: 3}
+    - target: {fileID: 0}
+      propertyPath: fullTex
+      value: 
+      objectReference: {fileID: 2800000, guid: f03f4eaa97f63d44c9e841b02d102b59, type: 3}
+    - target: {fileID: 0}
+      propertyPath: barDisplay
+      value: 100
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

@@ -21,8 +21,6 @@ public class EntitySelection : MonoBehaviour {
     private void config()
     {
         selection.enabled = false;
-        selection.transform.position = new Vector3(0, 50, 0);
-        selection.orthographicSize = 2;
     }
 
     /// <summary>

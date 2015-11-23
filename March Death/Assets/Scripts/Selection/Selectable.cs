@@ -24,6 +24,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     private bool entityMoving = true;
     private bool _changedVisible = false;
 
+
     public Storage.Races race {
         get { return player.race; }
     }
