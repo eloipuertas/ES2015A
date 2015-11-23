@@ -25,6 +25,7 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     public T DAMAGED { get; set; }
     public T DESTROYED { get; set; }
     public T CREATE_UNIT { get; set; }
+    public T BUILDING_FINISHED { get; set; }
 
     private float _totalBuildTime = 0;
     private float _creationTimer = 0;
@@ -85,7 +86,7 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     /// </summary>
     protected virtual void onBuilt()
     {
-
+        fire (BUILDING_FINISHED);
     }
 
     /// <summary>
@@ -96,6 +97,7 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
         DAMAGED = (T)Enum.Parse(typeof(T), "DAMAGED", true);
         DESTROYED = (T)Enum.Parse(typeof(T), "DESTROYED", true);
         CREATE_UNIT = (T)Enum.Parse(typeof(T), "CREATE_UNIT", true);
+        BUILDING_FINISHED = (T) Enum.Parse(typeof(T), "BUILDING_FINISHED", true);
 
         // Call GameEntity start
         base.Awake();
