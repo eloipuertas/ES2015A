@@ -14,14 +14,14 @@ public class EventsNotifier : MonoBehaviour {
     private readonly string LIGHT_ARMY_CREATED = "Light army warrior ready.";
     private readonly string HEAVY_ARMY_CREATED = "Heavy army warrior ready.";
     private readonly string CAVALRY_CREATED = "Cavalry warrior ready.";
-    private readonly string ARCHER_CREATED = "Shooter created.";
+    private readonly string SHOOTER_CREATED = "Shooter ready.";
 
     // Building creation messages
     private readonly string BARRACK_CREATED = "Barrack created.";
     private readonly string FARM_CREATED = "Farm created.";
     private readonly string MINE_CREATED = "Mine created.";
     private readonly string SAWMILL_CREATED = "Sawmill created.";
-    private readonly string ARCHERY_CREATED = "Shooting range created.";
+    private readonly string SHOOTING_RANGE_CREATED = "Shooting range created.";
     private readonly string STABLE_CREATED = "Stable created.";
 
     // Resource related messages
@@ -47,7 +47,7 @@ public class EventsNotifier : MonoBehaviour {
     private readonly string FARM_LOST = "You have lost a farm.";
     private readonly string MINE_LOST = "You have lost a mine.";
     private readonly string SAWMILL_LOST = "You have lost a sawmill.";
-    private readonly string ARCHERY_LOST = "You have lost a shooting range.";
+    private readonly string SHOOTING_RANGE_LOST = "You have lost a shooting range.";
     private readonly string BARRACK_LOST = "You have lost a barrack.";
     private readonly string STABLE_LOST = "You have lost a stable.";
 
@@ -55,6 +55,8 @@ public class EventsNotifier : MonoBehaviour {
 
     private float countdown;
     private bool updateMessages;
+
+    private const int MAX_LINES = 10;
 
     private GUIText text;
     private Queue<int> trimming;
@@ -80,11 +82,9 @@ public class EventsNotifier : MonoBehaviour {
         if (updateMessages)
         {
             countdown -= Time.deltaTime;
-            if (countdown <= 0.0f)
+            if (countdown <= 0.0f || trimming.Count > MAX_LINES)
             {
-                try {messages.Remove(0, trimming.Dequeue());}
-                catch (System.InvalidOperationException e)
-                {Debug.LogError(e.Message);Debug.Log(trimming.Count);Debug.Log("Messages: " + messages.ToString());}
+                messages.Remove(0, trimming.Dequeue());
                 countdown = TIME_TO_UPDATE;
                 updateMessages = trimming.Count != 0;
             }
@@ -113,7 +113,7 @@ public class EventsNotifier : MonoBehaviour {
             case Storage.BuildingTypes.STRONGHOLD:
                 break;
             case Storage.BuildingTypes.ARCHERY:
-                AppendMessage(ARCHERY_CREATED);
+                AppendMessage(SHOOTING_RANGE_CREATED);
                 break;
             case Storage.BuildingTypes.STABLE:
                 AppendMessage(STABLE_CREATED);
@@ -144,7 +144,7 @@ public class EventsNotifier : MonoBehaviour {
                 AppendMessage(LIGHT_ARMY_CREATED);
                 break;
             case Storage.UnitTypes.THROWN:
-                AppendMessage(ARCHER_CREATED);
+                AppendMessage(SHOOTER_CREATED);
                 break;
             case Storage.UnitTypes.CAVALRY:
                 AppendMessage(CAVALRY_CREATED);
@@ -181,7 +181,7 @@ public class EventsNotifier : MonoBehaviour {
                 AppendMessage(STRONGHOLD_LOST);
                 break;
             case Storage.BuildingTypes.ARCHERY:
-                AppendMessage(ARCHERY_LOST);
+                AppendMessage(SHOOTING_RANGE_LOST);
                 break;
             case Storage.BuildingTypes.BARRACK:
                 AppendMessage(BARRACK_LOST);

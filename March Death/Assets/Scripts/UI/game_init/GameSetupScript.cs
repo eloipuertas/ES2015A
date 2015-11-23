@@ -30,7 +30,6 @@ public class GameSetupScript : MonoBehaviour
     void Start ()
     {
         info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
-        Debug.Log("info exists");
         raceSelected = false;
         showMsgBox = false;
     }
