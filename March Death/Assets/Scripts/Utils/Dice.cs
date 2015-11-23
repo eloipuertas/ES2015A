@@ -20,30 +20,15 @@ namespace Utils
         public int rollN(int n)
         {
             double res = roll();
+            double step = (1.0 / n) + Double.Epsilon;
 
-            for (int i = 1; i < n; ++i)
-            {
-                if (res <= i / (double)n)
-                {
-                    return i - 1;
-                }
-            }
-
-            return n - 1;
+            return (int)(res / step);
         }
 
         // Less expensive version of "rollN(6) + 1"
         public int rollOnce()
         {
-            double res = roll();
-
-            if (res <= 1.0 / 6.0) return 1;
-            if (res <= 2.0 / 6.0) return 2;
-            if (res <= 3.0 / 6.0) return 3;
-            if (res <= 4.0 / 6.0) return 4;
-            if (res <= 5.0 / 6.0) return 5;
-
-            return 6;
+            return rollN(6) + 1;
         }
 
         public int rollSpecial()
