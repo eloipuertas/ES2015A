@@ -23,7 +23,7 @@ public class CameraController : MonoBehaviour
     private const float MOUSE_BOUNDS = 2f;
     private const float BASE_ACCELERATION = 80f;
     private const float MAX_ACCELERATION = 200f;
-    private const float CAMERA_MODIFIER = 2.5f;
+    private const float CAMERA_MODIFIER = 0.5432f;
 
     private Vector3 cameraOffset;
     public Vector3 getCameraOffset {
@@ -116,8 +116,16 @@ public class CameraController : MonoBehaviour
 
     void LateUpdate()
     {
+        //Ensures that camera is on the bounds of the map
         cameraContainer.transform.position = new Vector3(Mathf.Clamp(cameraContainer.transform.position.x, map1bounds.minxyz.x, map1bounds.maxxyz.x),
                     cameraContainer.transform.position.y, Mathf.Clamp(cameraContainer.transform.position.z, map1bounds.minxyz.z, map1bounds.maxxyz.z));
+        RaycastHit hit;
+
+        if (Physics.Raycast(transform.position, -Vector3.up, out hit))
+        {
+            float distanceToGround = hit.distance;
+            Debug.Log("Camera Distance to floor" + distanceToGround);
+        }
     }
 
     /// <summary>
@@ -301,7 +309,7 @@ public class CameraController : MonoBehaviour
     /// </summary>
     private void setupCamera()
     {
-        cameraOffset = new Vector3(-252.8f, 250.34f, -252.8f);
+        cameraOffset = new Vector3(-137.32f, 135.8f, -137.32f) ;
         Vector3 desiredCameraPosition = new Vector3(transform.position.x, cameraOffset.y, transform.position.z);
         cameraContainer = new GameObject("Camera");
         transform.localEulerAngles = new Vector3(35f, 0f, 0f);
@@ -328,20 +336,20 @@ public class CameraController : MonoBehaviour
         switch (newOrientation)
         {
             case CameraOrientation.NORTH_WEST:
-                cameraOffset = new Vector3(-252.8f, 250.34f, -252.8f) / CAMERA_MODIFIER;
+                cameraOffset = new Vector3(-137.32f, 135.8f, -137.32f) ;
                 baseVerticalRotation = 45f;
                 numOffsets = 0;
                 break;
             case CameraOrientation.SOUTH_WEST:
-                cameraOffset = new Vector3(-252.8f, 250.34f, +252.8f) / CAMERA_MODIFIER;
+                cameraOffset = new Vector3(-137.32f, 135.8f, +137.32f) ;
                 numOffsets = 1;
                 break;
             case CameraOrientation.SOUTH_EST:
-                cameraOffset = new Vector3(+252.8f, 250.34f, +252.8f) / CAMERA_MODIFIER;
+                cameraOffset = new Vector3(+137.32f, 135.8f, +137.32f) ;
                 numOffsets = 2;
                 break;
             case CameraOrientation.NORTH_EST:
-                cameraOffset = new Vector3(+252.8f, 250.34f, -252.8f) / CAMERA_MODIFIER;
+                cameraOffset = new Vector3(+137.32f, 135.8f, -137.32f) ;
                 numOffsets = 3;
                 break;
             default:
