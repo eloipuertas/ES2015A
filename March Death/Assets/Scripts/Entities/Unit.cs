@@ -106,17 +106,8 @@ public class Unit : GameEntity<Unit.Actions>
     {
         // TODO: Our target died, select next? Do nothing?
         setStatus(EntityStatus.IDLE);
-        Battle.PlayableEntity info = new Battle.PlayableEntity();
-        info.entityType = _target.info.entityType;
-        if (_target.info.isUnit)
-        {
-            info.type.unit = _target.getType<UnitTypes>();
-        }
-        else
-        {
-            info.type.building = _target.getType<BuildingTypes>();
-        }
-        fire(Actions.TARGET_TERMINATED, info);
+        IGameEntity entity = ((GameObject) obj).GetComponent<IGameEntity>();
+        fire(Actions.TARGET_TERMINATED, entity.info);
         _target = null;
     }
 
