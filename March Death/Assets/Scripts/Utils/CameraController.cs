@@ -309,7 +309,7 @@ public class CameraController : MonoBehaviour
     /// </summary>
     private void setupCamera()
     {
-        cameraOffset = new Vector3(-137.32f, 135.8f, -137.32f) ;
+        cameraOffset = new Vector3(-60.67f, 60f, -60.67f) ;
         Vector3 desiredCameraPosition = new Vector3(transform.position.x, cameraOffset.y, transform.position.z);
         cameraContainer = new GameObject("Camera");
         transform.localEulerAngles = new Vector3(35f, 0f, 0f);
@@ -336,20 +336,20 @@ public class CameraController : MonoBehaviour
         switch (newOrientation)
         {
             case CameraOrientation.NORTH_WEST:
-                cameraOffset = new Vector3(-137.32f, 135.8f, -137.32f) ;
+                cameraOffset = new Vector3(-60.67f, 60f, -60.67f) ;
                 baseVerticalRotation = 45f;
                 numOffsets = 0;
                 break;
             case CameraOrientation.SOUTH_WEST:
-                cameraOffset = new Vector3(-137.32f, 135.8f, +137.32f) ;
+                cameraOffset = new Vector3(-60.67f, 60f, +60.67f) ;
                 numOffsets = 1;
                 break;
             case CameraOrientation.SOUTH_EST:
-                cameraOffset = new Vector3(+137.32f, 135.8f, +137.32f) ;
+                cameraOffset = new Vector3(+60.67f, 60f, +60.67f) ;
                 numOffsets = 2;
                 break;
             case CameraOrientation.NORTH_EST:
-                cameraOffset = new Vector3(+137.32f, 135.8f, -137.32f) ;
+                cameraOffset = new Vector3(+60.67f, 60f, -60.67f) ;
                 numOffsets = 3;
                 break;
             default:
