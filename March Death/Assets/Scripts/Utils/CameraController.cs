@@ -31,7 +31,7 @@ public class CameraController : MonoBehaviour
             return cameraOffset;
         }
     }
-    private Vector3 lastLookedPoint;
+    private Vector3 lastLookedPoint, cameraOrigin;
     private GameObject followingGameObject;
     private GameObject cameraContainer;
     private bool isManualControlEnabled;
@@ -92,6 +92,7 @@ public class CameraController : MonoBehaviour
         setCameraZoom(50f);
         setCameraSpeed(40f);
         lookAtPoint(new Vector3(896.4047f, 90.51f, 581.8263f));
+        cameraOrigin = transform.position;
     }
 
     void Update()
@@ -124,7 +125,10 @@ public class CameraController : MonoBehaviour
         if (Physics.Raycast(transform.position, -Vector3.up, out hit))
         {
             float distanceToGround = hit.distance;
-            Debug.Log("Camera Distance to floor" + distanceToGround);
+            float newYToAdd = 60f - distanceToGround;
+            float factor = (cameraContainer.transform.position.y + newYToAdd) / cameraOrigin.y;
+            cameraContainer.transform.position *= factor;
+            Debug.Log(cameraContainer.transform.position + " Distance:" + distanceToGround);
         }
     }
 
