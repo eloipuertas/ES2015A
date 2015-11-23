@@ -47,6 +47,12 @@ namespace Pathfinding
 
             [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
             public static extern void updateTick(IntPtr tileCache, IntPtr nav, IntPtr crowd, float dt, float[] positions, float[] velocities, byte[] states, byte[] targetStates, ref int nagents);
+
+            [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+            public static extern void randomPoint(IntPtr crowd, float[] targetPoint);
+
+            [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+            public static extern void randomPointInCircle(IntPtr crowd, float[] initialPoint, float maxRadius, float[] targetPoint);
         }
     }
 }

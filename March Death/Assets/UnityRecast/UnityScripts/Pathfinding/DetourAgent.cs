@@ -61,6 +61,7 @@ namespace Pathfinding
         private Vector3 targetPoint;
         private float _lastKnownDistance;
 
+        public Vector3 TargetPoint { get { return targetPoint; } }
         public Vector3 Velocity { get; set; }
         public CrowdAgentState State { get; set; }
         public MoveRequestState TargetState { get; set; }
@@ -115,6 +116,8 @@ namespace Pathfinding
         {
             UpdateParams();
             AddToCrowd();
+
+            targetPoint = transform.position;
         }
 
         public void OnDestroy()

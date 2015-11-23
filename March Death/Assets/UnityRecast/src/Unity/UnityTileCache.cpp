@@ -1,5 +1,8 @@
 #include "Unity3d.h"
 
+#include <time.h>
+#include <stdlib.h>
+
 static const int EXPECTED_LAYERS_PER_TILE = 4;
 static const int TILECACHESET_MAGIC = 'T' << 24 | 'S' << 16 | 'E' << 8 | 'T'; //'TSET';
 static const int TILECACHESET_VERSION = 1;
@@ -532,6 +535,9 @@ dtCrowd* createCrowd(int maxAgents, float maxRadius, dtNavMesh* navmesh)
 
 int addAgent(dtCrowd* crowd, float* p, dtCrowdAgentParams* ap)
 {
+	// Randomize now, because yes!
+	srand(time(NULL));
+
 	return crowd->addAgent(p, ap);
 }
 
@@ -643,4 +649,31 @@ void updateTick(dtTileCache* tileCache, dtNavMesh* nav, dtCrowd* crowd, float dt
 		state[i] = ag->state;
 		targetState[i] = ag->targetState;
 	}
+}
+
+static float random_float()
+{
+	return (double)rand() / (double)RAND_MAX;
+}
+
+void randomPoint(dtCrowd* crowd, float* targetPoint)
+{
+	const dtNavMeshQuery* navQuery = crowd->getNavMeshQuery();
+	const dtQueryFilter* filter = crowd->getFilter(0);
+	dtPolyRef targetRef;
+
+	navQuery->findRandomPoint(filter, random_float, &targetRef, targetPoint);
+}
+
+void randomPointInCircle(dtCrowd* crowd, float* initialPoint, float maxRadius, float* targetPoint)
+{
+	const dtNavMeshQuery* navQuery = crowd->getNavMeshQuery();
+	const dtQueryFilter* filter = crowd->getFilter(0);
+	const float* ext = crowd->getQueryExtents();
+	dtPolyRef targetRef;
+	dtPolyRef nearestRef;
+	float nearestPoint[3];
+
+	navQuery->findNearestPoly(initialPoint, ext, filter, &nearestRef, nearestPoint);
+	navQuery->findRandomPointAroundCircle(nearestRef, initialPoint, maxRadius, filter, random_float, &targetRef, targetPoint);
 }

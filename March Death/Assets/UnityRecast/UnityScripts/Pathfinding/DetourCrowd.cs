@@ -26,6 +26,7 @@ namespace Pathfinding
         private IntPtr crowd = new IntPtr(0);
         private Dictionary<int, DetourAgent> agents = new Dictionary<int, DetourAgent>();
 
+        private float[] randomSample = null;
         private float[] positions = null;
         private float[] velocities = null;
         private byte[] targetStates = null;
@@ -50,6 +51,7 @@ namespace Pathfinding
             {
     			PathDetour.get.Initialize(navmeshData);
     			crowd = Detour.Crowd.createCrowd(MaxAgents, AgentMaxRadius, PathDetour.get.NavMesh);
+                randomSample = new float[3];
                 positions = new float[MaxAgents * 3];
                 velocities = new float[MaxAgents * 3];
                 targetStates = new byte[MaxAgents];
@@ -92,7 +94,7 @@ namespace Pathfinding
             return new float[] { p.x, p.y, p.z };
         }
 
-        public static Vector3 ToVector3(float[] p, int off)
+        public static Vector3 ToVector3(float[] p, int off = 0)
         {
             return new Vector3(p[off + 0], p[off + 1], p[off + 2]);
         }
@@ -137,6 +139,18 @@ namespace Pathfinding
             Assert.IsTrue(crowd.ToInt64() != 0);
 
             Detour.Crowd.resetPath(crowd, idx);
+        }
+
+        public Vector3 RandomValidPoint()
+        {
+            Detour.Crowd.randomPoint(crowd, randomSample);
+            return ToVector3(randomSample);
+        }
+
+        public Vector3 RandomValidPointInCircle(Vector3 cercleCenter, float maxRadius)
+        {
+            Detour.Crowd.randomPointInCircle(crowd, ToFloat(cercleCenter), maxRadius, randomSample);
+            return ToVector3(randomSample);
         }
 
         public void Update()
