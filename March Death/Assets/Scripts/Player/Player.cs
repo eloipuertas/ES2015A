@@ -102,8 +102,7 @@ public class Player : BasePlayer
     public override void removeEntity(IGameEntity entity)
     {
         _activeEntities.Remove(entity);
-        unregisterGameEntityActions(entity);
-        unregisterEventDisplayMessages(entity);
+        unregisterEntityEvents(entity);
     }
 
     /// <summary>
@@ -114,8 +113,7 @@ public class Player : BasePlayer
     public override void addEntity(IGameEntity newEntity)
     {
         _activeEntities.Add(newEntity);
-        registerEventDisplayMessage(newEntity);
-        registerGameEntityActions(newEntity);
+        registerEntityEvents(newEntity);
         Debug.Log(_activeEntities.Count + " entities");
     }
 
@@ -174,24 +172,6 @@ public class Player : BasePlayer
         }
     }
 
-    public void registerGameEntityActions(IGameEntity entity)
-    {
-        if (entity.info.isUnit)
-        {
-            Unit unit = (Unit) entity;
-            unit.register(Unit.Actions.TARGET_TERMINATED, signalMissionUpdate);
-        }
-    }
-
-    public void unregisterGameEntityActions(IGameEntity entity)
-    {
-        if (entity.info.isUnit)
-        {
-            Unit unit = (Unit) entity;
-            unit.unregister(Unit.Actions.TARGET_TERMINATED, signalMissionUpdate);
-        }
-    }
-
     protected override void AddBuilding(IGameEntity entity)
     {
         Storage.BuildingInfo bi;
@@ -212,7 +192,7 @@ public class Player : BasePlayer
     /// Registers the events that display a message to the user.
     /// </summary>
     /// <param name="entity">Game entity that triggers the event.</param>
-    private void registerEventDisplayMessage(IGameEntity entity)
+    private void registerEntityEvents(IGameEntity entity)
     {
         if (entity.info.isBuilding)
         {
@@ -238,10 +218,11 @@ public class Player : BasePlayer
             Unit unit = (Unit) entity;
             unit.register(Unit.Actions.DAMAGED, events.DisplayUnderAttack);
             unit.register(Unit.Actions.DIED, events.DisplayUnitDead);
+            unit.register(Unit.Actions.TARGET_TERMINATED, signalMissionUpdate);
         }
     }
 
-    private void unregisterEventDisplayMessages(IGameEntity entity)
+    private void unregisterEntityEvents(IGameEntity entity)
     {
         if (entity.info.isBarrack)
         {
@@ -264,6 +245,7 @@ public class Player : BasePlayer
             Unit unit = (Unit) entity;
             unit.unregister(Unit.Actions.DIED, events.DisplayUnitDead);
             unit.unregister(Unit.Actions.DAMAGED, events.DisplayUnderAttack);
+            unit.unregister(Unit.Actions.TARGET_TERMINATED, signalMissionUpdate);
         }
     }
 }
