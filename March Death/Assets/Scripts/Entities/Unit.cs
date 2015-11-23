@@ -106,8 +106,17 @@ public class Unit : GameEntity<Unit.Actions>
     {
         // TODO: Our target died, select next? Do nothing?
         setStatus(EntityStatus.IDLE);
-        IGameEntity entity = ((GameObject) obj).GetComponent<IGameEntity>();
-        fire(Actions.TARGET_TERMINATED, entity.info);
+        Battle.PlayableEntity info = new Battle.PlayableEntity();
+        info.entityType = _target.info.entityType;
+        if (_target.info.isUnit)
+        {
+            info.type.unit = _target.getType<UnitTypes>();
+        }
+        else
+        {
+            info.type.building = _target.getType<BuildingTypes>();
+        }
+        fire(Actions.TARGET_TERMINATED, info);
         _target = null;
     }
 
@@ -136,10 +145,10 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     protected override void onFatalWounds()
     {
-        fire(Actions.DIED);
-
-        statistics.growth_speed *= -1;
+        statistics.getNegative();
         fire(Actions.STAT_OUT, statistics);
+
+        fire(Actions.DIED);
     }
 
     /// <summary>
@@ -226,13 +235,14 @@ public class Unit : GameEntity<Unit.Actions>
 
             // if target has changed, hide old target health
             Selectable selectable = null;
-            if (_target != null) {
-            	selectable = _target.getGameObject().GetComponent<Selectable>();
-            	selectable.NotAttackedEntity();
+            if (_target != null)
+            {
+                selectable = _target.getGameObject().GetComponent<Selectable>();
+                selectable.NotAttackedEntity();
             }
 
             _target = entity;
-            
+
             // Show target health
             selectable = _target.getGameObject().GetComponent<Selectable>();
             selectable.AttackedEntity();
@@ -360,7 +370,7 @@ public class Unit : GameEntity<Unit.Actions>
         statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -5);
 
         fire(Actions.CREATED, statistics);
-        
+
         // Get DetourAgent and set basic variables
         _detourAgent = GetComponent<DetourAgent>();
         _detourAgent.SetMaxSpeed(info.unitAttributes.movementRate * 5);
@@ -477,7 +487,7 @@ public class Unit : GameEntity<Unit.Actions>
                         _detourAgent.MoveTo(destination);
                         _movePoint = destination;
                     }
-                    
+
                     // If we are already close enough, stop and attack
                     if (_distanceToTarget <= currentAttackRange())
                     {
@@ -501,7 +511,7 @@ public class Unit : GameEntity<Unit.Actions>
                         Debug.LogWarning("NavMesh not stopped at attack range... AttackRange = " + currentAttackRange());
                     }
                 }
-                
+
                 break;
         }
     }

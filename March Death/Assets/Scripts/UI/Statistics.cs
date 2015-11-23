@@ -38,6 +38,10 @@ public class Statistics
         _type = type;
     }
 
+    public void getNegative()
+    {
+        _amount *= -1;
+    }
 
     public static Statistics operator +(Statistics self, Statistics other)
     {

@@ -7,7 +7,7 @@ using Storage;
 
 public class Resource : Building<Resource.Actions>
 {
-    public enum Actions { CREATED, DAMAGED, DESTROYED, BUILDING_FINISHED, COLLECTION, CREATE_UNIT, DEL_STATS};
+    public enum Actions { CREATED, DAMAGED, DESTROYED, BUILDING_FINISHED, COLLECTION, CREATE_UNIT, DEL_STATS };
 
     /// <summary>
     /// civilian creation waste some time. When units are being created status
@@ -88,7 +88,7 @@ public class Resource : Building<Resource.Actions>
         {
             return harvestUnits;
         }
-   }
+    }
 
     /// <summary>
     /// HUD, max production rate for this resource building and level.
@@ -126,7 +126,7 @@ public class Resource : Building<Resource.Actions>
     /// <summary>
     /// number of units created by this building. dead or alive
     /// </summary>
-    public int totalUnits { get ;private set;}
+    public int totalUnits { get; private set; }
 
     /// <summary>
     /// material amount send to player (collected) when update succes.
@@ -147,7 +147,7 @@ public class Resource : Building<Resource.Actions>
 
     /// <summary>
     /// coordinates where new civilians are positioned before maxUnits limit is
-   ///  reached.
+    ///  reached.
     /// </summary>
     private Vector3 meetingPointInsidePosition;
 
@@ -187,7 +187,7 @@ public class Resource : Building<Resource.Actions>
     /// <summary>
     /// check if starter unit was created. We need to wait until resource is built
     /// </summary>
-    public bool hasDefaultUnit {get; private set;}
+    public bool hasDefaultUnit { get; private set; }
 
 
     private readonly object syncLock = new object();
@@ -276,7 +276,7 @@ public class Resource : Building<Resource.Actions>
     private void sendResource(float amount)
     {
 
-        if (amount  > 0.0)
+        if (amount > 0.0)
         {
             Goods goods = new Goods();
             goods.amount = amount;
@@ -289,7 +289,7 @@ public class Resource : Building<Resource.Actions>
                 BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.FOOD, amount);
                 goods.type = Goods.GoodsType.FOOD;
             }
-            else if(type.Equals(BuildingTypes.MINE))
+            else if (type.Equals(BuildingTypes.MINE))
             {
                 BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.METAL, amount);
                 goods.type = Goods.GoodsType.METAL;
@@ -421,14 +421,14 @@ public class Resource : Building<Resource.Actions>
     /// <summary>
     /// If unit inside building is attacked and killed we must recalculate
     /// collection rate and current harvestUnits. No harvestUnits means no
-   ///  production or collection so IDLE status.
+    ///  production or collection so IDLE status.
     /// </summary>
     /// <param name="other"></param>
     void OnTriggerStay(Collider other)
     {
 
         IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
-        if ((entity.info.isUnit)&&(entity.info.isCivil))
+        if ((entity.info.isUnit) && (entity.info.isCivil))
         {
             if (entity.status == EntityStatus.DEAD)
             {
@@ -483,7 +483,7 @@ public class Resource : Building<Resource.Actions>
     {
         if (_info.isResource)
         {
-            statistics.growth_speed *= -1;
+            statistics.getNegative();
             fire(Actions.DEL_STATS, statistics);
         }
 
@@ -578,7 +578,7 @@ public class Resource : Building<Resource.Actions>
                 {
                     hasDefaultUnit = true;
                 }
-                break; 
+                break;
 
             case EntityStatus.WORKING:
 
