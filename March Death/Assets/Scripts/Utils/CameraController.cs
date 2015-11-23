@@ -367,8 +367,7 @@ public class CameraController : MonoBehaviour
 
         float fov = Mathf.Clamp(newZoom, CAMERA_MAX_ZOOM, CAMERA_MIN_ZOOM);
         Camera.main.orthographicSize = fov;
-        _camera_zoom = fov;
-        Debug.Log(fov);     
+        _camera_zoom = fov;   
     }
 
 
@@ -467,10 +466,5 @@ public class CameraController : MonoBehaviour
     {
         stopFollowing();
         stopSmoothTravel();
-    }
-
-    public void OnGUI()
-    {
-        GUI.Label(new Rect(100 , 100, 200, 50), cameraContainer.transform.position.ToString());
     }
 }
