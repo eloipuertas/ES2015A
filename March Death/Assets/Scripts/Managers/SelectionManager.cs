@@ -243,7 +243,7 @@ namespace Managers
                 if (selected.entity.info.isUnit)
                 {
                     selected.GetComponent<Unit>().moveTo(point);
-                    fire(Actions.MOVE, selected.gameObject);
+                    fire(Actions.MOVE, selected);
                 }
 
             }
@@ -266,7 +266,7 @@ namespace Managers
                 {
                     Unit unit = selected.GetComponent<Unit>();
                     unit.attackTarget(enemy);
-                    fire(Actions.ATTACK, selected.gameObject);
+                    fire(Actions.ATTACK, selected);
                 }
             }
             Debug.Log("attacking");

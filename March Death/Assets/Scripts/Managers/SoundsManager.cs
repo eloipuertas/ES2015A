@@ -2,6 +2,8 @@
 using System.Collections;
 using Utils;
 using Managers;
+using System.Collections.Generic;
+
 namespace Managers
 {
     public class SoundsManager: MonoBehaviour
@@ -11,13 +13,28 @@ namespace Managers
         private AudioPool actionSoundPool;
         private AudioClip[] selectionSound;
         private AudioClip[] actionSound;
+        private Dictionary<Tuple<string, string>, AudioClip> sounds;
 
 
         void Start()
         {
             Setup();
             fakeSetup();
+            LoadSoundLibrary();
+        }
 
+
+        private void LoadSoundLibrary()
+        {
+            Object[] assets = Resources.LoadAll("Sounds/Buildings", typeof(AudioClip));
+            foreach(AudioClip audio in assets)
+            {
+                Debug.Log(audio.name);
+                string[] name = audio.name.Split('-');
+                string type = name[0], action = name[1];
+                sounds.Add(new Tuple<string, string>(type, action), audio);
+
+            }
         }
 
         /// <summary>
@@ -57,8 +74,13 @@ namespace Managers
         /// function to be triggered when an entity is selected
         /// </summary>
         /// <param name="obj"></param>
-        public void onEntitytSelected(System.Object obj)
+        public void onEntitytSelected(Object obj)
         {
+            Selectable selected = (Selectable)obj;
+            if(selected.entity.info.isBuilding)
+            {
+                Storage.BuildingInfo info = (Storage.BuildingInfo) selected.entity.info;
+            }
             selectionSoundPool.Play(selectionSound[RandomChoice()]);
         }
 
@@ -66,7 +88,7 @@ namespace Managers
         /// function to be triggered when a unit performs an action
         /// </summary>
         /// <param name="obj"></param>
-        public void onUnitAction(System.Object obj)
+        public void onUnitAction(Object obj)
         {
             actionSoundPool.Play(actionSound[RandomChoice()]);
         }
