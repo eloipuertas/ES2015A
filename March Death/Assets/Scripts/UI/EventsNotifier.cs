@@ -11,9 +11,9 @@ public class EventsNotifier : MonoBehaviour {
 
     // Unit creation messages
     private readonly string CIVILIAN_CREATED = "Civilian created.";
-    private readonly string LIGHT_ARMY_CREATED = "Light army warrior ready.";
-    private readonly string HEAVY_ARMY_CREATED = "Heavy army warrior ready.";
-    private readonly string CAVALRY_CREATED = "Cavalry warrior ready.";
+    private readonly string LIGHT_ARMY_CREATED = "Light armor warrior ready.";
+    private readonly string HEAVY_ARMY_CREATED = "Heavy armor warrior ready.";
+    private readonly string CAVALRY_CREATED = "Horseman ready.";
     private readonly string SHOOTER_CREATED = "Shooter ready.";
 
     // Building creation messages
@@ -41,6 +41,10 @@ public class EventsNotifier : MonoBehaviour {
     // Messages to indicate the loss of a unit
     private readonly string HERO_DEAD = "Your hero is dead.";
     private readonly string CIVILIAN_DEAD = "You have lost a civilian.";
+    private readonly string LIGHT_ARMY_DEAD = "You have lost a light armor soldier.";
+    private readonly string HEAVY_ARMY_DEAD = "You have lost a heavy armor soldier.";
+    private readonly string CAVALRY_DEAD = "You have lost a horseman.";
+    private readonly string SHOOTER_DEAD = "You have lost a shooter.";
 
     // Messages to indicate the loss of a building
     private readonly string STRONGHOLD_LOST = "You have lost your stronghold.";
@@ -163,9 +167,16 @@ public class EventsNotifier : MonoBehaviour {
                 AppendMessage(CIVILIAN_DEAD);
                 break;
             case Storage.UnitTypes.LIGHT:
+                AppendMessage(LIGHT_ARMY_DEAD);
+                break;
             case Storage.UnitTypes.THROWN:
+                AppendMessage(SHOOTER_DEAD);
+                break;
             case Storage.UnitTypes.CAVALRY:
+                AppendMessage(CAVALRY_DEAD);
+                break;
             case Storage.UnitTypes.HEAVY:
+                AppendMessage(HEAVY_ARMY_DEAD);
                 break;
             case Storage.UnitTypes.HERO:
                 AppendMessage(HERO_DEAD);
