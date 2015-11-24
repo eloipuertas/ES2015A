@@ -126,8 +126,12 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         // Instead of adding 10 to the center of the building, we should check the actual size of the building....
         _deploymentPoint = new Vector3(transform.position.x + 10, transform.position.y, transform.position.z + 10);
         activateFOWEntity();
-        _woundsReceived = info.buildingAttributes.wounds;
-        _woundsBuildControl = info.buildingAttributes.wounds;
+
+        if (DefaultStatus == EntityStatus.BUILDING_PHASE_1)
+        {
+            _woundsReceived = info.buildingAttributes.wounds;
+            _woundsBuildControl = info.buildingAttributes.wounds;
+        }
 
         //return (info.buildingAttributes.wounds - _woundsReceived) * 100f / info.buildingAttributes.wounds;
 
