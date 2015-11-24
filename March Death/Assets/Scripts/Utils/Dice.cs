@@ -20,9 +20,9 @@ namespace Utils
         public int rollN(int n)
         {
             double res = roll();
-            double step = (1.0 / n) + Double.Epsilon;
+            double step = 1.0 / n;
 
-            return (int)(res / step);
+            return (int)Math.Min(res / step, n - 1);
         }
 
         // Less expensive version of "rollN(6) + 1"

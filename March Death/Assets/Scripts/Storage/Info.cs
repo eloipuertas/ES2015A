@@ -62,7 +62,7 @@ namespace Storage
         private void parseJSONFiles<JSONType, EnumType>(string folder, Dictionary<Tuple<Races, EnumType>, EntityInfo> store, EntityType entityType) where JSONType : EntityInfo where EnumType : struct, IConvertible
         {
             Debug.Log("Parsing " + typeof(JSONType));
-
+            
             UnityEngine.Object[] assets = Resources.LoadAll(folder, typeof(TextAsset));
             foreach (UnityEngine.Object jsonObj in assets)
             {

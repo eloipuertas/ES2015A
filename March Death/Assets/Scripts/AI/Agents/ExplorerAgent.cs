@@ -180,7 +180,7 @@ namespace Assets.Scripts.AI.Agents
                             break;
 
                         case RescheduleType.RANDOM_AROUND_TARGET:
-                            result = findPlaceToExplore(grid, gridSize, out targetPos, knownPositions[D6.get.rollN(knownPositions.Count)], 50f);
+                            result = findPlaceToExplore(grid, gridSize, out targetPos, knownPositions[D6.get.rollN(knownPositions.Count)], 5f);
                             break;
 
                     }
@@ -198,7 +198,14 @@ namespace Assets.Scripts.AI.Agents
 
                         if (AIController.AI_DEBUG_ENABLED)
                         {
-                            ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
+                            ai.aiDebug.registerDebugInfoAboutUnit(u, agentName);
+                        }
+                    }
+                    else
+                    {
+                        if (AIController.AI_DEBUG_ENABLED)
+                        {
+                            ai.aiDebug.registerDebugInfoAboutUnit(u, agentName + " -> No Target");
                         }
                     }
                 }
