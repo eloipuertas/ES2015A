@@ -1,5 +1,22 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &106666
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 494734}
+  - 114: {fileID: 11403170}
+  - 119: {fileID: 11958914}
+  m_Layer: 10
+  m_Name: EntitySelection
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &113542
 GameObject:
   m_ObjectHideFlags: 0
@@ -14,7 +31,7 @@ GameObject:
   - 65: {fileID: 6501396}
   - 114: {fileID: 11443112}
   - 114: {fileID: 11476958}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Elf_Machine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29,7 +46,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 478030}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +61,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 434452}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Lamp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -61,7 +78,7 @@ GameObject:
   - 4: {fileID: 445446}
   - 33: {fileID: 3378944}
   - 23: {fileID: 2383372}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: (null)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87,12 +104,13 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 113542}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 780.776917, y: 79.013237, z: 863.253967}
+  m_LocalPosition: {x: 572.324707, y: 79.020668, z: 647.28717}
   m_LocalScale: {x: 1.70000005, y: 1.70000005, z: 1.70000005}
   m_Children:
   - {fileID: 445446}
   - {fileID: 478030}
   - {fileID: 434452}
+  - {fileID: 494734}
   m_Father: {fileID: 0}
   m_RootOrder: 0
 --- !u!4 &445446
@@ -119,6 +137,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 437858}
   m_RootOrder: 1
+--- !u!4 &494734
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 106666}
+  m_LocalRotation: {x: .707106829, y: 0, z: 0, w: .707106709}
+  m_LocalPosition: {x: 0, y: 50, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 437858}
+  m_RootOrder: 3
 --- !u!23 &2383372
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -182,6 +212,17 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 2, y: 3, z: 2}
   m_Center: {x: 0, y: 1.5, z: 0}
+--- !u!114 &11403170
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 106666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4f3a2240e8be8c48b8dc39005ac3c20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11426216
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -234,6 +275,24 @@ MonoBehaviour:
   race: 1
   type: 6
   _distanceToTarget: 0
+--- !u!119 &11958914
+Projector:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 106666}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_NearClipPlane: .100000001
+  m_FarClipPlane: 100
+  m_FieldOfView: 60
+  m_AspectRatio: 1
+  m_Orthographic: 1
+  m_OrthographicSize: 2.5
+  m_Material: {fileID: 2100000, guid: d7e7703eede09674aa0385b976896c3e, type: 2}
+  m_IgnoreLayers:
+    serializedVersion: 2
+    m_Bits: 1024
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
