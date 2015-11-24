@@ -131,8 +131,8 @@ public class GameInformation : MonoBehaviour {
         player.SetInitialResources(2000, 2000, 2000, 2000);
         game.AddPlayerInformation(player);
         player = new Battle.PlayerInformation(Races.ELVES);
-        player.AddUnit(UnitTypes.HERO, 946, 70);
-        player.AddBuilding(BuildingTypes.STRONGHOLD, 880, 70);
+        player.AddUnit(UnitTypes.HERO, 331.35f, 575.81f);
+        player.AddBuilding(BuildingTypes.STRONGHOLD, 283.7f, 562.5f);
         player.SetInitialResources(2000, 2000, 2000, 2000);
         game.AddPlayerInformation(player);
         game.SetWorldResources(5000, 5000, 5000);
