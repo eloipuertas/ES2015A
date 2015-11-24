@@ -8,7 +8,6 @@ using System.IO;
 
 namespace Pathfinding
 {
-    [ExecuteInEditMode]
     public class DetourCrowd : MonoBehaviour
     {
         public enum RenderMode { POLYS, DETAIL_POLYS, TILE_POLYS }
