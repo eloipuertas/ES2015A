@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
 using Utils;
-using Managers;
 using System.Collections.Generic;
 
 namespace Managers
@@ -13,19 +11,20 @@ namespace Managers
         private AudioPool actionSoundPool;
         private AudioClip[] selectionSound;
         private AudioClip[] actionSound;
-        private Dictionary<Tuple<string, string>, AudioClip> sounds;
+        private Dictionary<Tuple<Storage.BuildingTypes, string>, AudioClip> BuildingsSounds;
 
 
         void Start()
         {
             Setup();
             fakeSetup();
-            LoadSoundLibrary();
+         //   LoadSoundLibrary();
         }
 
 
         private void LoadSoundLibrary()
         {
+            /*
             Object[] assets = Resources.LoadAll("Sounds/Buildings", typeof(AudioClip));
             foreach(AudioClip audio in assets)
             {
@@ -35,6 +34,7 @@ namespace Managers
                 sounds.Add(new Tuple<string, string>(type, action), audio);
 
             }
+            */
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace Managers
         /// function to be triggered when an entity is selected
         /// </summary>
         /// <param name="obj"></param>
-        public void onEntitytSelected(Object obj)
+        public void onEntitytSelected(object obj)
         {
             Selectable selected = (Selectable)obj;
             if(selected.entity.info.isBuilding)
@@ -88,7 +88,7 @@ namespace Managers
         /// function to be triggered when a unit performs an action
         /// </summary>
         /// <param name="obj"></param>
-        public void onUnitAction(Object obj)
+        public void onUnitAction(object obj)
         {
             actionSoundPool.Play(actionSound[RandomChoice()]);
         }
@@ -99,7 +99,7 @@ namespace Managers
         /// <returns></returns>
         private int RandomChoice()
         {
-            return Random.Range(0, 3);
+            return UnityEngine.Random.Range(0, 3);
         }
 
         void OnDestroy()
