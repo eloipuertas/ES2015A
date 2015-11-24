@@ -432,7 +432,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     	}
     }
 
-    protected void setStatus(EntityStatus status)
+    protected virtual void setStatus(EntityStatus status)
     {
         _status = status;
 

@@ -463,6 +463,16 @@ public class Unit : GameEntity<Unit.Actions>
 #endif
     }
 
+    protected override void setStatus(EntityStatus status)
+    {
+        if (!_followingTarget && status == EntityStatus.MOVING)
+        {
+            fire(Actions.MOVEMENT_END);
+        }
+
+        base.setStatus(status);
+    }
+
     /// <summary>
     /// Called every fixed physics frame
     /// </summary>
@@ -495,8 +505,8 @@ public class Unit : GameEntity<Unit.Actions>
                     if (_distanceToTarget <= currentAttackRange())
                     {
                         _detourAgent.ResetPath();
-                        _followingTarget = false;
                         setStatus(EntityStatus.ATTACKING);
+                        _followingTarget = false;
                         return;
                     }
                 }
@@ -507,7 +517,6 @@ public class Unit : GameEntity<Unit.Actions>
                     {
                         _detourAgent.ResetPath();
                         setStatus(EntityStatus.IDLE);
-                        fire(Actions.MOVEMENT_END);
                     }
                 }
 
