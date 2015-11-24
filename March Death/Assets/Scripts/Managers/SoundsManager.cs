@@ -76,11 +76,13 @@ namespace Managers
         /// <param name="obj"></param>
         public void onEntitytSelected(object obj)
         {
+            /*
             Selectable selected = (Selectable)obj;
             if(selected.entity.info.isBuilding)
             {
                 Storage.BuildingInfo info = (Storage.BuildingInfo) selected.entity.info;
             }
+            */
             selectionSoundPool.Play(selectionSound[RandomChoice()]);
         }
 

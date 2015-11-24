@@ -16,7 +16,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public Collider _collider;
     private GameObject controller;
     private GameObject plane;
-    private EntitySelection _entitySelection;
+    private EntitySelection _unitSelection;
 
     public bool currentlySelected { get; set; }
     private float healthRatio = 1f;
@@ -53,7 +53,9 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         selectedBox = SelectionOverlay.CreateTexture(ownUnit);
         plane = SelectionOverlay.getPlane(gameObject);
 
-        RetrieveLightSelection();
+        // only apply for units
+        if (entity.info.isUnit) RetrieveLightSelection();
+        else _unitSelection = null;
     }
 
     public override void Update() { }
@@ -110,7 +112,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public virtual void SelectEntity()
     {
         this.currentlySelected = true;
-        if (_entitySelection) _entitySelection.Enable();
+        if (_unitSelection) _unitSelection.Enable();
         fire(Actions.SELECTED);
     }
 
@@ -120,7 +122,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public virtual void DeselectEntity()
     {
         this.currentlySelected = false;
-        if (_entitySelection) _entitySelection.Disable();
+        if (_unitSelection) _unitSelection.Disable();
         fire(Actions.DESELECTED);
     }
 
@@ -142,15 +144,17 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     	this.currentlySelected = false;
     }
 
+    /// <summary>
+    /// Retrieves the new selection mechanism
+    /// </summary>
     private void RetrieveLightSelection()
     {
         
         GameObject selection = transform.FindChild("EntitySelection").gameObject;
-        if (selection)
-        {
-            _entitySelection = selection.GetComponent<EntitySelection>();
-            _entitySelection.SetColorRace(race);
-        }
-        else { _entitySelection = null; }
+
+        if (!selection) throw new System.Exception("FIX: " + entity.info.race + " - "  + entity.info.name + " prefab needs the EntitySelection prefab which is in Resources/prefab/selection");
+        _unitSelection = selection.GetComponent<EntitySelection>();
+        _unitSelection.SetColorRace(race);
+        
     }
 }
