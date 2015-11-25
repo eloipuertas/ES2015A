@@ -51,6 +51,38 @@ namespace Pathfinding
             {
     			PathDetour.get.Initialize(navmeshData);
     			crowd = Detour.Crowd.createCrowd(MaxAgents, AgentMaxRadius, PathDetour.get.NavMesh);
+
+                RecastConfig recastConfig = FindObjectOfType<RecastConfig>();
+                Dictionary<string, ushort> areas = new Dictionary<string, ushort>();
+
+                ushort k = 1;
+                foreach (var layer in recastConfig.Layers)
+                {
+                    areas.Add(layer.LayerID, k);
+                    TileCache.addFlag(k, 1);
+                    k *= 2;
+                }
+
+                k = 0;
+                foreach (var filter in recastConfig.Filters)
+                {
+                    ushort include = 0;
+                    ushort exclude = 0;
+
+                    foreach (var incl in filter.Include)
+                    {
+                        include |= areas[incl.Name];
+                    }
+
+                    foreach (var excl in filter.Exclude)
+                    {
+                        exclude |= areas[excl.Name];
+                    }
+                    
+                    Detour.Crowd.setFilter(crowd, k, include, exclude);
+                    ++k;
+                }
+
                 randomSample = new float[3];
                 positions = new float[MaxAgents * 3];
                 velocities = new float[MaxAgents * 3];

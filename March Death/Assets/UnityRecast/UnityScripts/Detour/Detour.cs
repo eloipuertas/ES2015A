@@ -28,6 +28,9 @@ namespace Pathfinding
             public static extern IntPtr createCrowd(int maxAgents, float maxRadius, IntPtr navmesh);
 
             [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+            public static extern void setFilter(IntPtr crowd, int filter, ushort include, ushort exclude);
+
+            [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
             public static extern int addAgent(IntPtr crowd, float[] p, ref CrowdAgentParams ap);
 
             [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
@@ -49,10 +52,10 @@ namespace Pathfinding
             public static extern void updateTick(IntPtr tileCache, IntPtr nav, IntPtr crowd, float dt, float[] positions, float[] velocities, byte[] states, byte[] targetStates, ref int nagents);
 
             [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
-            public static extern void randomPoint(IntPtr crowd, float[] targetPoint);
+            public static extern bool randomPoint(IntPtr crowd, float[] targetPoint);
 
             [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
-            public static extern void randomPointInCircle(IntPtr crowd, float[] initialPoint, float maxRadius, float[] targetPoint);
+            public static extern bool randomPointInCircle(IntPtr crowd, float[] initialPoint, float maxRadius, float[] targetPoint);
         }
     }
 }

@@ -215,6 +215,23 @@ namespace Pathfinding
 
             UpdateProgress(0.5f);
 
+            RecastConfig recastConfig = FindObjectOfType<RecastConfig>();
+            Dictionary<string, ushort> areas = new Dictionary<string, ushort>();
+
+            ushort k = 1;
+            foreach (var layer in recastConfig.Layers)
+            {
+                areas.Add(layer.LayerID, k);
+                TileCache.addFlag(k, 1);
+                k *= 2;
+            }
+
+            DetourConvexVolume[] volumes = FindObjectsOfType<Pathfinding.DetourConvexVolume>();
+            foreach (var volume in volumes)
+            {
+                TileCache.addConvexVolume(volume.floatNodes(), volume.nodes.Count, volume.maxY, volume.minY, areas[volume.AreaID]);
+            }
+
             IntPtr tileCache = new IntPtr(0);
             IntPtr navMesh = new IntPtr(0);
             IntPtr navQuery = new IntPtr(0);
