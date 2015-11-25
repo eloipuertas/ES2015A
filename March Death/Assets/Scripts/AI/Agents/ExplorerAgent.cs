@@ -148,8 +148,6 @@ namespace Assets.Scripts.AI.Agents
                     return;
                 }
 
-                Debug.Log(reference + " " + reschedule);
-
                 // If we've lost the hero, seek it with the closer unit, regardless of what FOWManager tells us
                 if (lostHero)
                 {

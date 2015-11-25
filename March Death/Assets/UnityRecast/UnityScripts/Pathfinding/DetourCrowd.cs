@@ -49,21 +49,23 @@ namespace Pathfinding
         {
             if (navmeshData != null)
             {
-    			PathDetour.get.Initialize(navmeshData);
-    			crowd = Detour.Crowd.createCrowd(MaxAgents, AgentMaxRadius, PathDetour.get.NavMesh);
 
                 RecastConfig recastConfig = FindObjectOfType<RecastConfig>();
                 Dictionary<string, ushort> areas = new Dictionary<string, ushort>();
 
-                ushort k = 1;
-                foreach (var layer in recastConfig.Layers)
+                PathDetour.get.Initialize(navmeshData, () =>
                 {
-                    areas.Add(layer.LayerID, k);
-                    TileCache.addFlag(k, 1);
-                    k *= 2;
-                }
+                    ushort n = 1;
+                    foreach (var layer in recastConfig.Layers)
+                    {
+                        areas.Add(layer.LayerID, n);
+                        TileCache.addFlag(n, 1);
+                        n *= 2;
+                    }
+                });
+    			crowd = Detour.Crowd.createCrowd(MaxAgents, AgentMaxRadius, PathDetour.get.NavMesh);
 
-                k = 0;
+                ushort k = 0;
                 foreach (var filter in recastConfig.Filters)
                 {
                     ushort include = 0;
@@ -208,12 +210,13 @@ namespace Pathfinding
                 agent.State = (DetourAgent.CrowdAgentState)states[entry.Key];
                 agent.TargetState = (DetourAgent.MoveRequestState)targetStates[entry.Key];
 
+                Vector3 newPosition = ToVector3(positions, entry.Key * 3);
+                agent.transform.position = newPosition;
+
                 if (agent.Velocity.sqrMagnitude != 0)
                 {
-                    Vector3 newPosition = ToVector3(positions, entry.Key * 3);
                     Quaternion lookRotation = Quaternion.LookRotation(agent.Velocity);
 
-                    agent.transform.position = newPosition;
                     agent.transform.rotation = lookRotation;
                 }
             }

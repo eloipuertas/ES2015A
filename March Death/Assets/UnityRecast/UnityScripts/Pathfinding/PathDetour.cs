@@ -17,7 +17,7 @@ public class PathDetour : Utils.Singleton<PathDetour>
     {
     }
 
-    public void Initialize(TileCacheAsset navmeshData)
+    public void Initialize(TileCacheAsset navmeshData, Action postInitialize = null)
     {
         // Is it already initialized?
         if (TileCache.ToInt64() != 0)
@@ -27,6 +27,12 @@ public class PathDetour : Utils.Singleton<PathDetour>
 
         Assert.IsTrue(Pathfinding.Detour.pointerSize() == IntPtr.Size);
         Pathfinding.Recast.DefaultConfig(Application.dataPath + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Recast.log");
+
+        // Call postInitialize
+        if (postInitialize != null)
+        {
+            postInitialize();
+        }
 
         bool result = Pathfinding.TileCache.loadFromTileCacheHeaders(ref navmeshData.header, navmeshData.tilesHeader, navmeshData.tilesData, ref TileCache, ref NavMesh, ref NavQuery);
         if (!result)
