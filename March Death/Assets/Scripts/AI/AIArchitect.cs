@@ -7,10 +7,12 @@ namespace Assets.Scripts.AI
     class AIArchitect
     {
         String currentBaseMap;
+        AIController ai;
 
-        public AIArchitect(MacroManager ai)
+        public AIArchitect(AIController aic)
         {
-            readMap("easy_base_1.txt");
+            //readMap("easy_base_1.txt");
+            ai = aic;
         }
 
         /// <summary>

@@ -20,12 +20,14 @@ namespace Assets.Scripts.AI
         /// </summary>
         List<BuildingTypes> buildingPref;
         List<UnitTypes> UnitPref;
+        AIArchitect architect;
         AIController ai;
         public MacroManager(AIController ai)
         {
             this.ai = ai;
             buildingPref = new List<BuildingTypes>() { BuildingTypes.FARM, BuildingTypes.MINE, BuildingTypes.SAWMILL };
             UnitPref = new List<UnitTypes>() {UnitTypes.CIVIL};
+            architect = new AIArchitect(ai);
         }
         /// <summary>
         /// Called every few seconds, plans ahead and makes lists with what it wants
