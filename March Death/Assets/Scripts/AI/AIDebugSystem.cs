@@ -107,6 +107,10 @@ public class AIDebugSystem : MonoBehaviour {
         resourcesWindowRect = GUI.Window(2, resourcesWindowRect, showResources, "AI Resources");
     }
 
+    /// <summary>
+    /// Shows the resources of the AI in order to check if AI is spending money
+    /// </summary>
+    /// <param name="windowID"></param>
     void showResources(int windowID)
     {
         GUI.contentColor = Color.red;
