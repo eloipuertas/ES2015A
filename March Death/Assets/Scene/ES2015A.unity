@@ -8555,9 +8555,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   polymesh: {fileID: 11400000, guid: 26535da75e2ef5843a869e7e30a2d766, type: 2}
-  navmeshData: {fileID: 11400000, guid: 31f0d35e0a029574cab2ed55992032c7, type: 2}
+  navmeshData: {fileID: 11400000, guid: f107084265ae9d44a87e33ef5bf7ed0f, type: 2}
   MaxAgents: 1024
   AgentMaxRadius: 2
+  RenderInEditor: 1
+  material: {fileID: 2100000, guid: 35a4642327730e24e8d16d93def86e86, type: 2}
+  Mode: 2
 --- !u!114 &865109085
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12962,7 +12965,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 780611a67e8e941a2b3aa96e5915a793, type: 2}
       propertyPath: m_RootOrder
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 780611a67e8e941a2b3aa96e5915a793, type: 2}
       propertyPath: m_LocalScale.z

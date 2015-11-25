@@ -86,7 +86,7 @@ namespace Pathfinding
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
         public float[] bmax;              ///< The maximum bounds of the tile's AABB. [(x, y, z)]
 
-        /// The bounding volume quantization factor. 
+        /// The bounding volume quantization factor.
         public float bvQuantFactor;
     }
 
@@ -119,5 +119,35 @@ namespace Pathfinding
         public uint triBase;           ///< The offset of the triangles in the dtMeshTile::detailTris array.
         public byte vertCount;        ///< The number of vertices in the sub-mesh.
         public byte triCount;         ///< The number of triangles in the sub-mesh.
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct CrowdAgentParams
+    {
+    	public float radius;						///< Agent radius. [Limit: >= 0]
+    	public float height;						///< Agent height. [Limit: > 0]
+    	public float maxAcceleration;				///< Maximum allowed acceleration. [Limit: >= 0]
+    	public float maxSpeed;						///< Maximum allowed speed. [Limit: >= 0]
+
+    	/// Defines how close a collision element must be before it is considered for steering behaviors. [Limits: > 0]
+    	public float collisionQueryRange;
+
+    	public float pathOptimizationRange;		///< The path visibility optimization range. [Limit: > 0]
+
+    	/// How aggresive the agent manager should be at avoiding collisions with this agent. [Limit: >= 0]
+    	public float separationWeight;
+
+    	/// Flags that impact steering behavior. (See: #UpdateFlags)
+    	public byte updateFlags;
+
+    	/// The index of the avoidance configuration to use for the agent.
+    	/// [Limits: 0 <= value <= #DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS]
+    	public byte obstacleAvoidanceType;
+
+    	/// The index of the query filter used by this agent.
+    	public byte queryFilterType;
+
+    	/// User defined data attached to the agent.
+    	public IntPtr userData;
     };
 }

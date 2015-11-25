@@ -71,6 +71,7 @@ namespace Pathfinding
         public float AgentHeight;
         public float AgentRadius;
         public float AgentMaxClimb;
+        public int MaxObstacles;
     };
 
     [StructLayout(LayoutKind.Sequential)]

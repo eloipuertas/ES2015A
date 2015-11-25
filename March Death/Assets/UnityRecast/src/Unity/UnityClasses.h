@@ -146,6 +146,7 @@ struct ExtendedConfig
 	float AgentHeight;
 	float AgentRadius;
 	float AgentMaxClimb;
+	int MaxObstacles;
 };
 
 struct InputGeometry

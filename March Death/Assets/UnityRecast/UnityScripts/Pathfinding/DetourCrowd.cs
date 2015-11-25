@@ -3,17 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Assertions;
 using System.IO;
 
 namespace Pathfinding
 {
     public class DetourCrowd : MonoBehaviour
     {
+        public enum RenderMode { POLYS, DETAIL_POLYS, TILE_POLYS }
+
 		public PolyMeshAsset polymesh;
 		public TileCacheAsset navmeshData;
 
         public int MaxAgents = 1024;
         public float AgentMaxRadius = 2;
+
+        public bool RenderInEditor = false;
+        public Material material;
+        public RenderMode Mode;
+        private DbgRenderMesh mesh = new DbgRenderMesh();
 
         private IntPtr crowd = new IntPtr(0);
         private Dictionary<int, DetourAgent> agents = new Dictionary<int, DetourAgent>();
@@ -38,12 +46,45 @@ namespace Pathfinding
 
         public void OnEnable()
         {
-			PathDetour.get.Initialize(navmeshData);
-			crowd = Detour.Crowd.createCrowd(MaxAgents, AgentMaxRadius, PathDetour.get.NavMesh);
-            positions = new float[MaxAgents * 3];
-            velocities = new float[MaxAgents * 3];
-            targetStates = new byte[MaxAgents];
-            states = new byte[MaxAgents];
+            if (navmeshData != null)
+            {
+    			PathDetour.get.Initialize(navmeshData);
+    			crowd = Detour.Crowd.createCrowd(MaxAgents, AgentMaxRadius, PathDetour.get.NavMesh);
+                positions = new float[MaxAgents * 3];
+                velocities = new float[MaxAgents * 3];
+                targetStates = new byte[MaxAgents];
+                states = new byte[MaxAgents];
+
+                if (!Application.isPlaying && RenderInEditor)
+                {
+                    mesh.Clear();
+
+                    switch (Mode)
+                    {
+                        case RenderMode.POLYS:
+                            Assert.IsTrue(polymesh != null);
+
+                            RecastDebug.ShowRecastNavmesh(mesh, polymesh.PolyMesh, polymesh.config);
+                            break;
+
+                        case RenderMode.DETAIL_POLYS:
+                            Assert.IsTrue(polymesh != null);
+
+                            RecastDebug.ShowRecastDetailMesh(mesh, polymesh.PolyDetailMesh);
+                            break;
+
+                        case RenderMode.TILE_POLYS:
+                            for (int i = 0; i < navmeshData.header.numTiles; ++i)
+                                RecastDebug.ShowTilePolyDetails(mesh, PathDetour.get.NavMesh, i);
+                            break;
+                    }
+
+                    RecastDebug.RenderObstacles(PathDetour.get.TileCache);
+
+                    mesh.CreateGameObjects("RecastRenderer", material);
+                    mesh.Rebuild();
+                }
+            }
         }
 
         public static float[] ToFloat(Vector3 p)
@@ -56,40 +97,52 @@ namespace Pathfinding
             return new Vector3(p[off + 0], p[off + 1], p[off + 2]);
         }
 
-        public int AddAgent(IGameEntity entity, float radius, float height)
+        public int AddAgent(DetourAgent agent, CrowdAgentParams ap)
         {
-            int idx = Detour.Crowd.addAgent(crowd, ToFloat(entity.getTransform().position), radius, height);
+            Assert.IsTrue(crowd.ToInt64() != 0);
+
+            int idx = Detour.Crowd.addAgent(crowd, ToFloat(agent.transform.position), ref ap);
             if (idx != -1)
             {
-                agents.Add(idx, entity.getGameObject().GetComponent<DetourAgent>());
+                agents.Add(idx, agent);
             }
 
             return idx;
         }
 
-        public void SetAgentParemeters(int idx, float maxAcceleration, float maxSpeed)
+        public void UpdateAgentParemeters(int idx, CrowdAgentParams ap)
         {
-            Detour.Crowd.updateAgent(crowd, idx, maxAcceleration, maxSpeed);
+            Assert.IsTrue(crowd.ToInt64() != 0);
+
+            Detour.Crowd.updateAgent(crowd, idx, ref ap);
         }
 
         public void RemoveAgent(int idx)
         {
+            Assert.IsTrue(crowd.ToInt64() != 0);
+
             Detour.Crowd.removeAgent(crowd, idx);
             agents.Remove(idx);
         }
 
         public void MoveTarget(int idx, Vector3 target)
         {
+            Assert.IsTrue(crowd.ToInt64() != 0);
+
             Detour.Crowd.setMoveTarget(PathDetour.get.NavQuery, crowd, idx, ToFloat(target), false);
         }
 
         public void ResetPath(int idx)
         {
+            Assert.IsTrue(crowd.ToInt64() != 0);
+
             Detour.Crowd.resetPath(crowd, idx);
         }
 
         public void Update()
         {
+            Assert.IsTrue(crowd.ToInt64() != 0);
+
             Detour.Crowd.updateTick(PathDetour.get.TileCache, PathDetour.get.NavMesh, crowd, Time.deltaTime, positions, velocities, states, targetStates, ref numUpdated);
 
             foreach (KeyValuePair<int, DetourAgent> entry in agents)
@@ -98,7 +151,7 @@ namespace Pathfinding
                 agent.Velocity = ToVector3(velocities, entry.Key * 3);
                 agent.State = (DetourAgent.CrowdAgentState)states[entry.Key];
                 agent.TargetState = (DetourAgent.MoveRequestState)targetStates[entry.Key];
-                
+
                 if (agent.Velocity.sqrMagnitude != 0)
                 {
                     Vector3 newPosition = ToVector3(positions, entry.Key * 3);
