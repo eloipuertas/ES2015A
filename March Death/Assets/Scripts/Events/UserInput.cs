@@ -117,6 +117,7 @@ public partial class UserInput : MonoBehaviour
 
     private void LeftClick()
     {
+
         switch (player.currently)
         {
             case Player.status.IDLE:
