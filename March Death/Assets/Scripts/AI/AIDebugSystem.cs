@@ -24,6 +24,7 @@ public class AIDebugSystem : MonoBehaviour {
     bool showInfo { get; set; }
     public Rect commandingAgentWindowRect = new Rect(20, 20, 200, 80);
     public Rect statsWindowRect = new Rect(20 + 200 + 10, 20, 400, 100);
+    public Rect resourcesWindowRect = new Rect(20 + 200 + 10 + 400 + 10, 20, 120, 105);
 
     private const int WINDOW_HEIGHT_OFFSET_TOLERANCE = 20;
 
@@ -103,6 +104,20 @@ public class AIDebugSystem : MonoBehaviour {
         commandingAgentWindowRect = GUI.Window(0, commandingAgentWindowRect, controllingAgentWindow, "AI Debug");
         statsWindowRect = GUI.Window(1, statsWindowRect, statisticsWindow, "AI Stats");
         showAIInfoOverUnits();
+        resourcesWindowRect = GUI.Window(2, resourcesWindowRect, showResources, "AI Resources");
+    }
+
+    void showResources(int windowID)
+    {
+        GUI.contentColor = Color.red;
+        GUI.Label(new Rect(marginLeft, 20, textWidth, textHeight), "Food: " + controller.resources.getAmount(WorldResources.Type.FOOD).ToString());
+        GUI.contentColor = Color.white;
+        GUI.Label(new Rect(marginLeft, 40, textWidth, textHeight), "Wood: " + controller.resources.getAmount(WorldResources.Type.WOOD).ToString());
+        GUI.contentColor = Color.yellow;
+        GUI.Label(new Rect(marginLeft, 60, textWidth, textHeight), "Gold: " + controller.resources.getAmount(WorldResources.Type.GOLD).ToString());
+        GUI.contentColor = Color.cyan;
+        GUI.Label(new Rect(marginLeft, 80, textWidth, textHeight), "Metal: " + controller.resources.getAmount(WorldResources.Type.METAL).ToString());
+        GUI.DragWindow();
     }
 
     /// <summary>
@@ -140,6 +155,8 @@ public class AIDebugSystem : MonoBehaviour {
         showAgentsStats();
         GUI.DragWindow();
     }
+
+
 
     /// <summary>
     /// Used to display each agent stats on the Statistics window
