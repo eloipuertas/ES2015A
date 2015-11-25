@@ -48,7 +48,7 @@ namespace Assets.Scripts.AI
         public override void Start()
         {
             base.Start();
-
+            DifficultyLvl = 2; //TODO remove when this gets assigned from the menu
             _selfRace = info.GetPlayerRace() == Races.MEN ? Races.ELVES : Races.MEN;
 
             //Init lists

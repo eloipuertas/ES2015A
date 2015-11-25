@@ -113,6 +113,8 @@ public class AIDebugSystem : MonoBehaviour {
     void controllingAgentWindow(int windowID)
     {
         resetLines();
+        GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), "Difficulty lvl: "+controller.DifficultyLvl);
+        controller.DifficultyLvl=Mathf.RoundToInt(GUI.HorizontalSlider(new Rect(marginLeft, getNextLine()+5, textWidth, textHeight), controller.DifficultyLvl, 0, 10));
         GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), "Choosen Agent:");
         GUI.contentColor = Color.red;
         GUI.Label(new Rect(marginLeft, getNextLine(), textWidth, textHeight), controllingAgent);
