@@ -100,6 +100,7 @@ namespace Assets.Scripts.AI
             missionStatus = new MissionStatus(playerId);
 
         }
+        
         void Update()
         {
             if (!missionStatus.isGameOver())

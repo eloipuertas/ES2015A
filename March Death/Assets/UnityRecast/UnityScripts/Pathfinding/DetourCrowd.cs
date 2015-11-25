@@ -26,6 +26,7 @@ namespace Pathfinding
         private IntPtr crowd = new IntPtr(0);
         private Dictionary<int, DetourAgent> agents = new Dictionary<int, DetourAgent>();
 
+        private float[] randomSample = null;
         private float[] positions = null;
         private float[] velocities = null;
         private byte[] targetStates = null;
@@ -50,6 +51,39 @@ namespace Pathfinding
             {
     			PathDetour.get.Initialize(navmeshData);
     			crowd = Detour.Crowd.createCrowd(MaxAgents, AgentMaxRadius, PathDetour.get.NavMesh);
+
+                RecastConfig recastConfig = FindObjectOfType<RecastConfig>();
+                Dictionary<string, ushort> areas = new Dictionary<string, ushort>();
+
+                ushort k = 1;
+                foreach (var layer in recastConfig.Layers)
+                {
+                    areas.Add(layer.LayerID, k);
+                    TileCache.addFlag(k, 1);
+                    k *= 2;
+                }
+
+                k = 0;
+                foreach (var filter in recastConfig.Filters)
+                {
+                    ushort include = 0;
+                    ushort exclude = 0;
+
+                    foreach (var incl in filter.Include)
+                    {
+                        include |= areas[incl.Name];
+                    }
+
+                    foreach (var excl in filter.Exclude)
+                    {
+                        exclude |= areas[excl.Name];
+                    }
+                    
+                    Detour.Crowd.setFilter(crowd, k, include, exclude);
+                    ++k;
+                }
+
+                randomSample = new float[3];
                 positions = new float[MaxAgents * 3];
                 velocities = new float[MaxAgents * 3];
                 targetStates = new byte[MaxAgents];
@@ -92,7 +126,7 @@ namespace Pathfinding
             return new float[] { p.x, p.y, p.z };
         }
 
-        public static Vector3 ToVector3(float[] p, int off)
+        public static Vector3 ToVector3(float[] p, int off = 0)
         {
             return new Vector3(p[off + 0], p[off + 1], p[off + 2]);
         }
@@ -137,6 +171,28 @@ namespace Pathfinding
             Assert.IsTrue(crowd.ToInt64() != 0);
 
             Detour.Crowd.resetPath(crowd, idx);
+        }
+
+        public bool RandomValidPoint(ref Vector3 dest)
+        {
+            if (Detour.Crowd.randomPoint(crowd, randomSample))
+            {
+                dest = ToVector3(randomSample);
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool RandomValidPointInCircle(Vector3 cercleCenter, float maxRadius, ref Vector3 dest)
+        {
+            if (Detour.Crowd.randomPointInCircle(crowd, ToFloat(cercleCenter), maxRadius, randomSample))
+            {
+                dest = ToVector3(randomSample);
+                return true;
+            }
+
+            return false;
         }
 
         public void Update()

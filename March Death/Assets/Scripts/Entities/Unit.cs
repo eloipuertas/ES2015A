@@ -36,6 +36,12 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     const float RESOURCES_UPDATE_INTERVAL = 15.0f;
 
+    /// <summary>
+    /// Update follow distance when greater than this value
+    /// Do note this values is the SQUARED (^2) value of the real distance
+    /// </summary>
+    const float SQR_UPDATE_DISTANCE = 75.0f;
+
     Statistics statistics;
 
     ///<sumary>
@@ -82,6 +88,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// NavAgent, used fot map navigation
     /// </summary>
     private DetourAgent _detourAgent;
+    public DetourAgent Agent { get { return _detourAgent; } }
 
     /// <summary>
     /// Can this unit perform ranged attacks?
@@ -469,6 +476,16 @@ public class Unit : GameEntity<Unit.Actions>
 #endif
     }
 
+    public override void setStatus(EntityStatus status)
+    {
+        if (!_followingTarget && status == EntityStatus.MOVING)
+        {
+            fire(Actions.MOVEMENT_END);
+        }
+
+        base.setStatus(status);
+    }
+
     /// <summary>
     /// Called every fixed physics frame
     /// </summary>
@@ -484,18 +501,25 @@ public class Unit : GameEntity<Unit.Actions>
                 {
                     // Update destination only if target has moved
                     Vector3 destination = _closestPointToTarget;
-                    if (destination != _movePoint)
+                    if ((destination - _movePoint).sqrMagnitude > SQR_UPDATE_DISTANCE)
                     {
-                        _detourAgent.MoveTo(destination);
+                        // Try to predict next point!
+                        if (_target.info.isUnit)
+                        {
+                            destination = _closestPointToTarget + ((Unit)_target).Agent.Velocity.normalized * (float)Math.Sqrt(SQR_UPDATE_DISTANCE);
+                        }
+
+                        // Save move point
                         _movePoint = destination;
+                        _detourAgent.MoveTo(destination);
                     }
 
                     // If we are already close enough, stop and attack
                     if (_distanceToTarget <= currentAttackRange())
                     {
                         _detourAgent.ResetPath();
-                        _followingTarget = false;
                         setStatus(EntityStatus.ATTACKING);
+                        _followingTarget = false;
                         return;
                     }
                 }
@@ -506,11 +530,6 @@ public class Unit : GameEntity<Unit.Actions>
                     {
                         _detourAgent.ResetPath();
                         setStatus(EntityStatus.IDLE);
-                        fire(Actions.MOVEMENT_END);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("NavMesh not stopped at attack range... AttackRange = " + currentAttackRange());
                     }
                 }
 

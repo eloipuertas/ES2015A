@@ -445,7 +445,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         return false;
     }
 
-    public void setStatus(EntityStatus status)
+    public virtual void setStatus(EntityStatus status)
     {
         _status = status;
 

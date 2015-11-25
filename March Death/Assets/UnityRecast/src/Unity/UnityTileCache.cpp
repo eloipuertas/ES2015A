@@ -1,5 +1,8 @@
 #include "Unity3d.h"
 
+#include <time.h>
+#include <stdlib.h>
+
 static const int EXPECTED_LAYERS_PER_TILE = 4;
 static const int TILECACHESET_MAGIC = 'T' << 24 | 'S' << 16 | 'E' << 8 | 'T'; //'TSET';
 static const int TILECACHESET_VERSION = 1;
@@ -8,6 +11,12 @@ LinearAllocator* allocator = new LinearAllocator(5*1024*1024);
 FastLZCompressor* compressor = new FastLZCompressor();
 MeshProcess* processor = new MeshProcess();
 
+int numConvexVolumes = 0;
+ConvexVolume convexVolumes[MAX_CONVEX_VOLUMES];
+
+int numFlags = 0;
+unsigned short flags[MAX_FLAGS];
+unsigned short costs[MAX_FLAGS];
 
 static int rasterizeTileLayers(Context* ctx, TileCacheHolder* holder,
 	const int tx, const int ty,
@@ -115,15 +124,12 @@ static int rasterizeTileLayers(Context* ctx, TileCacheHolder* holder,
 	}
 
 	// (Optional) Mark areas.
-	/*
-	const ConvexVolume* vols = geom->getConvexVolumes();
-	for (int i = 0; i < geom->getConvexVolumeCount(); ++i)
+	for (int i = 0; i < numConvexVolumes; ++i)
 	{
-		rcMarkConvexPolyArea(ctx, vols[i].verts, vols[i].nverts,
-			vols[i].hmin, vols[i].hmax,
-			(unsigned char)vols[i].area, *rc.chf);
+		rcMarkConvexPolyArea(ctx, convexVolumes[i].verts, convexVolumes[i].nverts,
+			convexVolumes[i].hmin, convexVolumes[i].hmax,
+			(unsigned char)convexVolumes[i].area, *rc.chf);
 	}
-	*/
 
 	rc.lset = rcAllocHeightfieldLayerSet();
 	if (!rc.lset)
@@ -337,6 +343,43 @@ bool handleTileCacheBuild(rcConfig* cfg, ExtendedConfig* ecfg, InputGeometry* ge
 	return true;
 }
 
+void MeshProcess::process(struct dtNavMeshCreateParams* params,
+	unsigned char* polyAreas, unsigned short* polyFlags)
+{
+	for (int i = 0; i < params->polyCount; ++i)
+	{
+		if (polyAreas[i] == DT_TILECACHE_WALKABLE_AREA)
+		{
+			polyFlags[i] = flags[0];
+		}
+
+		for (int j = 1; j < numFlags; ++j)
+		{
+			if (polyAreas[i] == flags[j])
+			{
+				polyFlags[i] |= flags[j];
+			}
+		}
+	}
+}
+
+void addFlag(unsigned short area, unsigned short cost)
+{
+	flags[numFlags] = area;
+	costs[numFlags] = cost;
+	++numFlags;
+}
+
+void addConvexVolume(float* verts, int nverts, float hmax, float hmin, int area)
+{
+	memcpy(convexVolumes[numConvexVolumes].verts, verts, nverts * 3);
+	convexVolumes[numConvexVolumes].nverts = nverts;
+	convexVolumes[numConvexVolumes].hmax = hmax;
+	convexVolumes[numConvexVolumes].hmin = hmin;
+	convexVolumes[numConvexVolumes].area = area;
+	++numConvexVolumes;
+}
+
 void getTileCacheHeaders(TileCacheSetHeader& header, TileCacheTileHeader*& tilesHeader, dtTileCache* tileCache, dtNavMesh* navMesh)
 {
 	// Store header.
@@ -493,7 +536,6 @@ dtCrowd* createCrowd(int maxAgents, float maxRadius, dtNavMesh* navmesh)
 {
 	dtCrowd* crowd = dtAllocCrowd();
 	crowd->init(maxAgents, maxRadius, navmesh);
-	crowd->getEditableFilter(0)->setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
 
 	dtObstacleAvoidanceParams params;
 	// Use mostly default settings, copy from dtCrowd.
@@ -530,8 +572,17 @@ dtCrowd* createCrowd(int maxAgents, float maxRadius, dtNavMesh* navmesh)
 	return crowd;
 }
 
+void setFilter(dtCrowd* crowd, int filter, unsigned short include, unsigned short exclude)
+{
+	crowd->getEditableFilter(filter)->setIncludeFlags(include);
+	crowd->getEditableFilter(filter)->setExcludeFlags(exclude);
+}
+
 int addAgent(dtCrowd* crowd, float* p, dtCrowdAgentParams* ap)
 {
+	// Randomize now, because yes!
+	srand(time(NULL));
+
 	return crowd->addAgent(p, ap);
 }
 
@@ -643,4 +694,37 @@ void updateTick(dtTileCache* tileCache, dtNavMesh* nav, dtCrowd* crowd, float dt
 		state[i] = ag->state;
 		targetState[i] = ag->targetState;
 	}
+}
+
+static float random_float()
+{
+	return (double)rand() / (double)RAND_MAX;
+}
+
+bool randomPoint(dtCrowd* crowd, float* targetPoint)
+{
+	const dtNavMeshQuery* navQuery = crowd->getNavMeshQuery();
+	const dtQueryFilter* filter = crowd->getFilter(0);
+	dtPolyRef targetRef;
+
+	dtStatus status = navQuery->findRandomPoint(filter, random_float, &targetRef, targetPoint);
+	return dtStatusSucceed(status);
+}
+
+bool randomPointInCircle(dtCrowd* crowd, float* initialPoint, float maxRadius, float* targetPoint)
+{
+	const dtNavMeshQuery* navQuery = crowd->getNavMeshQuery();
+	const dtQueryFilter* filter = crowd->getFilter(0);
+	const float* ext = crowd->getQueryExtents();
+	dtPolyRef targetRef;
+	dtPolyRef nearestRef;
+	float nearestPoint[3];
+
+	dtStatus status = navQuery->findNearestPoly(initialPoint, ext, filter, &nearestRef, nearestPoint);
+	if (dtStatusSucceed(status))
+	{
+		status = navQuery->findRandomPointAroundCircle(nearestRef, initialPoint, maxRadius, filter, random_float, &targetRef, targetPoint);
+	}
+
+	return dtStatusSucceed(status);
 }
