@@ -67,6 +67,11 @@ public class GameSetupScript : MonoBehaviour
         raceSelected = true;
     }
 
+    public void SetDifficultyLevel(int level)
+    {
+        info.Difficulty = level;
+    }
+
     // TODO Implement mechanism to select game mode
     public void SetGameMode ()
     {

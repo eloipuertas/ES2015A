@@ -11,6 +11,7 @@ public class GameInformation : MonoBehaviour {
     private GameMode gameMode;
 
     private Battle game;
+    public int Difficulty { get; set; }
 
     private static string pauseMenuPrefab;
 
