@@ -25,7 +25,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     private bool _changedVisible = false;
 
     public Storage.Races race {
-        get { return player.race; }
+        get { return entity.info.race; }
     }
     
     public Selectable() { }
@@ -157,8 +157,19 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 
     public void onUnitDied(System.Object obj)
     {
-        this.currentlySelected = false;
-        fire(Actions.DESELECTED);
+
+        if (race == player.race)
+        {
+            Debug.Log("Unit died, deselecting and other stuff");
+            DeselectMe();
+
+        }
+        else
+        {
+            Debug.Log("Enemy died");
+            this.currentlySelected = false;
+            fire(Actions.DESELECTED);
+        }
     }
 
     /// <summary>
