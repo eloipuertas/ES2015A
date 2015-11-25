@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using Utils;
-using System.Collections.Generic;
+using Storage;
 
 namespace Managers
 {
@@ -11,30 +11,12 @@ namespace Managers
         private AudioPool actionSoundPool;
         private AudioClip[] selectionSound;
         private AudioClip[] actionSound;
-        private Dictionary<Tuple<Storage.BuildingTypes, string>, AudioClip> BuildingsSounds;
 
 
         void Start()
         {
             Setup();
             fakeSetup();
-         //   LoadSoundLibrary();
-        }
-
-
-        private void LoadSoundLibrary()
-        {
-            /*
-            Object[] assets = Resources.LoadAll("Sounds/Buildings", typeof(AudioClip));
-            foreach(AudioClip audio in assets)
-            {
-                Debug.Log(audio.name);
-                string[] name = audio.name.Split('-');
-                string type = name[0], action = name[1];
-                sounds.Add(new Tuple<string, string>(type, action), audio);
-
-            }
-            */
         }
 
         /// <summary>
@@ -76,14 +58,15 @@ namespace Managers
         /// <param name="obj"></param>
         public void onEntitytSelected(object obj)
         {
-            /*
-            Selectable selected = (Selectable)obj;
-            if(selected.entity.info.isBuilding)
+            GameObject gameObject = (GameObject)obj;
+            IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+
+            if (entity.info.isBuilding)
             {
-                Storage.BuildingInfo info = (Storage.BuildingInfo) selected.entity.info;
+                selectionSoundPool.Play(Sounds.get.Clip(entity.getType<BuildingTypes>(), Sounds.SoundType.SELECTION));
             }
-            */
-            selectionSoundPool.Play(selectionSound[RandomChoice()]);
+            else
+                selectionSoundPool.Play(selectionSound[RandomChoice()]);
         }
 
         /// <summary>
