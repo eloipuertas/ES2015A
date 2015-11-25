@@ -58,12 +58,12 @@ namespace Managers
         /// <param name="obj"></param>
         public void onEntitytSelected(object obj)
         {
-            GameObject gameObject = (GameObject)obj;
-            IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+            Selectable  select = (Selectable)obj;
+            //IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 
-            if (entity.info.isBuilding)
+            if (select.entity.info.isBuilding)
             {
-                selectionSoundPool.Play(Sounds.get.Clip(entity.getType<BuildingTypes>(), Sounds.SoundType.SELECTION));
+                selectionSoundPool.Play(Sounds.get.Clip(select.entity.getType<BuildingTypes>(), Sounds.SoundType.SELECTION));
             }
             else
                 selectionSoundPool.Play(selectionSound[RandomChoice()]);

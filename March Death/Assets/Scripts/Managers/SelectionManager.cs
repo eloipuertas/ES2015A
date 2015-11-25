@@ -55,7 +55,7 @@ namespace Managers
              if( _selectedEntities.Count > 0 ) _selectedEntities.Clear();
 
             _selectedEntities.Select(selectable);
-            fire(Actions.SELECT, selectable.gameObject);
+            fire(Actions.SELECT, selectable);
 
 
         }
