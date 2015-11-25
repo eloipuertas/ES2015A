@@ -4,6 +4,8 @@
 Context* ctx;
 bool monotonePartitioning = false;
 
+extern int numConvexVolumes;
+extern int numFlags;
 
 int pointerSize()
 {
@@ -19,6 +21,11 @@ rcConfig* DefaultConfig(char* logpath)
 {
 	rcConfig* cfg = new rcConfig();
 
+	// Reset some globals
+	numConvexVolumes = 0;
+	numFlags = 0;
+
+	// Default config
 	float cellSize = 0.3f;
 	float cellHeight = 0.2f;
 	float agentHeight = 2.0f;

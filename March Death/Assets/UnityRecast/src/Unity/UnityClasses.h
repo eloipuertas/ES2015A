@@ -205,3 +205,6 @@ struct ConvexVolume
 	int nverts;
 	int area;
 };
+
+static const int MAX_CONVEX_VOLUMES = 4096;
+static const int MAX_FLAGS = 16;

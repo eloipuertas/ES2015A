@@ -11,11 +11,9 @@ LinearAllocator* allocator = new LinearAllocator(5*1024*1024);
 FastLZCompressor* compressor = new FastLZCompressor();
 MeshProcess* processor = new MeshProcess();
 
-static const int MAX_CONVEX_VOLUMES = 4096;
 int numConvexVolumes = 0;
 ConvexVolume convexVolumes[MAX_CONVEX_VOLUMES];
 
-static const int MAX_FLAGS = 16;
 int numFlags = 0;
 unsigned short flags[MAX_FLAGS];
 unsigned short costs[MAX_FLAGS];

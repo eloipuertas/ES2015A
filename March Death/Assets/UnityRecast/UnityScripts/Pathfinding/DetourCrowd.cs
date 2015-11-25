@@ -173,16 +173,26 @@ namespace Pathfinding
             Detour.Crowd.resetPath(crowd, idx);
         }
 
-        public Vector3 RandomValidPoint()
+        public bool RandomValidPoint(ref Vector3 dest)
         {
-            Detour.Crowd.randomPoint(crowd, randomSample);
-            return ToVector3(randomSample);
+            if (Detour.Crowd.randomPoint(crowd, randomSample))
+            {
+                dest = ToVector3(randomSample);
+                return true;
+            }
+
+            return false;
         }
 
-        public Vector3 RandomValidPointInCircle(Vector3 cercleCenter, float maxRadius)
+        public bool RandomValidPointInCircle(Vector3 cercleCenter, float maxRadius, ref Vector3 dest)
         {
-            Detour.Crowd.randomPointInCircle(crowd, ToFloat(cercleCenter), maxRadius, randomSample);
-            return ToVector3(randomSample);
+            if (Detour.Crowd.randomPointInCircle(crowd, ToFloat(cercleCenter), maxRadius, randomSample))
+            {
+                dest = ToVector3(randomSample);
+                return true;
+            }
+
+            return false;
         }
 
         public void Update()

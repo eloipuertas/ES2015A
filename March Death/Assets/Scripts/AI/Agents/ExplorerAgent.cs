@@ -65,11 +65,11 @@ namespace Assets.Scripts.AI.Agents
             Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.DISCOVERED, OnEntityFound, selector);
             Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.HIDDEN, OnEntityLost, selector);
 
-            RescheduleSightRange = 10;
+            RescheduleSightRange = 30;
             ReschuduleDiceFaces = 1000;
             RescheduleRandomPointValue = 1000;
             RescheduleRandomAroundTargetValue = 990;
-            RescheduleRandomDirectionValue = 950;
+            RescheduleRandomDirectionValue = 970;
 
             heroVisible = false;
             fowManager = FOWManager.Instance;
@@ -79,6 +79,11 @@ namespace Assets.Scripts.AI.Agents
 
         public override void controlUnits(SquadAI squad)
         {
+            if (squad.units.Count == 0)
+            {
+                return;
+            }
+
             if (fowManager.Enabled)
             {
                 //PLACEHOLDER, until sprint2 when we split things
@@ -90,109 +95,111 @@ namespace Assets.Scripts.AI.Agents
                 }
 
                 bool lostHero = (heroLastPos != Vector3.zero && !heroVisible && squad.units.Count > 0);
-                float maxVal = float.MaxValue;
-                Unit closerToHero = null;
 
                 // Static values
                 FOWManager.visible[] grid = fowManager.aiVision;
                 Vector2 gridSize = fowManager.getGridSize();
 
+                // Get a random unit as a reference point
+                Unit reference = squad.units[D6.get.rollN(squad.units.Count)];
+                DetourAgent agent = reference.GetComponent<DetourAgent>();
+
+                // Check if target is already explored
+                Vector3 direction = (agent.TargetPoint - reference.transform.position).normalized;
+                // Set the further point as the targetPoint + sighRange - offset
+                Vector3 targetFOWPos = agent.TargetPoint + direction * (reference.info.attributes.sightRange - RescheduleSightRange);
+                Vector2 targetGrid = fowManager.CoordtoGrid(targetFOWPos);
+                // Check grid status
+                bool targetExplored = ((FOWManager.visible.explored & grid[(int)(targetGrid.x + targetGrid.y * gridSize.y)]) == FOWManager.visible.explored);
+
+                // If we are moving to a not seen target, don't reschedule at first, otherwise go to a random position in a circle around current position
+                RescheduleType reschedule = RescheduleType.RANDOM_IN_CURRENT_POSITION;
+                if (targetExplored && agent.IsMoving)
+                {
+                    reschedule = RescheduleType.RANDOM_IN_DIRECTION;
+                }
+                else if (agent.IsMoving)
+                {
+                    reschedule = RescheduleType.NONE;
+                }
+
+                // Throw a dice
+                int diceValue = D6.get.rollN(ReschuduleDiceFaces);
+                if (diceValue >= RescheduleRandomPointValue)
+                {
+                    // Change target point taking into account current direction (but not distance!)
+                    reschedule = RescheduleType.RANDOM_IN_DIRECTION;
+                }
+                else if (diceValue >= RescheduleRandomAroundTargetValue && knownPositions.Count > 0)
+                {
+                    reschedule = RescheduleType.RANDOM_AROUND_TARGET;
+                }
+                else if (diceValue >= RescheduleRandomDirectionValue)
+                {
+                    // Change target point taking into account distance (but not direction!)
+                    // Do note that direction is implicitelly taken into account because FOWManager reports
+                    // some areas as explored
+                    reschedule = RescheduleType.RANDOM_IN_CURRENT_TARGET;
+                }
+
+                // If we are moving and we don't have to reschedule, skip this squad
+                if (agent.IsMoving && !targetExplored && reschedule == RescheduleType.NONE)
+                {
+                    return;
+                }
+
+                Debug.Log(reference + " " + reschedule);
+
+                // If we've lost the hero, seek it with the closer unit, regardless of what FOWManager tells us
+                if (lostHero)
+                {
+                    float dist = (reference.transform.position - heroLastPos).sqrMagnitude;
+                    if (dist < reference.info.attributes.sightRange) // Nota, aixo implica "distancia_actual < sqrt(sightRange)"
+                    {
+                        heroLastPos = Vector3.zero;
+                        lostHero = false;
+                    }
+                }
+
+                // Switch to current reschedule type and find a target point
+                bool result = false;
+                switch (reschedule)
+                {
+                    case RescheduleType.NONE:
+                        break;
+
+                    case RescheduleType.RANDOM_IN_DIRECTION:
+                        result = findPlaceToExplore(grid, gridSize, out targetPos, true, reference.transform.position, agent.TargetPoint);
+                        break;
+
+                    case RescheduleType.RANDOM_IN_CURRENT_TARGET:
+                        result = findPlaceToExplore(grid, gridSize, out targetPos, agent.TargetPoint, 25f);
+                        break;
+
+                    case RescheduleType.RANDOM_IN_CURRENT_POSITION:
+                        result = findPlaceToExplore(grid, gridSize, out targetPos, reference.transform.position, 75f);
+                        break;
+
+                    case RescheduleType.RANDOM_AROUND_TARGET:
+                        result = findPlaceToExplore(grid, gridSize, out targetPos, knownPositions[D6.get.rollN(knownPositions.Count)], 5f);
+                        break;
+
+                }
+
+                // If we failed to find a valid target and we are not moving (thus we are IDLE), find a random point along all the map
+                if (!result && !agent.IsMoving)
+                {
+                    result = findPlaceToExplore(fowManager.aiVision, fowManager.getGridSize(), out targetPos);
+                }
+
+                // If we have a point, move there
                 foreach (Unit u in squad.units)
                 {
-                    DetourAgent agent = u.GetComponent<DetourAgent>();
-
-                    // Check if target is already explored
-                    Vector3 direction = (agent.TargetPoint - u.transform.position).normalized;
-                    // Set the further point as the targetPoint + sighRange - offset
-                    Vector2 targetGrid = fowManager.CoordtoGrid(agent.TargetPoint + direction * (u.info.attributes.sightRange - RescheduleSightRange));
-                    // Check grid status
-                    bool targetExplored = ((FOWManager.visible.explored & grid[(int)(targetGrid.x + targetGrid.y * gridSize.y)]) == FOWManager.visible.explored);
-
-                    // If we are moving to a not seen target, don't reschedule at first, otherwise go to a random position in a circle around current position
-                    RescheduleType reschedule = RescheduleType.RANDOM_IN_CURRENT_POSITION;
-                    if (targetExplored)
-                    {
-                        reschedule = RescheduleType.RANDOM_IN_DIRECTION;
-                    }
-                    else if (agent.IsMoving)
-                    {
-                        reschedule = RescheduleType.NONE;
-                    }
-
-                    // Throw a dice
-                    int diceValue = D6.get.rollN(ReschuduleDiceFaces);
-                    if (diceValue >= RescheduleRandomPointValue)
-                    {
-                        // Change target point taking into account current direction (but not distance!)
-                        reschedule = RescheduleType.RANDOM_IN_DIRECTION;
-                    }
-                    else if (diceValue >= RescheduleRandomAroundTargetValue && knownPositions.Count > 0)
-                    {
-                        reschedule = RescheduleType.RANDOM_AROUND_TARGET;
-                    }
-                    else if (diceValue >= RescheduleRandomDirectionValue)
-                    {
-                        // Change target point taking into account distance (but not direction!)
-                        // Do note that direction is implicitelly taken into account because FOWManager reports
-                        // some areas as explored
-                        reschedule = RescheduleType.RANDOM_IN_CURRENT_TARGET;
-                    }
-
-                    // If we are moving and we don't have to reschedule, skip this unit
-                    if (agent.IsMoving && !targetExplored && reschedule == RescheduleType.NONE)
-                    {
-                        continue;
-                    }
-
-                    // If we've lost the hero, seek it with the closer unit, regardless of what FOWManager tells us
                     if (lostHero)
                     {
-                        float dist = (u.transform.position - heroLastPos).sqrMagnitude;
-                        if (dist < u.info.attributes.sightRange) // Nota, aixo implica "distancia_actual < sqrt(sightRange)"
-                        {
-                            heroLastPos = Vector3.zero;
-                            lostHero = false;
-                        }
-                        else if (maxVal > dist)
-                        {
-                            maxVal = dist;
-                            closerToHero = u;
-                        }
+                        u.moveTo(heroLastPos);
                     }
-
-                    // Switch to current reschedule type and find a target point
-                    bool result = false;
-                    switch (reschedule)
-                    {
-                        case RescheduleType.NONE:
-                            break;
-
-                        case RescheduleType.RANDOM_IN_DIRECTION:
-                            result = findPlaceToExplore(grid, gridSize, out targetPos, true, u.transform.position, agent.TargetPoint);
-                            break;
-
-                        case RescheduleType.RANDOM_IN_CURRENT_TARGET:
-                            result = findPlaceToExplore(grid, gridSize, out targetPos, agent.TargetPoint, 25f);
-                            break;
-
-                        case RescheduleType.RANDOM_IN_CURRENT_POSITION:
-                            result = findPlaceToExplore(grid, gridSize, out targetPos, u.transform.position, 75f);
-                            break;
-
-                        case RescheduleType.RANDOM_AROUND_TARGET:
-                            result = findPlaceToExplore(grid, gridSize, out targetPos, knownPositions[D6.get.rollN(knownPositions.Count)], 5f);
-                            break;
-
-                    }
-
-                    // If we failed to find a valid target and we are not moving (thus we are IDLE), find a random point along all the map
-                    if (!result && !agent.IsMoving)
-                    {
-                        result = findPlaceToExplore(fowManager.aiVision, fowManager.getGridSize(), out targetPos);
-                    }
-
-                    // If we have a point, move there
-                    if (result)
+                    else if (result)
                     {
                         u.moveTo(targetPos);
 
@@ -208,11 +215,6 @@ namespace Assets.Scripts.AI.Agents
                             ai.aiDebug.registerDebugInfoAboutUnit(u, agentName + " -> No Target");
                         }
                     }
-                }
-
-                if (lostHero && closerToHero != null)
-                {
-                    closerToHero.moveTo(heroLastPos);
                 }
             }
         }
@@ -247,7 +249,10 @@ namespace Assets.Scripts.AI.Agents
 
             for (int i = 0; i < maxTries && !found; ++i)
             {
-                targetPoint = Pathfinding.DetourCrowd.Instance.RandomValidPoint();
+                if (!Pathfinding.DetourCrowd.Instance.RandomValidPoint(ref targetPoint))
+                {
+                    return false;
+                }
 
                 Vector2 gridPos = fowManager.CoordtoGrid(targetPoint);
                 if ((FOWManager.visible.unexplored & grid[(int)(gridPos.x + gridPos.y * size.y)]) == FOWManager.visible.unexplored)
@@ -275,7 +280,10 @@ namespace Assets.Scripts.AI.Agents
 
             for (int i = 0; i < maxTries && !found; ++i)
             {
-                targetPoint = Pathfinding.DetourCrowd.Instance.RandomValidPointInCircle(center, maxRadius);
+                if (!Pathfinding.DetourCrowd.Instance.RandomValidPointInCircle(center, maxRadius, ref targetPoint))
+                {
+                    return false;
+                }
 
                 Vector2 gridPos = fowManager.CoordtoGrid(targetPoint);
                 if ((FOWManager.visible.unexplored & grid[(int)(gridPos.x + gridPos.y * size.y)]) == FOWManager.visible.unexplored)
