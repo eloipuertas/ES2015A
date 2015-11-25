@@ -1,6 +1,7 @@
 {
     "race": "ELVES",
     "type": "BARRACK",
+    "name": "Barrack",
 
     "attributes": {
         "resistance": 3,
@@ -24,14 +25,27 @@
     "abilities":
     [
         {
-            "name":"Create Light"
+            "ability": "Create",
+            "name":"Create Light",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "UNIT",
+            "targetRace": "ELVES",
+            "targetUnit": "LIGHT"
         },
         {
-            "name":"Create Heavy"
+            "ability": "Create",
+            "name":"Create Heavy",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "UNIT",
+            "targetRace": "ELVES",
+            "targetUnit": "HEAVY"
         },
 
         {
-            "name": "Sell"
+            "name": "Sell",
+            "tooltipFlags": "HIDE"
         }
     ]
 }

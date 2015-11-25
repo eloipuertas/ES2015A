@@ -146,6 +146,7 @@ struct ExtendedConfig
 	float AgentHeight;
 	float AgentRadius;
 	float AgentMaxClimb;
+	int MaxObstacles;
 };
 
 struct InputGeometry
@@ -164,16 +165,6 @@ struct TileCacheHolder
 	rcChunkyTriMesh* chunkyMesh;
 };
 
-enum SamplePolyFlags
-{
-	SAMPLE_POLYFLAGS_WALK = 0x01,		// Ability to walk (ground, grass, road)
-	SAMPLE_POLYFLAGS_SWIM = 0x02,		// Ability to swim (water).
-	SAMPLE_POLYFLAGS_DOOR = 0x04,		// Ability to move through doors.
-	SAMPLE_POLYFLAGS_JUMP = 0x08,		// Ability to jump.
-	SAMPLE_POLYFLAGS_DISABLED = 0x10,		// Disabled polygon
-	SAMPLE_POLYFLAGS_ALL = 0xffff	// All abilities.
-};
-
 struct MeshProcess : public dtTileCacheMeshProcess
 {
 	InputGeometry* m_geom;
@@ -188,16 +179,7 @@ struct MeshProcess : public dtTileCacheMeshProcess
 	}
 
 	virtual void process(struct dtNavMeshCreateParams* params,
-		unsigned char* polyAreas, unsigned short* polyFlags)
-	{
-		for (int i = 0; i < params->polyCount; ++i)
-		{
-			//if (polyFlags[i] == DT_TILECACHE_WALKABLE_AREA)
-			{
-				polyFlags[i] = SAMPLE_POLYFLAGS_WALK;
-			}
-		}
-	}
+		unsigned char* polyAreas, unsigned short* polyFlags);
 };
 
 struct TileCacheSetHeader
@@ -214,3 +196,15 @@ struct TileCacheTileHeader
 	dtCompressedTileRef tileRef;
 	int dataSize;
 };
+
+static const int MAX_CONVEXVOL_PTS = 16;
+struct ConvexVolume
+{
+	float verts[MAX_CONVEXVOL_PTS * 3];
+	float hmin, hmax;
+	int nverts;
+	int area;
+};
+
+static const int MAX_CONVEX_VOLUMES = 4096;
+static const int MAX_FLAGS = 16;

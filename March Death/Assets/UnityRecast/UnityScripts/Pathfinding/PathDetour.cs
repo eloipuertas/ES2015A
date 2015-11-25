@@ -17,13 +17,22 @@ public class PathDetour : Utils.Singleton<PathDetour>
     {
     }
 
-    public void Initialize(TileCacheAsset navmeshData)
+    public void Initialize(TileCacheAsset navmeshData, Action postInitialize = null)
     {
         // Is it already initialized?
-        //Assert.IsTrue(TileCache.ToInt32() == 0);
-        Assert.IsTrue(Pathfinding.Detour.pointerSize() == IntPtr.Size);
+        if (TileCache.ToInt64() != 0)
+        {
+            return;
+        }
 
+        Assert.IsTrue(Pathfinding.Detour.pointerSize() == IntPtr.Size);
         Pathfinding.Recast.DefaultConfig(Application.dataPath + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Recast.log");
+
+        // Call postInitialize
+        if (postInitialize != null)
+        {
+            postInitialize();
+        }
 
         bool result = Pathfinding.TileCache.loadFromTileCacheHeaders(ref navmeshData.header, navmeshData.tilesHeader, navmeshData.tilesData, ref TileCache, ref NavMesh, ref NavQuery);
         if (!result)
@@ -57,6 +66,7 @@ public class PathDetour : Utils.Singleton<PathDetour>
 
     public void RemoveObstacle(uint reference)
     {
+        Assert.IsTrue(TileCache.ToInt64() != 0);
         Pathfinding.TileCache.removeObstacle(TileCache, reference);
     }
 }

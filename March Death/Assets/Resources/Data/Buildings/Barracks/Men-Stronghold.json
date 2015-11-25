@@ -1,6 +1,7 @@
 	{
     "race": "MEN",
     "type": "STRONGHOLD",
+    "name": "Stronhold",
 
     "attributes": {
         "resistance": 3,
@@ -21,39 +22,93 @@
 
 	"abilities":[
 		{
-			"name":"Create Farm"
+            "ability": "Create",
+			"name":"Create Farm",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "MEN",
+            "targetBuilding": "FARM"
 		},
 
 		{
-			"name":"Create Mine"
+            "ability": "Create",
+			"name":"Create Mine",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "MEN",
+            "targetBuilding": "MINE"
 		},
 
 		{
-			"name":"Create Sawmill"
+            "ability": "Create",
+			"name":"Create Sawmill",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "MEN",
+            "targetBuilding": "SAWMILL"
 		},
 
 		{
-            "name":"Create Archery"
+            "ability": "Create",
+            "name":"Create Archery",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "MEN",
+            "targetBuilding": "ARCHERY"
         },
 
         {
-            "name":"Create Barrack"
+            "ability": "Create",
+            "name":"Create Barrack",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "MEN",
+            "targetBuilding": "BARRACK"
         },
 
 		{
-            "name":"Create Stable"
+            "ability": "Create",
+            "name":"Create Stable",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "MEN",
+            "targetBuilding": "STABLE"
         },
 
         {
-            "name":"Create Wall"
+            "ability": "Create",
+            "name":"Create Wall",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "MEN",
+            "targetBuilding": "WALL"
         },
 
 		{
-            "name":"Create WallCorner"
+            "ability": "Create",
+            "name":"Create WallCorner",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "MEN",
+            "targetBuilding": "WALLCORNER"
         },
-		
+
         {
-            "name":"Create Watchtower"
+            "ability": "Create",
+            "name":"Create Watchtower",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "MEN",
+            "targetBuilding": "WATCHTOWER"
         }
     ]
 }

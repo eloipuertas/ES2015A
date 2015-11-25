@@ -45,26 +45,25 @@ namespace Assets.Scripts.AI.Agents
             }
             if (ai.EnemyUnits.Count > 0)
             {
-                //Select target
-                Unit bTar = ai.EnemyUnits[0];
-                float bVal = float.MaxValue;
-                foreach(Unit u in ai.EnemyUnits)
-                {
-                    float val = -Vector3.Distance(u.transform.position, Squadpos);
-                    if (u.type == Storage.UnitTypes.HERO)
-                        val += 10;
-                    if (u.healthPercentage < 20)
-                        val += 5;
-                    if (val < bVal)
-                    {
-                        bVal = val;
-                        bTar = u;
-                    }
-                }
-
                 foreach(Unit u in squad.units)
                 {
-                    if (u.status != EntityStatus.DEAD && ((Unit)u.getTarget()!= bTar))
+                    //Select target
+                    Unit bTar = null;
+                    float bVal = float.MinValue;
+                    foreach (Unit e in squad.enemySquad.units)
+                    {
+                        float val = -Vector3.Distance(u.transform.position, e.transform.position);
+                        if (u.type == Storage.UnitTypes.HERO)
+                            val += 80;
+                        if (u.healthPercentage < 20)
+                            val += 15;
+                        if (val > bVal)
+                        {
+                            bVal = val;
+                            bTar = e;
+                        }
+                    }
+                    if (bTar!=null && u.status != EntityStatus.DEAD && ((Unit)u.getTarget() != bTar))
                     {
                         u.attackTarget(bTar);
                     }

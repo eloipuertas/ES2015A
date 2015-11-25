@@ -45,31 +45,35 @@ namespace Assets.Scripts.AI
         /// </summary>
         public void Micro()
         {
-            float bVal = float.MinValue;
-            BaseAgent bAgent = agents[0];
-            int val;
-            foreach(SquadAI sq in squads)
+            //difficulty == 0 means the AI is disabled
+            if (ai.DifficultyLvl > 0)
             {
-                sq.recalculateSquadValues();
-                foreach(BaseAgent a in agents)
+                float bVal = float.MinValue;
+                BaseAgent bAgent = agents[0];
+                int val;
+                foreach (SquadAI sq in squads)
                 {
-                    val = a.getConfidence(sq);
-                    if(AIController.AI_DEBUG_ENABLED) ai.aiDebug.setAgentConfidence(a.agentName, val);
-                    if (val > bVal)
+                    sq.recalculateSquadValues();
+                    foreach (BaseAgent a in agents)
                     {
-                        bVal = val;
-                        bAgent = a;
+                        val = a.getConfidence(sq);
+                        if (AIController.AI_DEBUG_ENABLED) ai.aiDebug.setAgentConfidence(a.agentName, val);
+                        if (val > bVal)
+                        {
+                            bVal = val;
+                            bAgent = a;
+                        }
                     }
-                }
-                sq.lastAgent = bAgent;
-                if(AIController.AI_DEBUG_ENABLED)
-                {
-                    ai.aiDebug.setControllingAgent(bAgent.agentName, bVal);
-                }
+                    sq.lastAgent = bAgent;
+                    if (AIController.AI_DEBUG_ENABLED)
+                    {
+                        ai.aiDebug.setControllingAgent(bAgent.agentName, bVal);
+                    }
 
-                bAgent.controlUnits(sq);
-                agents[AGENT_ASSIST].extraConfidence = 0;
-                ((AssistAgent)agents[AGENT_ASSIST]).clearRequests();
+                    bAgent.controlUnits(sq);
+                    agents[AGENT_ASSIST].extraConfidence = 0;
+                    ((AssistAgent)agents[AGENT_ASSIST]).clearRequests();
+                }
             }
         }
         /// <summary>

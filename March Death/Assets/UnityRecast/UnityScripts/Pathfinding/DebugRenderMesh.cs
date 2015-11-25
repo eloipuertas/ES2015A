@@ -329,16 +329,16 @@ public class DbgRenderMesh
     {
         int nGameObjects = (int)Mathf.Ceil(3 * m_Triangles.Count / 65000.0f);
 
-        // Destroy all existing
+        // Reuse existing objects
+        m_GameObjects.Clear();
         GameObject gob = GameObject.Find(name);
         while (gob)
         {
-            GameObject.Destroy(gob);
-            gob = GameObject.Find(name);
+            m_GameObjects.Add(gob);
         }
 
         // Create new gobs
-        for (int i = 0; i < nGameObjects; ++i)
+        for (int i = m_GameObjects.Count; i < nGameObjects; ++i)
         {
             GameObject gao = new GameObject(name);
             gao.transform.position = Vector3.zero;

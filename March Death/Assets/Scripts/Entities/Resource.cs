@@ -578,7 +578,7 @@ public class Resource : Building<Resource.Actions>
                 {
                     hasDefaultUnit = true;
                 }
-                break; 
+                break;
 
             case EntityStatus.WORKING:
 

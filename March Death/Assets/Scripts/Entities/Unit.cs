@@ -16,12 +16,31 @@ public class Unit : GameEntity<Unit.Actions>
     public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT };
     public enum Roles { PRODUCING, WANDERING };
 
+    private EntityStatus _defaultStatus = EntityStatus.IDLE;
+    public override EntityStatus DefaultStatus
+    {
+        get
+        {
+            return _defaultStatus;
+        }
+        set
+        {
+            _defaultStatus = value;
+        }
+    }
+
     public Unit() { }
 
     /// <summary>
     /// Interval between resources update in miliseconds
     /// </summary>
     const float RESOURCES_UPDATE_INTERVAL = 15.0f;
+
+    /// <summary>
+    /// Update follow distance when greater than this value
+    /// Do note this values is the SQUARED (^2) value of the real distance
+    /// </summary>
+    const float SQR_UPDATE_DISTANCE = 75.0f;
 
     Statistics statistics;
 
@@ -69,6 +88,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// NavAgent, used fot map navigation
     /// </summary>
     private DetourAgent _detourAgent;
+    public DetourAgent Agent { get { return _detourAgent; } }
 
     /// <summary>
     /// Can this unit perform ranged attacks?
@@ -230,7 +250,7 @@ public class Unit : GameEntity<Unit.Actions>
             }
 
             _target = entity;
-            
+
             // Show target health
             selectable = _target.getGameObject().GetComponent<Selectable>();
             selectable.AttackedEntity();
@@ -340,7 +360,7 @@ public class Unit : GameEntity<Unit.Actions>
         base.Start();
 
         // Set the status
-        setStatus(EntityStatus.IDLE);
+        setStatus(DefaultStatus);
 
         activateFOWEntity();
 
@@ -358,11 +378,12 @@ public class Unit : GameEntity<Unit.Actions>
         statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -5);
 
         fire(Actions.CREATED, statistics);
-        
+
         // Get DetourAgent and set basic variables
         _detourAgent = GetComponent<DetourAgent>();
-        _detourAgent.SetMaxSpeed(info.unitAttributes.movementRate * 5);
-        _detourAgent.SetMaxAcceleration(20.5f);
+        _detourAgent.MaxSpeed = info.unitAttributes.movementRate * 5;
+        _detourAgent.MaxAcceleration = info.unitAttributes.movementRate * 20;
+        _detourAgent.UpdateParams();
     }
 
     /// <summary>
@@ -455,6 +476,16 @@ public class Unit : GameEntity<Unit.Actions>
 #endif
     }
 
+    public override void setStatus(EntityStatus status)
+    {
+        if (!_followingTarget && status == EntityStatus.MOVING)
+        {
+            fire(Actions.MOVEMENT_END);
+        }
+
+        base.setStatus(status);
+    }
+
     /// <summary>
     /// Called every fixed physics frame
     /// </summary>
@@ -470,18 +501,25 @@ public class Unit : GameEntity<Unit.Actions>
                 {
                     // Update destination only if target has moved
                     Vector3 destination = _closestPointToTarget;
-                    if (destination != _movePoint)
+                    if ((destination - _movePoint).sqrMagnitude > SQR_UPDATE_DISTANCE)
                     {
-                        _detourAgent.MoveTo(destination);
+                        // Try to predict next point!
+                        if (_target.info.isUnit)
+                        {
+                            destination = _closestPointToTarget + ((Unit)_target).Agent.Velocity.normalized * (float)Math.Sqrt(SQR_UPDATE_DISTANCE);
+                        }
+
+                        // Save move point
                         _movePoint = destination;
+                        _detourAgent.MoveTo(destination);
                     }
-                    
+
                     // If we are already close enough, stop and attack
                     if (_distanceToTarget <= currentAttackRange())
                     {
                         _detourAgent.ResetPath();
-                        _followingTarget = false;
                         setStatus(EntityStatus.ATTACKING);
+                        _followingTarget = false;
                         return;
                     }
                 }
@@ -492,14 +530,9 @@ public class Unit : GameEntity<Unit.Actions>
                     {
                         _detourAgent.ResetPath();
                         setStatus(EntityStatus.IDLE);
-                        fire(Actions.MOVEMENT_END);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("NavMesh not stopped at attack range... AttackRange = " + currentAttackRange());
                     }
                 }
-                
+
                 break;
         }
     }

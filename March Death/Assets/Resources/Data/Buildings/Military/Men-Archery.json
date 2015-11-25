@@ -1,6 +1,7 @@
 {
     "race": "MEN",
     "type": "ARCHERY",
+    "name": "Archery",
 
     "attributes": {
         "resistance": 3,
@@ -24,11 +25,18 @@
     "abilities":
     [
         {
-            "name":"Create Thrown"
+            "ability": "Create",
+            "name":"Create Thrown",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "UNIT",
+            "targetRace": "MEN",
+            "targetUnit": "THROWN"
         },
 
         {
-            "name": "Sell"
+            "name": "Sell",
+            "tooltipFlags": "HIDE"
         }
     ]
 }

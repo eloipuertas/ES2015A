@@ -11,7 +11,7 @@ using System.Collections;
 /// Building base class. Extends actor (which in turn extends MonoBehaviour) to
 /// handle basic API operations
 /// </summary>
-public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
+public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, IConvertible
 {
     public Building() { }
 
@@ -20,6 +20,19 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     /// </summary>
     public BuildingTypes type = BuildingTypes.STRONGHOLD;
     public override E getType<E>() { return (E)Convert.ChangeType(type, typeof(E)); }
+
+    private EntityStatus _defaultStatus = EntityStatus.BUILDING_PHASE_1;
+    public override EntityStatus DefaultStatus
+    {
+        get
+        {
+            return _defaultStatus;
+        }
+        set
+        {
+            _defaultStatus = value;
+        }
+    }
 
     /// Precach some actions
     public T DAMAGED { get; set; }
@@ -67,7 +80,7 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
     /// <summary>
     /// When destroyed, it's called
     /// </summary>
-    public override void OnDestroy() 
+    public override void OnDestroy()
 	{
 		try {
 			ConstructionGrid grid = GameObject.Find("GameController").GetComponent<ConstructionGrid>();
@@ -113,13 +126,17 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
         // Instead of adding 10 to the center of the building, we should check the actual size of the building....
         _deploymentPoint = new Vector3(transform.position.x + 10, transform.position.y, transform.position.z + 10);
         activateFOWEntity();
-        _woundsReceived = info.buildingAttributes.wounds;
-        _woundsBuildControl = info.buildingAttributes.wounds;
+
+        if (DefaultStatus == EntityStatus.BUILDING_PHASE_1)
+        {
+            _woundsReceived = info.buildingAttributes.wounds;
+            _woundsBuildControl = info.buildingAttributes.wounds;
+        }
 
         //return (info.buildingAttributes.wounds - _woundsReceived) * 100f / info.buildingAttributes.wounds;
 
         // Set the status
-        setStatus(EntityStatus.BUILDING_PHASE_1);
+        setStatus(DefaultStatus);
     }
 
     /// <summary>
@@ -130,7 +147,7 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
         base.Update();
 
         // Control the building phases, as well as wounds while being built.
-        // TODO: Figure out a better condition... 
+        // TODO: Figure out a better condition...
         if (status == EntityStatus.BUILDING_PHASE_3 || status == EntityStatus.BUILDING_PHASE_2 || status == EntityStatus.BUILDING_PHASE_1)
         {
             _totalBuildTime += Time.deltaTime;
@@ -144,12 +161,12 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
                 _woundsReceived -= diffWounds;
                 _woundsBuildControl = woundsBuilt;
             }
-	
+
 			// TODO: What if we have more than 3 phases... maybe we should add the number of phases in the JSON, instead of harcoding it...
 			if (buildingPercentage > 0.33 && buildingPercentage <=0.66) {
-				setStatus(EntityStatus.BUILDING_PHASE_2);			
+				setStatus(EntityStatus.BUILDING_PHASE_2);
 			} else if (buildingPercentage > 0.66 && buildingPercentage < 1) {
-				setStatus(EntityStatus.BUILDING_PHASE_3);				
+				setStatus(EntityStatus.BUILDING_PHASE_3);
 			} else if (buildingPercentage >= 1) {
 				setStatus(EntityStatus.IDLE);
                 onBuilt();
