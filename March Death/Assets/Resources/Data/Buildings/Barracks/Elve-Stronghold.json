@@ -1,6 +1,7 @@
 {
     "race": "ELVES",
     "type": "STRONGHOLD",
+    "name": "Stronhold",
 
     "attributes": {
         "resistance": 3,
@@ -21,37 +22,90 @@
 
     "abilities":[
         {
-            "name":"Create Farm"
+            "ability": "Create",
+            "name": "Create Farm",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "ELVES",
+            "targetBuilding": "FARM"
         },
         {
-            "name":"Create Mine"
+            "ability": "Create",
+            "name":"Create Mine",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "ELVES",
+            "targetBuilding": "MINE"
         },
         {
-            "name":"Create Sawmill"
+            "ability": "Create",
+            "name":"Create Sawmill",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "ELVES",
+            "targetBuilding": "SAWMILL"
+        },
+		{
+            "ability": "Create",
+            "name":"Create Archery",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "ELVES",
+            "targetBuilding": "ARCHERY"
+        },
+
+        {
+            "ability": "Create",
+            "name":"Create Barrack",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "ELVES",
+            "targetBuilding": "BARRACK"
         },
 
 		{
-            "name":"Create Archery"
+            "ability": "Create",
+            "name":"Create Stable",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "ELVES",
+            "targetBuilding": "STABLE"
         },
 
         {
-            "name":"Create Barrack"
+            "ability": "Create",
+            "name":"Create Wall",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "ELVES",
+            "targetBuilding": "WALL"
         },
 
 		{
-            "name":"Create Stable"
+            "ability": "Create",
+            "name":"Create WallCorner",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "ELVES",
+            "targetBuilding": "WALLCORNER"
         },
 
         {
-            "name":"Create Wall"
-        },
+            "ability": "Create",
+            "name":"Create Watchtower",
 
-		{
-            "name":"Create WallCorner"
-        },
-
-        {
-            "name":"Create Watchtower"
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "ELVES",
+            "targetBuilding": "WATCHTOWER"
         }
     ]
 }

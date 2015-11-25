@@ -16,6 +16,19 @@ public class Unit : GameEntity<Unit.Actions>
     public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT };
     public enum Roles { PRODUCING, WANDERING };
 
+    private EntityStatus _defaultStatus = EntityStatus.IDLE;
+    public override EntityStatus DefaultStatus
+    {
+        get
+        {
+            return _defaultStatus;
+        }
+        set
+        {
+            _defaultStatus = value;
+        }
+    }
+
     public Unit() { }
 
     /// <summary>
@@ -340,7 +353,7 @@ public class Unit : GameEntity<Unit.Actions>
         base.Start();
 
         // Set the status
-        setStatus(EntityStatus.IDLE);
+        setStatus(DefaultStatus);
 
         activateFOWEntity();
 

@@ -22,7 +22,7 @@ namespace Storage
         [JsonConverter(typeof(BuildingAttributesDataConverter))]
         public override EntityAttributes attributes { get; set; }
 
-        [JsonConverter(typeof(BuildingAttributesDataConverter))]
+        [JsonConverter(typeof(BuildingActionsDataConverter))]
         public override List<EntityAbility> abilities { get; set; }
 
         public override T getType<T>()

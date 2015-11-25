@@ -12,7 +12,7 @@ namespace Storage
     /// unit race and type.
     /// It automatically parses all units on Assets/Units and stores it.
     /// </summary>
-    sealed class Info : Singleton<Info>
+    public sealed class Info : Singleton<Info>
     {
         private Dictionary<Tuple<Races, UnitTypes>, EntityInfo> unitStore = new Dictionary<Tuple<Races, UnitTypes>, EntityInfo>();
         private Dictionary<Tuple<Races, UnitTypes>, List<string>> unitPrefabs = new Dictionary<Tuple<Races, UnitTypes>, List<string>>();
@@ -35,7 +35,10 @@ namespace Storage
             parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Defense", buildingStore, EntityType.BUILDING);
             parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Barracks", buildingStore, EntityType.BUILDING);
             parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Stable", buildingStore, EntityType.BUILDING);
-            
+
+            // Tooltips
+            parseTooltips(buildingStore);
+            parseTooltips(unitStore);
 
             // Unit prefabs
             parsePrefabs<Unit, UnitTypes>("Prefabs/Units", unitPrefabs);
@@ -53,6 +56,19 @@ namespace Storage
             parsePrefabs<GhostBuilding, BuildingTypes>("Prefabs/Buildings/Barracks", buildingPrefabs);
         }
 
+        private void parseTooltips<Type>(Dictionary<Tuple<Races, Type>, EntityInfo> store)
+        {
+            foreach (KeyValuePair<Tuple<Races, Type>, EntityInfo> entry in store)
+            {
+                foreach (EntityAbility ability in entry.Value.abilities)
+                {
+                    ability.SetupTooltip(this);
+                    ability.tooltip = ability.tooltip.FormatWith(entry.Value, @"\[\[", @"\]\]");
+                    ability.tooltip = ability.tooltip.FormatWith(ability, @"\(\(", @"\)\)");
+                }
+            }
+        }
+
         /// <summary>
         /// Parses all unit files on "Resources/Data/Units".
         /// <exception cref="System.FileLoadException">
@@ -61,24 +77,15 @@ namespace Storage
         /// </summary>
         private void parseJSONFiles<JSONType, EnumType>(string folder, Dictionary<Tuple<Races, EnumType>, EntityInfo> store, EntityType entityType) where JSONType : EntityInfo where EnumType : struct, IConvertible
         {
-            Debug.Log("Parsing " + typeof(JSONType));
-
             UnityEngine.Object[] assets = Resources.LoadAll(folder, typeof(TextAsset));
             foreach (UnityEngine.Object jsonObj in assets)
             {
                 TextAsset json = jsonObj as TextAsset;
-                Debug.Log("\tParsing " + json.name);
 
                 try
                 {
                     EntityInfo entityInfo = JsonConvert.DeserializeObject<JSONType>(json.text);
                     entityInfo.entityType = entityType;
-
-                    foreach (EntityAbility ability in entityInfo.abilities)
-                    {
-                        ability.tooltip = ability.tooltip.FormatWith(entityInfo, @"\[\[", @"\]\]");
-                        ability.tooltip = ability.tooltip.FormatWith(ability, @"\(\(", @"\)\)");
-                    }
 
                     Tuple<Races, EnumType> key = new Tuple<Races, EnumType>(entityInfo.race, entityInfo.getType<EnumType>());
 
@@ -117,10 +124,6 @@ namespace Storage
                     if (!store.ContainsKey(key))
                     {
                         store.Add(key, new List<string>());
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Intentional? Duplicated " + typeof(ComponentType) + " prefab ('" + component.getRace() + "', '" + component.getType<EnumType>() + "')");
                     }
 
                     store[key].Add(folder + "/" + gameObject.name);
