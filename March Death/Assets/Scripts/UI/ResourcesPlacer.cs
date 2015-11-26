@@ -4,6 +4,7 @@ using System.Collections;
 using Storage;
 using System.Collections.Generic;
 using Utils;
+using System;
 
 public class ResourcesPlacer : MonoBehaviour
 {
@@ -32,8 +33,30 @@ public class ResourcesPlacer : MonoBehaviour
 
         for (int i = 0; i < txt_names.Length; i++)
         {
-            res_amounts.Add(GameObject.Find("HUD/resources/text_" + txt_names[i]).GetComponent<Text>());
-            res_stats.Add(GameObject.Find("HUD/resources/text_" + txt_names[i] + "_hour").GetComponent<Text>());
+
+            GameObject obj;
+            Text text;
+
+            string _text = "HUD/resources/text_" + txt_names[i];
+            string _stats = "HUD/resources/text_" + txt_names[i] + "_hour";
+
+
+            obj = GameObject.Find(_text);
+            if (!obj) throw new Exception("Object " + _text + " not found!");
+
+            text = obj.GetComponent<Text>();
+            if (!text) throw new Exception("Component " + _text + " not found!");
+
+            res_amounts.Add(text);
+
+
+            obj = GameObject.Find(_stats);
+            if (!obj) throw new Exception("Object " + _text + " not found!");
+
+            text = obj.GetComponent<Text>();
+            if (!text) throw new Exception("Component " + _text + " not found!");
+
+            res_stats.Add(text);
         }
 
         setupText();
