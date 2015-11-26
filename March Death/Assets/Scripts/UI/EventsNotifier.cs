@@ -60,7 +60,7 @@ public class EventsNotifier : MonoBehaviour {
     private float countdown;
     private bool updateMessages;
 
-    private const float UNDER_ATTACK_UPDATE_TIME = 10;
+    private const float UNDER_ATTACK_TIME = 10;
     private Dictionary<IGameEntity, float> entityTimer;
 
     private const int MAX_LINES = 10;
@@ -303,8 +303,7 @@ public class EventsNotifier : MonoBehaviour {
         IGameEntity entity = g.GetComponent<IGameEntity>();
         if (entityTimer.ContainsKey(entity))
         {
-            entityTimer[entity] = Time.time - entityTimer[entity];
-            if (entityTimer[entity] >= UNDER_ATTACK_UPDATE_TIME)
+            if (Time.time - entityTimer[entity] >= UNDER_ATTACK_TIME)
             {
                 entityTimer[entity] = Time.time;
                 if (!isEntityUnderCamera(entity))
