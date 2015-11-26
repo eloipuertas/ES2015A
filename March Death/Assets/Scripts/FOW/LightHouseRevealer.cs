@@ -8,37 +8,46 @@ using UnityEngine;
 class LightHouseRevealer : MonoBehaviour
 {
 
-
+    private Storage.Races _race;
     public enum Direction { CLOCK, COUNTERCLOCK };
     public Direction direction = Direction.CLOCK;
+
     private int Angle = 360;
-    public float RevealerStep = 1f;
-    public float RevealerSpeed = 1f;
-    
-    private float ApertureStep = .25f;
-    private int RevealerRange = 55;
+    private float RevealerAngleStep = 2f;
+    private float ApertureStep = 1f;
+    private int RevealerApertureRange = 60;
 
     private Vector3 _basePosition;
-    private float _endOpening;
+    private int _endOpening;
     private bool _opening;
-    public bool _rotating;
-    private LightHouse _lightHouse;
+    private bool _rotating;
     private Vector3 _center;
+    private GameObject light;
+    
 
     void Awake()
     {
         _basePosition = transform.position;
-        _endOpening = _basePosition.z + RevealerRange;
+        _endOpening = RevealerApertureRange;
         _opening = true;
     }
 
     void Start()
     {
         Debug.Log("Lighthouse opening");
-        _lightHouse = transform.parent.gameObject.GetComponent<LightHouse>();
         _center = transform.parent.position;
+        _race = transform.parent.GetComponent<Barrack>().getRace();
+        GetComponent<FOWEntity>().Activate(_race);
+        _opening = true;
+        light = transform.parent.FindChild("Light").gameObject;
+
     }
 
+    private void CreateLight()
+    {
+
+
+    }
     void Update()
     {
         if (_opening)
@@ -46,19 +55,21 @@ class LightHouseRevealer : MonoBehaviour
             Vector3 newPos = transform.position;
             newPos.z += ApertureStep;
             transform.position = newPos;
-            if (newPos.z > _endOpening)
+            if (--_endOpening < 0)
             {
                 Debug.Log("Lighthouse on position");
-                _opening = false;
                 _rotating = true;
+                _opening = false;
             }
 
         }
         else if(_rotating)
         {
-            transform.RotateAround(_center, Vector3.up, RevealerStep);
+            Vector3 rotateDirection = direction == Direction.CLOCK ? Vector3.up : Vector3.down;
+            transform.RotateAround(_center, rotateDirection, RevealerAngleStep);
         }
 
+        light.transform.LookAt(transform);
     }
 
 
