@@ -7,7 +7,7 @@ using Utils;
 public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 {
 
-	public enum Actions { CREATED, SELECTED, DESELECTED };
+    public enum Actions { CREATED, SELECTED, DESELECTED };
 
     private Player player;
     private Rect selectedRect = new Rect();
@@ -16,6 +16,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public Collider _collider;
     private GameObject controller;
     private GameObject plane;
+    private EntitySelection _unitSelection;
 
     public bool currentlySelected { get; set; }
     private float healthRatio = 1f;
@@ -24,7 +25,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     private bool _changedVisible = false;
 
     public Storage.Races race {
-        get { return player.race; }
+        get { return entity.info.race; }
     }
     
     public Selectable() { }
@@ -47,10 +48,25 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         base.Start();
         fire(Actions.CREATED, this.gameObject);
         entity = GetComponent<IGameEntity>();
-        bool ownUnit = entity.info.race == player.race;
-        selectedBox = SelectionOverlay.CreateTexture(ownUnit);
+        if (entity.info.isBuilding == true)
+        {
+        	selectedBox = SelectionOverlay.CreateTexture(false);
+        } else 
+        {
+        	bool ownUnit = entity.info.race == player.race;
+        	selectedBox = SelectionOverlay.CreateTexture(ownUnit);
+        }
 
-        plane = SelectionOverlay.getPlane(gameObject);
+        plane = SelectionOverlay.getPlane(gameObject, selectedBox);
+
+        entity.doIfUnit(unit =>
+        {
+            unit.register(Unit.Actions.DIED, onUnitDied);
+        });
+
+        // only apply for units
+        if (entity.info.isUnit) RetrieveLightSelection();
+        else _unitSelection = null;
     }
 
     public override void Update() { }
@@ -59,7 +75,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
         if (!(currentlySelected ^ _changedVisible))
         {
-            if (currentlySelected) plane = SelectionOverlay.getPlane(gameObject);
+            if (currentlySelected) plane = SelectionOverlay.getPlane(gameObject, selectedBox);
             else Destroy(plane, 0f); _lastHealth = 100f;
 
             _changedVisible = !currentlySelected;
@@ -107,6 +123,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public virtual void SelectEntity()
     {
         this.currentlySelected = true;
+        if (_unitSelection) _unitSelection.Enable();
         fire(Actions.SELECTED);
     }
 
@@ -116,6 +133,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public virtual void DeselectEntity()
     {
         this.currentlySelected = false;
+        if (_unitSelection) _unitSelection.Disable();
         fire(Actions.DESELECTED);
     }
 
@@ -135,5 +153,36 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public virtual void NotAttackedEntity()
     {
     	this.currentlySelected = false;
+    }
+
+    public void onUnitDied(System.Object obj)
+    {
+
+        if (race == player.race)
+        {
+            Debug.Log("Unit died, deselecting and other stuff");
+            DeselectMe();
+
+        }
+        else
+        {
+            Debug.Log("Enemy died");
+            this.currentlySelected = false;
+            fire(Actions.DESELECTED);
+        }
+    }
+
+    /// <summary>
+    /// Retrieves the new selection mechanism
+    /// </summary>
+    private void RetrieveLightSelection()
+    {
+        
+        GameObject selection = transform.FindChild("EntitySelection").gameObject;
+
+        if (!selection) throw new System.Exception("FIX: " + entity.info.race + " - "  + entity.info.name + " prefab needs the EntitySelection prefab which is in Resources/prefab/selection");
+        _unitSelection = selection.GetComponent<EntitySelection>();
+        _unitSelection.SetColorRace(race);
+        
     }
 }

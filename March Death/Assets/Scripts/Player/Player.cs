@@ -28,6 +28,8 @@ public class Player : BasePlayer
 	//public ArrayList SelectedObjects = new ArrayList();
     public ArrayList SelectedObjects { get { return _selection.ToArrayList(); } }
 
+    private EventsNotifier events;
+
     private bool isGameOverScreenDisplayed = false;
 
     private CameraController cam;
@@ -42,6 +44,7 @@ public class Player : BasePlayer
         _selection.SetRace(race);
         
         cam = GameObject.FindWithTag("MainCamera").GetComponent<CameraController>();
+        events = GetComponent<EventsNotifier>();
 
         Battle.PlayerInformation me = info.GetBattle().GetPlayerInformationList()[playerId - 1];
         InstantiateBuildings(me.GetBuildings());
@@ -99,6 +102,7 @@ public class Player : BasePlayer
     public override void removeEntity(IGameEntity entity)
     {
         _activeEntities.Remove(entity);
+        unregisterEntityEvents(entity);
     }
 
     /// <summary>
@@ -109,6 +113,7 @@ public class Player : BasePlayer
     public override void addEntity(IGameEntity newEntity)
     {
         _activeEntities.Add(newEntity);
+        registerEntityEvents(newEntity);
         Debug.Log(_activeEntities.Count + " entities");
     }
 
@@ -151,39 +156,19 @@ public class Player : BasePlayer
         return (ArrayList) SelectedObjects.Clone();
     }
 
-    // <summary>
-    // Getter for the resources of the player.
-    // </summary>
-    //public Managers.ResourcesManager resources {get { return _resources; } }
-
-    private void performUnitDied(System.Object obj)
+    private void signalMissionUpdate(System.Object obj)
     {
-        IGameEntity e = ((GameObject) obj).GetComponent<IGameEntity>();
-        missionStatus.OnUnitKilled(((Unit) e).type);
-    }
-
-    private void performBuildingDestroyed(System.Object obj)
-    {
-        IGameEntity e = ((GameObject) obj).GetComponent<IGameEntity>();
-        if (e.info.isBarrack)
+        Storage.EntityInfo e = (Storage.EntityInfo) obj;
+        switch (e.entityType)
         {
-            missionStatus.OnBuildingDestroyed(((Barrack) e).type);
-        }
-        else if (e.info.isResource)
-        {
-            missionStatus.OnBuildingDestroyed(((Resource) e).type);
-        }
-    }
-
-    public void registerGameEntityActions(IGameEntity entity)
-    {
-        if (entity.info.isUnit)
-        {
-            entity.registerFatalWounds(performUnitDied);
-        }
-        else if (entity.info.isBuilding)
-        {
-            entity.registerFatalWounds(performBuildingDestroyed);
+            case Storage.EntityType.BUILDING:
+                missionStatus.OnBuildingDestroyed(e.getType<Storage.BuildingTypes>());
+                break;
+            case Storage.EntityType.UNIT:
+                missionStatus.OnUnitKilled(e.getType<Storage.UnitTypes>());
+                break;
+            case Storage.EntityType.RESOURCE:
+                break;
         }
     }
 
@@ -201,5 +186,66 @@ public class Player : BasePlayer
     protected override void AddUnit(IGameEntity entity)
     {
         addEntity(entity);
+    }
+
+    /// <summary>
+    /// Registers the events that display a message to the user.
+    /// </summary>
+    /// <param name="entity">Game entity that triggers the event.</param>
+    private void registerEntityEvents(IGameEntity entity)
+    {
+        if (entity.info.isBuilding)
+        {
+            if (entity.info.isBarrack)
+            {
+                Barrack barrack = (Barrack) entity;
+                barrack.register(Barrack.Actions.DAMAGED, events.DisplayUnderAttack);
+                barrack.register(Barrack.Actions.DESTROYED, events.DisplayBuildingDestroyed);
+                barrack.register(Barrack.Actions.CREATE_UNIT, events.DisplayUnitCreated);
+                barrack.register(Barrack.Actions.BUILDING_FINISHED, events.DisplayBuildingCreated);
+            }
+            else 
+            {
+                Resource resourcesBuilding = (Resource) entity;
+                resourcesBuilding.register(Resource.Actions.DAMAGED, events.DisplayUnderAttack);
+                resourcesBuilding.register(Resource.Actions.DESTROYED, events.DisplayBuildingDestroyed);
+                resourcesBuilding.register(Resource.Actions.BUILDING_FINISHED, events.DisplayBuildingCreated);
+                resourcesBuilding.register(Resource.Actions.CREATE_UNIT, events.DisplayUnitCreated);
+            }
+        }
+        else if (entity.info.isUnit)
+        {
+            Unit unit = (Unit) entity;
+            unit.register(Unit.Actions.DAMAGED, events.DisplayUnderAttack);
+            unit.register(Unit.Actions.DIED, events.DisplayUnitDead);
+            unit.register(Unit.Actions.TARGET_TERMINATED, signalMissionUpdate);
+        }
+    }
+
+    private void unregisterEntityEvents(IGameEntity entity)
+    {
+        if (entity.info.isBarrack)
+        {
+            Barrack barrack = (Barrack) entity;
+            barrack.unregister(Barrack.Actions.DAMAGED, events.DisplayUnderAttack);
+            barrack.unregister(Barrack.Actions.DESTROYED, events.DisplayBuildingDestroyed);
+            barrack.unregister(Barrack.Actions.CREATE_UNIT, events.DisplayUnitCreated);
+            barrack.unregister(Barrack.Actions.BUILDING_FINISHED, events.DisplayBuildingCreated);
+        }
+        else if (entity.info.isResource)
+        {
+            Resource resourcesBuilding = (Resource) entity;
+            resourcesBuilding.unregister(Resource.Actions.DAMAGED, events.DisplayUnderAttack);
+            resourcesBuilding.unregister(Resource.Actions.DESTROYED, events.DisplayBuildingDestroyed);
+            resourcesBuilding.unregister(Barrack.Actions.BUILDING_FINISHED, events.DisplayBuildingCreated);
+            resourcesBuilding.unregister(Resource.Actions.CREATE_UNIT, events.DisplayUnitCreated);
+        }
+        else if (entity.info.isUnit)
+        {
+            Unit unit = (Unit) entity;
+            unit.unregister(Unit.Actions.DIED, events.DisplayUnitDead);
+            unit.unregister(Unit.Actions.DAMAGED, events.DisplayUnderAttack);
+            unit.unregister(Unit.Actions.TARGET_TERMINATED, signalMissionUpdate);
+        }
     }
 }

@@ -11,12 +11,13 @@ GameObject:
   - 33: {fileID: 3300000}
   - 23: {fileID: 2300000}
   - 114: {fileID: 11400000}
+  - 65: {fileID: 6586612}
   m_Layer: 4
   m_Name: WaterProDaytime
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_NavMeshLayer: 1
+  m_StaticEditorFlags: 8
   m_IsActive: 1
 --- !u!1002 &100001
 EditorExtensionImpl:
@@ -27,9 +28,9 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 501, y: 74, z: 437.200012}
-  m_LocalScale: {x: 471.688354, y: 1.5898962, z: 599.755005}
+  m_LocalRotation: {x: .000902639702, y: .421974599, z: .00180985266, w: .906605422}
+  m_LocalPosition: {x: 535, y: 76.2300034, z: 434}
+  m_LocalScale: {x: 963.765564, y: 1.48892355, z: 1051.33838}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -73,6 +74,18 @@ MeshFilter:
 --- !u!1002 &3300001
 EditorExtensionImpl:
   serializedVersion: 6
+--- !u!65 &6586612
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.9999994, y: 4.76836988e-07, z: 1.99999893}
+  m_Center: {x: -3.08267744e-07, y: 3.81469727e-06, z: 3.27825518e-07}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 1

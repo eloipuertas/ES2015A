@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using Assets.Scripts.AI;
 
@@ -79,6 +79,16 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
         return ia;
     }
 
+    public static BasePlayer getOwner(Storage.Races race)
+    {
+        if (race == info.GetPlayerRace())
+        {
+            return player;
+        }
+
+        return ia;
+    }
+
     void Update () {}
 
     public void SetInitialResources(uint wood, uint food, uint metal, uint gold)
@@ -105,7 +115,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
             // HACK Without the addition, Construction Grid detects the terrain as it not being flat
             position.y = 1 + terrain.SampleHeight(position);
             created = _buildings.createBuilding(position, Quaternion.Euler(0,0,0),
-                                        building.entityType.building,
+                                        building.type.building,
                                         _selfRace);
 
             IGameEntity entity = created.GetComponent<IGameEntity>();
@@ -128,7 +138,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
             position.x = unit.position.X;
             position.z = unit.position.Y;
             position.y = terrain.SampleHeight(position);
-            created = Storage.Info.get.createUnit(_selfRace, unit.entityType.unit,
+            created = Storage.Info.get.createUnit(_selfRace, unit.type.unit,
                                           position, Quaternion.Euler(0,0,0));
             AddUnit(created.GetComponent<IGameEntity>());
         }

@@ -14,17 +14,11 @@ public class Main_Game : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
-        //strongholdTransform = GameObject.Find ("PlayerStronghold").transform;
-        //playerHero = GameObject.Find ("PlayerHero");
         if (GameObject.Find ("GameInformationObject"))
             info = (GameInformation)GameObject.Find ("GameInformationObject").GetComponent ("GameInformation");
-        //user = GameObject.Find ("GameController").GetComponent ("Player") as Player;
-        //bm = GameObject.Find ("GameController").GetComponent<Managers.BuildingsManager> ();
         bm = new Managers.BuildingsManager();
         sounds = GameObject.Find("GameController").GetComponent<Managers.SoundsManager>();
         if (info) info.LoadHUD ();
-        //LoadPlayerStronghold ();
-        //LoadPlayerUnits ();
         StartGame();
         bm.Player = user;
         UserInput inputs = gameObject.AddComponent<UserInput>();
@@ -54,8 +48,6 @@ public class Main_Game : MonoBehaviour
 
     private void LoadCampaign ()
     {
-        GameObject created;
-        Vector3 position;
         int id = 1;
         foreach (Battle.PlayerInformation player in info.GetBattle().GetPlayerInformationList())
         {

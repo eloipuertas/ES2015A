@@ -33,13 +33,7 @@ public class ResourcesPlacer : MonoBehaviour
         for (int i = 0; i < txt_names.Length; i++)
         {
             res_amounts.Add(GameObject.Find("HUD/resources/text_" + txt_names[i]).GetComponent<Text>());
-            if (player.race == Races.ELVES)
-            {
-                if (i != 2)
-                    res_stats.Add(GameObject.Find("HUD/resources/text_" + txt_names[i] + "_hour").GetComponent<Text>());
-                else
-                    res_stats.Add(GameObject.Find("HUD/resources/text_meta_hour").GetComponent<Text>());
-            }
+            res_stats.Add(GameObject.Find("HUD/resources/text_" + txt_names[i] + "_hour").GetComponent<Text>());
         }
 
         setupText();
@@ -55,7 +49,7 @@ public class ResourcesPlacer : MonoBehaviour
     void Update()
     {
         if (_timer >= UPDATE_STATS)
-        { 
+        {
             updateStatistics();
             _timer = 0f;
         }
@@ -95,11 +89,8 @@ public class ResourcesPlacer : MonoBehaviour
     {
         for (int i = 0; i < txt_names.Length; i++)
         {
-            if (player.race == Races.ELVES)
-            {
-                res_stats[i].text = "" + System.Math.Round(_statistics[i],2) + "/s";
-                res_stats[i].color = _statistics[i] >= 0 ? Color.gray : Color.red;
-            }
+            res_stats[i].text = "" + System.Math.Round(_statistics[i], 2) + "/s";
+            res_stats[i].color = _statistics[i] >= 0 ? Color.gray : Color.red;
         }
     }
 
@@ -142,7 +133,8 @@ public class ResourcesPlacer : MonoBehaviour
 
     private void setupText()
     {
-        foreach (Text t in res_amounts) {
+        foreach (Text t in res_amounts)
+        {
             t.color = Color.white;
             t.fontStyle = FontStyle.BoldAndItalic;
         }
@@ -165,6 +157,7 @@ public class ResourcesPlacer : MonoBehaviour
                 updateUnitCreated(go.GetComponent<IGameEntity>());
         }
     }
+
 
     public void onStatisticsUpdate(System.Object obj)
     {
@@ -190,7 +183,7 @@ public class ResourcesPlacer : MonoBehaviour
     public void onFoodConsumption(System.Object obj)
     {
         Goods goods = (Goods)obj;
-        Debug.Log("Let's eat an amount of: " + goods.amount + " on: " + goods.type);
+
         if (player != null && goods != null)
         {
             player.resources.SubstractAmount(t[0], goods.amount); // t[0] is FOOD
@@ -202,8 +195,6 @@ public class ResourcesPlacer : MonoBehaviour
     public void onCollection(System.Object obj)
     {
         Goods goods = (Goods)obj;
-
-        Debug.Log("Let's collect an amount of: " + goods.amount + " on: " + goods.type);
 
         switch (goods.type)
         {

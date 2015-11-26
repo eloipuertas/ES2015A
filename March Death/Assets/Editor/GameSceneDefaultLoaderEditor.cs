@@ -20,11 +20,11 @@ public class GameSceneDefaultLoaderEditor : Editor {
         DrawDefaultInspector();
 
         GameSceneDefaultLoader sceneLoader = (GameSceneDefaultLoader)target;
-        if (GUILayout.Button("Reload HUD"))
+        if (GUILayout.Button("Load Extra Units"))
         {
             //TODO
-            throw new Exception("Por ahora no es posible recargar el hud durante la partida");
-            sceneLoader.LoadSceneContext();
+            
+            sceneLoader.LoadExtraUnits();
         }
     }
 }

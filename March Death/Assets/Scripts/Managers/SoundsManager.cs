@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 using Utils;
-using Managers;
+using Storage;
+
 namespace Managers
 {
     public class SoundsManager: MonoBehaviour
@@ -17,7 +17,6 @@ namespace Managers
         {
             Setup();
             fakeSetup();
-
         }
 
         /// <summary>
@@ -57,16 +56,24 @@ namespace Managers
         /// function to be triggered when an entity is selected
         /// </summary>
         /// <param name="obj"></param>
-        public void onEntitytSelected(System.Object obj)
+        public void onEntitytSelected(object obj)
         {
-            selectionSoundPool.Play(selectionSound[RandomChoice()]);
+            Selectable  select = (Selectable)obj;
+            //IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+
+            if (select.entity.info.isBuilding)
+            {
+                selectionSoundPool.Play(Sounds.get.Clip(select.entity.getType<BuildingTypes>(), Sounds.SoundType.SELECTION));
+            }
+            else
+                selectionSoundPool.Play(selectionSound[RandomChoice()]);
         }
 
         /// <summary>
         /// function to be triggered when a unit performs an action
         /// </summary>
         /// <param name="obj"></param>
-        public void onUnitAction(System.Object obj)
+        public void onUnitAction(object obj)
         {
             actionSoundPool.Play(actionSound[RandomChoice()]);
         }
@@ -77,7 +84,7 @@ namespace Managers
         /// <returns></returns>
         private int RandomChoice()
         {
-            return Random.Range(0, 3);
+            return UnityEngine.Random.Range(0, 3);
         }
 
         void OnDestroy()

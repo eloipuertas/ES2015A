@@ -30,7 +30,6 @@ public class GameSetupScript : MonoBehaviour
     void Start ()
     {
         info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
-        Debug.Log("info exists");
         raceSelected = false;
         showMsgBox = false;
     }
@@ -50,7 +49,7 @@ public class GameSetupScript : MonoBehaviour
     void DrawWindow(int window)
     {
         GUI.Label(new Rect(5, 20, messageBox.width, 20), "Please, select a civilization");
-        if (GUI.Button(new Rect(5, 50, messageBox.width - 10, 20), "Ok"))
+        if (GUI.Button(new Rect(5, 120, messageBox.width - 10, 20), "Ok"))
         {
             showMsgBox = false;
         }
@@ -58,34 +57,35 @@ public class GameSetupScript : MonoBehaviour
 
     public void SetPlayerRaceToElf ()
     {
-        // HACK Even though info is initialized in Start(), it is null when it gets here
-        if (!info) info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
         info.SetPlayerRace(Races.ELVES);
         raceSelected = true;
     }
 
     public void SetPlayerRaceToHuman()
     {
-        // HACK Even though info is initialized in Start(), it is null when it gets here
-        if (!info) info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
         info.SetPlayerRace(Races.MEN);
         raceSelected = true;
+    }
+
+    public void SetDifficultyLevel(int level)
+    {
+        info.Difficulty = level;
     }
 
     // TODO Implement mechanism to select game mode
     public void SetGameMode ()
     {
-        info.setGameMode (GameInformation.GameMode.CAMPAIGN);
+        info.setGameMode(GameInformation.GameMode.CAMPAIGN);
     }
 
     public void StartGame()
     {
         if (raceSelected)
         {
-            GameObject menuMusic = GameObject.Find ("BackgroundMusic");
+            GameObject menuMusic = GameObject.Find("BackgroundMusic");
             if (menuMusic)
             {
-                Destroy (menuMusic);
+                Destroy(menuMusic);
             }
             SetGameMode();
             Application.LoadLevel(3);

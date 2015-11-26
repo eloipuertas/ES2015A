@@ -126,6 +126,8 @@ public class Unit : GameEntity<Unit.Actions>
     {
         // TODO: Our target died, select next? Do nothing?
         setStatus(EntityStatus.IDLE);
+        IGameEntity entity = ((GameObject) obj).GetComponent<IGameEntity>();
+        fire(Actions.TARGET_TERMINATED, entity.info);
         _target = null;
     }
 
@@ -154,6 +156,9 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     protected override void onFatalWounds()
     {
+        statistics.getNegative();
+        fire(Actions.STAT_OUT, statistics);
+
         fire(Actions.DIED);
 
         statistics.growth_speed *= -1;

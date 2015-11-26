@@ -55,7 +55,7 @@ namespace Managers
              if( _selectedEntities.Count > 0 ) _selectedEntities.Clear();
 
             _selectedEntities.Select(selectable);
-            fire(Actions.SELECT, selectable.gameObject);
+            fire(Actions.SELECT, selectable);
 
 
         }
@@ -96,7 +96,7 @@ namespace Managers
             if (!_selectedEntities.Contains(selectable))
             {
                 _selectedEntities.Select(selectable);
-                fire(Actions.SELECT, selectable.gameObject);
+                fire(Actions.SELECT, selectable);
                 _isTroop = false;
             }
         }
@@ -144,7 +144,7 @@ namespace Managers
             _selectedEntities.Select(selected);
             
             foreach(Selectable selectable in selected)
-                fire(Actions.SELECT, selectable.gameObject);
+                fire(Actions.SELECT, selectable);
 
             _isTroop = true;
             Debug.Log("Selected troop: " + key);
@@ -243,7 +243,7 @@ namespace Managers
                 if (selected.entity.info.isUnit)
                 {
                     selected.GetComponent<Unit>().moveTo(point);
-                    fire(Actions.MOVE, selected.gameObject);
+                    fire(Actions.MOVE, selected);
                 }
 
             }
@@ -266,7 +266,7 @@ namespace Managers
                 {
                     Unit unit = selected.GetComponent<Unit>();
                     unit.attackTarget(enemy);
-                    fire(Actions.ATTACK, selected.gameObject);
+                    fire(Actions.ATTACK, selected);
                 }
             }
             Debug.Log("attacking");

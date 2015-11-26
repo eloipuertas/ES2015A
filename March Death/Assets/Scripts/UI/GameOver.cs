@@ -2,15 +2,27 @@ using UnityEngine;
 
 public class GameOver : MonoBehaviour
 {
-    void Start() {}
+    Main_Game mg;
+
+    void Start()
+    {
+        mg = GameObject.FindWithTag("GameController").GetComponent<Main_Game>();
+    }
+
     void Update() {}
+
+    void loadLevel(int level)
+    {
+        mg.ClearGame();
+        Application.LoadLevel(level);
+    }
 
     /// <summary>
     /// Loads the main menu.
     /// </summary>
     public void ReturnToMainMenu()
     {
-        Application.LoadLevel(0);
+        loadLevel(0);
     }
 
     /// <summary>
@@ -18,6 +30,6 @@ public class GameOver : MonoBehaviour
     /// </summary>
     public void RestartGame()
     {
-        Application.LoadLevel(2);
+        loadLevel(2);
     }
 }

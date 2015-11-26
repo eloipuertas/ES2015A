@@ -35,11 +35,9 @@ public class Battle
         /// <summary>
         /// The type of building or unit this entity represents.
         /// </summary>
-        public EntityTypeUnion entityType;
+        public EntityTypeUnion type;
         public EntityPosition position;
-
-        public bool hasStatus;
-        public EntityStatus status;
+        public Storage.EntityType entityType;
     }
 
     public enum MissionType
@@ -89,28 +87,10 @@ public class Battle
         public void AddBuilding(Storage.BuildingTypes type, float x, float y)
         {
             PlayableEntity e = new PlayableEntity();
-            e.entityType.building = type;
+            e.type.building = type;
+            e.entityType = Storage.EntityType.BUILDING;
             e.position.X = x;
             e.position.Y = y;
-            e.hasStatus = false;
-            buildings.Add(e);
-        }
-
-        /// <summary>
-        /// Adds a building with the given type and position to this player's information.
-        /// </summary>
-        /// <param name="type">Type of building.</param>
-        /// <param name="x">The x coordinate in the grid.</param>
-        /// <param name="y">The y coordinate in the grid.</param>
-        /// <param name="status">The status of the entity.</param>
-        public void AddBuilding(Storage.BuildingTypes type, float x, float y, EntityStatus status)
-        {
-            PlayableEntity e = new PlayableEntity();
-            e.entityType.building = type;
-            e.position.X = x;
-            e.position.Y = y;
-            e.hasStatus = true;
-            e.status = status;
             buildings.Add(e);
         }
 
@@ -123,7 +103,8 @@ public class Battle
         public void AddUnit(Storage.UnitTypes type, float x, float y)
         {
             PlayableEntity e = new PlayableEntity();
-            e.entityType.unit = type;
+            e.type.unit = type;
+            e.entityType = Storage.EntityType.UNIT;
             e.position.X = x;
             e.position.Y = y;
             units.Add(e);
@@ -231,3 +212,4 @@ public class Battle
         missions = new List<MissionDefinition>();
     }
 }
+

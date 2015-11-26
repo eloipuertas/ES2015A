@@ -22,8 +22,11 @@ namespace Storage
         [JsonConverter(typeof(BuildingAttributesDataConverter))]
         public override EntityAttributes attributes { get; set; }
 
-        [JsonConverter(typeof(BuildingActionsDataConverter))]
+        [JsonConverter(typeof(BuildingAttributesDataConverter))]
         public override List<EntityAbility> abilities { get; set; }
+
+
+        public List<string> sounds;
 
         public override T getType<T>()
         {
@@ -33,6 +36,7 @@ namespace Storage
         public BuildingInfo()
         {
             abilities = new List<EntityAbility>();
+            sounds = new List<string>();
         }
     }
 }

@@ -271,4 +271,9 @@ public class EntityAbilitiesController : MonoBehaviour
         Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.DESELECTED, onActorDeselected);
     }
 
+    void OnDestroy()
+    {
+        Clear ();
+    }
+
 }
