@@ -23,6 +23,7 @@ class TestEnvironment : SingletonMono<TestEnvironment>
     private List<Tuple<String, String>> errorLogger = new List<Tuple<String, String>>();
     private float _elapsedTime;
 
+    private static bool _setupDone = false;
     private Dictionary<int, List<UnitTest>> unitTests = new Dictionary<int, List<UnitTest>>();
 
     public TestEnvironment()
@@ -52,39 +53,43 @@ class TestEnvironment : SingletonMono<TestEnvironment>
 
     public void Init()
     {
-        testingEnabled = false;
-        testTime = 15;
-        _elapsedTime = 0;
-        playerRace = Races.MEN;
-
-        String[] arguments = Environment.GetCommandLineArgs();
-
-        foreach (String arg in (new List<String>(arguments)).Skip(1))
+        if (!_setupDone)
         {
-            if (arg.StartsWith("--test="))
-            {
-                testingEnabled = true;
-                testFile = arg.Substring(7);
-            }
-            else if (arg.StartsWith("--player-race="))
-            {
-                playerRace = (Races)Enum.Parse(typeof(Races), arg.Substring(14), true);
-            }
-            else if (arg.StartsWith("--test-time="))
-            {
-                testTime = float.Parse(arg.Substring(12), CultureInfo.InvariantCulture.NumberFormat);
-                testTime /= 1000.0f;
-            }
-        }
+            _setupDone = true;
+            testingEnabled = false;
+            testTime = 15;
+            _elapsedTime = 0;
+            playerRace = Races.MEN;
 
-        // Destroy if not in use
-        if (!testingEnabled)
-        {
-            Destroy(this.gameObject);
-        }
-        else
-        {
-            state = States.IN_MENU;
+            String[] arguments = Environment.GetCommandLineArgs();
+
+            foreach (String arg in (new List<String>(arguments)).Skip(1))
+            {
+                if (arg.StartsWith("--test="))
+                {
+                    testingEnabled = true;
+                    testFile = arg.Substring(7);
+                }
+                else if (arg.StartsWith("--player-race="))
+                {
+                    playerRace = (Races)Enum.Parse(typeof(Races), arg.Substring(14), true);
+                }
+                else if (arg.StartsWith("--test-time="))
+                {
+                    testTime = float.Parse(arg.Substring(12), CultureInfo.InvariantCulture.NumberFormat);
+                    testTime /= 1000.0f;
+                }
+            }
+
+            // Destroy if not in use
+            if (!testingEnabled)
+            {
+                Destroy(this.gameObject);
+            }
+            else
+            {
+                state = States.IN_MENU;
+            }
         }
     }
 
@@ -131,6 +136,19 @@ class TestEnvironment : SingletonMono<TestEnvironment>
         }
     }
 
+    private bool Wait(float t)
+    {
+        // Give some margin time
+        if (_elapsedTime <= t)
+        {
+            _elapsedTime += Time.deltaTime;
+            return false;
+        }
+
+        _elapsedTime = 0;
+        return true;
+    }
+
     void Update()
     {
         if (testingEnabled)
@@ -138,6 +156,8 @@ class TestEnvironment : SingletonMono<TestEnvironment>
             switch (state)
             {
                 case States.IN_MENU:
+                    if (!Wait(1)) return;
+
                     RunAllTests(States.IN_RACES_SELECT, () =>
                     {
                         Application.LoadLevel("seleccion personaje");
@@ -145,11 +165,13 @@ class TestEnvironment : SingletonMono<TestEnvironment>
                     break;
 
                 case States.IN_RACES_SELECT:
+                    if (!Wait(1)) return;
+
                     RunAllTests(States.PRE_GAME_CHECKING, () =>
                     {
                         GameObject.Find("GameInformationObject").
                             GetComponent<GameInformation>().
-                            SetPlayerRace(playerRace);
+                            setGameMode(GameInformation.GameMode.CAMPAIGN);
 
                         Application.LoadLevel("ES2015A");
                     });
@@ -158,6 +180,8 @@ class TestEnvironment : SingletonMono<TestEnvironment>
                 case States.PRE_GAME_CHECKING:
                     // Hack to make camera stop moving
                     Camera.main.GetComponent<CameraController>().setCameraSpeed(0);
+
+                    if (!Wait(1)) return;
 
                     RunAllTests(States.IN_GAME);
                     break;

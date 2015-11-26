@@ -21,7 +21,7 @@ namespace Assets.Scripts.AI
         public BaseAgent lastAgent { get; set; }
         Dictionary<Type, AgentData> storage;
 
-        Rect boudningBox;
+        public Rect boudningBox;
         public float squadValue;
         public SquadAI enemySquad = null;
 
@@ -64,7 +64,7 @@ namespace Assets.Scripts.AI
         }
         public void removeUnit(Unit u)
         {
-            units.Add(u);
+            units.Remove(u);
 
             foreach (AgentData agent in storage.Values)
                 if (agent != null)
@@ -132,8 +132,10 @@ namespace Assets.Scripts.AI
 		}
 
         public void recalculateSquadValues()
-        {   
+        {
 
+            if (units.Count == 0)
+                return;
             //Recalculate the atack data of the squad    
             AttackData ad = getData<AttackData>();
             float val = 0;
@@ -167,7 +169,7 @@ namespace Assets.Scripts.AI
             if (maxLongitudeOfBox < 1) maxLongitudeOfBox = 1f;
 
             //Smell what is near this position
-            enemySquad.units = ai.senses.getUnitsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 3 * _maxUnitRange, _enemyRace);
+            enemySquad.units = ai.senses.getVisibleUnitsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 3 * _maxUnitRange, _enemyRace);
 
             //Get the enemy squad bounding box
             enemySquad.boudningBox = enemySquad.getSquadBoundingBox();

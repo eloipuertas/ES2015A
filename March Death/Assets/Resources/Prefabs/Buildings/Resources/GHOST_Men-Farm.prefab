@@ -10,6 +10,7 @@ GameObject:
   - 4: {fileID: 441654}
   - 33: {fileID: 3342168}
   - 23: {fileID: 2380806}
+  - 114: {fileID: 11418658}
   m_Layer: 0
   m_Name: GHOST_Men-Farm
   m_TagString: Untagged
@@ -60,6 +61,19 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 106504}
   m_Mesh: {fileID: 4300000, guid: 04f20e68e27fc3444b42cdf7665d940e, type: 3}
+--- !u!114 &11418658
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 106504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc4dbd7bbbda4e14baa3f054762b3ca9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 0
+  type: 1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -159,6 +173,10 @@ Prefab:
       propertyPath: m_Materials.Array.data[1]
       value: 
       objectReference: {fileID: 2100000, guid: a4f582c98890ac14cab8faa470cb2de1, type: 2}
+    - target: {fileID: 0}
+      propertyPath: type
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 106504}

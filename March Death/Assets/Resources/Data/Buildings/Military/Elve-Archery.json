@@ -1,0 +1,42 @@
+{
+    "race": "ELVES",
+    "type": "ARCHERY",
+    "name": "Archery",
+
+    "attributes": {
+        "resistance": 3,
+        "wounds": 50,
+        "capacity": 10,
+        "timeToBuild": 30,
+        "repairSpeed": 0.2,
+        "storeSize": 100,
+        "maxUnits":  10,
+        "productionRate": 20,
+        "updateInterval": 10,
+        "sightRange": 50
+    },
+
+    "resources": {
+        "wood": 100,
+        "metal": 40,
+        "food": 50
+    },
+
+    "abilities":
+    [
+        {
+            "ability": "Create",
+            "name":"Create Thrown",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "UNIT",
+            "targetRace": "ELVES",
+            "targetUnit": "THROWN"
+        },
+
+        {
+            "name": "Sell",
+            "tooltipFlags": "HIDE"
+        }
+    ]
+}

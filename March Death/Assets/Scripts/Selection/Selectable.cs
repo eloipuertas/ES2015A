@@ -7,7 +7,7 @@ using Utils;
 public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 {
 
-	public enum Actions { CREATED, SELECTED, DESELECTED };
+    public enum Actions { CREATED, SELECTED, DESELECTED };
 
     private Player player;
     private Rect selectedRect = new Rect();
@@ -15,13 +15,17 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public IGameEntity entity;
     public Collider _collider;
     private GameObject controller;
+    private GameObject plane;
+    private EntitySelection _unitSelection;
 
     public bool currentlySelected { get; set; }
     private float healthRatio = 1f;
     private float _lastHealth = 0f;
     private bool entityMoving = true;
+    private bool _changedVisible = false;
+
     public Storage.Races race {
-        get { return player.race; }
+        get { return entity.info.race; }
     }
     
     public Selectable() { }
@@ -35,8 +39,6 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         currentlySelected = false;
         controller = GameObject.Find("GameController");
         player = controller.GetComponent<Player>();
-        selectedBox = SelectionOverlay.CreateTexture();
-        entity = GetComponent<IGameEntity>();
         _collider = GetComponent<Collider>();
         selectedRect = SelectionOverlay.CalculateBox(_collider);
     }
@@ -45,12 +47,40 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
         base.Start();
         fire(Actions.CREATED, this.gameObject);
+        entity = GetComponent<IGameEntity>();
+        if (entity.info.isBuilding == true)
+        {
+        	selectedBox = SelectionOverlay.CreateTexture(false);
+        } else 
+        {
+        	bool ownUnit = entity.info.race == player.race;
+        	selectedBox = SelectionOverlay.CreateTexture(ownUnit);
+        }
+
+        plane = SelectionOverlay.getPlane(gameObject, selectedBox);
+
+        entity.doIfUnit(unit =>
+        {
+            unit.register(Unit.Actions.DIED, onUnitDied);
+        });
+
+        // only apply for units
+        if (entity.info.isUnit) RetrieveLightSelection();
+        else _unitSelection = null;
     }
 
     public override void Update() { }
 
     protected virtual void LateUpdate()
     {
+        if (!(currentlySelected ^ _changedVisible))
+        {
+            if (currentlySelected) plane = SelectionOverlay.getPlane(gameObject, selectedBox);
+            else Destroy(plane, 0f); _lastHealth = 100f;
+
+            _changedVisible = !currentlySelected;
+        }
+
         if (currentlySelected)
         {
             selectedRect = SelectionOverlay.CalculateBox(_collider);
@@ -59,19 +89,14 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
             {
                 _lastHealth = entity.healthPercentage;
                 healthRatio = _lastHealth / 100f;
-                SelectionOverlay.UpdateTexture(selectedBox, healthRatio);
+                SelectionOverlay.UpdateTexture(plane, selectedBox, healthRatio);
             }
+            plane.transform.position = this.gameObject.transform.position + SelectionOverlay.getOffset(_collider);
         }
+
     }
 
-    protected virtual void OnGUI()
-    {
-        if (currentlySelected)
-        {
-            DrawSelection();
-        }
-    }
-
+    protected virtual void OnGUI(){}
 
 
     /// <summary>
@@ -98,6 +123,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public virtual void SelectEntity()
     {
         this.currentlySelected = true;
+        if (_unitSelection) _unitSelection.Enable();
         fire(Actions.SELECTED);
     }
 
@@ -107,12 +133,56 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public virtual void DeselectEntity()
     {
         this.currentlySelected = false;
+        if (_unitSelection) _unitSelection.Disable();
         fire(Actions.DESELECTED);
     }
 
-
-    private void DrawSelection()
+    /// <summary>
+    /// Set as selected to show health bar
+    /// ! Use only for rival units
+    /// </summary>
+    public virtual void AttackedEntity()
     {
-        GUI.DrawTexture(selectedRect, selectedBox);
+    	this.currentlySelected = true;
+    }
+
+    /// <summary>
+    ///  Hides health bar
+    /// ! Use only for rival units
+    /// </summary>
+    public virtual void NotAttackedEntity()
+    {
+    	this.currentlySelected = false;
+    }
+
+    public void onUnitDied(System.Object obj)
+    {
+
+        if (race == player.race)
+        {
+            Debug.Log("Unit died, deselecting and other stuff");
+            DeselectMe();
+
+        }
+        else
+        {
+            Debug.Log("Enemy died");
+            this.currentlySelected = false;
+            fire(Actions.DESELECTED);
+        }
+    }
+
+    /// <summary>
+    /// Retrieves the new selection mechanism
+    /// </summary>
+    private void RetrieveLightSelection()
+    {
+        
+        GameObject selection = transform.FindChild("EntitySelection").gameObject;
+
+        if (!selection) throw new System.Exception("FIX: " + entity.info.race + " - "  + entity.info.name + " prefab needs the EntitySelection prefab which is in Resources/prefab/selection");
+        _unitSelection = selection.GetComponent<EntitySelection>();
+        _unitSelection.SetColorRace(race);
+        
     }
 }

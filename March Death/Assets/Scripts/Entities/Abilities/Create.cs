@@ -4,13 +4,12 @@ using Managers;
 
 using UnityEngine;
 
-abstract class Create : Ability
+public class Create : Ability
 {
-	private IGameEntity _entity;
-	private BuildingInfo _info_tobuild;
-    
-    protected abstract BuildingTypes _type { get; }
+	private static BuildingsManager BuildingsMgr = null;
 
+	private IGameEntity _entity;
+	private EntityInfo _infoToBuild;
 
     public override bool isActive
     {
@@ -24,16 +23,32 @@ abstract class Create : Ability
     {
         get
         {
-			return BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, _info_tobuild.resources.food) &&
-					BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, _info_tobuild.resources.wood) &&
-					BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, _info_tobuild.resources.metal);            
+			return BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, _infoToBuild.resources.food) &&
+					BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, _infoToBuild.resources.wood) &&
+					BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, _infoToBuild.resources.metal) &&
+					(_entity.status == EntityStatus.IDLE || _entity.status == EntityStatus.WORKING);
         }
     }
 
     public Create(EntityAbility info, GameObject gameObject) : base(info, gameObject)
     {
 		_entity = _gameObject.GetComponent<IGameEntity>();
-		_info_tobuild = Info.get.of(_entity.info.race, _type);
+
+		switch (_info.targetType)
+		{
+			case EntityType.UNIT:
+				_infoToBuild = Info.get.of(_info.targetRace, _info.targetUnit);
+				break;
+
+			case EntityType.BUILDING:
+				_infoToBuild = Info.get.of(_info.targetRace, _info.targetBuilding);
+				break;
+		}
+
+		if (BuildingsMgr == null)
+		{
+			BuildingsMgr = GameObject.Find("GameController").GetComponent<Main_Game>().BuildingsMgr;
+		}
     }
 
     public override void disable()
@@ -43,7 +58,17 @@ abstract class Create : Ability
 
     public override void enable()
     {
-		GameObject.Find("GameController").GetComponent<BuildingsManager>().createBuilding(_entity.info.race, _type);
+		switch (_info.targetType)
+		{
+			case EntityType.UNIT:
+				_entity.doIfBuilding(building => building.addUnitQueue(_info.targetUnit));
+				break;
+
+			case EntityType.BUILDING:
+				BuildingsMgr.createBuilding(_info.targetRace, _info.targetBuilding);
+				break;
+		}
+
         base.enable();
     }
 }

@@ -6,9 +6,10 @@ using Storage;
 /// <summary>
 /// Script to handle UI events for the game setup screen.
 /// </summary>
-public class GameSetupScript : MonoBehaviour {
+public class GameSetupScript : MonoBehaviour
+{
 
-	GameInformation info;
+    GameInformation info;
 
     /// <summary>
     /// Indicates whether the player has selected their civilization or not
@@ -26,7 +27,8 @@ public class GameSetupScript : MonoBehaviour {
     private Rect messageBox = new Rect((Screen.width - 200) / 2, (Screen.height - 300) / 2, 200, 150);
 
     // Use this for initialization
-    void Start () {
+    void Start ()
+    {
         info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
         raceSelected = false;
         showMsgBox = false;
@@ -47,13 +49,13 @@ public class GameSetupScript : MonoBehaviour {
     void DrawWindow(int window)
     {
         GUI.Label(new Rect(5, 20, messageBox.width, 20), "Please, select a civilization");
-        if (GUI.Button(new Rect(5, 50, messageBox.width - 10, 20), "Ok"))
+        if (GUI.Button(new Rect(5, 120, messageBox.width - 10, 20), "Ok"))
         {
             showMsgBox = false;
         }
     }
 
-    public void SetPlayerRaceToElf()
+    public void SetPlayerRaceToElf ()
     {
         info.SetPlayerRace(Races.ELVES);
         raceSelected = true;
@@ -65,16 +67,28 @@ public class GameSetupScript : MonoBehaviour {
         raceSelected = true;
     }
 
+    public void SetDifficultyLevel(int level)
+    {
+        info.Difficulty = level;
+    }
+
+    // TODO Implement mechanism to select game mode
+    public void SetGameMode ()
+    {
+        info.setGameMode(GameInformation.GameMode.CAMPAIGN);
+    }
+
     public void StartGame()
     {
-
-		if (raceSelected)
+        if (raceSelected)
         {
-			GameObject menuMusic = GameObject.Find("BackgroundMusic");
-			if (menuMusic) {
-				Destroy (menuMusic);
-			}
-		    Application.LoadLevel("ES2015A");
+            GameObject menuMusic = GameObject.Find("BackgroundMusic");
+            if (menuMusic)
+            {
+                Destroy(menuMusic);
+            }
+            SetGameMode();
+            Application.LoadLevel(3);
         }
         else
         {
@@ -84,10 +98,6 @@ public class GameSetupScript : MonoBehaviour {
 
     public void Cancel()
     {
-		Application.LoadLevel(0);
+        Application.LoadLevel(0);
     }
-
-	void OnMouseEnter(){
-
-	}
 }

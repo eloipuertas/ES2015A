@@ -459,7 +459,7 @@ GameObject:
   - 114: {fileID: 11496878}
   - 114: {fileID: 11427250}
   - 114: {fileID: 11482964}
-  - 208: {fileID: 20843856}
+  - 114: {fileID: 11405756}
   m_Layer: 0
   m_Name: ElfMine
   m_TagString: Untagged
@@ -1708,7 +1708,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 114686}
-  m_LocalRotation: {x: .207251549, y: .0823451504, z: .561577082, w: .796804488}
+  m_LocalRotation: {x: .207251519, y: .082345143, z: .561577022, w: .796804368}
   m_LocalPosition: {x: 3.16649679e-10, y: .000632171868, z: 5.58793532e-11}
   m_LocalScale: {x: 1, y: 1.00000048, z: 1}
   m_Children:
@@ -1721,7 +1721,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 180270}
-  m_LocalRotation: {x: .408401132, y: .53631705, z: .478711873, w: .562501073}
+  m_LocalRotation: {x: -.0497173555, y: -.0185150895, z: .627283633, w: .776981771}
   m_LocalPosition: {x: -4.78000021, y: 1.91612244, z: 6.88000011}
   m_LocalScale: {x: -7.33154678, y: -7.33155107, z: -7.33154917}
   m_Children: []
@@ -2019,7 +2019,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 138030}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 218.218811, y: 79.0026245, z: 751.160461}
+  m_LocalPosition: {x: 748.85022, y: 79.0026245, z: 901.803894}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 420884}
@@ -2624,9 +2624,9 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 186624}
-  m_LocalRotation: {x: -.703629076, y: -.00188485393, z: -.00708908169, w: .710529685}
-  m_LocalPosition: {x: -.479747266, y: 2.47730565, z: .512335122}
-  m_LocalScale: {x: 98.4617996, y: 103.132118, z: 103.132141}
+  m_LocalRotation: {x: -.707106829, y: 0, z: 0, w: .707106709}
+  m_LocalPosition: {x: -3.75999999, y: 2.55999994, z: .25}
+  m_LocalScale: {x: -.0939004645, y: 97.9897919, z: 92.2371979}
   m_Children: []
   m_Father: {fileID: 452492}
   m_RootOrder: 8
@@ -3106,8 +3106,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 14, y: 0, z: 14}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 14, y: 6, z: 14}
+  m_Center: {x: 0, y: 2.95000005, z: 0}
 --- !u!95 &9512156
 Animator:
   serializedVersion: 3
@@ -3125,6 +3125,21 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11405756
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 138030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55673783568d5024f8240d70a3d2456f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DebugOnEditor: 1
+  Position: {x: 0, y: 0, z: 0}
+  Size: {x: 22, y: 12, z: 22}
+  CheckEverySeconds: 1
 --- !u!114 &11427250
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3294,8 +3309,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: .00284743309, y: 6.68764114e-05, z: 0}
-    m_Extent: {x: .00696776155, y: .0100000035, z: .00873303879}
+    m_Center: {x: .00284719467, y: 6.68764114e-05, z: 0}
+    m_Extent: {x: .00696786633, y: .0100000035, z: .00873311609}
   m_DirtyAABB: 0
 --- !u!183 &18364164
 Cloth:
@@ -3900,21 +3915,6 @@ Cloth:
     collisionSphereDistance: 3.40282347e+38
   m_CapsuleColliders: []
   m_SphereColliders: []
---- !u!208 &20843856
-NavMeshObstacle:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 138030}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 7, y: .5, z: 7}
-  m_MoveThreshold: .100000001
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: .5
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -3932,7 +3932,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Size.y
-      value: .219999999
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Size.z
@@ -3973,6 +3973,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Center.y
+      value: 2.95000005
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

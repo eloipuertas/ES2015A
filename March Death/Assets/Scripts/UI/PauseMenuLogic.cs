@@ -4,10 +4,12 @@ using UnityEngine.UI;
 
 public class PauseMenuLogic : MonoBehaviour
 {
+    Main_Game mg;
 	
 	// Use this for initialization
 	void Start ()
 	{
+        mg = GameObject.FindWithTag("GameController").GetComponent<Main_Game>();
 		GameObject.Find ("Resume").GetComponent<Button> ().onClick.AddListener (() => {
 			QuitPauseMenu (); });
 		GameObject.Find ("Exit").GetComponent<Button> ().onClick.AddListener (() => {
@@ -20,9 +22,8 @@ public class PauseMenuLogic : MonoBehaviour
 	void QuitToMainMenu ()
 	{
 		MenuButtonLogic.Pause_Play ();
-		Main_Game mg = GameObject.Find("GameController").GetComponent<Main_Game>();
-		mg.ClearGame();
-		Application.LoadLevel (0);
+        mg.ClearGame();
+        Application.LoadLevel (0);
 	}
 
 	/// <summary>

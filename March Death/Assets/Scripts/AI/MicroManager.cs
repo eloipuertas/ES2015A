@@ -31,41 +31,49 @@ namespace Assets.Scripts.AI
             agents = new List<BaseAgent>();
             squads = new List<SquadAI>();
             this.ai = ai;
-            AttackAgent aA = new AttackAgent(ai, "Atack");
-            agents.Add(new ExplorerAgent(ai, "Explorer"));
+            AssistAgent assistAgent = new AssistAgent(ai, "Assist");
+            AttackAgent aA = new AttackAgent(ai, assistAgent, "Atack");
+            agents.Add(new ExplorerAgent(ai, assistAgent, "Explorer"));
             agents.Add(aA);
-            agents.Add(new RetreatAgent(ai, aA, "Retreat"));
-			agents.Add(new AssistAgent(ai, "Assist"));
-            addSquad(ai.Army); //hero squad
+            agents.Add(new RetreatAgent(ai, aA, assistAgent, "Retreat"));
+			agents.Add(assistAgent);
+            squads.Add(new SquadAI(1, ai));
+            squads.Add(new SquadAI(2, ai));
         }
         /// <summary>
         /// Called pretty fast, it's just like Update()
         /// </summary>
         public void Micro()
         {
-            float bVal = float.MinValue;
-            BaseAgent bAgent = agents[0];
-            int val;
-            foreach(SquadAI sq in squads)
+            //difficulty == 0 means the AI is disabled
+            if (ai.DifficultyLvl > 0)
             {
-                sq.recalculateSquadValues();
-                foreach(BaseAgent a in agents)
+                float bVal = float.MinValue;
+                BaseAgent bAgent = agents[0];
+                int val;
+                foreach (SquadAI sq in squads)
                 {
-                    val = a.getConfidence(sq);
-                    if(AIController.AI_DEBUG_ENABLED) ai.aiDebug.setAgentConfidence(a.agentName, val);
-                    if (val > bVal)
+                    sq.recalculateSquadValues();
+                    foreach (BaseAgent a in agents)
                     {
-                        bVal = val;
-                        bAgent = a;
+                        val = a.getConfidence(sq);
+                        if (AIController.AI_DEBUG_ENABLED) ai.aiDebug.setAgentConfidence(a.agentName, val);
+                        if (val > bVal)
+                        {
+                            bVal = val;
+                            bAgent = a;
+                        }
                     }
-                }
-                sq.lastAgent = bAgent;
-                if(AIController.AI_DEBUG_ENABLED)
-                {
-                    ai.aiDebug.setControllingAgent(bAgent.agentName, bVal);
-                }
+                    sq.lastAgent = bAgent;
+                    if (AIController.AI_DEBUG_ENABLED)
+                    {
+                        ai.aiDebug.setControllingAgent(bAgent.agentName, bVal);
+                    }
 
-                bAgent.controlUnits(sq);
+                    bAgent.controlUnits(sq);
+                    agents[AGENT_ASSIST].extraConfidence = 0;
+                    ((AssistAgent)agents[AGENT_ASSIST]).clearRequests();
+                }
             }
         }
         /// <summary>
@@ -120,7 +128,10 @@ namespace Assets.Scripts.AI
         public void assignUnit(Unit u)
         {
             //TODO: placeholder until we know how to split the squads
-            squads[0].addUnit(u);
+            if (u.type == Storage.UnitTypes.HERO)
+                squads[1].addUnit(u);
+            else
+                squads[0].addUnit(u);
         }
     }
 }

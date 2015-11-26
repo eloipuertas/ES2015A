@@ -20,12 +20,15 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public abstract E getType<E>() where E : struct, IConvertible;
 
     protected Collider _collider;
+    protected Pathfinding.DetourObstacle _obstacle;
     protected Terrain _terrain;
 
     /// <summary>
     /// Called when Start has been called
     /// </summary>
     public Action<GameObject> onStartDone = null;
+
+    public abstract EntityStatus DefaultStatus { get; set; }
 
     protected EntityInfo _info;
     public EntityInfo info
@@ -150,9 +153,23 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         return gameObject;
     }
 
+    private static readonly Vector3 COLLIDER_CORRECTION_FACTOR = new Vector3(3f, 0, 3f);
     public Vector3 closestPointTo(Vector3 point)
     {
-        return _collider.ClosestPointOnBounds(point);
+        Vector3 colliderPoint = _collider.ClosestPointOnBounds(point);
+
+        if (_obstacle == null)
+        {
+            return colliderPoint;
+        }
+        else
+        {
+            Vector3 direction = (colliderPoint - point).normalized;
+            Vector3 size = (transform.rotation * _obstacle.Size) - COLLIDER_CORRECTION_FACTOR;
+            Vector3 factor = Vector3.Scale(direction, size - _collider.bounds.size);
+
+            return colliderPoint - factor;
+        }
     }
 
     protected List<Ability> _abilities = new List<Ability>();
@@ -200,7 +217,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         foreach (EntityAbility ability in info.abilities)
         {
             // Try to get class with this name
-            string abilityName = ability.name.Replace(" ", "");
+            string abilityName = ability.ability.Replace(" ", "");
             Ability newAbility = null;
 
             try
@@ -245,6 +262,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     {
         setupAbilities();
 
+        _obstacle = GetComponent<Pathfinding.DetourObstacle>();
         _collider = GetComponent<Collider>();
         _terrain = Terrain.activeTerrain;
     }
@@ -398,12 +416,40 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         }
     }
 
-    protected void setStatus(EntityStatus status)
+    public bool doIfBuilding(Action<IBuilding> callIfTrue)
+    {
+        return doIfResource(x => callIfTrue(x)) || doIfBarrack(x => callIfTrue(x));
+    }
+
+    public bool doIfResource(Action<Resource> callIfTrue)
+    {
+    	Resource resource = this as Resource;
+    	if (resource != null)
+    	{
+    		callIfTrue(resource);
+            return true;
+    	}
+
+        return false;
+    }
+
+    public bool doIfBarrack(Action<Barrack> callIfTrue)
+    {
+    	Barrack barrack = this as Barrack;
+    	if (barrack != null)
+    	{
+    		callIfTrue(barrack);
+            return true;
+    	}
+
+        return false;
+    }
+
+    public virtual void setStatus(EntityStatus status)
     {
         _status = status;
 
 #if !DISABLE_ANIMATOR
-        //TODO: Hack to get this working for the sprint, why is _animator
         _animator.SetInteger("animation_state", (int)status);
 #endif
     }

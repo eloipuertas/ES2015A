@@ -21,6 +21,7 @@ public interface IGameEntity : IBaseActor
 {
     EntityInfo info { get; }
     EntityStatus status { get; }
+    EntityStatus DefaultStatus { get; set; }
 
     int wounds { get; }
     float damagePercentage { get; }
@@ -38,8 +39,12 @@ public interface IGameEntity : IBaseActor
 
     IKeyGetter registerFatalWounds(Action<System.Object> func);
     IKeyGetter unregisterFatalWounds(Action<System.Object> func);
+    void setStatus(EntityStatus status);
 
     void receiveAttack(Unit from, bool isRanged);
 
     void doIfUnit(Action<Unit> callIfTrue);
+    bool doIfBuilding(Action<IBuilding> callIfTrue);
+    bool doIfResource(Action<Resource> callIfTrue);
+    bool doIfBarrack(Action<Barrack> callIfTrue);
 }

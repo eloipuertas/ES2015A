@@ -13,7 +13,7 @@ namespace Storage
     /// Should something be added, append it as the last element, otherwise
     /// previously assigned gameobjects might get wrong types
     /// </remarks>
-    public enum BuildingTypes { STRONGHOLD, FARM, MINE, SAWMILL, ARCHERY, BARRACK };
+    public enum BuildingTypes { STRONGHOLD, FARM, MINE, SAWMILL, ARCHERY, BARRACK, STABLE, WALL, WALLCORNER, WATCHTOWER };
 
     public class BuildingInfo : EntityInfo
     {
@@ -25,6 +25,9 @@ namespace Storage
         [JsonConverter(typeof(BuildingAttributesDataConverter))]
         public override List<EntityAbility> abilities { get; set; }
 
+
+        public List<string> sounds;
+
         public override T getType<T>()
         {
             return (T)Convert.ChangeType(type, typeof(T));
@@ -33,6 +36,7 @@ namespace Storage
         public BuildingInfo()
         {
             abilities = new List<EntityAbility>();
+            sounds = new List<string>();
         }
     }
 }

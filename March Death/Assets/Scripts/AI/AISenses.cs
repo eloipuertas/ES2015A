@@ -37,7 +37,30 @@ public class AISenses : MonoBehaviour {
         {
             GameObject obj = foundGameObjects[i];
             Unit objUnit = obj.GetComponent<Unit>();
-            if(objUnit != null && objUnit.race == race)
+            if(objUnit != null && objUnit.status != EntityStatus.DEAD && objUnit.race == race)
+            {
+                unitsOfRace.Add(objUnit);
+            }
+        }
+        return unitsOfRace;
+    }
+    /// <summary>
+    /// Gets all units of a certain race that are being revealed to the other race.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="radius"></param>
+    /// <param name="race"></param>
+    /// <returns></returns>
+    public List<Unit> getVisibleUnitsOfRaceNearPosition(Vector3 position, float radius, Storage.Races race)
+    {
+        GameObject[] foundGameObjects = getObjectsNearPosition(position, radius);
+        List<Unit> unitsOfRace = new List<Unit>();
+
+        for (int i = 0; i < foundGameObjects.Length; i++)
+        {
+            GameObject obj = foundGameObjects[i];
+            Unit objUnit = obj.GetComponent<Unit>();
+            if (objUnit != null && objUnit.race == race && objUnit.status!=EntityStatus.DEAD && obj.GetComponent<FOWEntity>().IsRevealed)
             {
                 unitsOfRace.Add(objUnit);
             }

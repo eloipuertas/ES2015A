@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using Managers;
 
-public class UserInput : MonoBehaviour
+public partial class UserInput : MonoBehaviour
 {
     public enum action { NONE, LEFT_CLICK, RIGHT_CLICK, DRAG }
     private action currentAction;
@@ -49,13 +49,16 @@ public class UserInput : MonoBehaviour
     Rect rectActions;
     Rect rectInformation;
 
+    void Awake()
+    {
+        cursor = CursorManager.Instance;
+        cursor.SetInputs(this);
+    }
+
     // Use this for initialization
     void Start()
     {
         player = GetComponent<Player>();
-        cursor = CursorManager.Instance;
-        cursor.SetPlayer(player);
-        cursor.SetInputs(this);
         selectionTexture = (Texture2D)Resources.Load("SelectionTexture");
 
         cursorAttack = (Texture2D)Resources.Load("cursor_attack");
@@ -83,6 +86,8 @@ public class UserInput : MonoBehaviour
 
     void Update()
     {
+        CheckKeyboard();
+
         currentAction = GetMouseAction();
         // FIXME: add HUD colliders
         if (rectActions.Contains(Input.mousePosition) || rectInformation.Contains(Input.mousePosition))
@@ -112,13 +117,14 @@ public class UserInput : MonoBehaviour
 
     private void LeftClick()
     {
+
         switch (player.currently)
         {
             case Player.status.IDLE:
                 Select();
                 break;
             case Player.status.SELECTED_UNITS:
-                Deselect();
+                //Deselect(); when clicking two times over the same unit, there are two selections and two sounds
                 Select();
                 break;
             case Player.status.PLACING_BUILDING:
@@ -136,7 +142,7 @@ public class UserInput : MonoBehaviour
         {
             //Do nothing
         }
-        else if (player.isCurrently(Player.status.SELECTED_UNITS))
+        else if ( player.isCurrently(Player.status.SELECTED_UNITS) && !sManager.IsBuilding() )
         {
 
             GameObject hitObject = FindHitObject();
@@ -151,10 +157,15 @@ public class UserInput : MonoBehaviour
             else // let's find what it is, check if is own unit or rival
             {
                 IGameEntity entity = hitObject.GetComponent<IGameEntity>();
-
-                if (entity.info.race != player.race) // If it is another race, we'll attack, but if it's the same race?
+                //if entity == null it means it's a nonactor, like a tree
+                if(entity != null)
                 {
-                    sManager.AttackTo(entity);
+                    if ((entity.info.race != player.race)
+                    && entity.status != EntityStatus.DEAD
+                    && entity.status != EntityStatus.DESTROYED)
+                    {
+                        sManager.AttackTo(entity);
+                    }
                 }
             }
         }
@@ -192,17 +203,29 @@ public class UserInput : MonoBehaviour
             // We just be sure that is a selectable object
             if (selectedObject)
             {
+                // if it is the unique selected element, return
+                if (sManager.UniqueSelected(selectedObject)) return;
+
                 if (sManager.CanBeSelected(selectedObject))
                 {
+                    Deselect();
                     sManager.SelectUnique(selectedObject);
                     player.setCurrently(Player.status.SELECTED_UNITS);
                 }
                 else
+                {
+                    Deselect();
                     player.setCurrently(Player.status.IDLE);
+                }
+
             }
             else
+            {
+                Deselect();
                 player.setCurrently(Player.status.IDLE);
+            }
         }
+        else Deselect();
     }
 
     private void Deselect()

@@ -12,7 +12,7 @@ namespace Storage
     /// unit race and type.
     /// It automatically parses all units on Assets/Units and stores it.
     /// </summary>
-    sealed class Info : Singleton<Info>
+    public sealed class Info : Singleton<Info>
     {
         private Dictionary<Tuple<Races, UnitTypes>, EntityInfo> unitStore = new Dictionary<Tuple<Races, UnitTypes>, EntityInfo>();
         private Dictionary<Tuple<Races, UnitTypes>, List<string>> unitPrefabs = new Dictionary<Tuple<Races, UnitTypes>, List<string>>();
@@ -20,19 +20,53 @@ namespace Storage
         private Dictionary<Tuple<Races, BuildingTypes>, EntityInfo> buildingStore = new Dictionary<Tuple<Races, BuildingTypes>, EntityInfo>();
         private Dictionary<Tuple<Races, BuildingTypes>, List<string>> buildingPrefabs = new Dictionary<Tuple<Races, BuildingTypes>, List<string>>();
 
+        public enum BuildingVariant { REAL = 0, GHOST = 1 }
+
         /// <summary>
         /// Private constructor, singleton access only
         /// <remarks>Use Info.get instead</remarks>
         /// </summary>
         private Info()
         {
+            // JSON
             parseJSONFiles<UnitInfo, UnitTypes>("Data/Units", unitStore, EntityType.UNIT);
             parseJSONFiles<ResourceInfo, BuildingTypes>("Data/Buildings/Resources", buildingStore, EntityType.BUILDING);
+	        parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Military", buildingStore, EntityType.BUILDING);
+            parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Defense", buildingStore, EntityType.BUILDING);
             parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Barracks", buildingStore, EntityType.BUILDING);
+            parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Stable", buildingStore, EntityType.BUILDING);
 
+            // Tooltips
+            parseTooltips(buildingStore);
+            parseTooltips(unitStore);
+
+            // Unit prefabs
             parsePrefabs<Unit, UnitTypes>("Prefabs/Units", unitPrefabs);
+
+            // Buildings prefabs
             parsePrefabs<Resource, BuildingTypes>("Prefabs/Buildings/Resources", buildingPrefabs);
+			parsePrefabs<Barrack, BuildingTypes>("Prefabs/Buildings/Military", buildingPrefabs);
+            parsePrefabs<Barrack, BuildingTypes>("Prefabs/Buildings/Defense", buildingPrefabs);
             parsePrefabs<Barrack, BuildingTypes>("Prefabs/Buildings/Barracks", buildingPrefabs);
+
+            // Ghosts prefabs (MUST BE DONE AFTER REALS!)
+            parsePrefabs<GhostBuilding, BuildingTypes>("Prefabs/Buildings/Resources", buildingPrefabs);
+			parsePrefabs<GhostBuilding, BuildingTypes>("Prefabs/Buildings/Military", buildingPrefabs);
+            parsePrefabs<GhostBuilding, BuildingTypes>("Prefabs/Buildings/Defense", buildingPrefabs);
+            parsePrefabs<GhostBuilding, BuildingTypes>("Prefabs/Buildings/Barracks", buildingPrefabs);
+        }
+
+        private void parseTooltips<Type>(Dictionary<Tuple<Races, Type>, EntityInfo> store)
+        {
+            foreach (KeyValuePair<Tuple<Races, Type>, EntityInfo> entry in store)
+            {
+                foreach (EntityAbility ability in entry.Value.abilities)
+                {
+                    ability.SetupTooltip(this);
+                    ability.tooltip = ability.tooltip.FormatWith(entry.Value, @"\[\[", @"\]\]");
+                    ability.tooltip = ability.tooltip.FormatWith(ability, @"\(\(", @"\)\)");
+                }
+            }
         }
 
         /// <summary>
@@ -43,24 +77,15 @@ namespace Storage
         /// </summary>
         private void parseJSONFiles<JSONType, EnumType>(string folder, Dictionary<Tuple<Races, EnumType>, EntityInfo> store, EntityType entityType) where JSONType : EntityInfo where EnumType : struct, IConvertible
         {
-            Debug.Log("Parsing " + typeof(JSONType));
-
             UnityEngine.Object[] assets = Resources.LoadAll(folder, typeof(TextAsset));
             foreach (UnityEngine.Object jsonObj in assets)
             {
                 TextAsset json = jsonObj as TextAsset;
-                Debug.Log("\tParsing " + json.name);
 
                 try
                 {
                     EntityInfo entityInfo = JsonConvert.DeserializeObject<JSONType>(json.text);
                     entityInfo.entityType = entityType;
-
-                    foreach (EntityAbility ability in entityInfo.abilities)
-                    {
-                        ability.tooltip = ability.tooltip.FormatWith(entityInfo, @"\[\[", @"\]\]");
-                        ability.tooltip = ability.tooltip.FormatWith(ability, @"\(\(", @"\)\)");
-                    }
 
                     Tuple<Races, EnumType> key = new Tuple<Races, EnumType>(entityInfo.race, entityInfo.getType<EnumType>());
 
@@ -99,10 +124,6 @@ namespace Storage
                     if (!store.ContainsKey(key))
                     {
                         store.Add(key, new List<string>());
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Intentional? Duplicated " + typeof(ComponentType) + " prefab ('" + component.getRace() + "', '" + component.getType<EnumType>() + "')");
                     }
 
                     store[key].Add(folder + "/" + gameObject.name);
@@ -214,9 +235,9 @@ namespace Storage
         /// <param name="race">Race of the Building</param>
         /// <param name="type">Type of the Building</param>
         /// <returns>The created GameObject</returns>
-        public GameObject createBuilding(Races race, BuildingTypes type, int variant = -1)
+        public GameObject createBuilding(Races race, BuildingTypes type, BuildingVariant variant = BuildingVariant.REAL)
         {
-            string prefab = getPrefab(race, type, variant);
+            string prefab = getPrefab(race, type, (int)variant);
             return UnityEngine.Object.Instantiate((GameObject)Resources.Load(prefab, typeof(GameObject)));
         }
 
@@ -242,9 +263,9 @@ namespace Storage
         /// <param name="position">Building position</param>
         /// <param name="rotation">Building rotation</param>
         /// <returns>The created GameObject</returns>
-        public GameObject createBuilding(Races race, BuildingTypes type, Vector3 position, Quaternion rotation, int variant = 0)
+        public GameObject createBuilding(Races race, BuildingTypes type, Vector3 position, Quaternion rotation, BuildingVariant variant = BuildingVariant.REAL)
         {
-            string prefab = getPrefab(race, type, variant);
+            string prefab = getPrefab(race, type, (int)variant);
             return UnityEngine.Object.Instantiate((GameObject)Resources.Load(prefab, typeof(GameObject)), position, rotation) as GameObject;
         }
     }

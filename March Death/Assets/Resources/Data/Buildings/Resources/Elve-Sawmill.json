@@ -1,6 +1,7 @@
 {
     "race": "ELVES",
     "type": "SAWMILL",
+    "name": "Sawmill",
 
     "attributes": {
         "resistance": 3,
@@ -26,7 +27,17 @@
     "abilities":
     [
         {
-            "name":"Create Civil"
+            "ability": "Create",
+            "name":"Create Civil",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "UNIT",
+            "targetRace": "ELVES",
+            "targetUnit": "CIVIL"
+        },
+        {
+            "name": "Sell",
+            "tooltipFlags": "HIDE"
         }
     ]
 }

@@ -15,7 +15,10 @@ namespace Assets.Scripts.AI.Agents
         int conf;
         float supremaciIndex;
         float valOfCitizen;
-        public AttackAgent(AIController ai, string name) : base(ai, name)
+
+        AssistAgent assistAgent;
+
+        public AttackAgent(AIController ai, AssistAgent assist, string name) : base(ai, name)
         {
             valOfCitizen = 1f;
 			if (ai.race == Storage.Races.ELVES)
@@ -28,6 +31,8 @@ namespace Assets.Scripts.AI.Agents
 				_maxUnitRange = Storage.Info.get.of(Storage.Races.ELVES, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
 				_enemyRace = Storage.Races.ELVES;
 			}
+
+            assistAgent = assist;
         }
 
         public override void controlUnits(SquadAI squad)
@@ -36,36 +41,36 @@ namespace Assets.Scripts.AI.Agents
             if (squad.units.Count > 0)
             {
                 //We assume our squad is mostly together 
-                //TODO: Stop assuming members of the same squad are close
-                Squadpos = squad.units[0].transform.position;
+                Squadpos = squad.boudningBox.center;
             }
             if (ai.EnemyUnits.Count > 0)
             {
-                //Select target
-                Unit bTar = ai.EnemyUnits[0];
-                float bVal = float.MaxValue;
-                foreach(Unit u in ai.EnemyUnits)
-                {
-                    float val = -Vector3.Distance(u.transform.position, Squadpos);
-                    if (u.type == Storage.UnitTypes.HERO)
-                        val += 10;
-                    if (val < bVal)
-                    {
-                        bVal = val;
-                        bTar = u;
-                    }
-                }
-
                 foreach(Unit u in squad.units)
                 {
-                    if (u.status != EntityStatus.DEAD && !u.attackTarget(bTar))
+                    //Select target
+                    Unit bTar = null;
+                    float bVal = float.MinValue;
+                    foreach (Unit e in squad.enemySquad.units)
                     {
-                        u.moveTo(bTar.transform.position);
-                        if(AIController.AI_DEBUG_ENABLED)
+                        float val = -Vector3.Distance(u.transform.position, e.transform.position);
+                        if (u.type == Storage.UnitTypes.HERO)
+                            val += 80;
+                        if (u.healthPercentage < 20)
+                            val += 15;
+                        if (val > bVal)
                         {
-                            ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
+                            bVal = val;
+                            bTar = e;
                         }
-                    }     
+                    }
+                    if (bTar!=null && u.status != EntityStatus.DEAD && ((Unit)u.getTarget() != bTar))
+                    {
+                        u.attackTarget(bTar);
+                    }
+                    if (AIController.AI_DEBUG_ENABLED)
+                    {
+                        ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
+                    }
                 }
                     
             }

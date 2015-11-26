@@ -1,0 +1,28 @@
+{
+    "race": "MEN",
+    "type": "WALLCORNER",
+    "name": "Wall Corner",
+
+    "attributes": {
+        "resistance": 3,
+        "wounds": 50,
+        "capacity": 10,
+        "timeToBuild": 30,
+        "repairSpeed": 0.2,
+        "sightRange": 50
+    },
+
+    "resources": {
+        "wood": 100,
+        "metal": 40,
+        "food": 50
+    },
+
+    "abilities":
+    [
+        {
+            "name": "Sell",
+            "tooltipFlags": "HIDE"
+        }
+    ]
+}
