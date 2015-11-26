@@ -15,6 +15,7 @@ public class Unit : GameEntity<Unit.Actions>
 {
     public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT, TARGET_TERMINATED };
     public enum Roles { PRODUCING, WANDERING };
+    public enum Gender { MALE, FEMALE }
 
     private EntityStatus _defaultStatus = EntityStatus.IDLE;
     public override EntityStatus DefaultStatus
@@ -54,6 +55,11 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     public UnitTypes type = UnitTypes.HERO;
     public override E getType<E>() { return (E)Convert.ChangeType(type, typeof(E)); }
+
+    /// <summary>
+    /// Edit this on the Prefab to set the Unit Gender
+    /// </summary>
+    public Gender gender = Gender.MALE;
 
     /// <summary>
     /// If in battle, this is the target and last attack time

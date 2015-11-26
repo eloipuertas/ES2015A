@@ -3552,6 +3552,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   race: 1
   type: 0
+  gender: 1
   _distanceToTarget: 0
 --- !u!114 &11468730
 MonoBehaviour:
@@ -3568,6 +3569,9 @@ MonoBehaviour:
   Height: 2
   MaxSpeed: 2
   MaxAcceleration: 2
+  Flags: -1
+  AvoidanceType: 1
+  SeparationWeight: .5
 --- !u!114 &11491204
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4182,6 +4186,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: barDisplay
       value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Flags
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: gender
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
