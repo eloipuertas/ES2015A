@@ -38,6 +38,9 @@ public class Battle
         public EntityTypeUnion type;
         public EntityPosition position;
         public Storage.EntityType entityType;
+
+        public bool hasStatus;
+        public EntityStatus status;
     }
 
     public enum MissionType
@@ -91,6 +94,25 @@ public class Battle
             e.entityType = Storage.EntityType.BUILDING;
             e.position.X = x;
             e.position.Y = y;
+            e.hasStatus = false;
+            buildings.Add(e);
+        }
+
+        /// <summary>
+        /// Adds a building with the given type and position to this player's information.
+        /// </summary>
+        /// <param name="type">Type of building.</param>
+        /// <param name="x">The x coordinate in the grid.</param>
+        /// <param name="y">The y coordinate in the grid.</param>
+        /// <param name="status">The status of the entity.</param>
+        public void AddBuilding(Storage.BuildingTypes type, float x, float y, EntityStatus status)
+        {
+            PlayableEntity e = new PlayableEntity();
+            e.type.building = type;
+            e.position.X = x;
+            e.position.Y = y;
+            e.hasStatus = true;
+            e.status = status;
             buildings.Add(e);
         }
 
