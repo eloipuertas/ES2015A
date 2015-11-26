@@ -237,6 +237,14 @@ public abstract class Building<T> : GameEntity<T> where T : struct, IConvertible
 			Player.getOwner (entity).resources.AddAmount (WorldResources.Type.FOOD, unitInfo.resources.food);
 		}
 	}
+
+    /// <summary>
+    /// Returns the creation queue.
+    /// </summary>
+    public Queue getCreationQueue()
+    {
+        return _creationQueue;
+    }
 	
 	/// <summary>
 	/// Called every fixed physics frame
