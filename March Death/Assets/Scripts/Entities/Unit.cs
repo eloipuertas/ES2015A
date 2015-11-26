@@ -13,7 +13,7 @@ using Pathfinding;
 /// </summary>
 public class Unit : GameEntity<Unit.Actions>
 {
-    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT };
+    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT, TARGET_TERMINATED };
     public enum Roles { PRODUCING, WANDERING };
 
     private EntityStatus _defaultStatus = EntityStatus.IDLE;
@@ -127,6 +127,7 @@ public class Unit : GameEntity<Unit.Actions>
         // TODO: Our target died, select next? Do nothing?
         setStatus(EntityStatus.IDLE);
         IGameEntity entity = ((GameObject) obj).GetComponent<IGameEntity>();
+        // TODO: After merge, I had a conflich in this line and I hesitated what to do
         fire(Actions.TARGET_TERMINATED, entity.info);
         _target = null;
     }

@@ -118,13 +118,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
                                         building.type.building,
                                         _selfRace);
 
-            IGameEntity entity = created.GetComponent<IGameEntity>();
-            if (building.hasStatus)
-            {
-                entity.DefaultStatus = building.status;
-            }
-
-            AddBuilding(entity);
+            AddBuilding(created.GetComponent<IGameEntity>());
         }
     }
 
