@@ -60,14 +60,20 @@ public class EventsNotifier : MonoBehaviour {
     private float countdown;
     private bool updateMessages;
 
+    private const float UNDER_ATTACK_UPDATE_TIME = 10;
+    private Dictionary<IGameEntity, float> entityTimer;
+
     private const int MAX_LINES = 10;
 
     private GUIText text;
     private Queue<int> trimming;
     private System.Text.StringBuilder messages;
 
+    private Camera mainCam;
+
     void Awake()
     {
+        mainCam = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
         text = GameObject.Find("ScreenMessages").GetComponent<GUIText>();
     }
 
@@ -78,6 +84,7 @@ public class EventsNotifier : MonoBehaviour {
         messages = new System.Text.StringBuilder();
         countdown = TIME_TO_UPDATE;
         updateMessages = false;
+        entityTimer = new Dictionary<IGameEntity, float>();
     }
 	
     // Update is called once per frame
@@ -272,16 +279,50 @@ public class EventsNotifier : MonoBehaviour {
     // TODO Display troop's messages
     private void DisplayTroopCreated(string info) {}
 
+    /// <summary>
+    /// Returns <code>true</code> if the entity is under the camera.
+    /// </summary>
+    /// <returns><c>true</c>, if the entity is under the camera, <c>false</c> otherwise.</returns>
+    /// <param name="entity">Entity.</param>
+    private bool isEntityUnderCamera(IGameEntity entity)
+    {
+        Vector3 vp = mainCam.WorldToViewportPoint(entity.getTransform().position);
+        return vp.x >= 0 && vp.y >= 0 && vp.x <= 1 && vp.y <= 1 && vp.z >= 0;
+    }
+
+    /// <summary>
+    /// Displays a message warning the user that a game entity is under attack.
+    /// 
+    /// The message will only be displayed if the object has not been attacked before
+    /// and if it is not visible by the user.
+    /// </summary>
+    /// <param name="obj">Object that represents the entity being attacked.</param>
     public void DisplayUnderAttack(System.Object obj)
     {
         GameObject g = (GameObject) obj;
-        DisplayUnderAttack(g.transform.position);
+        IGameEntity entity = g.GetComponent<IGameEntity>();
+        if (entityTimer.ContainsKey(entity))
+        {
+            entityTimer[entity] = Time.time - entityTimer[entity];
+            if (entityTimer[entity] >= UNDER_ATTACK_UPDATE_TIME)
+            {
+                entityTimer[entity] = Time.time;
+                if (!isEntityUnderCamera(entity))
+                    DisplayUnderAttack(g.transform.position);
+            }
+        }
+        else
+        {
+            entityTimer.Add(entity, Time.time);
+            DisplayUnderAttack(g.transform.position);
+        }
     }
 
     public void DisplayBuildingDestroyed(System.Object obj)
     {
         GameObject g = (GameObject) obj;
         IGameEntity entity = g.GetComponent<IGameEntity>();
+        entityTimer.Remove(entity);
         DisplayBuildingDestroyed(((Storage.BuildingInfo) entity.info).type);
     }
 
@@ -302,6 +343,7 @@ public class EventsNotifier : MonoBehaviour {
     {
         GameObject g = (GameObject) obj;
         Unit entity = (Unit) g.GetComponent<IGameEntity>();
+        entityTimer.Remove(entity);
         DisplayUnitDead(entity.type);
     }
 }
