@@ -39,10 +39,12 @@ public class Player : BasePlayer
     private int minMetalTolerance;
     private int minGoldTolerance;
 
+    private bool foodDepleted;
+
     // Use this for initialization
     public override void Start()
     {   
-        Debug.Log("Player Start");base.Start();
+        base.Start();
         _selection = GetComponent<Managers.SelectionManager>();
         //request the race of the player
         _selfRace = info.GetPlayerRace();
@@ -63,6 +65,8 @@ public class Player : BasePlayer
         minWoodTolerance = 500;
         minMetalTolerance = 500;
         minGoldTolerance = 500;
+
+        foodDepleted = resources.getAmount(WorldResources.Type.FOOD) <= 0;
 
     }
 
@@ -183,7 +187,11 @@ public class Player : BasePlayer
     private void onUnitEats(System.Object obj)
     {
         // TODO Take into account goods? Storage.Goods goods = (Storage.Goods) obj;
-        displayResourceInfo(WorldResources.Type.FOOD, minFoodTolerance);
+        if (!foodDepleted)
+        {
+            displayResourceInfo(WorldResources.Type.FOOD, minFoodTolerance);
+            foodDepleted = resources.getAmount(WorldResources.Type.FOOD) <= 0;
+        }
     }
 
     private void OnUnitCreated(System.Object obj)
