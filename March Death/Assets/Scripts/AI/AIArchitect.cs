@@ -79,6 +79,13 @@ namespace Assets.Scripts.AI
         {
             Color[] pixels = mapData.GetPixels();
 
+            Vector2 center = new Vector2(mapData.width / 2 - 1, mapData.height / 2 -1);
+
+            // Math Facts: 
+            // The equation to find te position of something is
+            // Offset = (i , j) - Center
+            // centerPos + GridSize * Offset 
+
             for(int i = 0; i < mapData.height; i++)
             {
                 for(int j = 0; j < mapData.width; j++)
