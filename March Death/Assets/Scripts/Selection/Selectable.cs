@@ -17,6 +17,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     private GameObject controller;
     private GameObject plane;
     private EntitySelection _unitSelection;
+    private Quaternion _LifeBarDefaultRotation;
 
     public bool currentlySelected { get; set; }
     private float healthRatio = 1f;
@@ -62,6 +63,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         }
 
         //ponemos el plane dentro del gameobject
+        _LifeBarDefaultRotation = plane.transform.rotation;
         plane.transform.parent = transform;
         entity.doIfUnit(unit =>
         {
@@ -79,8 +81,15 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
         if (!(currentlySelected ^ _changedVisible))
         {
-            if (!currentlySelected) plane.SetActive(false);
-            else plane.SetActive(true);
+            if (!currentlySelected)
+            {
+                plane.SetActive(false);
+            }
+            else
+            {
+
+                plane.SetActive(true);
+            };
             //else Destroy(plane, 0f); _lastHealth = 100f;
 
             _changedVisible = !currentlySelected;
@@ -99,7 +108,12 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
 
             Vector3 position = this.gameObject.transform.position;
             position.y = _collider.bounds.max.y + (_collider.bounds.size.y * .5f);
+            // move the plane a little bit from the center
             plane.transform.position = position;
+            // rotate the plain to its original position
+            plane.transform.rotation = _LifeBarDefaultRotation;
+            
+
         }
 
     }

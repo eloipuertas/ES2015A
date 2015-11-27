@@ -69,10 +69,11 @@ public static class SelectionOverlay{
     {
 
         GameObject plane = new GameObject("Plane");
-        Camera cam = GameObject.Find("Camera/Main Camera").GetComponent<Camera>();
-        plane.transform.localEulerAngles = angle;
+
         MeshFilter meshFilter = (MeshFilter)plane.AddComponent(typeof(MeshFilter));
         Collider coll = gameObject.GetComponent<Collider>();
+
+        plane.transform.localEulerAngles = angle;
         meshFilter.mesh = getQuad();
 
         plane.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + (coll.bounds.size.y * 0.5f), gameObject.transform.position.z) ;
@@ -88,7 +89,12 @@ public static class SelectionOverlay{
 
         return plane;
     }
-    
+
+    public static Vector3 Angle()
+    {
+        return angle;
+    }
+
     public static Mesh getQuad()
     {
         Mesh mesh = new Mesh();
