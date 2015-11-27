@@ -7,7 +7,7 @@ using Utils;
 
 namespace Managers
 {
-    public class SelectionManager : SubscribableActor<SelectionManager.Actions, SelectionManager>
+    public class SelectionManager : Actor<SelectionManager.Actions>
     {
         public enum Actions { SELECT, ATTACK, MOVE};
         // class controller for the selected entities
@@ -22,11 +22,6 @@ namespace Managers
 
         // the amount of troops made
         public int TroopsCount { get { return _troops.Count; } }
-
-        public override void Start()
-        {
-            base.Start();
-        }
 
         /// <summary>
         /// Setter for the race
