@@ -238,7 +238,7 @@ public class EventsNotifier : MonoBehaviour {
         }
     }
 
-    private void DisplayNotEnoughResources(WorldResources.Type type)
+    public void DisplayNotEnoughResources(WorldResources.Type type)
     {
         switch (type)
         {
