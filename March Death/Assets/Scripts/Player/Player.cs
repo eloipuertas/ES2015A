@@ -158,14 +158,14 @@ public class Player : BasePlayer
 
     private void signalMissionUpdate(System.Object obj)
     {
-        Storage.EntityInfo e = (Storage.EntityInfo) obj;
-        switch (e.entityType)
+        IGameEntity entity = ((GameObject) obj).GetComponent<IGameEntity>();
+        switch (entity.info.entityType)
         {
             case Storage.EntityType.BUILDING:
-                missionStatus.OnBuildingDestroyed(e.getType<Storage.BuildingTypes>());
+                missionStatus.OnBuildingDestroyed(entity.info.getType<Storage.BuildingTypes>());
                 break;
             case Storage.EntityType.UNIT:
-                missionStatus.OnUnitKilled(e.getType<Storage.UnitTypes>());
+                missionStatus.OnUnitKilled(entity.info.getType<Storage.UnitTypes>());
                 break;
             case Storage.EntityType.RESOURCE:
                 break;
