@@ -24,6 +24,7 @@ namespace Assets.Scripts.AI
         public Rect boudningBox;
         public float squadValue;
         public SquadAI enemySquad = null;
+        public List<IBuilding> enemyBuildings;
 
         float _maxUnitRange;
         Storage.Races _enemyRace;
@@ -183,6 +184,13 @@ namespace Assets.Scripts.AI
                 val += valOfUnit(u);
             }
             ad.Value = val;
+
+            enemyBuildings = ai.senses.getBuildingsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 3 * _maxUnitRange, _enemyRace);
+
+            if(enemyBuildings.Count > 0)
+            {
+                Debug.Log("Ai Senses num buildings detected: " + enemyBuildings.Count);
+            }
         }
 
         float valOfUnit(Unit u)
