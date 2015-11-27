@@ -8,6 +8,7 @@ using System.IO;
 
 namespace Pathfinding
 {
+    [RequireComponent(typeof(RecastConfig))]
     public class DetourCrowd : MonoBehaviour
     {
         public enum RenderMode { POLYS, DETAIL_POLYS, TILE_POLYS }
