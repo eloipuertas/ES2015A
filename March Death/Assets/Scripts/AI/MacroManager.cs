@@ -1,8 +1,6 @@
 ﻿using Storage;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 /// <summary>
@@ -25,7 +23,7 @@ namespace Assets.Scripts.AI
         public MacroManager(AIController ai)
         {
             this.ai = ai;
-            buildingPref = new List<BuildingTypes>() { BuildingTypes.FARM, BuildingTypes.MINE, BuildingTypes.SAWMILL };
+            buildingPref = new List<BuildingTypes>() { BuildingTypes.FARM, BuildingTypes.MINE, BuildingTypes.SAWMILL, BuildingTypes.ARCHERY, BuildingTypes.BARRACK, BuildingTypes.STABLE, BuildingTypes.WATCHTOWER };
             UnitPref = new List<UnitTypes>() {UnitTypes.CIVIL};
             architect = new AIArchitect(ai);
         }
@@ -38,14 +36,15 @@ namespace Assets.Scripts.AI
                 if (r.harvestUnits == 10) //TODO ask for the actual max
                     buildingPref.Add(r.type);
         }
-        /// <summary>
+        /// <summar>
         /// Called fast enough, acomplishes what the macroHigh asks for
         /// </summary>
         public void MacroLow()
         {
             if (buildingPref.Count > 0) //TODO and has resources
             {
-                ai.CreateBuilding(buildingPref[0]);
+                Vector3 position = architect.getPositionForBuildingType(buildingPref[0]);
+                ai.CreateBuilding(buildingPref[0], position, Quaternion.Euler(0, 0, 0));
                 buildingPref.RemoveAt(0);
             }
             foreach(Resource r in ai.OwnResources)

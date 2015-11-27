@@ -79,6 +79,12 @@ public class ConstructionGrid : MonoBehaviour {
         var heights = new float[]{ centerHeight, topLeftHeight, topRightHeight, BottomLeftHeight, BottomRightHeight };
         float max_height = heights.Max();
         float min_height = heights.Min();
+
+        if (min_height < 79.0f)
+        {
+            return false;
+        }
+
         float difference = max_height - min_height;
 
         return difference < DIFERENCE_OF_HEIGHTS_TOLERANCE;
@@ -140,5 +146,10 @@ public class ConstructionGrid : MonoBehaviour {
         reservePosition(discretizeMapCoords(bottom));
         reservePosition(discretizeMapCoords(bottomRight));
 
+    }
+
+    public Vector2 getDimensions()
+    {
+        return dimensions;
     }
 }

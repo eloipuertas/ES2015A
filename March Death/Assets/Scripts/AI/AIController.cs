@@ -170,6 +170,12 @@ namespace Assets.Scripts.AI
             OnBuildingCreated(g.GetComponent<IGameEntity>());
         }
 
+        public void CreateBuilding(BuildingTypes btype, Vector3 position, Quaternion rotation)
+        {
+            GameObject g = Info.get.createBuilding(_selfRace, btype, position, rotation);;
+            OnBuildingCreated(g.GetComponent<IGameEntity>());
+        }
+
         void OnBuildingCreated(IGameEntity entity)
         {
             if (entity.info.isResource)

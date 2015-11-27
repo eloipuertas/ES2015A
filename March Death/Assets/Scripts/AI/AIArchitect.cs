@@ -29,6 +29,7 @@ namespace Assets.Scripts.AI
         Color cornerWall = new Color(0.188f, 0.188f, 0.188f, 1.000f);
         Color defenceZone = new Color(1.000f, 0.000f, 0.000f, 1.000f);
         Color emptySpace = new Color(0.000f, 1.000f, 0.000f, 1.000f);
+        Color ignorePixel = new Color(1.000f, 0, 1.000f, 1.000f);
         AIController ai;
 
         Dictionary<StructureType, List<Vector3>> avaliablePositions;
@@ -79,53 +80,73 @@ namespace Assets.Scripts.AI
         {
             Color[] pixels = mapData.GetPixels();
 
-            Vector2 center = new Vector2(mapData.width / 2 - 1, mapData.height / 2 -1);
+            Vector2 center = new Vector2(mapData.width / 2 - 1, mapData.height / 2 - 1);
 
             // Math Facts: 
             // The equation to find te position of something is
             // Offset = (i , j) - Center
             // centerPos + GridSize * Offset 
 
+            Vector3 processingPos = Vector3.zero;
+            Vector2 processingOffset = Vector2.zero;
+
+            processingPos.y = basePosition.y;
+
             for(int i = 0; i < mapData.height; i++)
             {
                 for(int j = 0; j < mapData.width; j++)
                 {
                     Color pixel = pixels[j + i * mapData.width];
+                    processingOffset = new Vector2(i, j) - center;
+                    processingPos.x = basePosition.x + constructionGrid.getDimensions().x * processingOffset.x;
+                    processingPos.z = basePosition.z + constructionGrid.getDimensions().y * processingOffset.y;
+                    processingPos = constructionGrid.discretizeMapCoords(processingPos);
+
+                    //In order to be more flexible we need to check if we can construct
+                    if (!constructionGrid.isNewPositionAbleForConstrucction(processingPos))
+                    {
+                        continue;
+                    }
+
                     if (CompareColors(pixel, stronghold))
                     {
                         Debug.Log("Stronghold");
                     }
                     else if (CompareColors(pixel, militaryBuilding))
                     {
-                        Debug.Log("militaryBuilding");
+                        avaliablePositions[StructureType.MILITARY_BUILDING].Add(processingPos);
                     }
                     else if (CompareColors(pixel, resourcesBuilding))
                     {
-                        Debug.Log("resourcesBuilding");
+                        avaliablePositions[StructureType.RESOURCE_BUILDING].Add(processingPos);
                     }
                     else if (CompareColors(pixel, tower))
                     {
-                        Debug.Log("tower");
+                        avaliablePositions[StructureType.TOWER].Add(processingPos);
                     }
                     else if (CompareColors(pixel, horizontallWall))
                     {
-                        Debug.Log("horizontallWall");
+                        avaliablePositions[StructureType.HORIZONTALL_WALL].Add(processingPos);
                     }
                     else if (CompareColors(pixel, verticallWall))
                     {
-                        Debug.Log("verticallWall");
+                        avaliablePositions[StructureType.VERTICALL_WALL].Add(processingPos);
                     }
                     else if (CompareColors(pixel, cornerWall))
                     {
-                        Debug.Log("cornerWall");
+                        avaliablePositions[StructureType.CORNER_WALL].Add(processingPos);
                     }
                     else if (CompareColors(pixel, defenceZone))
                     {
-                        Debug.Log("defenceZone");
+                        avaliablePositions[StructureType.DEFENCE_ZONE].Add(processingPos);
                     }
                     else if (CompareColors(pixel, emptySpace))
                     {
-                        Debug.Log("emptySpace");
+                        continue;
+                    }
+                    else if (CompareColors(pixel, ignorePixel))
+                    {
+                        continue;
                     }
                     else
                     {
@@ -199,9 +220,8 @@ namespace Assets.Scripts.AI
             int numPositions = positionsForType.Count;
             if(numPositions > 0)
             {
-                int randomPosition = UnityEngine.Random.Range(0, numPositions - 1);
-                Vector3 requestedPosition = positionsForType[randomPosition];
-                positionsForType.RemoveAt(randomPosition);
+                Vector3 requestedPosition = positionsForType[0];
+                positionsForType.RemoveAt(0);
                 return requestedPosition;
             }
             return Vector3.zero;
