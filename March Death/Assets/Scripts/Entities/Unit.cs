@@ -13,7 +13,7 @@ using Pathfinding;
 /// </summary>
 public class Unit : GameEntity<Unit.Actions>
 {
-    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT };
+    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT, DESELECT };
     public enum Roles { PRODUCING, WANDERING };
 
     private EntityStatus _defaultStatus = EntityStatus.IDLE;
@@ -54,6 +54,11 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     public UnitTypes type = UnitTypes.HERO;
     public override E getType<E>() { return (E)Convert.ChangeType(type, typeof(E)); }
+
+    /// <summary>
+    /// List of components needed to deactivate at Vanish() and activate at bringback()
+    /// </summary>
+    protected List<Component> unitConponents = new List<Component>();
 
     /// <summary>
     /// If in battle, this is the target and last attack time
@@ -140,6 +145,8 @@ public class Unit : GameEntity<Unit.Actions>
             moveTo(((GameObject)obj).transform.position);
         }
     }
+
+    
 
     /// <summary>
     /// When a wound is received, this is called
@@ -340,6 +347,117 @@ public class Unit : GameEntity<Unit.Actions>
     }
 
     /// <summary>
+    /// Vanish unit from game just disabling components attached.
+    /// If some new component is added you must add it to this method
+    /// and to bringback method too.
+    /// </summary>
+    /// 
+    public void Vanish()
+    {
+        //Disable FOW
+        if (GetComponent<FOWEntity>())
+        {
+            GetComponent<FOWEntity>().enabled = false;
+        }
+        //disable EntityMarker
+        if (GetComponent<EntityMarker>())
+        {   
+            GetComponent<EntityMarker>().enabled = false;
+        }
+        // Disable animator
+        if (GetComponent<Animator>())
+        {
+            GetComponent<Animator>().enabled = false;
+        }
+        // Rigidbody can't be disabled. Must toggle detectCollisions and iskinematic
+        if (GetComponent<Rigidbody>())
+        {
+            GetComponent<Rigidbody>().detectCollisions = false;
+            GetComponent<Rigidbody>().isKinematic = true;
+        }
+        //Disable Selectable
+        // TODO: can't disable square border and lifebar
+        
+        if (GetComponent<Selectable>())
+        {
+            GetComponent<Selectable>().enabled = false;
+            GetComponent<Selectable>().DeselectMe();
+        }  
+        // Disable ligths if any    
+        if (GetComponent<Light>())
+        {
+            GetComponent<Light>().enabled = false;
+        }
+        //disable collider
+        if(GetComponent<Collider>())
+        {
+            GetComponent<Collider>().enabled = false;
+        }
+        // Disable DetourAgent. Must remove form crowd first
+        if (GetComponent<DetourAgent>())
+        {  
+            GetComponent<DetourAgent>().RemoveFromCrowd();
+            GetComponent<DetourAgent>().enabled = false;
+        }
+        // Disable render
+        Component[] allRenderers = GetComponentsInChildren<Renderer>();
+        foreach (Renderer r in allRenderers)
+        {
+            r.enabled = false;
+        }
+        
+
+    }
+    /// <summary>
+    /// Units vanished with vanish method needs to uses BringBack method in 
+    /// order to enable components.
+    /// </summary>
+    public void BringBack()
+    {
+       
+        if (GetComponent<FOWEntity>())
+        {
+            GetComponent<FOWEntity>().enabled = true;
+        }
+        if (GetComponent<EntityMarker>())
+        {
+            GetComponent<EntityMarker>().enabled = true;
+        }
+        if (GetComponent<Animator>())
+        {
+            GetComponent<Animator>().enabled = true;
+        }
+        if (GetComponent<Rigidbody>())
+        {
+            GetComponent<Rigidbody>().detectCollisions = true;
+            GetComponent<Rigidbody>().isKinematic = false;
+        }
+        if (GetComponent<Collider>())
+        {
+            GetComponent<Collider>().enabled = true;
+        }
+        
+        if (GetComponent<Light>())
+        {
+            GetComponent<Light>().enabled = true;
+        }
+        if (GetComponent<DetourAgent>())
+        {
+            GetComponent<DetourAgent>().enabled = true;
+            GetComponent<DetourAgent>().AddToCrowd();
+        }
+        Component[] allRenderers = GetComponentsInChildren<Renderer>();
+        foreach (Renderer r in allRenderers)
+        {
+            r.enabled = true;
+        }
+        if (GetComponent<Selectable>())
+        {
+            GetComponent<Selectable>().enabled = true;
+            //GetComponent<Selectable>().SelectOnlyMe();
+        }
+    }
+    /// <summary>
     /// Object initialization
     /// </summary>
     public override void Awake()
@@ -392,7 +510,7 @@ public class Unit : GameEntity<Unit.Actions>
     public override void Update()
     {
         base.Update();
-
+        
         // Precompute distance to our target if we have target
         // Avoids computing it serveral (5+ times)
         if (_target != null)
