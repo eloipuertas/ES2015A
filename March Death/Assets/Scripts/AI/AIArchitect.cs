@@ -130,31 +130,54 @@ namespace Assets.Scripts.AI
 
         public Vector3 getPositionForBuildingType(BuildingTypes type)
         {
+
+            StructureType buildingType = StructureType.RESOURCE_BUILDING;
+
             switch (type)
             {
                 case BuildingTypes.FARM:
+                    buildingType = StructureType.RESOURCE_BUILDING;
                     break;
                 case BuildingTypes.MINE:
+                    buildingType = StructureType.RESOURCE_BUILDING;
                     break;
                 case BuildingTypes.SAWMILL:
+                    buildingType = StructureType.RESOURCE_BUILDING;
                     break;
                 case BuildingTypes.ARCHERY:
+                    buildingType = StructureType.MILITARY_BUILDING;
                     break;
                 case BuildingTypes.BARRACK:
+                    buildingType = StructureType.MILITARY_BUILDING;
                     break;
                 case BuildingTypes.STABLE:
+                    buildingType = StructureType.MILITARY_BUILDING;
                     break;
                 case BuildingTypes.WALL:
+                    //TODO: Need to think about it
                     break;
                 case BuildingTypes.WALLCORNER:
+                    //TODO: Need to think about it
                     break;
                 case BuildingTypes.WATCHTOWER:
+                    buildingType = StructureType.TOWER;
                     break;
                 default:
-                    break;
+                    //In case that something new has entered return 0
+                    return Vector3.zero;
             }
+            return getPositionForStructureType(buildingType);
+        }
 
-            
+        private Vector3 getPositionForStructureType(StructureType type)
+        {
+            List<Vector3> positionsForType = avaliablePositions[type];
+            if(positionsForType.Count > 0)
+            {
+                Vector3 requestedPosition = positionsForType[0];
+                positionsForType.RemoveAt(0);
+                return requestedPosition;
+            }
             return Vector3.zero;
         }
     }
