@@ -7,16 +7,13 @@ namespace Managers
     public class SoundsManager: MonoBehaviour
     {
 
-        private AudioPool selectionSoundPool;
-        private AudioPool actionSoundPool;
-        private AudioClip[] selectionSound;
-        private AudioClip[] actionSound;
+        private AudioPool _unitsAudioPool;
+        private AudioPool _buildingsAudioPool;
 
 
         void Start()
         {
             Setup();
-            fakeSetup();
         }
 
         /// <summary>
@@ -24,31 +21,14 @@ namespace Managers
         /// </summary>
         void Setup()
         {
-            selectionSoundPool = new AudioPool(this.gameObject, 3);
-            actionSoundPool = new AudioPool(this.gameObject, 3);
+            _buildingsAudioPool = new AudioPool(this.gameObject, 3);
+            _unitsAudioPool = new AudioPool(this.gameObject, 5);
+           
 
             // suscribes the audio managet to main events 
             Subscriber<SelectionManager.Actions, SelectionManager>.get.registerForAll(SelectionManager.Actions.SELECT, onEntitytSelected);
             Subscriber<SelectionManager.Actions, SelectionManager>.get.registerForAll(SelectionManager.Actions.ATTACK, onUnitAction);
             Subscriber<SelectionManager.Actions, SelectionManager>.get.registerForAll(SelectionManager.Actions.MOVE, onUnitAction);
-        }
-
-        /// <summary>
-        /// Adds test sounds
-        /// </summary>
-        void fakeSetup()
-        {
-            selectionSound = new AudioClip[3];
-            actionSound = new AudioClip[3];
-
-            //Register to selectable actions
-            selectionSound[0] = (AudioClip)Resources.Load("Sounds/test-fx/civil-selected");
-            selectionSound[1] = (AudioClip)Resources.Load("Sounds/test-fx/hero-selected");
-            selectionSound[2] = (AudioClip)Resources.Load("Sounds/test-fx/hero-selected-2");
-
-            actionSound[0] = (AudioClip)Resources.Load("Sounds/test-fx/civil-action");
-            actionSound[1] = (AudioClip)Resources.Load("Sounds/test-fx/hero-action");
-            actionSound[2] = (AudioClip)Resources.Load("Sounds/test-fx/hero-action-2");
         }
 
 
@@ -63,10 +43,10 @@ namespace Managers
 
             if (select.entity.info.isBuilding)
             {
-                selectionSoundPool.Play(Sounds.get.Clip(select.entity.getType<BuildingTypes>(), Sounds.SoundType.SELECTION));
+                _buildingsAudioPool.Play(Sounds.get.Clip(select.entity.getType<BuildingTypes>(), Sounds.SoundType.SELECTION));
             }
             else
-                selectionSoundPool.Play(selectionSound[RandomChoice()]);
+                _unitsAudioPool.Play(Sounds.get.RandomClip(Sounds.SoundSource.UNIT, Sounds.SoundType.SELECTION));
         }
 
         /// <summary>
@@ -75,17 +55,51 @@ namespace Managers
         /// <param name="obj"></param>
         public void onUnitAction(object obj)
         {
-            actionSoundPool.Play(actionSound[RandomChoice()]);
+            _unitsAudioPool.Play(Sounds.get.RandomClip(Sounds.SoundSource.UNIT, Sounds.SoundType.ACTION));
         }
 
         /// <summary>
-        /// Randomizes test sounds
+        /// function to trigger a sound when building is created
         /// </summary>
-        /// <returns></returns>
-        private int RandomChoice()
+        /// <param name="bType"></param>
+        public void onBuildingCreated(BuildingTypes bType)
         {
-            return UnityEngine.Random.Range(0, 3);
+
+            _buildingsAudioPool.Play(Sounds.get.Clip(bType, Sounds.SoundType.CREATION));
         }
+
+        /// <summary>
+        /// function to trigger a sound when unit is created
+        /// </summary>
+        /// <param name="bType"></param>
+        public void onUnitCreated()
+        {
+
+            _unitsAudioPool.Play(Sounds.get.RandomClip(Sounds.SoundSource.UNIT, Sounds.SoundType.SELECTION)); // is selection sound too
+        }
+
+
+        /// <summary>
+        /// function to trigger a sound when building is destroyed
+        /// </summary>
+        /// <param name="bType"></param>
+        public void onBuildingDestroyed()
+        {
+            _buildingsAudioPool.Play(Sounds.get.RandomClip(Sounds.SoundSource.BUILDING, Sounds.SoundType.DEAD));
+        }
+
+
+        /// <summary>
+        /// function to trigger a sound when unit is dead
+        /// </summary>
+        /// <param name="bType"></param>
+        public void onUnitDead()
+        {
+            _unitsAudioPool.Play(Sounds.get.RandomClip(Sounds.SoundSource.UNIT, Sounds.SoundType.DEAD));
+
+        }
+
+
 
         void OnDestroy()
         {
