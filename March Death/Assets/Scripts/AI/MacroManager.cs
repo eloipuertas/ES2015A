@@ -20,6 +20,7 @@ namespace Assets.Scripts.AI
         /// </summary>
         List<BuildingTypes> buildingPref;
         List<UnitTypes> UnitPref;
+        AIArchitect architect;
         AIController ai;
         AIArchitect architect;
         public MacroManager(AIController ai)

@@ -5,6 +5,7 @@ namespace Assets.Scripts.AI
 {
     class AIArchitect
     {
+
         Color stronghold = new Color(0.000f, 0.000f, 0.059f, 1.000f);
         Color militaryBuilding = new Color(0, 0, 0, 1.000f);
         Color resourcesBuilding = new Color(0, 0, 0, 1.000f);
@@ -25,6 +26,7 @@ namespace Assets.Scripts.AI
         {
             readMap("pixels");
             ai = aiController;
+
         }
 
         /// <summary>
@@ -33,6 +35,7 @@ namespace Assets.Scripts.AI
         /// <param name="mapName"></param>
         public void readMap(String mapName)
         {
+
             Texture2D mapTexture = Resources.Load<Texture2D>("Data/AIBaseMaps/" + mapName);
             Texture2D tex = new Texture2D(9, 1, TextureFormat.BGRA32, false);
             byte[] fileData;
@@ -54,6 +57,7 @@ namespace Assets.Scripts.AI
             }
 
             Debug.Log("Finished Parsing Map");
+
         }
     }
 }
