@@ -22,7 +22,7 @@ namespace Pathfinding
         private Quaternion lastKnownRotation = new Quaternion();
         private bool alreadyAdded = false;
 
-        public void OnDestroy()
+        public void OnDisable()
         {
             if (alreadyAdded)
             {

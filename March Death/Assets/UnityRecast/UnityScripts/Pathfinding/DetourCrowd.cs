@@ -45,11 +45,21 @@ namespace Pathfinding
             Instance = this;
         }
 
+        public void OnDestroy()
+        {
+            if (Instance != null)
+            {
+                PathDetour.get.Destroy();
+
+                // TODO: Free crowd
+                crowd = new IntPtr(0);
+            }
+        }
+
         public void OnEnable()
         {
             if (navmeshData != null)
             {
-
                 RecastConfig recastConfig = FindObjectOfType<RecastConfig>();
                 Dictionary<string, ushort> areas = new Dictionary<string, ushort>();
 
@@ -164,6 +174,7 @@ namespace Pathfinding
         public void MoveTarget(int idx, Vector3 target)
         {
             Assert.IsTrue(crowd.ToInt64() != 0);
+            Assert.IsTrue(PathDetour.get.NavQuery.ToInt64() != 0);
 
             Detour.Crowd.setMoveTarget(PathDetour.get.NavQuery, crowd, idx, ToFloat(target), false);
         }
@@ -177,6 +188,8 @@ namespace Pathfinding
 
         public bool RandomValidPoint(ref Vector3 dest)
         {
+            Assert.IsTrue(crowd.ToInt64() != 0);
+
             if (Detour.Crowd.randomPoint(crowd, randomSample))
             {
                 dest = ToVector3(randomSample);
@@ -188,6 +201,8 @@ namespace Pathfinding
 
         public bool RandomValidPointInCircle(Vector3 cercleCenter, float maxRadius, ref Vector3 dest)
         {
+            Assert.IsTrue(crowd.ToInt64() != 0);
+
             if (Detour.Crowd.randomPointInCircle(crowd, ToFloat(cercleCenter), maxRadius, randomSample))
             {
                 dest = ToVector3(randomSample);
@@ -200,6 +215,8 @@ namespace Pathfinding
         public void Update()
         {
             Assert.IsTrue(crowd.ToInt64() != 0);
+            Assert.IsTrue(PathDetour.get.TileCache.ToInt64() != 0);
+            Assert.IsTrue(PathDetour.get.NavMesh.ToInt64() != 0);
 
             Detour.Crowd.updateTick(PathDetour.get.TileCache, PathDetour.get.NavMesh, crowd, Time.deltaTime, positions, velocities, states, targetStates, ref numUpdated);
 

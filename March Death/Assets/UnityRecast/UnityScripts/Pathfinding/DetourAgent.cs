@@ -112,15 +112,14 @@ namespace Pathfinding
             }
         }
 
-        public void Start()
+        public void OnEnable()
         {
             UpdateParams();
             AddToCrowd();
-
             targetPoint = transform.position;
         }
 
-        public void OnDestroy()
+        public void OnDisable()
         {
             RemoveFromCrowd();
         }

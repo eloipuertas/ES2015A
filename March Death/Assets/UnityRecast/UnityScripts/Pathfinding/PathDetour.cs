@@ -41,6 +41,16 @@ public class PathDetour : Utils.Singleton<PathDetour>
         }
     }
 
+    public void Destroy()
+    {
+        // TODO: Find out why freeing TileCache crashes Unity
+        //Pathfinding.Recast.freeTileCache(NavMesh, TileCache);
+        
+        TileCache = new IntPtr(0);
+        NavMesh = new IntPtr(0);
+        NavQuery = new IntPtr(0);
+    }
+
     public uint AddObstacle(Pathfinding.DetourObstacle block)
     {
         Assert.IsTrue(TileCache.ToInt64() != 0);
