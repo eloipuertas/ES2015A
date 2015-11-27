@@ -219,7 +219,7 @@ public class EventsNotifier : MonoBehaviour {
         }
     }
 
-    private void DisplayResourceIsLow(WorldResources.Type type)
+    public void DisplayResourceIsLow(WorldResources.Type type)
     {
         switch (type)
         {
@@ -257,7 +257,7 @@ public class EventsNotifier : MonoBehaviour {
         }
     }
 
-    private void DisplayResourceDepleted(WorldResources.Type type)
+    public void DisplayResourceDepleted(WorldResources.Type type)
     {
         switch (type)
         {
