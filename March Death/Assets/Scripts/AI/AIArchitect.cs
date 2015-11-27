@@ -31,11 +31,14 @@ namespace Assets.Scripts.AI
         Color emptySpace = new Color(0.000f, 1.000f, 0.000f, 1.000f);
         Color ignorePixel = new Color(1.000f, 0, 1.000f, 1.000f);
         AIController ai;
+        string dificultyFolder;
 
         Dictionary<StructureType, List<Vector3>> avaliablePositions;
         ConstructionGrid constructionGrid;
 
         Vector3 basePosition;
+
+        public List<BuildingTypes> buildingPrefs;
 
         public AIArchitect(AIController aiController)
         {
@@ -62,17 +65,85 @@ namespace Assets.Scripts.AI
 
             constructionGrid.reservePositionForStronghold(basePosition);
 
-            readMapData("hard_base");
+            planifyBuildingsAccordingToDifficulty();
+
+            readMapData();
         }
 
+
+        public void planifyBuildingsAccordingToDifficulty()
+        {
+
+            if (ai.DifficultyLvl == 1)
+            {
+                dificultyFolder = "Easy";
+                buildingPrefs = new List<BuildingTypes>()
+                {
+                    BuildingTypes.FARM,
+                    BuildingTypes.MINE,
+                    BuildingTypes.SAWMILL,
+                    BuildingTypes.ARCHERY,
+                    BuildingTypes.BARRACK,
+                    BuildingTypes.STABLE,
+                };
+            }
+
+            if (ai.DifficultyLvl == 2)
+            {
+                dificultyFolder = "Medium";
+                buildingPrefs  = new List<BuildingTypes>()
+                {
+                    BuildingTypes.FARM,
+                    BuildingTypes.MINE,
+                    BuildingTypes.SAWMILL,
+                    BuildingTypes.ARCHERY,
+                    BuildingTypes.BARRACK,
+                    BuildingTypes.WATCHTOWER,
+                    BuildingTypes.STABLE,
+                    BuildingTypes.WATCHTOWER,
+                    BuildingTypes.WATCHTOWER,
+                    BuildingTypes.WATCHTOWER,
+                    BuildingTypes.WATCHTOWER,
+                    BuildingTypes.WATCHTOWER,
+                    BuildingTypes.WATCHTOWER,
+                    BuildingTypes.WATCHTOWER,
+                };
+            }
+
+            if (ai.DifficultyLvl == 3)
+            {
+                dificultyFolder = "Hard";
+                buildingPrefs = new List<BuildingTypes>()
+                {
+                    BuildingTypes.FARM,
+                    BuildingTypes.MINE,
+                    BuildingTypes.SAWMILL,
+                    BuildingTypes.ARCHERY,
+                    BuildingTypes.BARRACK,
+                    BuildingTypes.WATCHTOWER,
+                    BuildingTypes.STABLE,
+                    BuildingTypes.WATCHTOWER,
+                    BuildingTypes.WATCHTOWER,
+                    BuildingTypes.WATCHTOWER,
+                    BuildingTypes.WATCHTOWER,
+                    BuildingTypes.WALL,
+                    BuildingTypes.WALL,
+                    BuildingTypes.WALL,
+                };
+            }
+
+
+        }
 
         /// <summary>
         /// Reads a file containing the map
         /// </summary>
         /// <param name="mapName"></param>
-        public void readMapData(String mapName)
+        public void readMapData()
         {
-            Texture2D mapData = Resources.Load(RELATIVE_PATH_TO_MAPS + mapName) as Texture2D;
+            Debug.Log(RELATIVE_PATH_TO_MAPS + dificultyFolder);
+            Texture2D[] maps = Resources.LoadAll<Texture2D>(RELATIVE_PATH_TO_MAPS + dificultyFolder);
+            Texture2D mapData = maps[UnityEngine.Random.Range(0, maps.Length)];
             parseMapData(mapData);
         }
 
@@ -225,6 +296,22 @@ namespace Assets.Scripts.AI
                 return requestedPosition;
             }
             return Vector3.zero;
+        }
+
+        public void constructNextBuilding()
+        {
+            Vector3 position = getPositionForBuildingType(buildingPrefs[0]);
+            //If there is no empty space for something just enqueue it
+            if (position.Equals(Vector3.zero))
+            {
+                buildingPrefs.Add(buildingPrefs[0]);
+                buildingPrefs.RemoveAt(0);
+            }
+            else
+            {
+                ai.CreateBuilding(buildingPrefs[0], position, Quaternion.Euler(0, 0, 0));
+                buildingPrefs.RemoveAt(0);
+            }
         }
     }
 }

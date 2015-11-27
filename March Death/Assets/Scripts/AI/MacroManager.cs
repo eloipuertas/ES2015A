@@ -16,14 +16,12 @@ namespace Assets.Scripts.AI
         /// <summary>
         /// This list contains what buildings the macro plans to build next
         /// </summary>
-        List<BuildingTypes> buildingPref;
         List<UnitTypes> UnitPref;
         AIController ai;
         AIArchitect architect;
         public MacroManager(AIController ai)
         {
             this.ai = ai;
-            buildingPref = new List<BuildingTypes>() { BuildingTypes.FARM, BuildingTypes.MINE, BuildingTypes.SAWMILL, BuildingTypes.ARCHERY, BuildingTypes.BARRACK, BuildingTypes.STABLE, BuildingTypes.WATCHTOWER };
             UnitPref = new List<UnitTypes>() {UnitTypes.CIVIL};
             architect = new AIArchitect(ai);
         }
@@ -34,18 +32,16 @@ namespace Assets.Scripts.AI
         {
             foreach (Resource r in ai.OwnResources)
                 if (r.harvestUnits == 10) //TODO ask for the actual max
-                    buildingPref.Add(r.type);
+                    architect.buildingPrefs.Add(r.type);
         }
         /// <summar>
         /// Called fast enough, acomplishes what the macroHigh asks for
         /// </summary>
         public void MacroLow()
         {
-            if (buildingPref.Count > 0) //TODO and has resources
+            if (architect.buildingPrefs.Count > 0) //TODO and has resources
             {
-                Vector3 position = architect.getPositionForBuildingType(buildingPref[0]);
-                ai.CreateBuilding(buildingPref[0], position, Quaternion.Euler(0, 0, 0));
-                buildingPref.RemoveAt(0);
+                architect.constructNextBuilding();
             }
             foreach(Resource r in ai.OwnResources)
             {
