@@ -9,26 +9,31 @@ namespace Managers
 
         private AudioPool _unitsAudioPool;
         private AudioPool _buildingsAudioPool;
+        private SelectionManager _sManager;
 
+
+        void Awake()
+        {
+            _buildingsAudioPool = new AudioPool(this.gameObject, 3);
+            _unitsAudioPool = new AudioPool(this.gameObject, 5);
+        }
 
         void Start()
         {
-            Setup();
+            _sManager = GetComponent<SelectionManager>();
+            Register();
         }
 
         /// <summary>
         /// Setups the SoundsManager
         /// </summary>
-        void Setup()
+        private void Register()
         {
-            _buildingsAudioPool = new AudioPool(this.gameObject, 3);
-            _unitsAudioPool = new AudioPool(this.gameObject, 5);
-           
 
             // suscribes the audio managet to main events 
-            Subscriber<SelectionManager.Actions, SelectionManager>.get.registerForAll(SelectionManager.Actions.SELECT, onEntitytSelected);
-            Subscriber<SelectionManager.Actions, SelectionManager>.get.registerForAll(SelectionManager.Actions.ATTACK, onUnitAction);
-            Subscriber<SelectionManager.Actions, SelectionManager>.get.registerForAll(SelectionManager.Actions.MOVE, onUnitAction);
+            _sManager.register(SelectionManager.Actions.SELECT, onEntitytSelected);
+            _sManager.register(SelectionManager.Actions.ATTACK, onUnitAction);
+            _sManager.register(SelectionManager.Actions.MOVE, onUnitAction);
         }
 
 
@@ -103,9 +108,9 @@ namespace Managers
 
         void OnDestroy()
         {
-            Subscriber<SelectionManager.Actions, SelectionManager>.get.unregisterFromAll(SelectionManager.Actions.SELECT, onEntitytSelected);
-            Subscriber<SelectionManager.Actions, SelectionManager>.get.unregisterFromAll(SelectionManager.Actions.ATTACK, onUnitAction);
-            Subscriber<SelectionManager.Actions, SelectionManager>.get.unregisterFromAll(SelectionManager.Actions.MOVE, onUnitAction);
+            _sManager.unregister(SelectionManager.Actions.SELECT, onEntitytSelected);
+            _sManager.unregister(SelectionManager.Actions.ATTACK, onUnitAction);
+            _sManager.unregister(SelectionManager.Actions.MOVE, onUnitAction);
         }
     }
 }
