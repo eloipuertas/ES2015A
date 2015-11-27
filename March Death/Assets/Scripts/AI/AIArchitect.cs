@@ -1,30 +1,29 @@
 ﻿using System;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Assets.Scripts.AI
 {
     class AIArchitect
     {
 
-        Color stronghold = new Color(0.000f, 0.000f, 0.059f, 1.000f);
-        Color militaryBuilding = new Color(0, 0, 0, 1.000f);
-        Color resourcesBuilding = new Color(0, 0, 0, 1.000f);
+        const String RELATIVE_PATH_TO_MAPS = "Data/AIBaseMaps/";
 
-        Color tower = new Color(0, 0, 0, 1.000f);
-        Color horizontallWall = new Color(0, 0, 0, 1.000f);
-        Color verticallWall = new Color(0, 0, 0, 1.000f);
-
-        Color cornerWall = new Color(0, 0, 0, 1.000f);
-        Color defenceZone = new Color(0, 0, 0, 1.000f);
-        Color emptySpace = new Color(0, 0, 0, 1.000f);
-
-        String currentBaseMap;
+        Color stronghold = new Color(0.000f, 0.000f, 0.000f, 1.000f);
+        Color militaryBuilding = new Color(0.000f, 0.000f, 1.000f, 1.000f);
+        Color resourcesBuilding = new Color(1.000f, 1.000f, 0.000f, 1.000f);
+        Color tower = new Color(1.000f, 1.000f, 1.000f, 1.000f);
+        Color horizontallWall = new Color(0.502f, 0.502f, 0.502f, 1.000f);
+        Color verticallWall = new Color(0.376f, 0.376f, 0.376f, 1.000f);
+        Color cornerWall = new Color(0.188f, 0.188f, 0.188f, 1.000f);
+        Color defenceZone = new Color(1.000f, 0.000f, 0.000f, 1.000f);
+        Color emptySpace = new Color(0.000f, 1.000f, 0.000f, 1.000f);
 
         AIController ai;
 
         public AIArchitect(AIController aiController)
         {
-            readMap("pixels");
+            readMapData("map_palete");
             ai = aiController;
 
         }
@@ -33,31 +32,81 @@ namespace Assets.Scripts.AI
         /// Reads a file containing the map
         /// </summary>
         /// <param name="mapName"></param>
-        public void readMap(String mapName)
+        public void readMapData(String mapName)
         {
+            Texture2D mapData = Resources.Load(RELATIVE_PATH_TO_MAPS + mapName) as Texture2D;
+            parseMapData(mapData);
+        }
 
-            Texture2D mapTexture = Resources.Load<Texture2D>("Data/AIBaseMaps/" + mapName);
-            Texture2D tex = new Texture2D(9, 1, TextureFormat.BGRA32, false);
-            byte[] fileData;
+        public void parseMapData(Texture2D mapData)
+        {
+            Color[] pixels = mapData.GetPixels();
 
-            if (mapTexture == null)
+            for(int i = 0; i < mapData.height; i++)
             {
-                Debug.Log("AIArchitect: " + mapName + " could not be found");
-                return;
-            }
-
-            Color[] pixels = mapTexture.GetPixels();
-
-            for (int i = 0; i < mapTexture.height; i++)
-            {
-                for(int j = 0; j < mapTexture.width; j++)
+                for(int j = 0; j < mapData.width; j++)
                 {
-                    Console.WriteLine(mapTexture.GetPixel(i, j));
+                    Color pixel = pixels[j + i * mapData.width];
+                    if (CompareColors(pixel, stronghold))
+                    {
+                        Debug.Log("Stronghold");
+                    }
+                    else if (CompareColors(pixel, militaryBuilding))
+                    {
+                        Debug.Log("militaryBuilding");
+                    }
+                    else if (CompareColors(pixel, resourcesBuilding))
+                    {
+                        Debug.Log("resourcesBuilding");
+                    }
+                    else if (CompareColors(pixel, tower))
+                    {
+                        Debug.Log("tower");
+                    }
+                    else if (CompareColors(pixel, horizontallWall))
+                    {
+                        Debug.Log("horizontallWall");
+                    }
+                    else if (CompareColors(pixel, verticallWall))
+                    {
+                        Debug.Log("verticallWall");
+                    }
+                    else if (CompareColors(pixel, cornerWall))
+                    {
+                        Debug.Log("cornerWall");
+                    }
+                    else if (CompareColors(pixel, defenceZone))
+                    {
+                        Debug.Log("defenceZone");
+                    }
+                    else if (CompareColors(pixel, emptySpace))
+                    {
+                        Debug.Log("emptySpace");
+                    }
+                    else
+                    {
+                        Debug.Log("Unknown Structure" + pixel.ToString());
+                    }
                 }
             }
+            Debug.Log("Reading Complete");
+        }
 
-            Debug.Log("Finished Parsing Map");
+        /// <summary>
+        /// I need to compare this way because unity optimizes comparison and sometimes is not working,
+        ///  and i don't want to work with alpha channel
+        /// </summary>
+        /// <param name="c1"></param>
+        /// <param name="c2"></param>
+        /// <returns></returns>
+        public static  bool CompareColors(Color c1, Color c2)
+        {
+            if((c1.r == c2.r && c1.g == c2.g &&  c1.b == c2.b) || c1.ToString().Equals(c2.ToString()))
+            {
+                return true;
+            }
 
+            return false;
         }
     }
 }
