@@ -460,4 +460,9 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         fe.Range = info.attributes.sightRange;
         fe.Activate(info.race);
     }
+
+    protected void activateEntityMarker()
+    {
+        EntityMarker em = gameObject.AddComponent<EntityMarker>();
+    }
 }
