@@ -186,11 +186,6 @@ namespace Assets.Scripts.AI
             ad.Value = val;
 
             enemyBuildings = ai.senses.getBuildingsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 3 * _maxUnitRange, _enemyRace);
-
-            if(enemyBuildings.Count > 0)
-            {
-                Debug.Log("Ai Senses num buildings detected: " + enemyBuildings.Count);
-            }
         }
 
         float valOfUnit(Unit u)
