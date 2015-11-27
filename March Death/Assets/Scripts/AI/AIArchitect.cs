@@ -61,7 +61,7 @@ namespace Assets.Scripts.AI
 
             constructionGrid.reservePositionForStronghold(basePosition);
 
-            readMapData("map_palete");
+            readMapData("hard_base");
         }
 
 
