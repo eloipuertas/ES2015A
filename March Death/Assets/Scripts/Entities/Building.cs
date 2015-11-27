@@ -127,6 +127,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
 
         // Instead of adding 10 to the center of the building, we should check the actual size of the building....
         _deploymentPoint = new Vector3(transform.position.x + 10, transform.position.y, transform.position.z + 10);
+        activateEntityMarker();
         activateFOWEntity();
 
         if (DefaultStatus == EntityStatus.BUILDING_PHASE_1)
@@ -136,7 +137,6 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         }
 
         //return (info.buildingAttributes.wounds - _woundsReceived) * 100f / info.buildingAttributes.wounds;
-
         // Set the status
         setStatus(DefaultStatus);
     }
