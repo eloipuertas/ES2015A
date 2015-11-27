@@ -1,11 +1,22 @@
 ﻿using System;
 using UnityEngine;
+using Storage;
 using System.Collections.Generic;
 
 namespace Assets.Scripts.AI
 {
     class AIArchitect
     {
+        enum StructureType {
+            STRONGHOLD,
+            MILITARY_BUILDING,
+            RESOURCE_BUILDING,
+            TOWER,
+            HORIZONTALL_WALL,
+            VERTICALL_WALL,
+            CORNER_WALL,
+            DEFENCE_ZONE,
+        }
 
         const String RELATIVE_PATH_TO_MAPS = "Data/AIBaseMaps/";
 
@@ -18,14 +29,23 @@ namespace Assets.Scripts.AI
         Color cornerWall = new Color(0.188f, 0.188f, 0.188f, 1.000f);
         Color defenceZone = new Color(1.000f, 0.000f, 0.000f, 1.000f);
         Color emptySpace = new Color(0.000f, 1.000f, 0.000f, 1.000f);
-
         AIController ai;
+
+        Dictionary<StructureType, List<Vector3>> avaliablePositions;
 
         public AIArchitect(AIController aiController)
         {
+            avaliablePositions = new Dictionary<StructureType, List<Vector3>>();
+            avaliablePositions.Add(StructureType.MILITARY_BUILDING, new List<Vector3>());
+            avaliablePositions.Add(StructureType.RESOURCE_BUILDING, new List<Vector3>());
+            avaliablePositions.Add(StructureType.TOWER, new List<Vector3>());
+            avaliablePositions.Add(StructureType.HORIZONTALL_WALL, new List<Vector3>());
+            avaliablePositions.Add(StructureType.VERTICALL_WALL, new List<Vector3>());
+            avaliablePositions.Add(StructureType.CORNER_WALL, new List<Vector3>());
+            avaliablePositions.Add(StructureType.DEFENCE_ZONE, new List<Vector3>());
+
             readMapData("map_palete");
             ai = aiController;
-
         }
 
         /// <summary>
@@ -105,8 +125,37 @@ namespace Assets.Scripts.AI
             {
                 return true;
             }
-
             return false;
+        }
+
+        public Vector3 getPositionForBuildingType(BuildingTypes type)
+        {
+            switch (type)
+            {
+                case BuildingTypes.FARM:
+                    break;
+                case BuildingTypes.MINE:
+                    break;
+                case BuildingTypes.SAWMILL:
+                    break;
+                case BuildingTypes.ARCHERY:
+                    break;
+                case BuildingTypes.BARRACK:
+                    break;
+                case BuildingTypes.STABLE:
+                    break;
+                case BuildingTypes.WALL:
+                    break;
+                case BuildingTypes.WALLCORNER:
+                    break;
+                case BuildingTypes.WATCHTOWER:
+                    break;
+                default:
+                    break;
+            }
+
+            
+            return Vector3.zero;
         }
     }
 }
