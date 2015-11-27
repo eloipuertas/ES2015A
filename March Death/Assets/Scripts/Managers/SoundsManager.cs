@@ -15,7 +15,7 @@ namespace Managers
         void Awake()
         {
             _buildingsAudioPool = new AudioPool(this.gameObject, 3);
-            _unitsAudioPool = new AudioPool(this.gameObject, 5);
+            _unitsAudioPool = new AudioPool(this.gameObject, 3);
         }
 
         void Start()
