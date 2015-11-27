@@ -154,7 +154,8 @@ public class Unit : GameEntity<Unit.Actions>
     /// When a wound is received, this is called
     /// </summary>
     protected override void onReceiveDamage()
-    {
+	{
+		base.onReceiveDamage ();
         fire(Actions.DAMAGED);
     }
 
