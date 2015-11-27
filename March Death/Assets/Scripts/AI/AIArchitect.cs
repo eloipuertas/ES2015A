@@ -32,6 +32,9 @@ namespace Assets.Scripts.AI
         AIController ai;
 
         Dictionary<StructureType, List<Vector3>> avaliablePositions;
+        ConstructionGrid constructionGrid;
+
+        Vector3 basePosition;
 
         public AIArchitect(AIController aiController)
         {
@@ -43,10 +46,24 @@ namespace Assets.Scripts.AI
             avaliablePositions.Add(StructureType.VERTICALL_WALL, new List<Vector3>());
             avaliablePositions.Add(StructureType.CORNER_WALL, new List<Vector3>());
             avaliablePositions.Add(StructureType.DEFENCE_ZONE, new List<Vector3>());
+            constructionGrid = GameObject.Find("GameController").GetComponent<ConstructionGrid>();
+            ai = aiController;
+
+            //HACK: Probably would be cool to find a way to get this dinamically
+            if (ai.race == Storage.Races.ELVES)
+            {
+                basePosition = new Vector3(590f, 80.00262f, 792f);
+            }
+            else
+            {
+                basePosition = new Vector3(801.4f, 80.00262f, 753.6f);
+            }
+
+            constructionGrid.reservePositionForStronghold(basePosition);
 
             readMapData("map_palete");
-            ai = aiController;
         }
+
 
         /// <summary>
         /// Reads a file containing the map
@@ -172,10 +189,12 @@ namespace Assets.Scripts.AI
         private Vector3 getPositionForStructureType(StructureType type)
         {
             List<Vector3> positionsForType = avaliablePositions[type];
-            if(positionsForType.Count > 0)
+            int numPositions = positionsForType.Count;
+            if(numPositions > 0)
             {
-                Vector3 requestedPosition = positionsForType[0];
-                positionsForType.RemoveAt(0);
+                int randomPosition = UnityEngine.Random.Range(0, numPositions - 1);
+                Vector3 requestedPosition = positionsForType[randomPosition];
+                positionsForType.RemoveAt(randomPosition);
                 return requestedPosition;
             }
             return Vector3.zero;
