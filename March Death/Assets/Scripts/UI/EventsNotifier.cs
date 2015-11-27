@@ -23,6 +23,10 @@ public class EventsNotifier : MonoBehaviour {
     private readonly string SAWMILL_CREATED = "Sawmill created.";
     private readonly string SHOOTING_RANGE_CREATED = "Shooting range created.";
     private readonly string STABLE_CREATED = "Stable created.";
+    private readonly string WATCHTOWER_CREATED = "Watchtower created.";
+    // TODO Find a better way to display these two messages: creation of wall and wall corner.
+    private readonly string WALL_CREATED = "Wall created.";
+    private readonly string WALL_CORNER_CREATED = "Wall tower created.";
 
     // Resource related messages
     private readonly string FOOD_LOW = "Your food supplies are low!";
@@ -54,6 +58,8 @@ public class EventsNotifier : MonoBehaviour {
     private readonly string SHOOTING_RANGE_LOST = "You have lost a shooting range.";
     private readonly string BARRACK_LOST = "You have lost a barrack.";
     private readonly string STABLE_LOST = "You have lost a stable.";
+    private readonly string WATCHTOWER_LOST = "You have lost a watchtower";
+    private readonly string WALL_LOST = "Your wall has been wrecked.";
 
     private const float TIME_TO_UPDATE = 5f;
 
@@ -70,11 +76,13 @@ public class EventsNotifier : MonoBehaviour {
     private System.Text.StringBuilder messages;
 
     private Camera mainCam;
+    private Managers.SoundsManager sounds;
 
     void Awake()
     {
         mainCam = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
         text = GameObject.Find("ScreenMessages").GetComponent<GUIText>();
+        sounds = GameObject.FindWithTag("GameController").GetComponent<Managers.SoundsManager>();
     }
 
     // Use this for initialization
@@ -141,7 +149,17 @@ public class EventsNotifier : MonoBehaviour {
             case Storage.BuildingTypes.SAWMILL:
                 AppendMessage(SAWMILL_CREATED);
                 break;
+            case Storage.BuildingTypes.WATCHTOWER:
+                AppendMessage(WATCHTOWER_CREATED);
+                break;
+            case Storage.BuildingTypes.WALL:
+                AppendMessage(WALL_CREATED);
+                break;
+            case Storage.BuildingTypes.WALLCORNER:
+                AppendMessage(WALL_CORNER_CREATED);
+                break;
         }
+        sounds.onBuildingCreated(type);
     }
 
     private void DisplayUnitCreated(Storage.UnitTypes type)
@@ -164,6 +182,7 @@ public class EventsNotifier : MonoBehaviour {
                 AppendMessage(HEAVY_ARMY_CREATED);
                 break;
         }
+        sounds.onUnitCreated();
     }
 
     private void DisplayUnitDead(Storage.UnitTypes type)
@@ -189,6 +208,7 @@ public class EventsNotifier : MonoBehaviour {
                 AppendMessage(HERO_DEAD);
                 break;
         }
+        sounds.onUnitDead();
     }
 
     private void DisplayBuildingDestroyed(Storage.BuildingTypes type)
@@ -216,7 +236,15 @@ public class EventsNotifier : MonoBehaviour {
             case Storage.BuildingTypes.STABLE:
                 AppendMessage(STABLE_LOST);
                 break;
+            case Storage.BuildingTypes.WATCHTOWER:
+                AppendMessage(WATCHTOWER_LOST);
+                break;
+            case Storage.BuildingTypes.WALLCORNER:
+            case Storage.BuildingTypes.WALL:
+                AppendMessage(WALL_LOST);
+                break;
         }
+        sounds.onBuildingDestroyed();
     }
 
     public void DisplayResourceIsLow(WorldResources.Type type)
