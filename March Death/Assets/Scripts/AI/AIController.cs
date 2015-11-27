@@ -163,17 +163,41 @@ namespace Assets.Scripts.AI
                 EnemyBuildings.Remove(g);
             }
         }
+
+        /// <summary>
+        /// Need to unify this method with players one.
+        /// </summary>
+        /// <param name="race"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public bool isAffordable(Storage.Races race, Storage.BuildingTypes type)
+        {
+            Storage.BuildingInfo i = Storage.Info.get.of(race, type);
+
+            return (resources.getAmount(WorldResources.Type.FOOD) >= i.resources.food &&
+                    resources.getAmount(WorldResources.Type.WOOD) >= i.resources.wood &&
+                    resources.getAmount(WorldResources.Type.METAL) >= i.resources.metal);
+        }
+
         public void CreateBuilding(BuildingTypes btype)
         {
             GameObject g = Info.get.createBuilding(_selfRace, btype, buildPosition, Quaternion.Euler(0, 0, 0));
             buildPosition += new Vector3(0, 0, 20);
-            OnBuildingCreated(g.GetComponent<IGameEntity>());
+            IGameEntity entity = g.GetComponent<IGameEntity>();
+            OnBuildingCreated(entity);
+            resources.SubstractAmount(WorldResources.Type.FOOD, entity.info.resources.food);
+            resources.SubstractAmount(WorldResources.Type.WOOD, entity.info.resources.wood);
+            resources.SubstractAmount(WorldResources.Type.METAL, entity.info.resources.metal);
         }
 
         public void CreateBuilding(BuildingTypes btype, Vector3 position, Quaternion rotation)
         {
-            GameObject g = Info.get.createBuilding(_selfRace, btype, position, rotation);;
-            OnBuildingCreated(g.GetComponent<IGameEntity>());
+            GameObject g = Info.get.createBuilding(_selfRace, btype, position, rotation);
+            IGameEntity entity = g.GetComponent<IGameEntity>();
+            OnBuildingCreated(entity);
+            resources.SubstractAmount(WorldResources.Type.FOOD, entity.info.resources.food);
+            resources.SubstractAmount(WorldResources.Type.WOOD, entity.info.resources.wood);
+            resources.SubstractAmount(WorldResources.Type.METAL, entity.info.resources.metal);
         }
 
         void OnBuildingCreated(IGameEntity entity)

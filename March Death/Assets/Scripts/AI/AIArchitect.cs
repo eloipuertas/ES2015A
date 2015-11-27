@@ -71,6 +71,9 @@ namespace Assets.Scripts.AI
         }
 
 
+        /// <summary>
+        /// Gets the lists of buildings that we are going to construct for every difficulty
+        /// </summary>
         public void planifyBuildingsAccordingToDifficulty()
         {
 
@@ -136,7 +139,8 @@ namespace Assets.Scripts.AI
         }
 
         /// <summary>
-        /// Reads a file containing the map
+        /// Reads a file containing the map (we can read any map inside the folders an chooses one 
+        /// randomly)
         /// </summary>
         /// <param name="mapName"></param>
         public void readMapData()
@@ -147,6 +151,10 @@ namespace Assets.Scripts.AI
             parseMapData(mapData);
         }
 
+        /// <summary>
+        /// Reads a map and syncronizes it with the construction grid
+        /// </summary>
+        /// <param name="mapData"></param>
         public void parseMapData(Texture2D mapData)
         {
             Color[] pixels = mapData.GetPixels();
@@ -243,7 +251,12 @@ namespace Assets.Scripts.AI
             }
             return false;
         }
-
+        
+        /// <summary>
+        /// Translates type to structuretype
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public Vector3 getPositionForBuildingType(BuildingTypes type)
         {
 
@@ -285,23 +298,44 @@ namespace Assets.Scripts.AI
             return getPositionForStructureType(buildingType);
         }
 
+        /// <summary>
+        /// Gets the position of an structure on the AI map
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         private Vector3 getPositionForStructureType(StructureType type)
         {
             List<Vector3> positionsForType = avaliablePositions[type];
-            int numPositions = positionsForType.Count;
-            if(numPositions > 0)
+            bool found = false;
+            Vector3 requestedPosition = Vector3.zero;
+
+            while (positionsForType.Count > 0 && !found)
             {
-                Vector3 requestedPosition = positionsForType[0];
+                // Recheck positions in order to know if player has constructed on this position
+                if (constructionGrid.isNewPositionAbleForConstrucction(positionsForType[0]))
+                {
+                    requestedPosition = positionsForType[0];
+                    found = true;
+                }
                 positionsForType.RemoveAt(0);
-                return requestedPosition;
             }
-            return Vector3.zero;
+
+            return requestedPosition;
         }
 
+        /// <summary>
+        /// Used to know what building construct on the next iteration
+        /// </summary>
         public void constructNextBuilding()
         {
             Vector3 position = getPositionForBuildingType(buildingPrefs[0]);
-            //If there is no empty space for something just enqueue it
+
+            if (!ai.isAffordable(ai.race, buildingPrefs[0]))
+            {
+                return;
+            }
+
+            //Enque it if we cannot construct it in this position
             if (position.Equals(Vector3.zero))
             {
                 buildingPrefs.Add(buildingPrefs[0]);
