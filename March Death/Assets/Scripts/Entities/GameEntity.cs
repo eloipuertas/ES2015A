@@ -300,8 +300,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 
 			if (_autoRecoveryTimer >= 60) {
 				_autoRecoveryTimer -= 60;
-				_autoRecoveryAccom += _info.attributes.autoRecoveryRate;
-				Debug.Log("Sum recovery " + _autoRecoveryAccom.ToString());
+				_autoRecoveryAccom += (_info.attributes.wounds * _info.attributes.autoRecoveryRate);
 				if (_autoRecoveryAccom >= 1) {
 					_woundsReceived -= 1;
 					_autoRecoveryAccom -= 1;
