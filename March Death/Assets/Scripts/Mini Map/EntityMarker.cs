@@ -129,7 +129,7 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
     }
 
 
-    public void onEntityUnderAttack(System.Object obj)
+    public void entityUnderAttack()
     {
         underAttack_ON = true;
     }

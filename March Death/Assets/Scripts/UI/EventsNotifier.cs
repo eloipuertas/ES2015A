@@ -119,10 +119,10 @@ public class EventsNotifier : MonoBehaviour {
         messages.Append("\n");
     }
 
-    private void DisplayUnderAttack(Vector3 where)
+    private void DisplayUnderAttack(GameObject target)
     {
         AppendMessage(UNDER_ATTACK);
-        // TODO Display information on the mini-map
+        target.GetComponent<EntityMarker>().entityUnderAttack();
     }
 
     private void DisplayBuildingCreated(Storage.BuildingTypes type)
@@ -335,13 +335,13 @@ public class EventsNotifier : MonoBehaviour {
             {
                 entityTimer[entity] = Time.time;
                 if (!isEntityUnderCamera(entity))
-                    DisplayUnderAttack(g.transform.position);
+                    DisplayUnderAttack(g);
             }
         }
         else
         {
             entityTimer.Add(entity, Time.time);
-            DisplayUnderAttack(g.transform.position);
+            DisplayUnderAttack(g);
         }
     }
 

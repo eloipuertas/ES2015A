@@ -373,20 +373,17 @@ public class Unit : GameEntity<Unit.Actions>
         // Set the status
         setStatus(DefaultStatus);
 
-        activateEntityMarker();
         activateFOWEntity();
 
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
         GameObject gameController = GameObject.Find("GameController");
         ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
-        EntityMarker em = gameObject.GetComponent<EntityMarker>();
 
         if (Player.getOwner(this).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
         {
             register(Actions.EAT, res_pl.onFoodConsumption);
             register(Actions.STAT_OUT, res_pl.onStatisticsUpdate);
             register(Actions.CREATED, res_pl.onStatisticsUpdate);
-            register(Actions.DAMAGED, em.onEntityUnderAttack);
         }
 
         statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -5);
