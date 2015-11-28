@@ -20,7 +20,7 @@ namespace Assets.Scripts.AI
 
         const String RELATIVE_PATH_TO_MAPS = "Data/AIBaseMaps/";
 
-        const bool TESTING = true;
+        const bool TESTING = false;
 
         Color stronghold = new Color(0.000f, 0.000f, 0.000f, 1.000f);
         Color militaryBuilding = new Color(0.000f, 0.000f, 1.000f, 1.000f);
@@ -390,7 +390,12 @@ namespace Assets.Scripts.AI
             {
                 if(buildingPrefs[0] == BuildingTypes.WALLCORNER)
                 {
-                    getCornerRotation(position);
+                    //If the corner hasn't 2 walls or has 3 or more i need to skip it
+                    if (!getCornerRotation(position))
+                    {
+                        buildingPrefs.RemoveAt(0);
+                        return;
+                    }
                 }
                 ai.CreateBuilding(buildingPrefs[0], position, Quaternion.Euler(0, buildingAngle, 0));
                 buildingPrefs.RemoveAt(0);
@@ -398,9 +403,10 @@ namespace Assets.Scripts.AI
             }
         }
 
-        void getCornerRotation(Vector3 pos)
+        bool getCornerRotation(Vector3 pos)
         {
-            List<IBuilding> buildings = ai.senses.getBuildingsOfRaceNearPosition(pos, 20, ai.race);
+            List<IBuilding> buildings = ai.race == Races.ELVES ? ai.senses.getBuildingsOfRaceNearPosition(pos, 20, ai.race) : ai.senses.getBuildingsOfRaceNearPosition(pos, 22, ai.race);
+            Debug.Log(buildings.Count);
             List <GameObject> walls  = new List<GameObject>();
             foreach(IBuilding wall in buildings)
             {
@@ -418,50 +424,97 @@ namespace Assets.Scripts.AI
                 {
                     GameObject wall = walls[i];
                    
-                    if (choosenAngle) return;
+                    if (choosenAngle) return choosenAngle;
                     float angle = Mathf.Round(wall.transform.rotation.eulerAngles.y);
+                    
                     if(angle == 90f)
                     {
-                        if(wall.transform.position.x > pos.x)
+                        if(ai.race == Races.ELVES)
                         {
-                            if(wall.transform.position.z.Equals(pos.z))
+                            if (wall.transform.position.x > pos.x)
                             {
-                                GameObject horWall = i == 0 ? walls[1] : walls[0];
-                                if(horWall.transform.position.z > pos.z)
+                                if (wall.transform.position.z.Equals(pos.z))
                                 {
-                                    buildingAngle = ai.race == Races.ELVES ? 0f : 0f; // Elves OK Human NO
-                                    choosenAngle = true;
+                                    GameObject horWall = i == 0 ? walls[1] : walls[0];
+                                    if (horWall.transform.position.z > pos.z)
+                                    {
+                                        buildingAngle = ai.race == Races.ELVES ? 0f : 0f; // Elves OK Human NO
+                                        choosenAngle = true;
+                                    }
+                                    else
+                                    {
+                                        buildingAngle = ai.race == Races.ELVES ? 90f : 90f; // Elves OK Human NO
+                                        choosenAngle = true;
+                                    }
+
                                 }
-                                else
+                            }
+
+                            else
+                            {
+                                if (wall.transform.position.z.Equals(pos.z))
                                 {
-                                    buildingAngle = ai.race == Races.ELVES ? 90f : 90f; // Elves OK Human NO
-                                    choosenAngle = true;
+                                    GameObject horWall = i == 0 ? walls[1] : walls[0];
+                                    if (horWall.transform.position.z < pos.z)
+                                    {
+                                        buildingAngle = ai.race == Races.ELVES ? 180f : 180f; // Elves OK Human NO
+                                        choosenAngle = true;
+                                    }
+                                    else
+                                    {
+                                        buildingAngle = ai.race == Races.ELVES ? 270f : 270f; // Elves OK Human NO
+                                        choosenAngle = true;
+                                    }
+
                                 }
-                            
                             }
                         }
-
                         else
                         {
-                            if (wall.transform.position.z.Equals(pos.z))
+                            if (wall.transform.position.z > pos.z)
                             {
-                                GameObject horWall = i == 0 ? walls[1] : walls[0];
-                                if (horWall.transform.position.z < pos.z)
+                                if (wall.transform.position.x.Equals(pos.x))
                                 {
-                                    buildingAngle = ai.race == Races.ELVES ? 180f : 180f; // Elves OK Human NO
-                                    choosenAngle = true;
-                                }
-                                else
-                                {
-                                    buildingAngle = ai.race == Races.ELVES ? 270f : 270f; // Elves OK Human NO
-                                    choosenAngle = true;
-                                }
+                                    GameObject horWall = i == 0 ? walls[1] : walls[0];
+                                    if (horWall.transform.position.x > pos.x)
+                                    {
+                                        buildingAngle =  0f; 
+                                        choosenAngle = true;
+                                    }
+                                    else
+                                    {
+                                        buildingAngle =  90f; 
+                                        choosenAngle = true;
+                                    }
 
+                                }
+                            }
+
+                            else
+                            {
+                                if (wall.transform.position.x.Equals(pos.x))
+                                {
+                                    GameObject horWall = i == 0 ? walls[1] : walls[0];
+                                    if (horWall.transform.position.z < pos.z)
+                                    {
+                                        buildingAngle = 180f; 
+                                        choosenAngle = true;
+                                    }
+                                    else
+                                    {
+                                        buildingAngle = 270f; 
+                                        choosenAngle = true;
+                                    }
+
+                                }
                             }
                         }
                     }
+                       
                 }
             }
+
+            return choosenAngle;
         }
 
         void fixPositions()
