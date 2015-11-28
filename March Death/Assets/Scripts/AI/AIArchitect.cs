@@ -410,60 +410,53 @@ namespace Assets.Scripts.AI
                 }
             }
 
+            bool choosenAngle = false;
+
             if(walls.Count == 2)
             {
-                foreach(GameObject wall in walls)
+                for(int i = 0; i < walls.Count; i++)
                 {
+                    GameObject wall = walls[i];
+                   
+                    if (choosenAngle) return;
                     float angle = Mathf.Round(wall.transform.rotation.eulerAngles.y);
                     if(angle == 90f)
                     {
                         if(wall.transform.position.x > pos.x)
                         {
-                            if(wall.transform.position.y > pos.y)
+                            if(wall.transform.position.z.Equals(pos.z))
                             {
-                                buildingAngle = ai.race == Races.ELVES ? 90f : 0f; // Elves OK Human NO
-                            }
-                            else
-                            {
-                                buildingAngle = ai.race == Races.ELVES ? 0f : 0f; // Elves OK Human NO
-                            }
-                        }
-
-                        if (wall.transform.position.x < pos.x)
-                        {
-                            if (wall.transform.position.y > pos.y)
-                            {
-                                buildingAngle = ai.race == Races.ELVES ? 0f : 0f; // Elves OK Human NO
-                            }
-                            else
-                            {
-                                buildingAngle = ai.race == Races.ELVES ? 270f : 0f; // Elves OK Human NO
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (wall.transform.position.x > pos.x)
-                        {
-                            if (wall.transform.position.y > pos.y)
-                            {
-                                buildingAngle = ai.race == Races.ELVES ? 90f : 0f; // Elves OK Human NO
-                            }
-                            else
-                            {
-                                buildingAngle = ai.race == Races.ELVES ? 0f : 0f; // Elves OK Human NO
+                                GameObject horWall = i == 0 ? walls[1] : walls[0];
+                                if(horWall.transform.position.z > pos.z)
+                                {
+                                    buildingAngle = ai.race == Races.ELVES ? 0f : 0f; // Elves OK Human NO
+                                    choosenAngle = true;
+                                }
+                                else
+                                {
+                                    buildingAngle = ai.race == Races.ELVES ? 90f : 90f; // Elves OK Human NO
+                                    choosenAngle = true;
+                                }
+                            
                             }
                         }
 
-                        if (wall.transform.position.x < pos.x)
+                        else
                         {
-                            if (wall.transform.position.y > pos.y)
+                            if (wall.transform.position.z.Equals(pos.z))
                             {
-                                buildingAngle = ai.race == Races.ELVES ? 0f : 0f; // Elves OK Human NO
-                            }
-                            else
-                            {
-                                buildingAngle = ai.race == Races.ELVES ? 270f : 0f; // Elves OK Human NO
+                                GameObject horWall = i == 0 ? walls[1] : walls[0];
+                                if (horWall.transform.position.z < pos.z)
+                                {
+                                    buildingAngle = ai.race == Races.ELVES ? 180f : 180f; // Elves OK Human NO
+                                    choosenAngle = true;
+                                }
+                                else
+                                {
+                                    buildingAngle = ai.race == Races.ELVES ? 270f : 270f; // Elves OK Human NO
+                                    choosenAngle = true;
+                                }
+
                             }
                         }
                     }
