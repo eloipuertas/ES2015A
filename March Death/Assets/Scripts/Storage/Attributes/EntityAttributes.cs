@@ -12,5 +12,6 @@ namespace Storage
         public int wounds;
         public int sightRange;
 		public int creationTime = 10;
+		public float autoRecoveryRate = 0.2f;
     }
 }
