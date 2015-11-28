@@ -549,4 +549,13 @@ public class Unit : GameEntity<Unit.Actions>
                 break;
         }
     }
+
+	public Boolean canThrow()
+	{
+		if (info.unitAttributes.projectileAbility > 0) {
+			return true;
+		}
+
+		return false;
+	}
 }
