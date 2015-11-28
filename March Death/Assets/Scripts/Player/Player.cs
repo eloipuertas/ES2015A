@@ -68,6 +68,13 @@ public class Player : BasePlayer
 
         foodDepleted = resources.getAmount(WorldResources.Type.FOOD) <= 0;
 
+        ActorSelector selector = new ActorSelector()
+        {
+            registerCondition = gameObject => !gameObject.GetComponent<FOWEntity>().IsOwnedByPlayer,
+            fireCondition = gameObject => true
+        };
+        Utils.Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.DISCOVERED, OnEntityFound, selector);
+
     }
 
     // Update is called once per frame
@@ -112,6 +119,7 @@ public class Player : BasePlayer
     void OnDestroy()
     {
         _currently = status.TERMINATED;
+        Utils.Subscriber<FOWEntity.Actions, FOWEntity>.get.unregisterFromAll(FOWEntity.Actions.DISCOVERED, OnEntityFound);
     }
 
     public override void removeEntity(IGameEntity entity)
@@ -295,6 +303,15 @@ public class Player : BasePlayer
             unit.unregister(Unit.Actions.DAMAGED, events.DisplayUnderAttack);
             unit.unregister(Unit.Actions.TARGET_TERMINATED, signalMissionUpdate);
             unit.unregister(Unit.Actions.EAT, onUnitEats);
+        }
+    }
+
+    private void OnEntityFound(System.Object obj)
+    {
+        IGameEntity entity = ((GameObject) obj).GetComponent<IGameEntity>();
+        if (entity.info.isUnit)
+        {
+            events.DisplayEnemySpotted(entity);
         }
     }
 }

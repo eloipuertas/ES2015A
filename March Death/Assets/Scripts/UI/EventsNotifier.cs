@@ -8,6 +8,7 @@ using System.Collections.Generic;
 public class EventsNotifier : MonoBehaviour {
 
     private readonly string UNDER_ATTACK = "You're under attack!";
+    private readonly string ENEMY_ON_SIGHT = "Enemy on sight!";
 
     // Unit creation messages
     private readonly string CIVILIAN_CREATED = "Civilian created.";
@@ -372,5 +373,11 @@ public class EventsNotifier : MonoBehaviour {
         Unit entity = (Unit) g.GetComponent<IGameEntity>();
         entityTimer.Remove(entity);
         DisplayUnitDead(entity.type);
+    }
+
+    public void DisplayEnemySpotted(IGameEntity entity)
+    {
+        AppendMessage(ENEMY_ON_SIGHT);
+        // TODO Get position and show it on mini-map
     }
 }
