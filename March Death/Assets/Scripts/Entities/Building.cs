@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
@@ -162,6 +162,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
                 // We are substracting wounds instead of a new value because the building might be under attack while is being built.
                 _woundsReceived -= diffWounds;
                 _woundsBuildControl = woundsBuilt;
+                fire(DAMAGED);
             }
 
 			// TODO: What if we have more than 3 phases... maybe we should add the number of phases in the JSON, instead of harcoding it...
@@ -266,6 +267,14 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
             Player.getOwner(entity).resources.AddAmount(WorldResources.Type.METAL, unitInfo.resources.metal);
             Player.getOwner(entity).resources.AddAmount(WorldResources.Type.FOOD, unitInfo.resources.food);
         }
+    }
+
+    /// <summary>
+    /// Returns the creation queue.
+    /// </summary>
+    public Queue<UnitTypes> getCreationQueue()
+    {
+        return _creationQueue;
     }
 
     /// <summary>
