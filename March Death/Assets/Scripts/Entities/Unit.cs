@@ -13,7 +13,7 @@ using Pathfinding;
 /// </summary>
 public class Unit : GameEntity<Unit.Actions>
 {
-    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT, DESELECT };
+    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT};
     public enum Roles { PRODUCING, WANDERING };
 
     private EntityStatus _defaultStatus = EntityStatus.IDLE;
@@ -233,6 +233,29 @@ public class Unit : GameEntity<Unit.Actions>
         _distanceToTarget = Vector3.Distance(_attackPoint, _closestPointToTarget);
     }
 
+
+
+
+    /// <summary>
+    /// Starts unit travel to building resource
+    /// </summary>
+    /// <param name="building"></param>
+    /// <returns></returns>
+    public bool goToBuilding(IGameEntity building)
+    {
+        
+        _target = building;
+        _followingTarget = true;
+        _movePoint = building.getTransform().position;
+        _detourAgent.MoveTo(_movePoint);
+        setStatus(EntityStatus.MOVING);
+        fire(Actions.MOVEMENT_START);
+        updateDistanceToTarget();
+        Debug.Log("Unit: GoToBuilding()");
+        
+        return true;
+    }
+
     /// <summary>
     /// Sets up our attack target, registers callback for its death and
     /// updates our state.
@@ -352,7 +375,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// and to bringback method too.
     /// </summary>
     /// 
-    public void Vanish()
+    public void vanish()
     {
         //Disable FOW
         if (GetComponent<FOWEntity>())
@@ -382,6 +405,7 @@ public class Unit : GameEntity<Unit.Actions>
         {
             GetComponent<Selectable>().enabled = false;
             GetComponent<Selectable>().DeselectMe();
+            
         }  
         // Disable ligths if any    
         if (GetComponent<Light>())
@@ -412,7 +436,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// Units vanished with vanish method needs to uses BringBack method in 
     /// order to enable components.
     /// </summary>
-    public void BringBack()
+    public void bringBack()
     {
        
         if (GetComponent<FOWEntity>())
@@ -617,6 +641,24 @@ public class Unit : GameEntity<Unit.Actions>
                 // would be otherwise outdated
                 if (_followingTarget)
                 {
+                    // If we are just civilian unit travelling to our own building resource.
+                    // Check distance to target to know if we are close enough.
+                    // When capture distance is reached resource building capture 
+                    // method is triggered.
+
+                    if (_target.info.race == this.race)
+                    {                      
+                        if (_distanceToTarget <= _target.info.resourceAttributes.trapRange)
+                        {
+                            _detourAgent.ResetPath();
+                            setStatus(EntityStatus.IDLE);
+                            _followingTarget = false;
+                            fire(Actions.MOVEMENT_END);
+                            ((Resource)_target).trapUnit(this);
+                            return;
+                        }
+                       
+                    } 
                     // Update destination only if target has moved
                     Vector3 destination = _closestPointToTarget;
                     if ((destination - _movePoint).sqrMagnitude > SQR_UPDATE_DISTANCE)

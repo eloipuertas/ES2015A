@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using Storage;
+using UnityEngine.Assertions;
+
 
 
 public class Resource : Building<Resource.Actions>
@@ -329,6 +331,7 @@ public class Resource : Building<Resource.Actions>
             GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
 
             Unit civil = gob.GetComponent<Unit>();
+            civil.vanish();
             civil.role = Unit.Roles.PRODUCING;
             BasePlayer.getOwner(this).addEntity(civil);
             fire(Actions.CREATE_UNIT, civil);
@@ -353,7 +356,7 @@ public class Resource : Building<Resource.Actions>
     /// Recruit a Explorer from building. you need to do this to take away worker
     ///  from building. production decrease when you remove workers
     /// </summary>
-    private void recruitExplorer(Unit worker)
+    public void recruitExplorer(Unit worker)
     {
         if (harvestUnits > 0)
         {
@@ -362,14 +365,20 @@ public class Resource : Building<Resource.Actions>
 
             worker.role = Unit.Roles.WANDERING;
             workersList.Remove(worker);
+            _xDisplacement = harvestUnits % 5;
+            _yDisplacement = harvestUnits / 5;
+            _unitPosition.Set(_center.x + _xDisplacement, _center.y, _center.z + _yDisplacement);
+            worker.bringBack();
+            if (harvestUnits == 0)
+            {
+                setStatus(EntityStatus.IDLE);
+            }
         }
-
-        // No workers
-        if (harvestUnits == 0)
+        else
         {
-            setStatus(EntityStatus.IDLE);
-        }
-        // TODO: Some alert message if you try to remove unit when no unit at building
+            Debug.Log("Can't recruiter explorer because no workers");
+        }      
+        // TODO: Some alert message or sound for player if try to remove unit when no unit at building
     }
 
     /// <summary>
@@ -385,96 +394,46 @@ public class Resource : Building<Resource.Actions>
 
             explorer.role = Unit.Roles.PRODUCING;
             workersList.Add(explorer);
+            if (harvestUnits == 1)
+            {
+                setStatus(EntityStatus.WORKING);
+            }
         }
-        if (harvestUnits == 1)
+        else
         {
-            setStatus(EntityStatus.WORKING);
+            Debug.Log(" You are trying to recruit worker but building capacity is full");
         }
-        Debug.Log(" You are trying to recruit worker but building capacity is full");
+        
+        
     }
 
     /// <summary>
-    /// when collider interact with other gameobject method checks if
-    /// gameobject is a civilian unit. Civilians units are recruited as workers
-    /// while limit of workers are not reached.
+    /// If civilian unit points to building and is close enough (inside trapRange)
+    /// Unit is vanished and teleported to building. Civilian units at building
+    /// are recruited as workers.
     /// </summary>
-    /// <param name="other">collider gameobject interacting with our own collider</param>
-    void OnTriggerEnter(Collider other)
+    /// <param name="entity"></param>
+    public void trapUnit(IGameEntity entity)
     {
+        // Unit must be civil and player owned
+        Assert.IsTrue(entity.info.isCivil);
+        Assert.IsTrue(entity.info.race == info.race);
 
         // space enough to hold new civil
-
         if (harvestUnits < info.resourceAttributes.maxUnits)
         {
-            IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
-
-            if (entity.info.isUnit)
             {
-                if (entity.info.isCivil)
-                {
-                    recruitWorker((Unit)entity);
-                }
+                Unit unit = (Unit)entity;
+                unit.vanish();
+                unit.transform.position = this.transform.position;
+                recruitWorker((Unit)unit);
             }
         }
-    }
-
-    /// <summary>
-    /// If unit inside building is attacked and killed we must recalculate
-    /// collection rate and current harvestUnits. No harvestUnits means no
-   ///  production or collection so IDLE status.
-    /// </summary>
-    /// <param name="other"></param>
-    void OnTriggerStay(Collider other)
-    {
-
-        IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
-        if ((entity.info.isUnit)&&(entity.info.isCivil))
+        else
         {
-            if (entity.status == EntityStatus.DEAD)
-            {
-                _collectionRate -= entity.info.attributes.capacity;
-                harvestUnits--;
-                if (harvestUnits == 0)
-                {
-                    setStatus(EntityStatus.IDLE);
-                }
-            }
+            //do nothing
         }
     }
-
-    /// <summary>
-    /// when collider interaction with other gameobject ends method checks if
-    /// gameobject is civilian unit. Civilians units are recruited as explorers
-    /// and fired as workers.
-    /// </summary>
-    /// <param name="other">collider gameobject interacting with our own collider</param>
-    void OnTriggerExit(Collider other)
-
-    {
-        // get entity
-        IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
-
-        if (harvestUnits < info.resourceAttributes.maxUnits)
-        {
-            if (entity.info.isUnit)
-            {
-                if (entity.info.isCivil)
-                {
-                    recruitExplorer((Unit)entity);
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// Workers can be attacked inside buildings???. waiting for design decission
-    /// </summary>
-    /// <param name="unit"></param>
-    private void onUnitDestroy(Unit unit)
-    {
-
-    }
-
 
     /// <summary>
     /// When building is destroyed civilian workers turns into explorers

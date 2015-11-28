@@ -272,6 +272,29 @@ namespace Managers
             Debug.Log("attacking");
         }
 
+        /// <summary>
+        /// Entering resource building. only civilians units are able to do this 
+        /// </summary>
+        /// 
+        public void Enter(IGameEntity building_resource)
+        {
+           
+            foreach (Selectable selected in _selectedEntities.ToArray())
+            {
+
+                if (selected.entity.info.isCivil)
+                {
+                    Unit unit = selected.GetComponent<Unit>();
+                    if (unit.info.isCivil)
+                    {
+                        unit.goToBuilding(building_resource);
+                    }
+                    
+                    fire(Actions.MOVE, selected.gameObject);
+                }
+            }
+            Debug.Log("Walking to building");
+        }
 
         /// <summary>
         /// This method checks if the current selection is a building, returns true or false.
