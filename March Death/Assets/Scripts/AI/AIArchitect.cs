@@ -32,6 +32,7 @@ namespace Assets.Scripts.AI
         Color ignorePixel = new Color(1.000f, 0, 1.000f, 1.000f);
         AIController ai;
         string dificultyFolder;
+        public float buildingAngle = 0f;
 
         Dictionary<StructureType, List<Vector3>> avaliablePositions;
         ConstructionGrid constructionGrid;
@@ -56,7 +57,7 @@ namespace Assets.Scripts.AI
             //HACK: Probably would be cool to find a way to get this dinamically
             if (ai.race == Storage.Races.ELVES)
             {
-                basePosition = new Vector3(590f, 80.00262f, 792f);
+                basePosition = new Vector3(283.7f, 80.00262f, 562.5f);
             }
             else
             {
@@ -113,7 +114,7 @@ namespace Assets.Scripts.AI
                 };
             }
 
-            if (ai.DifficultyLvl == 3)
+            if (ai.DifficultyLvl == 2)
             {
                 dificultyFolder = "Hard";
                 buildingPrefs = new List<BuildingTypes>()
@@ -262,6 +263,8 @@ namespace Assets.Scripts.AI
 
             StructureType buildingType = StructureType.RESOURCE_BUILDING;
 
+            buildingAngle = 0;
+
             switch (type)
             {
                 case BuildingTypes.FARM:
@@ -283,10 +286,21 @@ namespace Assets.Scripts.AI
                     buildingType = StructureType.MILITARY_BUILDING;
                     break;
                 case BuildingTypes.WALL:
-                    //TODO: Need to think about it
+                    if (avaliablePositions[StructureType.HORIZONTALL_WALL].Count > 0)
+                    {
+                        buildingType = StructureType.HORIZONTALL_WALL;
+                        if (ai.race == Races.MEN)
+                            buildingAngle = 90f;
+                    }
+                    else
+                    {
+                        buildingType = StructureType.VERTICALL_WALL;
+                        if (ai.race == Races.ELVES)
+                            buildingAngle = 90f;
+                    }
                     break;
                 case BuildingTypes.WALLCORNER:
-                    //TODO: Need to think about it
+                    buildingType = StructureType.TOWER;
                     break;
                 case BuildingTypes.WATCHTOWER:
                     buildingType = StructureType.TOWER;
@@ -343,7 +357,7 @@ namespace Assets.Scripts.AI
             }
             else
             {
-                ai.CreateBuilding(buildingPrefs[0], position, Quaternion.Euler(0, 0, 0));
+                ai.CreateBuilding(buildingPrefs[0], position, Quaternion.Euler(0, buildingAngle, 0));
                 buildingPrefs.RemoveAt(0);
             }
         }
