@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Assets.Scripts.AI
 {
-    class AIArchitect
+    public class AIArchitect
     {
         enum StructureType {
             STRONGHOLD,
@@ -20,7 +20,7 @@ namespace Assets.Scripts.AI
 
         const String RELATIVE_PATH_TO_MAPS = "Data/AIBaseMaps/";
 
-        const bool TESTING = false;
+        public static bool TESTING = false;
 
         Color stronghold = new Color(0.000f, 0.000f, 0.000f, 1.000f);
         Color militaryBuilding = new Color(0.000f, 0.000f, 1.000f, 1.000f);
@@ -146,12 +146,12 @@ namespace Assets.Scripts.AI
             if (TESTING)
             {
                 buildingPrefs = new List<BuildingTypes>();
-                for (int i = 0; i < 12; i++)
+                for (int i = 0; i < 25; i++)
                 {
                     buildingPrefs.Add(BuildingTypes.WALL);
                 }
                 
-                for(int i = 0; i < 4; i++)
+                for(int i = 0; i < 10; i++)
                 {
                     buildingPrefs.Add(BuildingTypes.WALLCORNER);
                 }

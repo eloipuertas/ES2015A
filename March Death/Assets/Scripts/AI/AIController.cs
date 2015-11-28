@@ -206,7 +206,7 @@ namespace Assets.Scripts.AI
             GameObject g = Info.get.createBuilding(_selfRace, btype, position, rotation);
             IGameEntity entity = g.GetComponent<IGameEntity>();
             OnBuildingCreated(entity);
-            checkout(entity);
+            if(!AIArchitect.TESTING) checkout(entity);
         }
 
         void OnBuildingCreated(IGameEntity entity)
