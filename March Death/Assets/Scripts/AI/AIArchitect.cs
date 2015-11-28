@@ -92,7 +92,7 @@ namespace Assets.Scripts.AI
                 };
             }
 
-            if (ai.DifficultyLvl == 2)
+            else if (ai.DifficultyLvl == 2)
             {
                 dificultyFolder = "Medium";
                 buildingPrefs  = new List<BuildingTypes>()
@@ -114,7 +114,7 @@ namespace Assets.Scripts.AI
                 };
             }
 
-            if (ai.DifficultyLvl == 2)
+            else
             {
                 dificultyFolder = "Hard";
                 buildingPrefs = new List<BuildingTypes>()
