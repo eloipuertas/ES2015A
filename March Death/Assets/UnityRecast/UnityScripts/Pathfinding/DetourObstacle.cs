@@ -26,7 +26,7 @@ namespace Pathfinding
         {
             if (alreadyAdded)
             {
-                PathDetour.get.RemoveObstacle(obstacleReference);
+                DetourCrowd.Instance.TileCache.RemoveObstacle(obstacleReference);
             }
         }
 
@@ -66,10 +66,10 @@ namespace Pathfinding
 
                     if (alreadyAdded)
                     {
-                        PathDetour.get.RemoveObstacle(obstacleReference);
+                        DetourCrowd.Instance.TileCache.RemoveObstacle(obstacleReference);
                     }
 
-                    obstacleReference = PathDetour.get.AddObstacle(this);
+                    obstacleReference = DetourCrowd.Instance.TileCache.AddObstacle(this);
                     alreadyAdded = true;
                 }
             }
