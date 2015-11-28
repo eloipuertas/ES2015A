@@ -130,11 +130,8 @@ public class Unit : GameEntity<Unit.Actions>
     /// <param name="gob"></param>
     private void onTargetDied(System.Object obj)
     {
-        // TODO: Our target died, select next? Do nothing?
         setStatus(EntityStatus.IDLE);
-        IGameEntity entity = ((GameObject) obj).GetComponent<IGameEntity>();
-        // TODO: After merge, I had a conflich in this line and I hesitated what to do
-        fire(Actions.TARGET_TERMINATED, entity.info);
+        fire(Actions.TARGET_TERMINATED, _target.info);
         _target = null;
     }
 
@@ -256,7 +253,8 @@ public class Unit : GameEntity<Unit.Actions>
 
             // if target has changed, hide old target health
             Selectable selectable = null;
-            if (_target != null) {
+            if (_target != null)
+            {
             	selectable = _target.getGameObject().GetComponent<Selectable>();
             	selectable.NotAttackedEntity();
             }

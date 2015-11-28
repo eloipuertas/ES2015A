@@ -167,8 +167,6 @@ public class Player : BasePlayer
             case Storage.EntityType.UNIT:
                 missionStatus.OnUnitKilled(e.getType<Storage.UnitTypes>());
                 break;
-            case Storage.EntityType.RESOURCE:
-                break;
         }
     }
 
