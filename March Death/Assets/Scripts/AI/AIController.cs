@@ -74,7 +74,7 @@ namespace Assets.Scripts.AI
 
             Micro = new MicroManager(this);
             modules.Add(new AIModule(Macro.MacroHigh, 30));
-            modules.Add(new AIModule(Macro.MacroLow, 5));
+            modules.Add(new AIModule(Macro.MacroLow, 1));
             modules.Add(new AIModule(Micro.Micro, 1));
             timers = new float[modules.Count];
             for (int i = 0; i < modules.Count; i++)

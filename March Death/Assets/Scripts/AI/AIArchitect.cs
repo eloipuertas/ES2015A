@@ -20,6 +20,8 @@ namespace Assets.Scripts.AI
 
         const String RELATIVE_PATH_TO_MAPS = "Data/AIBaseMaps/";
 
+        const bool TESTING = true;
+
         Color stronghold = new Color(0.000f, 0.000f, 0.000f, 1.000f);
         Color militaryBuilding = new Color(0.000f, 0.000f, 1.000f, 1.000f);
         Color resourcesBuilding = new Color(1.000f, 1.000f, 0.000f, 1.000f);
@@ -41,6 +43,8 @@ namespace Assets.Scripts.AI
 
         public List<BuildingTypes> buildingPrefs;
 
+        int buildingsPlaced;
+
         public AIArchitect(AIController aiController)
         {
             avaliablePositions = new Dictionary<StructureType, List<Vector3>>();
@@ -52,6 +56,7 @@ namespace Assets.Scripts.AI
             avaliablePositions.Add(StructureType.CORNER_WALL, new List<Vector3>());
             avaliablePositions.Add(StructureType.DEFENCE_ZONE, new List<Vector3>());
             constructionGrid = GameObject.Find("GameController").GetComponent<ConstructionGrid>();
+            buildingsPlaced = 0;
             ai = aiController;
 
             //HACK: Probably would be cool to find a way to get this dinamically
@@ -77,6 +82,7 @@ namespace Assets.Scripts.AI
         /// </summary>
         public void planifyBuildingsAccordingToDifficulty()
         {
+
 
             if (ai.DifficultyLvl == 1)
             {
@@ -136,6 +142,24 @@ namespace Assets.Scripts.AI
                 };
             }
 
+            // Need this in case we want to be creative
+            if (TESTING)
+            {
+                buildingPrefs = new List<BuildingTypes>();
+                for (int i = 0; i < 12; i++)
+                {
+                    buildingPrefs.Add(BuildingTypes.WALL);
+                }
+                
+                for(int i = 0; i < 4; i++)
+                {
+                    buildingPrefs.Add(BuildingTypes.WALLCORNER);
+                }
+
+                dificultyFolder = "Testing";
+                return;
+            }
+
 
         }
 
@@ -160,7 +184,8 @@ namespace Assets.Scripts.AI
         {
             Color[] pixels = mapData.GetPixels();
 
-            Vector2 center = new Vector2(mapData.width / 2 - 1, mapData.height / 2 - 1);
+
+            Vector2 center = ai.race == Races.ELVES ? new Vector2(mapData.width / 2 + 0.5f, mapData.height / 2 - 0.5f) : new Vector2(mapData.width / 2 -0.5f, mapData.height / 2 - 1f);
 
             // Math Facts: 
             // The equation to find te position of something is
@@ -300,7 +325,7 @@ namespace Assets.Scripts.AI
                     }
                     break;
                 case BuildingTypes.WALLCORNER:
-                    buildingType = StructureType.TOWER;
+                    buildingType = StructureType.CORNER_WALL;
                     break;
                 case BuildingTypes.WATCHTOWER:
                     buildingType = StructureType.TOWER;
@@ -342,6 +367,12 @@ namespace Assets.Scripts.AI
         /// </summary>
         public void constructNextBuilding()
         {
+
+            if(buildingsPlaced == 0)
+            {
+                fixPositions();
+            }
+
             Vector3 position = getPositionForBuildingType(buildingPrefs[0]);
 
             if (!ai.isAffordable(ai.race, buildingPrefs[0]))
@@ -357,9 +388,98 @@ namespace Assets.Scripts.AI
             }
             else
             {
+                if(buildingPrefs[0] == BuildingTypes.WALLCORNER)
+                {
+                    getCornerRotation(position);
+                }
                 ai.CreateBuilding(buildingPrefs[0], position, Quaternion.Euler(0, buildingAngle, 0));
                 buildingPrefs.RemoveAt(0);
+                buildingsPlaced++;
             }
+        }
+
+        void getCornerRotation(Vector3 pos)
+        {
+            List<IBuilding> buildings = ai.senses.getBuildingsOfRaceNearPosition(pos, 20, ai.race);
+            List <GameObject> walls  = new List<GameObject>();
+            foreach(IBuilding wall in buildings)
+            {
+                if(wall.getType<BuildingTypes>() == BuildingTypes.WALL && wall.getRace() == ai.race)
+                {
+                    walls.Add(wall.getGameObject());
+                }
+            }
+
+            if(walls.Count == 2)
+            {
+                foreach(GameObject wall in walls)
+                {
+                    float angle = Mathf.Round(wall.transform.rotation.eulerAngles.y);
+                    if(angle == 90f)
+                    {
+                        if(wall.transform.position.x > pos.x)
+                        {
+                            if(wall.transform.position.y > pos.y)
+                            {
+                                buildingAngle = ai.race == Races.ELVES ? 90f : 0f; // Elves OK Human NO
+                            }
+                            else
+                            {
+                                buildingAngle = ai.race == Races.ELVES ? 0f : 0f; // Elves OK Human NO
+                            }
+                        }
+
+                        if (wall.transform.position.x < pos.x)
+                        {
+                            if (wall.transform.position.y > pos.y)
+                            {
+                                buildingAngle = ai.race == Races.ELVES ? 0f : 0f; // Elves OK Human NO
+                            }
+                            else
+                            {
+                                buildingAngle = ai.race == Races.ELVES ? 270f : 0f; // Elves OK Human NO
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (wall.transform.position.x > pos.x)
+                        {
+                            if (wall.transform.position.y > pos.y)
+                            {
+                                buildingAngle = ai.race == Races.ELVES ? 90f : 0f; // Elves OK Human NO
+                            }
+                            else
+                            {
+                                buildingAngle = ai.race == Races.ELVES ? 0f : 0f; // Elves OK Human NO
+                            }
+                        }
+
+                        if (wall.transform.position.x < pos.x)
+                        {
+                            if (wall.transform.position.y > pos.y)
+                            {
+                                buildingAngle = ai.race == Races.ELVES ? 0f : 0f; // Elves OK Human NO
+                            }
+                            else
+                            {
+                                buildingAngle = ai.race == Races.ELVES ? 270f : 0f; // Elves OK Human NO
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        void fixPositions()
+        {
+            GameObject stronghold;
+            string sName;
+            sName = ai.race == Races.ELVES ? "Elf-Stronghold(Clone)" : "Human_Stronghold(Clone)";
+
+            stronghold = GameObject.Find(sName);
+            stronghold.transform.position = constructionGrid.discretizeMapCoords(stronghold.transform.position);
+            
         }
     }
 }
