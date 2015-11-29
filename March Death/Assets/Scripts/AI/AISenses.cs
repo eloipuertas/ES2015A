@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using Storage;
 
 public class AISenses : MonoBehaviour {
     
@@ -28,7 +29,7 @@ public class AISenses : MonoBehaviour {
     /// <param name="radius"></param>
     /// <param name="race"></param>
     /// <returns></returns>
-    public List<Unit> getUnitsOfRaceNearPosition(Vector3 position, float radius, Storage.Races race)
+    public List<Unit> getUnitsOfRaceNearPosition(Vector3 position, float radius, Races race)
     {
         GameObject[] foundGameObjects = getObjectsNearPosition(position, radius);
         List<Unit> unitsOfRace = new List<Unit>();
@@ -44,6 +45,31 @@ public class AISenses : MonoBehaviour {
         }
         return unitsOfRace;
     }
+
+    /// <summary>
+    /// Gets all the buildings of a certain race
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="radius"></param>
+    /// <param name="race"></param>
+    /// <returns></returns>
+    public List<IBuilding> getBuildingsOfRaceNearPosition(Vector3 position, float radius, Races race)
+    {
+        GameObject[] foundGameObjects = getObjectsNearPosition(position, radius);
+        List<IBuilding> buldingsOfRace = new List<IBuilding>();
+
+        for (int i = 0; i < foundGameObjects.Length; i++)
+        {
+            GameObject obj = foundGameObjects[i];
+            IBuilding objBuilding = obj.GetComponent<IBuilding>();
+            if (objBuilding != null && objBuilding.healthPercentage > 0f && objBuilding.getRace() == race)
+            {
+                buldingsOfRace.Add(objBuilding);
+            }
+        }
+        return buldingsOfRace;
+    }
+
     /// <summary>
     /// Gets all units of a certain race that are being revealed to the other race.
     /// </summary>

@@ -12,6 +12,9 @@ namespace Pathfinding
         public static extern IntPtr DefaultConfig(string logPath);
 
         [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void freeTileCache(IntPtr navMesh, IntPtr tileCache);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool handleBuild(ref Config cfg, float[] verts, int nverts, int[] tris, int ntris);
 
         [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]

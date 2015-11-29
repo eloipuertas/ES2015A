@@ -247,7 +247,7 @@ namespace Assets.Scripts.AI.Agents
 
             for (int i = 0; i < maxTries && !found; ++i)
             {
-                if (!Pathfinding.DetourCrowd.Instance.RandomValidPoint(ref targetPoint))
+                if (!DetourCrowd.Instance.RandomValidPoint(ref targetPoint))
                 {
                     return false;
                 }
@@ -278,7 +278,7 @@ namespace Assets.Scripts.AI.Agents
 
             for (int i = 0; i < maxTries && !found; ++i)
             {
-                if (!Pathfinding.DetourCrowd.Instance.RandomValidPointInCircle(center, maxRadius, ref targetPoint))
+                if (!DetourCrowd.Instance.RandomValidPointInCircle(center, maxRadius, ref targetPoint))
                 {
                     return false;
                 }

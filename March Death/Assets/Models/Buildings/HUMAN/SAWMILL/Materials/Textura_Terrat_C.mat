@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: Textura_Terrat_C
-  m_Shader: {fileID: 4800000, guid: 054a31a99d11e49d110086ba44295342, type: 3}
+  m_Shader: {fileID: 4800000, guid: 9ce107479d11178d11005b9844295342, type: 3}
   m_ShaderKeywords: _NORMALMAP
   m_LightmapFlags: 5
   m_CustomRenderQueue: 2000
@@ -19,7 +19,7 @@ Material:
         first:
           name: _MainTex
         second:
-          m_Texture: {fileID: 2800000, guid: e08e3ed4cab1598488e1ca7146b8a20d, type: 3}
+          m_Texture: {fileID: 2800000, guid: e32d281fb787ff64bb070c50d88c8ca3, type: 3}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
@@ -85,6 +85,13 @@ Material:
           m_Texture: {fileID: 2800000, guid: 4a056241e2722dc46a7262a8e7073fd9, type: 3}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _ToonShade
+        second:
+          m_Texture: {fileID: 8900000, guid: b995d4bd9d11078d11005b9844295342, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
     m_Floats:
       data:
         first:
@@ -137,7 +144,7 @@ Material:
       data:
         first:
           name: _Outline
-        second: .00200000009
+        second: .00350000011
     m_Colors:
       data:
         first:
@@ -146,7 +153,7 @@ Material:
       data:
         first:
           name: _Color
-        second: {r: .43921569, g: .352941185, b: .352941185, a: 1}
+        second: {r: .286764681, g: .0780168697, b: .0780168697, a: 1}
       data:
         first:
           name: _OutlineColor

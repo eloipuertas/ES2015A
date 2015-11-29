@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
@@ -127,14 +127,13 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
 
         // Instead of adding 10 to the center of the building, we should check the actual size of the building....
         _deploymentPoint = new Vector3(transform.position.x + 10, transform.position.y, transform.position.z + 10);
-        activateEntityMarker();
         activateFOWEntity();
 
-        if (DefaultStatus == EntityStatus.BUILDING_PHASE_1)
+        /*if (DefaultStatus == EntityStatus.BUILDING_PHASE_1)
         {
             _woundsReceived = info.buildingAttributes.wounds;
             _woundsBuildControl = info.buildingAttributes.wounds;
-        }
+        }*/
 
         //return (info.buildingAttributes.wounds - _woundsReceived) * 100f / info.buildingAttributes.wounds;
         // Set the status
@@ -162,6 +161,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
                 // We are substracting wounds instead of a new value because the building might be under attack while is being built.
                 _woundsReceived -= diffWounds;
                 _woundsBuildControl = woundsBuilt;
+                fire(DAMAGED);
             }
 
 			// TODO: What if we have more than 3 phases... maybe we should add the number of phases in the JSON, instead of harcoding it...
@@ -266,6 +266,14 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
             Player.getOwner(entity).resources.AddAmount(WorldResources.Type.METAL, unitInfo.resources.metal);
             Player.getOwner(entity).resources.AddAmount(WorldResources.Type.FOOD, unitInfo.resources.food);
         }
+    }
+
+    /// <summary>
+    /// Returns the creation queue.
+    /// </summary>
+    public Queue<UnitTypes> getCreationQueue()
+    {
+        return _creationQueue;
     }
 
     /// <summary>

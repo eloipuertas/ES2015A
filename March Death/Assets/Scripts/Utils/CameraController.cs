@@ -357,14 +357,9 @@ public class CameraController : MonoBehaviour
     /// <summary>
     /// Sets the new zoom of the camera
     /// </summary>
-    /// <param name="newZoom"> A number between 5 (max zoom) and 100 (min zoom) </param>
+    /// <param name="newZoom"> A number between 5 (max zoom) and 80 (min zoom) </param>
     public void setCameraZoom(float newZoom)
     {
-        if(newZoom > CAMERA_MIN_ZOOM || newZoom < CAMERA_MAX_ZOOM)
-        {
-            throw new InvalidOperationException("New camera zoom must be a positive float between "+ CAMERA_MAX_ZOOM + " (max zoom) and " + CAMERA_MIN_ZOOM + " (min zoom)!");
-        }
-
         float fov = Mathf.Clamp(newZoom, CAMERA_MAX_ZOOM, CAMERA_MIN_ZOOM);
         Camera.main.orthographicSize = fov;
         _camera_zoom = fov;   

@@ -31,4 +31,17 @@ public class RecastConfig : MonoBehaviour
 
     [Header("Recast Filters")]
     public List<Filter> Filters = new List<Filter>() { new Filter() };
+
+    public Dictionary<string, ushort> Areas = new Dictionary<string, ushort>();
+
+    public void SetupAreas()
+    {
+        ushort n = 1;
+        foreach (var layer in Layers)
+        {
+            Areas.Add(layer.LayerID, n);
+            Pathfinding.TileCache.addFlag(n, 1);
+            n *= 2;
+        }
+    }
 }

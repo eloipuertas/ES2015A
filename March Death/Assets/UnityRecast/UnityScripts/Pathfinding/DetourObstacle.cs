@@ -22,11 +22,11 @@ namespace Pathfinding
         private Quaternion lastKnownRotation = new Quaternion();
         private bool alreadyAdded = false;
 
-        public void OnDestroy()
+        public void OnDisable()
         {
             if (alreadyAdded)
             {
-                PathDetour.get.RemoveObstacle(obstacleReference);
+                DetourCrowd.Instance.TileCache.RemoveObstacle(obstacleReference);
             }
         }
 
@@ -66,10 +66,10 @@ namespace Pathfinding
 
                     if (alreadyAdded)
                     {
-                        PathDetour.get.RemoveObstacle(obstacleReference);
+                        DetourCrowd.Instance.TileCache.RemoveObstacle(obstacleReference);
                     }
 
-                    obstacleReference = PathDetour.get.AddObstacle(this);
+                    obstacleReference = DetourCrowd.Instance.TileCache.AddObstacle(this);
                     alreadyAdded = true;
                 }
             }
