@@ -64,3 +64,8 @@ rcConfig* DefaultConfig(char* logpath)
 	return cfg;
 }
 
+void freeTileCache(dtNavMesh* navMesh, dtTileCache* tileCache)
+{
+	dtFreeNavMesh(navMesh);
+	//dtFreeTileCache(tileCache);
+}

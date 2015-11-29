@@ -18,7 +18,7 @@ public class ConstructionGrid : MonoBehaviour {
         discretizedCoords.y = position.y;
         return discretizedCoords;
     }
-
+  
     /// <summary>
     /// Sets the new grid dimensions
     /// </summary>
@@ -79,6 +79,12 @@ public class ConstructionGrid : MonoBehaviour {
         var heights = new float[]{ centerHeight, topLeftHeight, topRightHeight, BottomLeftHeight, BottomRightHeight };
         float max_height = heights.Max();
         float min_height = heights.Min();
+
+        if (min_height < 79.0f)
+        {
+            return false;
+        }
+
         float difference = max_height - min_height;
 
         return difference < DIFERENCE_OF_HEIGHTS_TOLERANCE;
@@ -100,5 +106,50 @@ public class ConstructionGrid : MonoBehaviour {
 
         //next check if the zone is flat enought for construction
         return isFlatEnoughtForConstruction(discretizedPosition);
+    }
+
+    /// <summary>
+    /// Reserves a 3 x 3 matrix on the grid for strongholds
+    /// </summary>
+    /// <param name="sp"></param>
+    public void reservePositionForStronghold(Vector3 sp, bool centerToo = false)
+    {
+        Vector3 topLeft, top, topRight,
+                left, right,
+                bottomLeft, bottom, bottomRight;
+
+        topLeft = new Vector3(sp.x - dimensions.x, sp.y, sp.z - dimensions.y);
+        top = new Vector3(sp.x, sp.y, sp.z - dimensions.y);
+        topRight = new Vector3(sp.x + dimensions.x, sp.y, sp.z - dimensions.y);
+
+        left = new Vector3(sp.x - dimensions.x, sp.y, sp.z);
+        right = new Vector3(sp.x + dimensions.x, sp.y, sp.z);
+
+        bottomLeft = new Vector3(sp.x - dimensions.x, sp.y, sp.z + dimensions.y);
+        bottom = new Vector3(sp.x, sp.y, sp.z + dimensions.y);
+        bottomRight = new Vector3(sp.x + dimensions.x, sp.y, sp.z + dimensions.y);
+
+        reservePosition(discretizeMapCoords(topLeft));
+        reservePosition(discretizeMapCoords(top));
+        reservePosition(discretizeMapCoords(topRight));
+
+        reservePosition(discretizeMapCoords(left));
+
+        if (centerToo)
+        {
+            reservePosition(discretizeMapCoords(sp));
+        }
+
+        reservePosition(discretizeMapCoords(right));
+
+        reservePosition(discretizeMapCoords(bottomLeft));
+        reservePosition(discretizeMapCoords(bottom));
+        reservePosition(discretizeMapCoords(bottomRight));
+
+    }
+
+    public Vector2 getDimensions()
+    {
+        return dimensions;
     }
 }

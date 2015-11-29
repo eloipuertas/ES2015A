@@ -1,143 +1,210 @@
-﻿using System;
+using System;
+using System.Runtime.InteropServices;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityEngine.Assertions;
-using System.IO;
+using Utils;
 
 namespace Pathfinding
 {
-    public class DetourCrowd : MonoBehaviour
+    public sealed class DetourCrowd : MonoBehaviour, IDisposable
     {
+        #region DLL Imports
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr createCrowd(int maxAgents, float maxRadius, IntPtr navmesh);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void setFilter(IntPtr crowd, int filter, ushort include, ushort exclude);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int addAgent(IntPtr crowd, float[] p, ref CrowdAgentParams ap);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr getAgent(IntPtr crowd, int idx);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void updateAgent(IntPtr crowd, int idx, ref CrowdAgentParams ap);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void removeAgent(IntPtr crowd, int idx);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void setMoveTarget(IntPtr navquery, IntPtr crowd, int idx, float[] p, bool adjust);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void resetPath(IntPtr crowd, int idx);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void updateTick(IntPtr tileCache, IntPtr nav, IntPtr crowd, float dt, float[] positions, float[] velocities, byte[] states, byte[] targetStates, ref int nagents);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool randomPoint(IntPtr crowd, float[] targetPoint);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool randomPointInCircle(IntPtr crowd, float[] initialPoint, float maxRadius, float[] targetPoint);
+        #endregion
+
+        #region Unity Attributes
         public enum RenderMode { POLYS, DETAIL_POLYS, TILE_POLYS }
 
-		public PolyMeshAsset polymesh;
-		public TileCacheAsset navmeshData;
+        public PolyMeshAsset polymesh;
+        public TileCacheAsset navmeshData;
 
         public int MaxAgents = 1024;
         public float AgentMaxRadius = 2;
+        #endregion
 
+        #region Mesh Debugging
         public bool RenderInEditor = false;
         public Material material;
         public RenderMode Mode;
         private DbgRenderMesh mesh = new DbgRenderMesh();
+        #endregion
 
-        private IntPtr crowd = new IntPtr(0);
-        private Dictionary<int, DetourAgent> agents = new Dictionary<int, DetourAgent>();
-
+        #region Internal Library Memory Wrappers
         private float[] randomSample = null;
         private float[] positions = null;
         private float[] velocities = null;
         private byte[] targetStates = null;
         private byte[] states = null;
-        int numUpdated = 0;
+        private int numUpdated = 0;
+        #endregion
 
-        public static DetourCrowd Instance = null;
+        // Global access
+        public static DetourCrowd Instance;
 
-        public void Awake()
-        {
-            if (Instance != null)
-            {
-                throw new Exception("No more than one DetourCrowd might exist");
-            }
+        // Use a HandleRef to avoid race conditions;
+        // see the GC-Safe P/Invoke Code section
+        private HandleRef _crowd;
+        private TileCache _tileCache;
 
-            Instance = this;
-        }
+        private Dictionary<int, DetourAgent> agents = new Dictionary<int, DetourAgent>();
 
         public void OnEnable()
         {
-            if (navmeshData != null)
+            RecastConfig recastConfig = GameObject.FindObjectOfType<RecastConfig>();
+            _tileCache = new TileCache(navmeshData, recastConfig);
+
+            IntPtr h = createCrowd(MaxAgents, AgentMaxRadius, _tileCache.NavMeshHandle.Handle);
+            _crowd = new HandleRef(this, h);
+            
+            ushort k = 0;
+            foreach (var filter in recastConfig.Filters)
             {
+                ushort include = 0;
+                ushort exclude = 0;
 
-                RecastConfig recastConfig = FindObjectOfType<RecastConfig>();
-                Dictionary<string, ushort> areas = new Dictionary<string, ushort>();
-
-                PathDetour.get.Initialize(navmeshData, () =>
+                foreach (var incl in filter.Include)
                 {
-                    ushort n = 1;
-                    foreach (var layer in recastConfig.Layers)
-                    {
-                        areas.Add(layer.LayerID, n);
-                        TileCache.addFlag(n, 1);
-                        n *= 2;
-                    }
-                });
-    			crowd = Detour.Crowd.createCrowd(MaxAgents, AgentMaxRadius, PathDetour.get.NavMesh);
-
-                ushort k = 0;
-                foreach (var filter in recastConfig.Filters)
-                {
-                    ushort include = 0;
-                    ushort exclude = 0;
-
-                    foreach (var incl in filter.Include)
-                    {
-                        include |= areas[incl.Name];
-                    }
-
-                    foreach (var excl in filter.Exclude)
-                    {
-                        exclude |= areas[excl.Name];
-                    }
-                    
-                    Detour.Crowd.setFilter(crowd, k, include, exclude);
-                    ++k;
+                    include |= recastConfig.Areas[incl.Name];
                 }
 
-                randomSample = new float[3];
-                positions = new float[MaxAgents * 3];
-                velocities = new float[MaxAgents * 3];
-                targetStates = new byte[MaxAgents];
-                states = new byte[MaxAgents];
-
-                if (!Application.isPlaying && RenderInEditor)
+                foreach (var excl in filter.Exclude)
                 {
-                    mesh.Clear();
-
-                    switch (Mode)
-                    {
-                        case RenderMode.POLYS:
-                            Assert.IsTrue(polymesh != null);
-
-                            RecastDebug.ShowRecastNavmesh(mesh, polymesh.PolyMesh, polymesh.config);
-                            break;
-
-                        case RenderMode.DETAIL_POLYS:
-                            Assert.IsTrue(polymesh != null);
-
-                            RecastDebug.ShowRecastDetailMesh(mesh, polymesh.PolyDetailMesh);
-                            break;
-
-                        case RenderMode.TILE_POLYS:
-                            for (int i = 0; i < navmeshData.header.numTiles; ++i)
-                                RecastDebug.ShowTilePolyDetails(mesh, PathDetour.get.NavMesh, i);
-                            break;
-                    }
-
-                    RecastDebug.RenderObstacles(PathDetour.get.TileCache);
-
-                    mesh.CreateGameObjects("RecastRenderer", material);
-                    mesh.Rebuild();
+                    exclude |= recastConfig.Areas[excl.Name];
                 }
+
+                setFilter(_crowd.Handle, k, include, exclude);
+                ++k;
+            }
+
+            randomSample = new float[3];
+            positions = new float[MaxAgents * 3];
+            velocities = new float[MaxAgents * 3];
+            targetStates = new byte[MaxAgents];
+            states = new byte[MaxAgents];
+            
+            Instance = this;
+
+            if (!Application.isPlaying && RenderInEditor)
+            {
+                mesh.Clear();
+
+                switch (Mode)
+                {
+                    case RenderMode.POLYS:
+                        Assert.IsTrue(polymesh != null);
+
+                        RecastDebug.ShowRecastNavmesh(mesh, polymesh.PolyMesh, polymesh.config);
+                        break;
+
+                    case RenderMode.DETAIL_POLYS:
+                        Assert.IsTrue(polymesh != null);
+
+                        RecastDebug.ShowRecastDetailMesh(mesh, polymesh.PolyDetailMesh);
+                        break;
+
+                    case RenderMode.TILE_POLYS:
+                        for (int i = 0; i < navmeshData.header.numTiles; ++i)
+                            RecastDebug.ShowTilePolyDetails(mesh, _tileCache.NavMeshHandle.Handle, i);
+                        break;
+                }
+
+                RecastDebug.RenderObstacles(_tileCache.TileCacheHandle.Handle);
+
+                mesh.CreateGameObjects("RecastRenderer", material);
+                mesh.Rebuild();
             }
         }
 
-        public static float[] ToFloat(Vector3 p)
+        // Provide access to 3rd party code
+        public HandleRef CrowdHandle
         {
-            return new float[] { p.x, p.y, p.z };
+            get { return _crowd; }
         }
 
-        public static Vector3 ToVector3(float[] p, int off = 0)
+        public TileCache TileCache
         {
-            return new Vector3(p[off + 0], p[off + 1], p[off + 2]);
+            get { return _tileCache; }
+        }
+
+        // Dispose of the resource
+        public void Dispose()
+        {
+            Cleanup();
+
+            // Prevent the object from being placed on the
+            // finalization queue
+            System.GC.SuppressFinalize(this);
+        }
+
+        // Finalizer provided in case Dispose isn't called.
+        // This is a fallback mechanism, but shouldn't be
+        // relied upon (see previous discussion).
+        public void OnDestroy()
+        {
+            // Disable other components first
+            DetourAgent[] agents = FindObjectsOfType<DetourAgent>();
+            foreach (DetourAgent script in agents)
+            {
+                script.enabled = false;
+            }
+
+            DetourObstacle[] obstacles = FindObjectsOfType<DetourObstacle>();
+            foreach (DetourObstacle script in obstacles)
+            {
+                script.enabled = false;
+            }
+
+            Cleanup();
+        }
+
+        // Really dispose of the resource
+        private void Cleanup()
+        {
+            //DeleteResource(Handle);
+
+            // Don't permit the handle to be used again.
+            _crowd = new HandleRef(this, IntPtr.Zero);
+            Instance = null;
         }
 
         public int AddAgent(DetourAgent agent, CrowdAgentParams ap)
         {
-            Assert.IsTrue(crowd.ToInt64() != 0);
+            Assert.IsTrue(_crowd.Handle.ToInt64() != 0);
 
-            int idx = Detour.Crowd.addAgent(crowd, ToFloat(agent.transform.position), ref ap);
+            int idx = addAgent(_crowd.Handle, agent.transform.position.ToFloat(), ref ap);
             if (idx != -1)
             {
                 agents.Add(idx, agent);
@@ -148,38 +215,41 @@ namespace Pathfinding
 
         public void UpdateAgentParemeters(int idx, CrowdAgentParams ap)
         {
-            Assert.IsTrue(crowd.ToInt64() != 0);
+            Assert.IsTrue(_crowd.Handle.ToInt64() != 0);
 
-            Detour.Crowd.updateAgent(crowd, idx, ref ap);
+            updateAgent(_crowd.Handle, idx, ref ap);
         }
 
         public void RemoveAgent(int idx)
         {
-            Assert.IsTrue(crowd.ToInt64() != 0);
+            Assert.IsTrue(_crowd.Handle.ToInt64() != 0);
 
-            Detour.Crowd.removeAgent(crowd, idx);
+            removeAgent(_crowd.Handle, idx);
             agents.Remove(idx);
         }
 
         public void MoveTarget(int idx, Vector3 target)
         {
-            Assert.IsTrue(crowd.ToInt64() != 0);
+            Assert.IsTrue(_crowd.Handle.ToInt64() != 0);
+            Assert.IsTrue(_tileCache.NavQueryHandle.Handle.ToInt64() != 0);
 
-            Detour.Crowd.setMoveTarget(PathDetour.get.NavQuery, crowd, idx, ToFloat(target), false);
+            setMoveTarget(_tileCache.NavQueryHandle.Handle, _crowd.Handle, idx, target.ToFloat(), false);
         }
 
         public void ResetPath(int idx)
         {
-            Assert.IsTrue(crowd.ToInt64() != 0);
+            Assert.IsTrue(_crowd.Handle.ToInt64() != 0);
 
-            Detour.Crowd.resetPath(crowd, idx);
+            resetPath(_crowd.Handle, idx);
         }
 
         public bool RandomValidPoint(ref Vector3 dest)
         {
-            if (Detour.Crowd.randomPoint(crowd, randomSample))
+            Assert.IsTrue(_crowd.Handle.ToInt64() != 0);
+
+            if (randomPoint(_crowd.Handle, randomSample))
             {
-                dest = ToVector3(randomSample);
+                dest = randomSample.ToVector3();
                 return true;
             }
 
@@ -188,9 +258,11 @@ namespace Pathfinding
 
         public bool RandomValidPointInCircle(Vector3 cercleCenter, float maxRadius, ref Vector3 dest)
         {
-            if (Detour.Crowd.randomPointInCircle(crowd, ToFloat(cercleCenter), maxRadius, randomSample))
+            Assert.IsTrue(_crowd.Handle.ToInt64() != 0);
+
+            if (randomPointInCircle(_crowd.Handle, cercleCenter.ToFloat(), maxRadius, randomSample))
             {
-                dest = ToVector3(randomSample);
+                dest = randomSample.ToVector3();
                 return true;
             }
 
@@ -199,18 +271,20 @@ namespace Pathfinding
 
         public void Update()
         {
-            Assert.IsTrue(crowd.ToInt64() != 0);
+            Assert.IsTrue(_crowd.Handle.ToInt64() != 0);
+            Assert.IsTrue(_tileCache.TileCacheHandle.Handle.ToInt64() != 0);
+            Assert.IsTrue(_tileCache.NavMeshHandle.Handle.ToInt64() != 0);
 
-            Detour.Crowd.updateTick(PathDetour.get.TileCache, PathDetour.get.NavMesh, crowd, Time.deltaTime, positions, velocities, states, targetStates, ref numUpdated);
+            updateTick(_tileCache.TileCacheHandle.Handle, _tileCache.NavMeshHandle.Handle, _crowd.Handle, Time.deltaTime, positions, velocities, states, targetStates, ref numUpdated);
 
             foreach (KeyValuePair<int, DetourAgent> entry in agents)
             {
                 DetourAgent agent = entry.Value;
-                agent.Velocity = ToVector3(velocities, entry.Key * 3);
+                agent.Velocity = velocities.ToVector3(entry.Key * 3);
                 agent.State = (DetourAgent.CrowdAgentState)states[entry.Key];
                 agent.TargetState = (DetourAgent.MoveRequestState)targetStates[entry.Key];
 
-                Vector3 newPosition = ToVector3(positions, entry.Key * 3);
+                Vector3 newPosition = positions.ToVector3(entry.Key * 3);
                 agent.transform.position = newPosition;
 
                 if (agent.Velocity.sqrMagnitude != 0)

@@ -25,6 +25,7 @@ extern bool monotonePartitioning;
 DLL_EXPORT int pointerSize();
 DLL_EXPORT void setMonotonePartitioning(bool enabled);
 DLL_EXPORT rcConfig* DefaultConfig(char* logpath);
+DLL_EXPORT void freeTileCache(dtNavMesh* navMesh, dtTileCache* tileCache);
 
 // Build
 DLL_EXPORT rcPolyMesh* getPolyMesh();

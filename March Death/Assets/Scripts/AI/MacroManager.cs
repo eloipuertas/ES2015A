@@ -1,8 +1,6 @@
 ﻿using Storage;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 /// <summary>
@@ -18,14 +16,14 @@ namespace Assets.Scripts.AI
         /// <summary>
         /// This list contains what buildings the macro plans to build next
         /// </summary>
-        List<BuildingTypes> buildingPref;
         List<UnitTypes> UnitPref;
         AIController ai;
+        AIArchitect architect;
         public MacroManager(AIController ai)
         {
             this.ai = ai;
-            buildingPref = new List<BuildingTypes>() { BuildingTypes.FARM, BuildingTypes.MINE, BuildingTypes.SAWMILL };
             UnitPref = new List<UnitTypes>() {UnitTypes.CIVIL};
+            architect = new AIArchitect(ai);
         }
         /// <summary>
         /// Called every few seconds, plans ahead and makes lists with what it wants
@@ -34,17 +32,16 @@ namespace Assets.Scripts.AI
         {
             foreach (Resource r in ai.OwnResources)
                 if (r.harvestUnits == 10) //TODO ask for the actual max
-                    buildingPref.Add(r.type);
+                    architect.buildingPrefs.Add(r.type);
         }
-        /// <summary>
+        /// <summar>
         /// Called fast enough, acomplishes what the macroHigh asks for
         /// </summary>
         public void MacroLow()
         {
-            if (buildingPref.Count > 0) //TODO and has resources
+            if (architect.buildingPrefs.Count > 0) //TODO and has resources
             {
-                ai.CreateBuilding(buildingPref[0]);
-                buildingPref.RemoveAt(0);
+                architect.constructNextBuilding();
             }
             foreach(Resource r in ai.OwnResources)
             {
