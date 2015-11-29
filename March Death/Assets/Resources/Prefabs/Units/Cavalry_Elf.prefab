@@ -2167,7 +2167,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 124876}
-  m_LocalRotation: {x: -.522122443, y: .252127707, z: .163378835, w: .798202515}
+  m_LocalRotation: {x: -.522122383, y: .252127677, z: .16337882, w: .798202395}
   m_LocalPosition: {x: 5.21540644e-10, y: .00191103399, z: -5.28525557e-10}
   m_LocalScale: {x: .99999994, y: .99999994, z: .999999881}
   m_Children:
@@ -2989,7 +2989,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 146292}
-  m_LocalRotation: {x: .359111756, y: .715873837, z: -.283505678, w: .527435422}
+  m_LocalRotation: {x: .359111726, y: .715873778, z: -.283505648, w: .527435362}
   m_LocalPosition: {x: 5.02914155e-10, y: .000583659566, z: 2.23517413e-10}
   m_LocalScale: {x: 1, y: 1.00000024, z: 1.00000012}
   m_Children:
@@ -3512,6 +3512,9 @@ MonoBehaviour:
   Height: 2
   MaxSpeed: 2
   MaxAcceleration: 2
+  Flags: -1
+  AvoidanceType: 1
+  SeparationWeight: .5
 --- !u!114 &11412768
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3559,6 +3562,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   race: 1
   type: 5
+  gender: 0
   _distanceToTarget: 0
 --- !u!114 &11475070
 MonoBehaviour:
@@ -3749,6 +3753,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Constraints
       value: 126
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Flags
+      value: -1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
