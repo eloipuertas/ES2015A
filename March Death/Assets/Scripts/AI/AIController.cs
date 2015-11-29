@@ -226,9 +226,7 @@ namespace Assets.Scripts.AI
         {
             if (u.info.isCivil)
             {
-                //Workers.Add(u);
-                //The line above is correct, but we still don't have enemy units so let's just put everything into the army and wipe the floor with the player
-                addToArmy(u);
+                Workers.Add(u);
             }
             else
             {

@@ -326,7 +326,7 @@ public class Resource : Building<Resource.Actions>
 
             Unit civil = gob.GetComponent<Unit>();
             civil.vanish();
-            civil.role = Unit.Roles.PRODUCING;
+            civil.setStatus(EntityStatus.WORKING);
             BasePlayer.getOwner(this).addEntity(civil);
             fire(Actions.CREATE_UNIT, civil);
 
@@ -351,7 +351,7 @@ public class Resource : Building<Resource.Actions>
     /// Recruit a Explorer from building. you need to do this to take away worker
     ///  from building. production decrease when you remove workers
     /// </summary>
-    public void recruitExplorer()
+    public Unit recruitExplorer()
     {
        
         if (harvestUnits > 0)
@@ -360,23 +360,24 @@ public class Resource : Building<Resource.Actions>
             worker = workersList.PopAt(0);
             _collectionRate -= worker.info.attributes.capacity;
             harvestUnits--;
-            worker.role = Unit.Roles.WANDERING;
-            
             _xDisplacement = totalUnits % 5;
             _yDisplacement = totalUnits / 5;
             _unitPosition.Set(_center.x + 10 + _xDisplacement, _center.y, _center.z + 10 +  _yDisplacement);
-            
-            worker.transform.position = _unitPosition;
 
             worker.bringBack();
+            worker.transform.position = _unitPosition;
+            worker.setStatus(EntityStatus.IDLE);
+
             if (harvestUnits == 0)
             {
                 setStatus(EntityStatus.IDLE);
             }
+            return worker;
         }
         else
         {
             Debug.Log("Can't recruite explorer because no workers");
+            return null;
         }      
         // TODO: Some alert message or sound for player if try to remove unit when no unit at building
     }
@@ -391,8 +392,9 @@ public class Resource : Building<Resource.Actions>
         {
             _collectionRate -= explorer.info.attributes.capacity;
             harvestUnits++;
+            
+            explorer.setStatus(EntityStatus.WORKING);
 
-            explorer.role = Unit.Roles.PRODUCING;
             workersList.Add(explorer);
             if (harvestUnits == 1)
             {
@@ -421,12 +423,10 @@ public class Resource : Building<Resource.Actions>
         // space enough to hold new civil
         if (harvestUnits < info.resourceAttributes.maxUnits)
         {
-            {
-                Unit unit = (Unit)entity;
-                unit.vanish();
-                unit.transform.position = this.transform.position;
-                recruitWorker((Unit)unit);
-            }
+            Unit unit = (Unit)entity;
+            unit.vanish();
+            unit.transform.position = this.transform.position;
+            recruitWorker((Unit)unit);
         }
         else
         {
@@ -443,12 +443,6 @@ public class Resource : Building<Resource.Actions>
         {
             statistics.getNegative();
             fire(Actions.DEL_STATS, statistics);
-        }
-
-        foreach (Unit unit in workersList)
-        {
-            unit.role = Unit.Roles.WANDERING;
-            harvestUnits--;
         }
 
         base.OnDestroy();

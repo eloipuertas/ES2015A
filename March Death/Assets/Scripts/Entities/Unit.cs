@@ -15,7 +15,6 @@ public class Unit : GameEntity<Unit.Actions>
 {
 
     public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT, TARGET_TERMINATED };
-    public enum Roles { PRODUCING, WANDERING };
     public enum Gender { MALE, FEMALE }
 
     private EntityStatus _defaultStatus = EntityStatus.IDLE;
@@ -87,11 +86,6 @@ public class Unit : GameEntity<Unit.Actions>
     private float _lastAttack = 0;
 
     /// <summary>
-    /// Get and set current role (mostly for CIVILS)
-    /// </summary>
-    public Roles role { get; set; }
-
-    /// <summary>
     /// Point to move to
     /// </summary>
     private Vector3 _movePoint;
@@ -101,7 +95,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     private DetourAgent _detourAgent;
     public DetourAgent Agent { get { return _detourAgent; } }
-
+    
     /// <summary>
     /// Can this unit perform ranged attacks?
     /// </summary>
@@ -567,7 +561,7 @@ public class Unit : GameEntity<Unit.Actions>
             float goldProduced = 0;
 
             // Civils produce gold when working and doesn't consume it
-            if (info.isCivil && role == Roles.PRODUCING)
+            if (info.isCivil && status == EntityStatus.WORKING)
             {
                 goldProduced = info.unitAttributes.goldProduction * resourcesElapsed;
                 goldConsumed = 0;

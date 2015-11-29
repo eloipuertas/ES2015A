@@ -163,26 +163,14 @@ public partial class UserInput : MonoBehaviour
                     && entity.status != EntityStatus.DEAD
                     && entity.status != EntityStatus.DESTROYED)
                     {
-
-                        
-                        if ((entity.info.isUnit))
-                        {
-                            sManager.AttackTo(entity);
-                        }
+                        sManager.AttackTo(entity);
                     }
-                    else//
+                    else if(entity.info.isResource
+                            && (entity.status == EntityStatus.IDLE
+                            || entity.status == EntityStatus.WORKING))
                     {
-                        if((entity.info.isResource)
-                            && entity.status != EntityStatus.BUILDING_PHASE_1
-                            && entity.status != EntityStatus.BUILDING_PHASE_2
-                            && entity.status != EntityStatus.BUILDING_PHASE_3
-                            && entity.status != EntityStatus.DEAD
-                            && entity.status != EntityStatus.DESTROYED)
-
-                            {
-                                sManager.Enter(entity);
-                            }                   
-                    }
+                        sManager.Enter(entity);
+                    }   
                 }
             }
         }
