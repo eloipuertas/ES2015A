@@ -6,7 +6,6 @@ using Storage;
 using UnityEngine.Assertions;
 
 
-
 public class Resource : Building<Resource.Actions>
 {
     public enum Actions { CREATED, DAMAGED, DESTROYED, COLLECTION, CREATE_UNIT, DEL_STATS};
@@ -81,6 +80,7 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     List<Unit> workersList = new List<Unit>();
 
+   
     /// <summary>
     /// HUD, get current civilian units working here
     /// </summary>
@@ -316,16 +316,10 @@ public class Resource : Building<Resource.Actions>
     public void newCivilian()
     {
         // If there's no workers, the next unit to be created will be a worker...
-        if (harvestUnits < 1)
+        if (harvestUnits < info.resourceAttributes.maxUnits)
         {
-            // TODO get inside meeting point and calculate position
-            //unitPosition = this.GetComponent(meetingPointInside).transform.position;
 
-            // Units distributed in rows of 5 elements
-
-            _xDisplacement = harvestUnits % 5;
-            _yDisplacement = harvestUnits / 5;
-            _unitPosition.Set(_center.x + _xDisplacement, _center.y, _center.z + _yDisplacement);
+            _unitPosition.Set(_center.x , _center.y, _center.z );
 
             // Method createUnit from Info returns GameObject Instance;
             GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
@@ -345,6 +339,7 @@ public class Resource : Building<Resource.Actions>
         }
         else
         {
+            // building capacity is full new civilians will be explorers
             base.addUnitQueue(UnitTypes.CIVIL);
         }
 
@@ -356,18 +351,23 @@ public class Resource : Building<Resource.Actions>
     /// Recruit a Explorer from building. you need to do this to take away worker
     ///  from building. production decrease when you remove workers
     /// </summary>
-    public void recruitExplorer(Unit worker)
+    public void recruitExplorer()
     {
+       
         if (harvestUnits > 0)
         {
+            Unit worker;
+            worker = workersList.PopAt(0);
             _collectionRate -= worker.info.attributes.capacity;
             harvestUnits--;
-
             worker.role = Unit.Roles.WANDERING;
-            workersList.Remove(worker);
-            _xDisplacement = harvestUnits % 5;
-            _yDisplacement = harvestUnits / 5;
-            _unitPosition.Set(_center.x + _xDisplacement, _center.y, _center.z + _yDisplacement);
+            
+            _xDisplacement = totalUnits % 5;
+            _yDisplacement = totalUnits / 5;
+            _unitPosition.Set(_center.x + 10 + _xDisplacement, _center.y, _center.z + 10 +  _yDisplacement);
+            
+            worker.transform.position = _unitPosition;
+
             worker.bringBack();
             if (harvestUnits == 0)
             {
@@ -376,7 +376,7 @@ public class Resource : Building<Resource.Actions>
         }
         else
         {
-            Debug.Log("Can't recruiter explorer because no workers");
+            Debug.Log("Can't recruite explorer because no workers");
         }      
         // TODO: Some alert message or sound for player if try to remove unit when no unit at building
     }
@@ -402,8 +402,7 @@ public class Resource : Building<Resource.Actions>
         else
         {
             Debug.Log(" You are trying to recruit worker but building capacity is full");
-        }
-        
+        }     
         
     }
 
@@ -567,5 +566,19 @@ public class Resource : Building<Resource.Actions>
     {
         base.onBuilt();
         newCivilian();
+    }
+}
+
+/// <summary>
+/// Class to pop element from list. Weird thing , sure. 
+/// </summary>
+/// 
+static class ListExtension
+{
+    public static T PopAt<T>(this List<T> list, int index)
+    {
+        T r = list[index];
+        list.RemoveAt(index);
+        return r;
     }
 }

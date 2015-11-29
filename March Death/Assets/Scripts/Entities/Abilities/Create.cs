@@ -61,10 +61,21 @@ public class Create : Ability
 		switch (_info.targetType)
 		{
 			case EntityType.UNIT:
-				_entity.doIfBuilding(building => building.addUnitQueue(_info.targetUnit));
+                // Resource is building too. We need check if it is resource because Resource 
+                // script must control when new unit is added to queue or not.
+                // Please be careful if you need to change this.
+                if (_entity.info.isResource)
+                {
+                    _gameObject.GetComponent<Resource>().newCivilian();
+                }
+                else
+                {
+                    _entity.doIfBuilding(building => building.addUnitQueue(_info.targetUnit));
+                }
+				
 				break;
 
-			case EntityType.BUILDING:
+            case EntityType.BUILDING:
 				BuildingsMgr.createBuilding(_info.targetRace, _info.targetBuilding);
 				break;
 		}
