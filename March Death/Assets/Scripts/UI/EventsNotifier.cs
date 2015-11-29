@@ -375,9 +375,9 @@ public class EventsNotifier : MonoBehaviour {
         DisplayUnitDead(entity.type);
     }
 
-    public void DisplayEnemySpotted(IGameEntity entity)
+    public void DisplayEnemySpotted(GameObject go)
     {
         AppendMessage(ENEMY_ON_SIGHT);
-        // TODO Get position and show it on mini-map
+		go.GetComponent<EntityMarker>().entityOnSight();
     }
 }

@@ -70,8 +70,8 @@ public class Player : BasePlayer
 
         ActorSelector selector = new ActorSelector()
         {
-            registerCondition = gameObject => !gameObject.GetComponent<FOWEntity>().IsOwnedByPlayer,
-            fireCondition = gameObject => true
+            registerCondition = (g) => !(g.GetComponent<FOWEntity>().IsOwnedByPlayer),
+            fireCondition = (g) => true
         };
         Utils.Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.DISCOVERED, OnEntityFound, selector);
 
@@ -308,10 +308,11 @@ public class Player : BasePlayer
 
     private void OnEntityFound(System.Object obj)
     {
-        IGameEntity entity = ((GameObject) obj).GetComponent<IGameEntity>();
+		GameObject go = (GameObject) obj;
+        IGameEntity entity = go.GetComponent<IGameEntity>();
         if (entity.info.isUnit)
         {
-            events.DisplayEnemySpotted(entity);
+            events.DisplayEnemySpotted(go);
         }
     }
 }
