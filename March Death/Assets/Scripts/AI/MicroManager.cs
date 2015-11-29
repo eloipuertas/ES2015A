@@ -19,6 +19,7 @@ namespace Assets.Scripts.AI
 		public const int AGENT_EXPLORER = 1;
 		public const int AGENT_RETREAT = 2;
 		public const int AGENT_ASSIST = 3;
+        public const int AGENT_STRATEGY = 4;
 
         AIController ai;
         /// <summary>
@@ -37,6 +38,7 @@ namespace Assets.Scripts.AI
             agents.Add(aA);
             agents.Add(new RetreatAgent(ai, aA, assistAgent, "Retreat"));
 			agents.Add(assistAgent);
+            agents.Add(new StrategyAgent(ai, assistAgent, "Strategy"));
             squads.Add(new SquadAI(1, ai));
             squads.Add(new SquadAI(2, ai));
         }
@@ -54,6 +56,7 @@ namespace Assets.Scripts.AI
                 foreach (SquadAI sq in squads)
                 {
                     sq.recalculateSquadValues();
+                    ((StrategyAgent)agents[AGENT_STRATEGY]).evaluateTimings();
                     foreach (BaseAgent a in agents)
                     {
                         val = a.getConfidence(sq);

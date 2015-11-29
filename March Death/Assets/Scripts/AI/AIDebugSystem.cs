@@ -23,7 +23,7 @@ public class AIDebugSystem : MonoBehaviour {
 
     bool showInfo { get; set; }
     public Rect commandingAgentWindowRect = new Rect(20, 20, 200, 80);
-    public Rect statsWindowRect = new Rect(20 + 200 + 10, 20, 400, 100);
+    public Rect statsWindowRect = new Rect(20 + 200 + 10, 20, 400, 120);
     public Rect resourcesWindowRect = new Rect(20 + 200 + 10 + 400 + 10, 20, 120, 105);
 
     private const int WINDOW_HEIGHT_OFFSET_TOLERANCE = 20;
