@@ -58,27 +58,27 @@ public partial class InformationController : MonoBehaviour
 		Vector2 center = rectTransform.position;
 		multiselectionButtonSize = new Vector2(panelSize.x / multiselectionColumns, panelSize.y / multiselectionRows);
 		multiselectionInitialPoint = new Vector2(center.x - panelSize.x / 2, center.y + panelSize.y / 2);
-
+		
 		//Create button to generate squad controls
 		rectTransform = GameObject.Find("Information").transform.FindChild ("SquadButtons").GetComponent<RectTransform>();
-		
 		panelSize = rectTransform.sizeDelta;
 		center = rectTransform.position;
-		float width = panelSize.x / squadsColumns;
-		float height = panelSize.y / squadsRows;
 		squadsButtonSize = new Vector2(panelSize.x / squadsColumns, panelSize.y / squadsRows);
 		squadsInitialPoint = new Vector2(center.x - panelSize.x / 2, center.y + panelSize.y / 2);
 		MAX_SQUADS_BUTTONS = squadsColumns * squadsRows;
 		
+		//Inicializate parameters for unit creation buttons
+		/*
+		rectTransform = GameObject.Find("Information").transform.FindChild ("UnitCreationButtons").GetComponent<RectTransform>();
+		panelSize = rectTransform.sizeDelta;
+		center = rectTransform.position;
+		creationQueueButtonSize = new Vector2(panelSize.x / 5, panelSize.y);
+		creationQueueInitialPoint = new Vector2(center.x - panelSize.x / 2, center.y + panelSize.y / 2);
+		*/
 		//Default is hidden
 		HideInformation ();
 	}
 	
-	// Update is called once per frame
-	void Update () 
-	{
-	}
-
 	private void ShowInformation(GameObject gameObject) 
 	{
 		IGameEntity entity = gameObject.GetComponent<IGameEntity> ();
@@ -100,6 +100,12 @@ public partial class InformationController : MonoBehaviour
 			imgActorDetail.enabled = true;
 			imgActorDetail.sprite = image;
 		}
+		
+		entity.doIfResource(resource =>
+		                    {
+			currentResource = resource;
+			ShowCreationQueue();
+		});
 	}
 	
 	private void HideInformation() 
@@ -152,19 +158,19 @@ public partial class InformationController : MonoBehaviour
 		IGameEntity entity = selectable.GetComponent<IGameEntity>();
 		
 		UnityAction selectUnique = new UnityAction(() =>
-		{
+		                                           {
 			selectable.SelectOnlyMe();
 		});
 		
 		return CreateCustomButton(buttonCenter, multiselectionButtonSize, "MultiSelectionButton", "", buttonImage: GetImageForEntity (entity), actionMethod: selectUnique);
 	}
-
+	
 	private void DestroyButtons()
 	{
-
+		
 		//Destroy button to generate squads
 		DestroyGenerateSquadButton ();
-
+		
 		//destroy multiselection buttons
 		multiselectionButtons.Clear ();
 		GameObject[] buttons = GameObject.FindGameObjectsWithTag("MultiSelectionButton");
@@ -201,18 +207,34 @@ public partial class InformationController : MonoBehaviour
 			unit.register(Unit.Actions.DAMAGED, onUnitDamaged);
 			unit.register(Unit.Actions.DIED, onUnitDied);
 		});
-
+		
 		entity.doIfResource(resource =>
-		{
+		                    {
 			resource.register(Resource.Actions.DAMAGED, onUnitDamaged);
 			resource.register(Resource.Actions.DESTROYED, onUnitDied);
+			resource.register(Resource.Actions.CREATE_UNIT, onBuildingUnitCreated);
+			resource.register(Resource.Actions.LOAD_UNIT, onBuildingUnitCreated);
 		});
-
+		
 		entity.doIfBarrack(building =>
-		{
+		                   {
 			building.register(Barrack.Actions.DAMAGED, onUnitDamaged);
 			building.register(Barrack.Actions.DESTROYED, onUnitDied);
+			building.register(Barrack.Actions.CREATE_UNIT, onBuildingUnitCreated);
+			//TODO: reload actions on building created -> building.register(Barrack.Actions.BUILDING_FINISHED, reloadActionsPanel);
 		});
+	}
+	
+	public void onBuildingUnitCreated(System.Object obj)
+	{
+		//Destroy first button and move others to the left
+		ShowCreationQueue();
+	}
+	
+	public void onBuildingLoadNewUnit(System.Object obj)
+	{
+		//Recreate buttons
+		ShowCreationQueue();
 	}
 	
 	public void onUnitDeselected(System.Object obj)
@@ -242,6 +264,12 @@ public partial class InformationController : MonoBehaviour
 			unit.unregister(Unit.Actions.DAMAGED, onUnitDamaged);
 			unit.unregister(Unit.Actions.DIED, onUnitDied);
 		});
+		
+		entity.doIfResource(resource =>
+		                    {
+			currentResource = null;
+			DestroyUnitCreationButtons();
+		});
 	}
 	
 	public void onUnitDamaged(System.Object obj)
@@ -262,7 +290,7 @@ public partial class InformationController : MonoBehaviour
 		Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.SELECTED, onUnitSelected);
 		Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.DESELECTED, onUnitDeselected);
 	}
-
+	
 	private Sprite GetImageForEntity(IGameEntity entity) {
 		char separator = '/';
 		string path = IMAGES_PATH + separator + entity.getRace () + "_" + entity.info.name;
@@ -273,7 +301,7 @@ public partial class InformationController : MonoBehaviour
 			return null;
 		}
 	}
-
+	
 	private GameObject CreateCustomButton(Vector2 center, Vector2 size, String tag, String text = "", Sprite buttonImage = null, UnityAction actionMethod = null) {
 		String canvasName = tag + "Canvas";
 		String buttonName = tag + "Button";
