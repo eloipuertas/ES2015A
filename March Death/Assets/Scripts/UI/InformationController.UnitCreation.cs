@@ -54,9 +54,9 @@ public partial class InformationController : MonoBehaviour {
 
 	private GameObject CreateCreationUnitButton(Vector2 center) 
 	{
-		GameObject canvasObject = new GameObject("MultiSelectionButtonCanvas");
+		GameObject canvasObject = new GameObject("UnitCreationButtonCanvas");
 		Canvas canvas = canvasObject.AddComponent<Canvas>();
-		canvas.tag = "MultiSelectionButton";
+		canvas.tag = "UnitCreationButton";
 		canvasObject.AddComponent<GraphicRaycaster>();
 		canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
@@ -70,7 +70,7 @@ public partial class InformationController : MonoBehaviour {
 			image.sprite = Sprite.Create (texture, new Rect (0, 0, texture.width, texture.height), new Vector2 (0.5f, 0.5f));
 		}
 
-		GameObject shadowObject = new GameObject("MultiSelectionButtonButton");
+		GameObject shadowObject = new GameObject("UnitCreationButtonButton");
 		Image shadow = shadowObject.AddComponent<Image>();
 		shadow.transform.parent = canvas.transform;
 		shadow.rectTransform.sizeDelta = creationQueueButtonSize * 0.9f;
@@ -87,7 +87,7 @@ public partial class InformationController : MonoBehaviour {
 
 	private void DestroyUnitCreationButtons() {
 		creationQueueButtons.Clear();
-		GameObject[] buttons = GameObject.FindGameObjectsWithTag("MultiSelectionButton");
+		GameObject[] buttons = GameObject.FindGameObjectsWithTag("UnitCreationButton");
 		if (buttons != null)
 		{
 			foreach (GameObject button in buttons)
