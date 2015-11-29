@@ -75,7 +75,6 @@ namespace Assets.Scripts.AI.Agents
                 {
                     EarmyValue += s.enemySquad.getData<AttackData>().Value;
                 }
-                Debug.Log(EarmyValue);
                 if(armyValue > (EarmyValue * 1.1))
                 {
                     if(!attacking)
@@ -83,7 +82,6 @@ namespace Assets.Scripts.AI.Agents
                         //If we aren't already attacking we find a target to attack 
                         attacking = true;
                         int eBuild = ai.EnemyBuildings.Count;
-                        Debug.Log(eBuild);
                         if (eBuild > 0)
                         {
                             targetPos = ai.EnemyBuildings[rnd.Next(0, eBuild)].closestPointTo(ai.rootBasePosition);
