@@ -34,10 +34,17 @@ public class Player : BasePlayer
 
     private CameraController cam;
 
+    private int minFoodTolerance;
+    private int minWoodTolerance;
+    private int minMetalTolerance;
+    private int minGoldTolerance;
+
+    private bool foodDepleted;
+
     // Use this for initialization
     public override void Start()
     {   
-        Debug.Log("Player Start");base.Start();
+        base.Start();
         _selection = GetComponent<Managers.SelectionManager>();
         //request the race of the player
         _selfRace = info.GetPlayerRace();
@@ -52,6 +59,21 @@ public class Player : BasePlayer
         SetInitialResources(me.GetResources().Wood, me.GetResources().Food, me.GetResources().Metal, me.GetResources().Gold);
         gameObject.AddComponent<ResourcesPlacer>();
         missionStatus = new MissionStatus(playerId);
+
+        // TODO Set this values dynamically
+        minFoodTolerance = 100;
+        minWoodTolerance = 500;
+        minMetalTolerance = 500;
+        minGoldTolerance = 500;
+
+        foodDepleted = resources.getAmount(WorldResources.Type.FOOD) <= 0;
+
+        ActorSelector selector = new ActorSelector()
+        {
+            registerCondition = (g) => !(g.GetComponent<FOWEntity>().IsOwnedByPlayer),
+            fireCondition = (g) => true
+        };
+        Utils.Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.DISCOVERED, OnEntityFound, selector);
 
     }
 
@@ -97,6 +119,7 @@ public class Player : BasePlayer
     void OnDestroy()
     {
         _currently = status.TERMINATED;
+        Utils.Subscriber<FOWEntity.Actions, FOWEntity>.get.unregisterFromAll(FOWEntity.Actions.DISCOVERED, OnEntityFound);
     }
 
     public override void removeEntity(IGameEntity entity)
@@ -156,16 +179,48 @@ public class Player : BasePlayer
         return (ArrayList) SelectedObjects.Clone();
     }
 
+    private void displayResourceInfo(WorldResources.Type resourceType, int tolerance)
+    {
+        int amount;
+        amount = Mathf.FloorToInt(resources.getAmount(resourceType));
+        if (amount <= tolerance)
+        {
+            if (amount > 0)
+                events.DisplayResourceIsLow(resourceType);
+            else
+                events.DisplayResourceDepleted(resourceType);
+        }
+    }
+
+    private void onUnitEats(System.Object obj)
+    {
+        // TODO Take into account goods? Storage.Goods goods = (Storage.Goods) obj;
+        if (!foodDepleted)
+        {
+            displayResourceInfo(WorldResources.Type.FOOD, minFoodTolerance);
+            foodDepleted = resources.getAmount(WorldResources.Type.FOOD) <= 0;
+        }
+    }
+
+    private void OnUnitCreated(System.Object obj)
+    {
+        displayResourceInfo(WorldResources.Type.FOOD, minFoodTolerance);
+        displayResourceInfo(WorldResources.Type.METAL, minMetalTolerance);
+        displayResourceInfo(WorldResources.Type.WOOD, minWoodTolerance);
+        displayResourceInfo(WorldResources.Type.GOLD, minGoldTolerance);
+        events.DisplayUnitCreated(obj);
+    }
+
     private void signalMissionUpdate(System.Object obj)
     {
-        Storage.EntityInfo e = (Storage.EntityInfo) obj;
-        switch (e.entityType)
+        IGameEntity entity = ((GameObject) obj).GetComponent<IGameEntity>();
+        switch (entity.info.entityType)
         {
             case Storage.EntityType.BUILDING:
-                missionStatus.OnBuildingDestroyed(e.getType<Storage.BuildingTypes>());
+                missionStatus.OnBuildingDestroyed(entity.info.getType<Storage.BuildingTypes>());
                 break;
             case Storage.EntityType.UNIT:
-                missionStatus.OnUnitKilled(e.getType<Storage.UnitTypes>());
+                missionStatus.OnUnitKilled(entity.info.getType<Storage.UnitTypes>());
                 break;
             case Storage.EntityType.RESOURCE:
                 break;
@@ -201,7 +256,7 @@ public class Player : BasePlayer
                 Barrack barrack = (Barrack) entity;
                 barrack.register(Barrack.Actions.DAMAGED, events.DisplayUnderAttack);
                 barrack.register(Barrack.Actions.DESTROYED, events.DisplayBuildingDestroyed);
-                barrack.register(Barrack.Actions.CREATE_UNIT, events.DisplayUnitCreated);
+                barrack.register(Barrack.Actions.CREATE_UNIT, OnUnitCreated);
                 barrack.register(Barrack.Actions.BUILDING_FINISHED, events.DisplayBuildingCreated);
             }
             else 
@@ -210,7 +265,7 @@ public class Player : BasePlayer
                 resourcesBuilding.register(Resource.Actions.DAMAGED, events.DisplayUnderAttack);
                 resourcesBuilding.register(Resource.Actions.DESTROYED, events.DisplayBuildingDestroyed);
                 resourcesBuilding.register(Resource.Actions.BUILDING_FINISHED, events.DisplayBuildingCreated);
-                resourcesBuilding.register(Resource.Actions.CREATE_UNIT, events.DisplayUnitCreated);
+                resourcesBuilding.register(Resource.Actions.CREATE_UNIT, OnUnitCreated);
             }
         }
         else if (entity.info.isUnit)
@@ -219,6 +274,7 @@ public class Player : BasePlayer
             unit.register(Unit.Actions.DAMAGED, events.DisplayUnderAttack);
             unit.register(Unit.Actions.DIED, events.DisplayUnitDead);
             unit.register(Unit.Actions.TARGET_TERMINATED, signalMissionUpdate);
+            unit.register(Unit.Actions.EAT, onUnitEats);
         }
     }
 
@@ -229,7 +285,7 @@ public class Player : BasePlayer
             Barrack barrack = (Barrack) entity;
             barrack.unregister(Barrack.Actions.DAMAGED, events.DisplayUnderAttack);
             barrack.unregister(Barrack.Actions.DESTROYED, events.DisplayBuildingDestroyed);
-            barrack.unregister(Barrack.Actions.CREATE_UNIT, events.DisplayUnitCreated);
+            barrack.unregister(Barrack.Actions.CREATE_UNIT, OnUnitCreated);
             barrack.unregister(Barrack.Actions.BUILDING_FINISHED, events.DisplayBuildingCreated);
         }
         else if (entity.info.isResource)
@@ -238,7 +294,7 @@ public class Player : BasePlayer
             resourcesBuilding.unregister(Resource.Actions.DAMAGED, events.DisplayUnderAttack);
             resourcesBuilding.unregister(Resource.Actions.DESTROYED, events.DisplayBuildingDestroyed);
             resourcesBuilding.unregister(Barrack.Actions.BUILDING_FINISHED, events.DisplayBuildingCreated);
-            resourcesBuilding.unregister(Resource.Actions.CREATE_UNIT, events.DisplayUnitCreated);
+            resourcesBuilding.unregister(Resource.Actions.CREATE_UNIT, OnUnitCreated);
         }
         else if (entity.info.isUnit)
         {
@@ -246,6 +302,17 @@ public class Player : BasePlayer
             unit.unregister(Unit.Actions.DIED, events.DisplayUnitDead);
             unit.unregister(Unit.Actions.DAMAGED, events.DisplayUnderAttack);
             unit.unregister(Unit.Actions.TARGET_TERMINATED, signalMissionUpdate);
+            unit.unregister(Unit.Actions.EAT, onUnitEats);
+        }
+    }
+
+    private void OnEntityFound(System.Object obj)
+    {
+		GameObject go = (GameObject) obj;
+        IGameEntity entity = go.GetComponent<IGameEntity>();
+        if (entity.info.isUnit)
+        {
+            events.DisplayEnemySpotted(go);
         }
     }
 }

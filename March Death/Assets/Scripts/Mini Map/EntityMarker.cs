@@ -32,6 +32,12 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
     private  Rect marker_rect;
     private Texture2D box_text;
 
+	private bool isOnSight;
+	private int onSightIdx;
+	private float onSightTimer;
+	private Rect onSightRect;
+	private Texture2D onSightTexture;
+
 
     // Use this for initialization
     public override void Start () {
@@ -49,6 +55,12 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
         underAttack_tex = (Texture2D)Resources.Load("underAttack");
 
         creation_ON = true;
+
+		isOnSight = false;
+		onSightIdx = 0;
+		onSightTimer = 0f;
+		onSightTexture = new Texture2D(32, 32);
+		onSightTexture = (Texture2D) Resources.Load("redcross");
     }
 
     // Update is called once per frame
@@ -80,6 +92,13 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
                 underAttack_ind = getIndex(underAttack_timer, ANIMATION_TIME);
             }
         }
+		if (isOnSight)
+		{
+			if (!hasAnimationEnd(ref onSightTimer, ANIMATION_TIME, ref isOnSight))
+			{
+				onSightIdx = getIndex(onSightTimer, ANIMATION_TIME);
+			}
+		}
     }
 
     protected virtual void OnGUI()
@@ -94,6 +113,7 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
                     GUI.DrawTexture(marker_rect, box_text);
                     if (creation_ON) showCreate(creation_ind);
                     if (underAttack_ON) showAttack(underAttack_ind);
+					if (isOnSight) showOnSight(onSightIdx);
                 }
 
             }
@@ -121,6 +141,12 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
         GUI.DrawTexture(underAttack_rect, underAttack_tex);
     }
 
+	private void showOnSight(int index)
+	{
+		onSightRect = MinimapOverlays.CalculateBoxFromCntr(transform.position, mainCam, (int)((15f * 3f)/(index + 1)));
+		GUI.DrawTexture(onSightRect, onSightTexture);
+	}
+
     private bool hasAnimationEnd(ref float actual_time, float tot_time, ref bool ON)
     {
         actual_time += Time.deltaTime;
@@ -129,10 +155,15 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
     }
 
 
-    public void onEntityUnderAttack(System.Object obj)
+    public void entityUnderAttack()
     {
         underAttack_ON = true;
     }
+
+	public void entityOnSight()
+	{
+		isOnSight = true;
+	}
 
 
     // info methods
