@@ -142,9 +142,8 @@ public partial class UserInput : MonoBehaviour
         {
             //Do nothing
         }
-        else if ( player.isCurrently(Player.status.SELECTED_UNITS) && !sManager.IsBuilding() )
+        else if ( player.isCurrently(Player.status.SELECTED_UNITS) )
         {
-
             GameObject hitObject = FindHitObject();
             if (!hitObject) // out of bounds click
             {
@@ -164,7 +163,25 @@ public partial class UserInput : MonoBehaviour
                     && entity.status != EntityStatus.DEAD
                     && entity.status != EntityStatus.DESTROYED)
                     {
-                        sManager.AttackTo(entity);
+
+                        player.registerGameEntityActions(entity);
+                        if ((entity.info.isUnit))
+                        {
+                            sManager.AttackTo(entity);
+                        }
+                    }
+                    else//
+                    {
+                        if((entity.info.isResource)
+                            && entity.status != EntityStatus.BUILDING_PHASE_1
+                            && entity.status != EntityStatus.BUILDING_PHASE_2
+                            && entity.status != EntityStatus.BUILDING_PHASE_3
+                            && entity.status != EntityStatus.DEAD
+                            && entity.status != EntityStatus.DESTROYED)
+
+                            {
+                                sManager.Enter(entity);
+                            }                   
                     }
                 }
             }
