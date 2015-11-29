@@ -25,7 +25,7 @@ public partial class InformationController : MonoBehaviour {
 		//Check if array have buttons -> clear array on destroy
 		if (creationQueueButtons.Count > 0) {
 			GameObject buttonCanvas = (GameObject) creationQueueButtons[0];
-			GameObject button = buttonCanvas.transform.Find ("MultiSelectionButtonButton").gameObject;
+			GameObject button = buttonCanvas.transform.Find ("UnitCreationShadow").gameObject;
 			Image image = button.GetComponent<Image> ();
 
 			if (currentResource != null) {
@@ -70,7 +70,16 @@ public partial class InformationController : MonoBehaviour {
 			image.sprite = Sprite.Create (texture, new Rect (0, 0, texture.width, texture.height), new Vector2 (0.5f, 0.5f));
 		}
 
-		GameObject shadowObject = new GameObject("UnitCreationButtonButton");
+		Button button = buttonObject.AddComponent<Button>();
+		button.targetGraphic = image;
+		button.onClick.AddListener(() =>
+		{
+			currentResource.cancelUnitQueue();
+			ShowCreationQueue();
+		});
+
+
+		GameObject shadowObject = new GameObject("UnitCreationShadow");
 		Image shadow = shadowObject.AddComponent<Image>();
 		shadow.transform.parent = canvas.transform;
 		shadow.rectTransform.sizeDelta = creationQueueButtonSize * 0.9f;
