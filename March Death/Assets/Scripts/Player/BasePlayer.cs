@@ -122,6 +122,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
             if (building.hasStatus)
             {
                 entity.DefaultStatus = building.status;
+                entity.setStatus(building.status);
             }
             
             AddBuilding(entity);
