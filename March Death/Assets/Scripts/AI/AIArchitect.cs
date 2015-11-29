@@ -82,8 +82,6 @@ namespace Assets.Scripts.AI
         /// </summary>
         public void planifyBuildingsAccordingToDifficulty()
         {
-
-
             if (ai.DifficultyLvl == 1)
             {
                 dificultyFolder = "Easy";
@@ -95,6 +93,10 @@ namespace Assets.Scripts.AI
                     BuildingTypes.ARCHERY,
                     BuildingTypes.BARRACK,
                     BuildingTypes.STABLE,
+                    BuildingTypes.FARM,
+                    BuildingTypes.MINE,
+                    BuildingTypes.SAWMILL,
+                    BuildingTypes.BARRACK,
                 };
             }
 
@@ -107,17 +109,19 @@ namespace Assets.Scripts.AI
                     BuildingTypes.MINE,
                     BuildingTypes.SAWMILL,
                     BuildingTypes.ARCHERY,
+                    BuildingTypes.FARM,
+                    BuildingTypes.MINE,
+                    BuildingTypes.SAWMILL,
                     BuildingTypes.BARRACK,
                     BuildingTypes.WATCHTOWER,
                     BuildingTypes.STABLE,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
+
                 };
+
+                for(int i = 0; i < 20; i++)
+                {
+                    buildingPrefs.Add(BuildingTypes.WATCHTOWER);
+                }
             }
 
             else
@@ -126,20 +130,34 @@ namespace Assets.Scripts.AI
                 buildingPrefs = new List<BuildingTypes>()
                 {
                     BuildingTypes.FARM,
+                    BuildingTypes.FARM,
                     BuildingTypes.MINE,
                     BuildingTypes.SAWMILL,
+                    BuildingTypes.FARM,
                     BuildingTypes.ARCHERY,
                     BuildingTypes.BARRACK,
                     BuildingTypes.WATCHTOWER,
                     BuildingTypes.STABLE,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WALL,
-                    BuildingTypes.WALL,
-                    BuildingTypes.WALL,
                 };
+                int elvesDiscounter = ai.race == Races.ELVES ? 5 : 0;
+               
+                for (int i = 0; i < 30 - elvesDiscounter; i++)
+                {
+                    buildingPrefs.Add(BuildingTypes.WATCHTOWER);
+                }
+
+                if(ai.race == Races.ELVES)
+                {
+                    for(int i = 0; i < 40; i++)
+                    {
+                        buildingPrefs.Add(BuildingTypes.WALL);
+                    }
+
+                    for(int i = 0; i < 6; i++)
+                    {
+                        buildingPrefs.Add(BuildingTypes.WALLCORNER);
+                    }
+                }
             }
 
             // Need this in case we want to be creative
@@ -350,13 +368,14 @@ namespace Assets.Scripts.AI
 
             while (positionsForType.Count > 0 && !found)
             {
+                int pos = UnityEngine.Random.Range(0, positionsForType.Count);
                 // Recheck positions in order to know if player has constructed on this position
-                if (constructionGrid.isNewPositionAbleForConstrucction(positionsForType[0]))
+                if (constructionGrid.isNewPositionAbleForConstrucction(positionsForType[pos]))
                 {
-                    requestedPosition = positionsForType[0];
+                    requestedPosition = positionsForType[pos];
                     found = true;
                 }
-                positionsForType.RemoveAt(0);
+                positionsForType.RemoveAt(pos);
             }
 
             return requestedPosition;
