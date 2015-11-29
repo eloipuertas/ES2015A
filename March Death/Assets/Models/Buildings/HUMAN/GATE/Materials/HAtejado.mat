@@ -19,7 +19,7 @@ Material:
         first:
           name: _MainTex
         second:
-          m_Texture: {fileID: 2800000, guid: 66883b8f48618b5408053f542102a94d, type: 3}
+          m_Texture: {fileID: 2800000, guid: d8d96f4ffa56141498e1a2617a1d1201, type: 3}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
@@ -32,13 +32,6 @@ Material:
       data:
         first:
           name: _DetailNormalMap
-        second:
-          m_Texture: {fileID: 0}
-          m_Scale: {x: 1, y: 1}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
-          name: _ToonShade
         second:
           m_Texture: {fileID: 0}
           m_Scale: {x: 1, y: 1}
@@ -85,6 +78,13 @@ Material:
           m_Texture: {fileID: 0}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _ToonShade
+        second:
+          m_Texture: {fileID: 8900000, guid: b995d4bd9d11078d11005b9844295342, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
     m_Floats:
       data:
         first:
@@ -98,10 +98,6 @@ Material:
         first:
           name: _Cutoff
         second: .5
-      data:
-        first:
-          name: _Outline
-        second: .00499999989
       data:
         first:
           name: _Parallax
@@ -138,6 +134,10 @@ Material:
         first:
           name: _Metallic
         second: 0
+      data:
+        first:
+          name: _Outline
+        second: .00350000011
     m_Colors:
       data:
         first:
@@ -146,7 +146,7 @@ Material:
       data:
         first:
           name: _Color
-        second: {r: .800000012, g: .800000012, b: .800000012, a: 1}
+        second: {r: .749019623, g: .247058824, b: .247058824, a: 1}
       data:
         first:
           name: _OutlineColor
