@@ -9,12 +9,12 @@ using System.Collections.Generic;
 using UnityEngine.Events;
 
 public partial class InformationController : MonoBehaviour {
-
-
+	
 	//objects for creation units queue
 	int creationQueueButtonsCount;
 	Vector2 creationQueueButtonSize;
 	Vector2 creationQueueInitialPoint;
+	Vector2 scaledUnitCreationPanel;
 	Resource currentResource;
 
 	ArrayList creationQueueButtons = new ArrayList();
@@ -44,8 +44,8 @@ public partial class InformationController : MonoBehaviour {
 		
 			for (int i = 0; i < creationQueueButtonsCount; i++) {
 				Vector2 buttonCenter = new Vector2();
-				buttonCenter.x = multiselectionInitialPoint.x + multiselectionButtonSize.x / 2 + (multiselectionButtonSize.x * i);
-				buttonCenter.y = multiselectionInitialPoint.y;
+				buttonCenter.x = creationQueueInitialPoint.x + scaledUnitCreationPanel.x / 2f + (creationQueueButtonSize.x * i) + creationQueueButtonSize.x / 2f;
+				buttonCenter.y = creationQueueInitialPoint.y - scaledUnitCreationPanel.y;
 				GameObject button = CreateCreationUnitButton(buttonCenter);
 				creationQueueButtons.Add(button);
 			}
@@ -63,7 +63,7 @@ public partial class InformationController : MonoBehaviour {
 		GameObject buttonObject = new GameObject("CreationUnitImage");
 		Image image = buttonObject.AddComponent<Image>();
 		image.transform.parent = canvas.transform;
-		image.rectTransform.sizeDelta = multiselectionButtonSize * 0.9f;
+		image.rectTransform.sizeDelta = creationQueueButtonSize * 0.9f;
 		image.rectTransform.position = center;
 		Texture2D texture = (Texture2D)Resources.Load ("InformationImages/MEN_civil");
 		if (texture) {
@@ -73,7 +73,7 @@ public partial class InformationController : MonoBehaviour {
 		GameObject shadowObject = new GameObject("MultiSelectionButtonButton");
 		Image shadow = shadowObject.AddComponent<Image>();
 		shadow.transform.parent = canvas.transform;
-		shadow.rectTransform.sizeDelta = multiselectionButtonSize * 0.9f;
+		shadow.rectTransform.sizeDelta = creationQueueButtonSize * 0.9f;
 		shadow.rectTransform.position = center;
 		shadow.type = Image.Type.Filled;
 		shadow.fillMethod = Image.FillMethod.Radial360;

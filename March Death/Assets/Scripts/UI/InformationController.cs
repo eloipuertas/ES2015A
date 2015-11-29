@@ -68,13 +68,15 @@ public partial class InformationController : MonoBehaviour
 		MAX_SQUADS_BUTTONS = squadsColumns * squadsRows;
 		
 		//Inicializate parameters for unit creation buttons
-		/*
-		rectTransform = GameObject.Find("Information").transform.FindChild ("UnitCreationButtons").GetComponent<RectTransform>();
-		panelSize = rectTransform.sizeDelta;
-		center = rectTransform.position;
-		creationQueueButtonSize = new Vector2(panelSize.x / 5, panelSize.y);
-		creationQueueInitialPoint = new Vector2(center.x - panelSize.x / 2, center.y + panelSize.y / 2);
-		*/
+		RectTransform parentTransform = GameObject.Find("Information").GetComponent<RectTransform>();
+		Vector2 globalScaleXY = new Vector2(parentTransform.lossyScale.x, parentTransform.lossyScale.y);
+		RectTransform newrectTransform = GameObject.Find("Information").transform.FindChild ("UnitCreationPanel").GetComponent<RectTransform>();
+		var newpanelSize = newrectTransform.sizeDelta;
+		var newcenter = newrectTransform.position;
+		scaledUnitCreationPanel = Vector2.Scale(newpanelSize, globalScaleXY);
+		creationQueueButtonSize = new Vector2(scaledUnitCreationPanel.x / 5, scaledUnitCreationPanel.y);
+		creationQueueInitialPoint = new Vector2(newcenter.x - scaledUnitCreationPanel.x, newcenter.y + scaledUnitCreationPanel.y);
+
 		//Default is hidden
 		HideInformation ();
 	}
