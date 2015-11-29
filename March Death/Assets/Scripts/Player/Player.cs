@@ -308,8 +308,9 @@ public class Player : BasePlayer
 
     private void OnEntityFound(System.Object obj)
     {
-		GameObject go = (GameObject) obj;
+        GameObject go = (GameObject) obj;
         IGameEntity entity = go.GetComponent<IGameEntity>();
+        if (entity == null) return;    // HACK Sometimes, it is a LightHouse-Revealer, i.e. there is no game entity (NullReferenceException)
         if (entity.info.isUnit)
         {
             events.DisplayEnemySpotted(go);
