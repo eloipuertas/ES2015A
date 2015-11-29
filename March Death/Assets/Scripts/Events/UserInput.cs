@@ -164,7 +164,7 @@ public partial class UserInput : MonoBehaviour
                     && entity.status != EntityStatus.DESTROYED)
                     {
 
-                        player.registerGameEntityActions(entity);
+                        
                         if ((entity.info.isUnit))
                         {
                             sManager.AttackTo(entity);
