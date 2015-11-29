@@ -201,10 +201,11 @@ namespace Assets.Scripts.AI
 
         }
 
-        public void CreateBuilding(BuildingTypes btype, Vector3 position, Quaternion rotation)
+        public void CreateBuilding(BuildingTypes btype, Vector3 position, Quaternion rotation, AIArchitect architect)
         {
             GameObject g = Info.get.createBuilding(_selfRace, btype, position, rotation);
             IGameEntity entity = g.GetComponent<IGameEntity>();
+            entity.registerFatalWounds(architect.onDestroy);
             OnBuildingCreated(entity);
             if(!AIArchitect.TESTING) checkout(entity);
         }
