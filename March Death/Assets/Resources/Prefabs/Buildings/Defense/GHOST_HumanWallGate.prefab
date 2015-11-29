@@ -1,41 +1,40 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &160380
+--- !u!1 &107522
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 419470}
-  - 33: {fileID: 3347748}
-  - 23: {fileID: 2396018}
-  - 114: {fileID: 11466666}
+  - 4: {fileID: 414070}
+  - 33: {fileID: 3341120}
+  - 23: {fileID: 2360060}
   m_Layer: 0
-  m_Name: GHOST_Elf-Wall_Corner
+  m_Name: GHOST_HumanWallGate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &419470
+--- !u!4 &414070
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 160380}
+  m_GameObject: {fileID: 107522}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 758.00238, y: 79.0026245, z: 826.028015}
-  m_LocalScale: {x: 144.287384, y: 144.287384, z: 216.293854}
+  m_LocalPosition: {x: 772.351257, y: 79.0026245, z: 821.997314}
+  m_LocalScale: {x: -315.409241, y: -254.678818, z: -100}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
---- !u!23 &2396018
+--- !u!23 &2360060
 MeshRenderer:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 160380}
+  m_GameObject: {fileID: 107522}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -56,42 +55,21 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!33 &3347748
+--- !u!33 &3341120
 MeshFilter:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 160380}
-  m_Mesh: {fileID: 4300002, guid: e81e6b3d9cf252743af33c6e0bc180dd, type: 3}
---- !u!114 &11466666
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 160380}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc4dbd7bbbda4e14baa3f054762b3ca9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  race: 1
-  type: 8
+  m_GameObject: {fileID: 107522}
+  m_Mesh: {fileID: 4300000, guid: 0141eae8034bf1247bf63aad5e1207cf, type: 3}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 0}
-      propertyPath: race
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: type
-      value: 8
-      objectReference: {fileID: 0}
+    m_Modifications: []
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 160380}
+  m_RootGameObject: {fileID: 107522}
   m_IsPrefabParent: 1
