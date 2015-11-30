@@ -213,7 +213,6 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         GameObject gob = Info.get.createUnit(race, type, unitPosition, transform.rotation, -1);
 
         Unit new_unit = gob.GetComponent<Unit>();
-        new_unit.role = Unit.Roles.WANDERING;
 
         BasePlayer.getOwner(this).addEntity(new_unit);
         fire(CREATE_UNIT, new_unit);

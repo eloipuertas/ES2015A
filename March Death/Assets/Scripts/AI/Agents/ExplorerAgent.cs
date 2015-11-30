@@ -86,14 +86,15 @@ namespace Assets.Scripts.AI.Agents
 
             if (fowManager.Enabled)
             {
-                //PLACEHOLDER, until sprint2 when we split things
-                if (squad.Units.Count < 2)
+                /*
+                TODO: takeArms Explorer
+                if (squad.units.Count < 2)
                 {
                     int num = 2 - squad.Units.Count();
                     if (ai.Macro.canTakeArms() >= num)
                         ai.Macro.takeArms(num);
                 }
-
+                */
                 bool lostHero = (heroLastPos != Vector3.zero && !heroVisible && squad.Units.Count > 0);
 
                 // Static values

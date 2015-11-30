@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
@@ -56,7 +56,7 @@ namespace Pathfinding
         #endregion
 
         #region Mesh Debugging
-        public bool RenderInEditor = false;
+        public bool RenderInGame = false;
         public Material material;
         public RenderMode Mode;
         private DbgRenderMesh mesh = new DbgRenderMesh();
@@ -79,8 +79,8 @@ namespace Pathfinding
         private HandleRef _crowd;
         private TileCache _tileCache;
 
-        private Dictionary<int, DetourAgent> agents = new Dictionary<int, DetourAgent>();
-
+        private List<DetourAgent> agents = new List<DetourAgent>();
+        
         public void OnEnable()
         {
             RecastConfig recastConfig = GameObject.FindObjectOfType<RecastConfig>();
@@ -117,7 +117,7 @@ namespace Pathfinding
             
             Instance = this;
 
-            if (!Application.isPlaying && RenderInEditor)
+            if (RenderInGame)
             {
                 mesh.Clear();
 
@@ -141,7 +141,7 @@ namespace Pathfinding
                         break;
                 }
 
-                RecastDebug.RenderObstacles(_tileCache.TileCacheHandle.Handle);
+                //RecastDebug.RenderObstacles(_tileCache.TileCacheHandle.Handle);
 
                 mesh.CreateGameObjects("RecastRenderer", material);
                 mesh.Rebuild();
@@ -207,7 +207,7 @@ namespace Pathfinding
             int idx = addAgent(_crowd.Handle, agent.transform.position.ToFloat(), ref ap);
             if (idx != -1)
             {
-                agents.Add(idx, agent);
+                agents.Add(agent);
             }
 
             return idx;
@@ -220,12 +220,12 @@ namespace Pathfinding
             updateAgent(_crowd.Handle, idx, ref ap);
         }
 
-        public void RemoveAgent(int idx)
+        public void RemoveAgent(DetourAgent agent)
         {
             Assert.IsTrue(_crowd.Handle.ToInt64() != 0);
 
-            removeAgent(_crowd.Handle, idx);
-            agents.Remove(idx);
+            removeAgent(_crowd.Handle, agent.ID);
+            agents.Remove(agent);
         }
 
         public void MoveTarget(int idx, Vector3 target)
@@ -277,14 +277,13 @@ namespace Pathfinding
 
             updateTick(_tileCache.TileCacheHandle.Handle, _tileCache.NavMeshHandle.Handle, _crowd.Handle, Time.deltaTime, positions, velocities, states, targetStates, ref numUpdated);
 
-            foreach (KeyValuePair<int, DetourAgent> entry in agents)
+            foreach (DetourAgent agent in agents)
             {
-                DetourAgent agent = entry.Value;
-                agent.Velocity = velocities.ToVector3(entry.Key * 3);
-                agent.State = (DetourAgent.CrowdAgentState)states[entry.Key];
-                agent.TargetState = (DetourAgent.MoveRequestState)targetStates[entry.Key];
+                agent.Velocity = velocities.ToVector3(agent.ID * 3);
+                agent.State = (DetourAgent.CrowdAgentState)states[agent.ID];
+                agent.TargetState = (DetourAgent.MoveRequestState)targetStates[agent.ID];
 
-                Vector3 newPosition = positions.ToVector3(entry.Key * 3);
+                Vector3 newPosition = positions.ToVector3(agent.ID * 3);
                 agent.transform.position = newPosition;
 
                 if (agent.Velocity.sqrMagnitude != 0)

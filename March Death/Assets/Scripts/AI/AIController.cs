@@ -195,10 +195,11 @@ namespace Assets.Scripts.AI
 
         }
 
-        public void CreateBuilding(BuildingTypes btype, Vector3 position, Quaternion rotation)
+        public void CreateBuilding(BuildingTypes btype, Vector3 position, Quaternion rotation, AIArchitect architect)
         {
             GameObject g = Info.get.createBuilding(_selfRace, btype, position, rotation);
             IGameEntity entity = g.GetComponent<IGameEntity>();
+            entity.registerFatalWounds(architect.onDestroy);
             OnBuildingCreated(entity);
             if(!AIArchitect.TESTING) checkout(entity);
         }
@@ -219,9 +220,7 @@ namespace Assets.Scripts.AI
         {
             if (u.info.isCivil)
             {
-                //Workers.Add(u);
-                //The line above is correct, but we still don't have enemy units so let's just put everything into the army and wipe the floor with the player
-                addToArmy(u);
+                Workers.Add(u);
             }
             else
             {

@@ -113,15 +113,16 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
             position.x = building.position.X;
             position.z = building.position.Y;
             // HACK Without the addition, Construction Grid detects the terrain as it not being flat
-            position.y = 1 + terrain.SampleHeight(position);
+            position.y = terrain.SampleHeight(position);
             created = _buildings.createBuilding(position, Quaternion.Euler(0,0,0),
                                         building.type.building,
-                                        _selfRace);
+                                        _selfRace, 1.0f);
 
             IGameEntity entity = created.GetComponent<IGameEntity>();
             if (building.hasStatus)
             {
                 entity.DefaultStatus = building.status;
+                entity.setStatus(building.status);
             }
             
             AddBuilding(entity);

@@ -64,10 +64,28 @@ namespace Assets.Scripts.AI
         {
             if (ai.Workers.Count > 0)
             {
+                List<Unit> lu = new List<Unit>();
+                
                 int min = Math.Min(num, ai.Workers.Count);
-                List<Unit> lu = ai.Workers.GetRange(0, min);
-                ai.Workers.RemoveRange(0, min);
-                ai.addToArmy(lu);
+                int edL= 0;
+                while(lu.Count< min && edL<ai.OwnResources.Count)
+                {
+                    Resource building = ai.OwnResources[edL];
+                    if (building.harvestUnits > 0)
+                    {
+                        Unit u = building.recruitExplorer();
+                        if(u!= null)
+                        {
+                            lu.Add(u);
+                            ai.Workers.Remove(u);
+                        }
+                    }
+                    else
+                    {
+                        edL++;
+                    }
+                    ai.addToArmy(lu);
+                }
             }
         }
     }

@@ -142,9 +142,8 @@ public partial class UserInput : MonoBehaviour
         {
             //Do nothing
         }
-        else if ( player.isCurrently(Player.status.SELECTED_UNITS) && !sManager.IsBuilding() )
+        else if ( player.isCurrently(Player.status.SELECTED_UNITS) )
         {
-
             GameObject hitObject = FindHitObject();
             if (!hitObject) // out of bounds click
             {
@@ -166,6 +165,12 @@ public partial class UserInput : MonoBehaviour
                     {
                         sManager.AttackTo(entity);
                     }
+                    else if(entity.info.isResource
+                            && (entity.status == EntityStatus.IDLE
+                            || entity.status == EntityStatus.WORKING))
+                    {
+                        sManager.Enter(entity);
+                    }   
                 }
             }
         }

@@ -13,8 +13,8 @@ using Pathfinding;
 /// </summary>
 public class Unit : GameEntity<Unit.Actions>
 {
+
     public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT, TARGET_TERMINATED };
-    public enum Roles { PRODUCING, WANDERING };
     public enum Gender { MALE, FEMALE }
 
     private EntityStatus _defaultStatus = EntityStatus.IDLE;
@@ -62,6 +62,11 @@ public class Unit : GameEntity<Unit.Actions>
     public Gender gender = Gender.MALE;
 
     /// <summary>
+    /// List of components needed to deactivate at Vanish() and activate at bringback()
+    /// </summary>
+    protected List<Component> unitConponents = new List<Component>();
+
+    /// <summary>
     /// If in battle, this is the target and last attack time
     /// </summary>
     private IGameEntity _target = null;
@@ -81,11 +86,6 @@ public class Unit : GameEntity<Unit.Actions>
     private float _lastAttack = 0;
 
     /// <summary>
-    /// Get and set current role (mostly for CIVILS)
-    /// </summary>
-    public Roles role { get; set; }
-
-    /// <summary>
     /// Point to move to
     /// </summary>
     private Vector3 _movePoint;
@@ -95,7 +95,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     private DetourAgent _detourAgent;
     public DetourAgent Agent { get { return _detourAgent; } }
-
+    
     /// <summary>
     /// Can this unit perform ranged attacks?
     /// </summary>
@@ -175,6 +175,8 @@ public class Unit : GameEntity<Unit.Actions>
             moveTo(((GameObject)obj).transform.position);
         }
     }
+
+    
 
     /// <summary>
     /// When a wound is received, this is called
@@ -262,6 +264,29 @@ public class Unit : GameEntity<Unit.Actions>
         _closestPointToTarget.y = _target.getTransform().position.y;
 
         _distanceToTarget = Vector3.Distance(_attackPoint, _closestPointToTarget);
+    }
+
+
+
+
+    /// <summary>
+    /// Starts unit travel to building resource
+    /// </summary>
+    /// <param name="building"></param>
+    /// <returns></returns>
+    public bool goToBuilding(IGameEntity building)
+    {
+        
+        _target = building;
+        _followingTarget = true;
+        _movePoint = building.getTransform().position;
+        _detourAgent.MoveTo(_movePoint);
+        setStatus(EntityStatus.MOVING);
+        fire(Actions.MOVEMENT_START);
+        updateDistanceToTarget();
+        Debug.Log("Unit: GoToBuilding()");
+        
+        return true;
     }
 
     /// <summary>
@@ -379,6 +404,118 @@ public class Unit : GameEntity<Unit.Actions>
     }
 
     /// <summary>
+    /// Vanish unit from game just disabling components attached.
+    /// If some new component is added you must add it to this method
+    /// and to bringback method too.
+    /// </summary>
+    /// 
+    public void vanish()
+    {
+        //Disable FOW
+        if (GetComponent<FOWEntity>())
+        {
+            GetComponent<FOWEntity>().enabled = false;
+        }
+        //disable EntityMarker
+        if (GetComponent<EntityMarker>())
+        {   
+            GetComponent<EntityMarker>().enabled = false;
+        }
+        // Disable animator
+        if (GetComponent<Animator>())
+        {
+            GetComponent<Animator>().enabled = false;
+        }
+        // Rigidbody can't be disabled. Must toggle detectCollisions and iskinematic
+        if (GetComponent<Rigidbody>())
+        {
+            GetComponent<Rigidbody>().detectCollisions = false;
+            GetComponent<Rigidbody>().isKinematic = true;
+        }
+        //Disable Selectable
+        // TODO: can't disable square border and lifebar
+        
+        if (GetComponent<Selectable>())
+        {
+            GetComponent<Selectable>().enabled = false;
+            GetComponent<Selectable>().DeselectMe();
+            
+        }  
+        // Disable ligths if any    
+        if (GetComponent<Light>())
+        {
+            GetComponent<Light>().enabled = false;
+        }
+        //disable collider
+        if(GetComponent<Collider>())
+        {
+            GetComponent<Collider>().enabled = false;
+        }
+        // Disable DetourAgent. Must remove form crowd first
+        if (GetComponent<DetourAgent>())
+        {  
+            GetComponent<DetourAgent>().RemoveFromCrowd();
+            GetComponent<DetourAgent>().enabled = false;
+        }
+        // Disable render
+        Component[] allRenderers = GetComponentsInChildren<Renderer>();
+        foreach (Renderer r in allRenderers)
+        {
+            r.enabled = false;
+        }
+        
+
+    }
+    /// <summary>
+    /// Units vanished with vanish method needs to uses BringBack method in 
+    /// order to enable components.
+    /// </summary>
+    public void bringBack()
+    {
+       
+        if (GetComponent<FOWEntity>())
+        {
+            GetComponent<FOWEntity>().enabled = true;
+        }
+        if (GetComponent<EntityMarker>())
+        {
+            GetComponent<EntityMarker>().enabled = true;
+        }
+        if (GetComponent<Animator>())
+        {
+            GetComponent<Animator>().enabled = true;
+        }
+        if (GetComponent<Rigidbody>())
+        {
+            GetComponent<Rigidbody>().detectCollisions = true;
+            GetComponent<Rigidbody>().isKinematic = false;
+        }
+        if (GetComponent<Collider>())
+        {
+            GetComponent<Collider>().enabled = true;
+        }
+        
+        if (GetComponent<Light>())
+        {
+            GetComponent<Light>().enabled = true;
+        }
+        if (GetComponent<DetourAgent>())
+        {
+            GetComponent<DetourAgent>().enabled = true;
+            GetComponent<DetourAgent>().AddToCrowd();
+        }
+        Component[] allRenderers = GetComponentsInChildren<Renderer>();
+        foreach (Renderer r in allRenderers)
+        {
+            r.enabled = true;
+        }
+        if (GetComponent<Selectable>())
+        {
+            GetComponent<Selectable>().enabled = true;
+            //GetComponent<Selectable>().SelectOnlyMe();
+        }
+    }
+    /// <summary>
     /// Object initialization
     /// </summary>
     public override void Awake()
@@ -431,7 +568,7 @@ public class Unit : GameEntity<Unit.Actions>
     public override void Update()
     {
         base.Update();
-
+        
         // Precompute distance to our target if we have target
         // Avoids computing it serveral (5+ times)
         if (_target != null)
@@ -451,7 +588,7 @@ public class Unit : GameEntity<Unit.Actions>
             float goldProduced = 0;
 
             // Civils produce gold when working and doesn't consume it
-            if (info.isCivil && role == Roles.PRODUCING)
+            if (info.isCivil && status == EntityStatus.WORKING)
             {
                 goldProduced = info.unitAttributes.goldProduction * resourcesElapsed;
                 goldConsumed = 0;
@@ -538,6 +675,24 @@ public class Unit : GameEntity<Unit.Actions>
                 // would be otherwise outdated
                 if (_followingTarget)
                 {
+                    // If we are just civilian unit travelling to our own building resource.
+                    // Check distance to target to know if we are close enough.
+                    // When capture distance is reached resource building capture 
+                    // method is triggered.
+
+                    if (_target.info.race == this.race)
+                    {                      
+                        if (_distanceToTarget <= _target.info.resourceAttributes.trapRange)
+                        {
+                            _detourAgent.ResetPath();
+                            setStatus(EntityStatus.IDLE);
+                            _followingTarget = false;
+                            fire(Actions.MOVEMENT_END);
+                            ((Resource)_target).trapUnit(this);
+                            return;
+                        }
+                       
+                    } 
                     // Update destination only if target has moved
                     Vector3 destination = _closestPointToTarget;
                     if ((destination - _movePoint).sqrMagnitude > SQR_UPDATE_DISTANCE)
