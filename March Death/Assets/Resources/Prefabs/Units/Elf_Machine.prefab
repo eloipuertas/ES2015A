@@ -261,6 +261,9 @@ MonoBehaviour:
   Height: 2
   MaxSpeed: 2
   MaxAcceleration: 2
+  Flags: -1
+  AvoidanceType: 1
+  SeparationWeight: .5
 --- !u!114 &11486442
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -274,6 +277,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   race: 1
   type: 6
+  gender: 0
   _distanceToTarget: 0
 --- !u!119 &11958914
 Projector:
@@ -343,6 +347,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: Radius
       value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Flags
+      value: -1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
