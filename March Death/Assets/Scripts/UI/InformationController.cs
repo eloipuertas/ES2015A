@@ -215,7 +215,7 @@ public partial class InformationController : MonoBehaviour
 			resource.register(Resource.Actions.DAMAGED, onUnitDamaged);
 			resource.register(Resource.Actions.DESTROYED, onUnitDied);
 			resource.register(Resource.Actions.CREATE_UNIT, onBuildingUnitCreated);
-			resource.register(Resource.Actions.LOAD_UNIT, onBuildingUnitCreated);
+			//resource.register(Resource.Actions.LOAD_UNIT, onBuildingUnitCreated);
 		});
 		
 		entity.doIfBarrack(building =>
