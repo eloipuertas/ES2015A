@@ -18,6 +18,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public Races race = Races.MEN;
     public Races getRace() { return race; }
     public abstract E getType<E>() where E : struct, IConvertible;
+    public T HEALTH_UPDATED { get; set; }
 
     protected Collider _collider;
     protected Pathfinding.DetourObstacle _obstacle;
@@ -254,6 +255,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public override void Awake()
     {
         base.Awake();
+        HEALTH_UPDATED = (T)Enum.Parse(typeof(T), "HEALTH_UPDATED", true);
 
 #if !DISABLE_ANIMATOR
         // Get the Animator
@@ -304,6 +306,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 				if (_autoRecoveryAccom >= 1) {
 					_woundsReceived -= 1;
 					_autoRecoveryAccom -= 1;
+                    fire(HEALTH_UPDATED);
 
 					if (_woundsReceived == 0) {
 						_autoRecoveryAccom = 0;
@@ -383,7 +386,6 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 
     protected virtual void onReceiveDamage()
 	{
-		Debug.Log (_woundsReceived.ToString ());
 		// If _autoRepairTimer is -1, means that the building was fully recovered before the attack.
 		if (_autoRecoveryTimer == -1) {
 			_autoRecoveryTimer = 0;

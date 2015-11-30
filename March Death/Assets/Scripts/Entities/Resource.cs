@@ -7,7 +7,7 @@ using Storage;
 
 public class Resource : Building<Resource.Actions>
 {
-    public enum Actions { CREATED, DAMAGED, DESTROYED, BUILDING_FINISHED, COLLECTION, CREATE_UNIT, DEL_STATS };
+    public enum Actions { CREATED, DAMAGED, DESTROYED, BUILDING_FINISHED, COLLECTION, CREATE_UNIT, DEL_STATS, HEALTH_UPDATED };
 
     /// <summary>
     /// civilian creation waste some time. When units are being created status
