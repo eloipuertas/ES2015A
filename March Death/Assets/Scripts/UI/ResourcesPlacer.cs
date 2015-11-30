@@ -16,6 +16,7 @@ public class ResourcesPlacer : MonoBehaviour
     private WorldResources.Type[] t = { WorldResources.Type.FOOD, WorldResources.Type.WOOD, WorldResources.Type.METAL };
     private List<Text> res_amounts;
     private List<Text> res_stats;
+    private Text pop;
     private Player player;
 
     private float[] _statistics = { 0f, 0f, 0f };
@@ -59,6 +60,11 @@ public class ResourcesPlacer : MonoBehaviour
             res_stats.Add(text);
         }
 
+        GameObject go = GameObject.Find("HUD/resources/text_population");
+        if (!go) throw new Exception("Object text_population not found!");
+
+        pop = go.GetComponent<Text>();
+
         setupText();
         updateAmounts();
 
@@ -74,6 +80,7 @@ public class ResourcesPlacer : MonoBehaviour
         if (_timer >= UPDATE_STATS)
         {
             updateStatistics();
+            updatePopulation();
             _timer = 0f;
         }
         else _timer += Time.deltaTime;
@@ -106,6 +113,11 @@ public class ResourcesPlacer : MonoBehaviour
         {
             res_amounts[i].text = "" + player.resources.getAmount(t[i]);
         }
+    }
+
+    public void updatePopulation()
+    {
+        pop.text = PopulationInfo.get.number_of_units.ToString();
     }
 
     public void updateStatistics()
