@@ -8,6 +8,7 @@ using UnityEngine;
 /// </summary>
 namespace Assets.Scripts.AI
 {
+    /*
     public class SquadAI
     {
 
@@ -193,16 +194,11 @@ namespace Assets.Scripts.AI
             return u.healthPercentage / 100 * (u.info.unitAttributes.resistance + u.info.unitAttributes.attackRate * u.info.unitAttributes.strength);
         }
     }
-    /* Small class to save data for each agent on this squad
-    Implements the following events:
-        OnUnitLeft  (could leave for death or just reshuffling squads)
-        OnUnitJoined
 
-    Must have a nonParametized constructor
-    */
     public class AgentData
     {
         public virtual void OnUnitLeft(Unit u) { }
         public virtual void OnUnitJoined(Unit u) { }
     }
+    */
 }

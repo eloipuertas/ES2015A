@@ -77,9 +77,9 @@ namespace Assets.Scripts.AI.Agents
             assistAgent = assist;
         }
 
-        public override void controlUnits(SquadAI squad)
+        public override void controlUnits(Squad squad)
         {
-            if (squad.units.Count == 0)
+            if (squad.Units.Count == 0)
             {
                 return;
             }
@@ -87,21 +87,21 @@ namespace Assets.Scripts.AI.Agents
             if (fowManager.Enabled)
             {
                 //PLACEHOLDER, until sprint2 when we split things
-                if (squad.units.Count < 2)
+                if (squad.Units.Count < 2)
                 {
-                    int num = 2 - squad.units.Count();
+                    int num = 2 - squad.Units.Count();
                     if (ai.Macro.canTakeArms() >= num)
                         ai.Macro.takeArms(num);
                 }
 
-                bool lostHero = (heroLastPos != Vector3.zero && !heroVisible && squad.units.Count > 0);
+                bool lostHero = (heroLastPos != Vector3.zero && !heroVisible && squad.Units.Count > 0);
 
                 // Static values
                 FOWManager.visible[] grid = fowManager.aiVision;
                 Vector2 gridSize = fowManager.getGridSize();
 
                 // Get a random unit as a reference point
-                Unit reference = squad.units[D6.get.rollN(squad.units.Count)];
+                Unit reference = squad.Units[D6.get.rollN(squad.Units.Count)];
                 DetourAgent agent = reference.GetComponent<DetourAgent>();
 
                 // Check if target is already explored
@@ -191,7 +191,7 @@ namespace Assets.Scripts.AI.Agents
                 }
 
                 // If we have a point, move there
-                foreach (Unit u in squad.units)
+                foreach (Unit u in squad.Units)
                 {
                     if (lostHero)
                     {
@@ -298,7 +298,7 @@ namespace Assets.Scripts.AI.Agents
 		/// </summary>
 		/// <returns>The confidence.</returns>
 		/// <param name="units">Units.</param>
-        public override int getConfidence(SquadAI squad)
+        public override int getConfidence(Squad squad)
         {
 			//Explorer agent has some confidence by default
 			confidence = CONFIDENCE_EXPLORER_BY_DEFAULT;
@@ -316,7 +316,7 @@ namespace Assets.Scripts.AI.Agents
 			}
 
 			//If all units of the squad adds some more confidence to this behaivour
-			foreach(Unit unit in squad.units)
+			foreach(Unit unit in squad.Units)
 			{
 				if(unit.type != Storage.UnitTypes.CIVIL)
 				{

@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using Storage;
 
-public class AISenses : MonoBehaviour {
+public static class AISenses
+{
     
     /// <summary>
     /// Returns all the gameObjects in some radius
@@ -10,7 +11,7 @@ public class AISenses : MonoBehaviour {
     /// <param name="position"></param>
     /// <param name="radius"></param>
     /// <returns></returns>
-    public GameObject[] getObjectsNearPosition(Vector3 position, float radius)
+    public static GameObject[] getObjectsNearPosition(Vector3 position, float radius)
     {
         Collider[] collidersNearUs = Physics.OverlapSphere(position, radius);
         GameObject[] objectsNearUs = new GameObject[collidersNearUs.Length];
@@ -29,7 +30,7 @@ public class AISenses : MonoBehaviour {
     /// <param name="radius"></param>
     /// <param name="race"></param>
     /// <returns></returns>
-    public List<Unit> getUnitsOfRaceNearPosition(Vector3 position, float radius, Races race)
+    public static List<Unit> getUnitsOfRaceNearPosition(Vector3 position, float radius, Races race)
     {
         GameObject[] foundGameObjects = getObjectsNearPosition(position, radius);
         List<Unit> unitsOfRace = new List<Unit>();
@@ -53,7 +54,7 @@ public class AISenses : MonoBehaviour {
     /// <param name="radius"></param>
     /// <param name="race"></param>
     /// <returns></returns>
-    public List<IBuilding> getBuildingsOfRaceNearPosition(Vector3 position, float radius, Races race)
+    public static List<IBuilding> getBuildingsOfRaceNearPosition(Vector3 position, float radius, Races race)
     {
         GameObject[] foundGameObjects = getObjectsNearPosition(position, radius);
         List<IBuilding> buldingsOfRace = new List<IBuilding>();
@@ -77,7 +78,7 @@ public class AISenses : MonoBehaviour {
     /// <param name="radius"></param>
     /// <param name="race"></param>
     /// <returns></returns>
-    public List<Unit> getVisibleUnitsOfRaceNearPosition(Vector3 position, float radius, Storage.Races race)
+    public static List<Unit> getVisibleUnitsOfRaceNearPosition(Vector3 position, float radius, Storage.Races race)
     {
         GameObject[] foundGameObjects = getObjectsNearPosition(position, radius);
         List<Unit> unitsOfRace = new List<Unit>();
@@ -87,6 +88,23 @@ public class AISenses : MonoBehaviour {
             GameObject obj = foundGameObjects[i];
             Unit objUnit = obj.GetComponent<Unit>();
             if (objUnit != null && objUnit.race == race && objUnit.status!=EntityStatus.DEAD && obj.GetComponent<FOWEntity>().IsRevealed)
+            {
+                unitsOfRace.Add(objUnit);
+            }
+        }
+        return unitsOfRace;
+    }
+
+    public static List<Unit> getVisibleUnitsNotOfRaceNearPosition(Vector3 position, float radius, Storage.Races race)
+    {
+        GameObject[] foundGameObjects = getObjectsNearPosition(position, radius);
+        List<Unit> unitsOfRace = new List<Unit>();
+
+        for (int i = 0; i < foundGameObjects.Length; i++)
+        {
+            GameObject obj = foundGameObjects[i];
+            Unit objUnit = obj.GetComponent<Unit>();
+            if (objUnit != null && objUnit.race != race && objUnit.status != EntityStatus.DEAD && obj.GetComponent<FOWEntity>().IsRevealed)
             {
                 unitsOfRace.Add(objUnit);
             }

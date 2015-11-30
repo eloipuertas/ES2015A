@@ -110,6 +110,35 @@ public class Unit : GameEntity<Unit.Actions>
     /// <summary>
     /// Max. euclidean distance to the target
     /// </summary>
+    private Squad _squad;
+    private SquadUpdater _squadUpdater;
+    public Squad Squad
+    {
+        get
+        {
+            if (_squad == null)
+            {
+                _squadUpdater = gameObject.AddComponent<SquadUpdater>();
+                _squadUpdater.Initialize(info.race);
+                _squad = _squadUpdater.UnitsSquad;
+            }
+
+            return _squad;
+        }
+        set
+        {
+            if (_squadUpdater)
+            {
+                Destroy(_squadUpdater);
+            }
+
+            _squad = value;
+        }
+    }
+
+    /// <summary>
+    /// Max. euclidean distance to the target
+    /// </summary>
     public float currentAttackRange()
     {
         if (isRanged)

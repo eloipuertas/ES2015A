@@ -6,7 +6,7 @@ using System.Text;
 namespace Storage
 {
     public enum EntityType { UNIT, BUILDING, SQUAD };
-    public enum Races { MEN, ELVES, DWARFS, LIZARDMEN, GREENSKINS, CHAOS, SKAVEN, UNDEAD, OGRES };
+    public enum Races { MEN, ELVES, DWARFS, LIZARDMEN, GREENSKINS, CHAOS, SKAVEN, UNDEAD, OGRES, RESERVED_UNSPECIFIED };
 
     public abstract class EntityInfo
     {
