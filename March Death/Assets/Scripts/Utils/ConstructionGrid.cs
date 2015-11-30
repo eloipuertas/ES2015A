@@ -169,8 +169,8 @@ public class ConstructionGrid : MonoBehaviour
     /// <summary>
     /// Gets a free position near somewhere
     /// </summary>
-    /// <param name="sp"></param>
-    public Vector3 getFreePositionAbleToConstructNearAPoint(Vector3 position)
+    /// <param name="position"></param>
+    public Vector3 getFreePositionAbleToConstructNearPoint(Vector3 position)
     {
         recursionDepth++;
 
@@ -227,7 +227,7 @@ public class ConstructionGrid : MonoBehaviour
         }
 
         //If we don't find anithing we need to search somewhere
-        return getFreePositionAbleToConstructNearAPoint(possibilities[UnityEngine.Random.Range(0, 7)]);
+        return getFreePositionAbleToConstructNearPoint(possibilities[UnityEngine.Random.Range(0, 7)]);
     }
 
     public Vector2 getDimensions()
