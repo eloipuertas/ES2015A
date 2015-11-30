@@ -364,8 +364,8 @@ public class Resource : Building<Resource.Actions>
             _xDisplacement = totalUnits % 5;
             _yDisplacement = totalUnits / 5;
             _unitPosition.Set(_center.x + 10 + _xDisplacement, _center.y, _center.z + 10 +  _yDisplacement);
-            
-            
+
+           
             worker.transform.position = _unitPosition;
             worker.bringBack();
             worker.setStatus(EntityStatus.IDLE);
@@ -418,7 +418,7 @@ public class Resource : Building<Resource.Actions>
     /// <param name="entity"></param>
     public void trapUnit(IGameEntity entity)
     {
-        Debug.Log("*****Trap****");
+        Debug.Log("Unit trapped");
         // Unit must be civil and player owned
         Assert.IsTrue(entity.info.isCivil);
         Assert.IsTrue(entity.info.race == info.race);
