@@ -483,8 +483,6 @@ public class Unit : GameEntity<Unit.Actions>
         }
 
         if (_projectileThrown) {
-            //Recalculate the remaining distance after moving.
-            float sqrRemainingDistance = (_projectile.transform.position - _projectileEndPoint).sqrMagnitude;
             float inverseMoveTime = 30f; //This should be an attribute of the unit
 
             //Find a new position proportionally closer to the end, based on the moveTime
@@ -492,10 +490,12 @@ public class Unit : GameEntity<Unit.Actions>
 
             //Move the object to the new position.
             _projectile.transform.position = newPostion;
-            
+
+            //Recalculate the remaining distance after moving.
+            float sqrRemainingDistance = (_projectile.transform.position - _projectileEndPoint).sqrMagnitude;
+
             // If we reach the target...            
-            if (sqrRemainingDistance <= float.Epsilon)
-            {
+            if (sqrRemainingDistance <= float.Epsilon) {
                 List<IGameEntity> objectsInRadius = AISenses.getEntitiesNearPosition(_projectileEndPoint, 0.2f);
 
                 // Should I prevent friendly fire?
