@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Collections;
 
-public class HUDPopulationInfo : MonoBehaviour {
-
+public class HUDPopulationInfo : MonoBehaviour
+{
     public bool onShow; // to show if info is shown
     public bool UnitsMarked; // units (true) or buildings (false) are displayed.
 
-    private float REPAINT_TIME = 0.5f;
-    private float _timer = 1.5f;
+    private float REPAINT_TIME = 0.3f;
+    private float _timer = 0.3f;
 
     private GUIText pop_info;
     GameObject text;
@@ -29,13 +29,14 @@ public class HUDPopulationInfo : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        if (Input.GetKey(KeyCode.U))
+        if (Input.GetKeyUp(KeyCode.U))
         {
             Toggle();
         }
-        if (Input.GetKey(KeyCode.C))
+        if (Input.GetKeyUp(KeyCode.C))
         {
-            onShow = true;
+            ToggleVision();
+            EnableDisableText();
         }
 
     }
@@ -50,6 +51,11 @@ public class HUDPopulationInfo : MonoBehaviour {
         {
             UnitsMarked ^= true;
         }
+    }
+
+    public void ToggleVision()
+    {
+        onShow ^= true;
     }
 
     void OnGUI()
@@ -111,12 +117,17 @@ public class HUDPopulationInfo : MonoBehaviour {
         text.GetComponent<GUIText>().text = newText; 
     }
 
+    private void EnableDisableText()
+    {
+        text.GetComponent<GUIText>().enabled = onShow;
+    }
+
     private void CreateText()
     {
         text = new GameObject("Pop_Info");
         text.AddComponent<GUIText>();
         text.GetComponent<GUIText>().fontSize = 15;
         text.GetComponent<GUIText>().alignment = TextAlignment.Right;
-        text.transform.position = new Vector3(0.88f,0.7f,0f);
+        text.transform.position = new Vector3(0.80f,0.5f,0f);
     }
 }
