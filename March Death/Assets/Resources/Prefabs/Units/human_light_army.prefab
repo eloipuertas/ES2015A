@@ -953,8 +953,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 413624}
   - 95: {fileID: 9507248}
-  - 114: {fileID: 11405552}
-  - 114: {fileID: 11403732}
   - 54: {fileID: 5451292}
   - 114: {fileID: 11436026}
   - 65: {fileID: 6555024}
@@ -3103,30 +3101,6 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &11403732
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 162952}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: caa19c7f960625f4b83094529589a1c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  IsActor: 1
-  Range: 0
---- !u!114 &11405552
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 162952}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed8fedea892f030418970e7ce2a2bc2f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &11436026
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3140,6 +3114,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   race: 0
   type: 2
+  gender: 0
   _distanceToTarget: 0
 --- !u!114 &11441576
 MonoBehaviour:
@@ -3167,6 +3142,9 @@ MonoBehaviour:
   Height: 2
   MaxSpeed: 2
   MaxAcceleration: 2
+  Flags: 31
+  AvoidanceType: 1
+  SeparationWeight: .5
 --- !u!114 &11496920
 MonoBehaviour:
   m_ObjectHideFlags: 1
