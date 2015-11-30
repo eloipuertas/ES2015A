@@ -21,6 +21,16 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     public BuildingTypes type = BuildingTypes.STRONGHOLD;
     public override E getType<E>() { return (E)Convert.ChangeType(type, typeof(E)); }
 
+    /// <summary>
+    /// AISenses class needed to use method getObjectsNearPosition to locate valid 
+    /// deployment point for new units.
+    /// </summary>
+    private AISenses senses = new AISenses();
+
+    /// <summary>
+    /// Used to store values returned from getObjectsNearPosition method.
+    /// </summary>
+    private GameObject[] nearObjects;
     private EntityStatus _defaultStatus = EntityStatus.BUILDING_PHASE_1;
     public override EntityStatus DefaultStatus
     {
@@ -202,9 +212,31 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
             return transform.position;
         }
     }
+    
+    private Vector3 getMeetingPoint()
+    {
+
+        
+        Vector3 position = new Vector3();
+        ConstructionGrid grid = new ConstructionGrid();
+        
+        nearObjects = senses.getObjectsNearPosition(_center, 20);
+        foreach (GameObject g in nearObjects)
+        {
+            IBuilding objBuilding = g.GetComponent<IBuilding>();
+
+            if (g.GetComponent<IBuilding>() != null)
+            {
+                Debug.Log(" pos:" + (_center - g.transform.position));
+            }    
+        }
+        return position;
+    }
+    
 
     protected void createUnit(UnitTypes type)
     {
+        
 
         // TODO which position????
         int xDisplacement = _totalUnits % 5;

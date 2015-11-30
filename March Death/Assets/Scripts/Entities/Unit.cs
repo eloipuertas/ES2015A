@@ -654,9 +654,10 @@ public class Unit : GameEntity<Unit.Actions>
                     // method is triggered.
 
                     if (_target.info.race == this.race)
-                    {                      
+                    {
                         if (_distanceToTarget <= _target.info.resourceAttributes.trapRange)
-                        {
+                        
+                        {                   
                             _detourAgent.ResetPath();
                             setStatus(EntityStatus.IDLE);
                             _followingTarget = false;

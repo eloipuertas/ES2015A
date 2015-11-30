@@ -8,6 +8,7 @@ using UnityEngine.Assertions;
 
 public class Resource : Building<Resource.Actions>
 {
+    
     public enum Actions { CREATED, DAMAGED, DESTROYED, BUILDING_FINISHED, COLLECTION, CREATE_UNIT, DEL_STATS };
 
     /// <summary>
@@ -363,9 +364,10 @@ public class Resource : Building<Resource.Actions>
             _xDisplacement = totalUnits % 5;
             _yDisplacement = totalUnits / 5;
             _unitPosition.Set(_center.x + 10 + _xDisplacement, _center.y, _center.z + 10 +  _yDisplacement);
-
-            worker.bringBack();
+            
+            
             worker.transform.position = _unitPosition;
+            worker.bringBack();
             worker.setStatus(EntityStatus.IDLE);
 
             if (harvestUnits == 0)
@@ -416,6 +418,7 @@ public class Resource : Building<Resource.Actions>
     /// <param name="entity"></param>
     public void trapUnit(IGameEntity entity)
     {
+        Debug.Log("*****Trap****");
         // Unit must be civil and player owned
         Assert.IsTrue(entity.info.isCivil);
         Assert.IsTrue(entity.info.race == info.race);
