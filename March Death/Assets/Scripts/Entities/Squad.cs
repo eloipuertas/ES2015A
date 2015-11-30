@@ -88,6 +88,7 @@ public sealed class Squad : BareObserver<Squad.Actions>
         _data.Add(DataType.BOUNDING_BOX, new BoundingBox(this));
         _data.Add(DataType.ATTACK_VALUE, new AttackValue(this));
 
+        // Smelled squads can not smell enemies or we would run into endless recursion
         if (smellEnemies)
         {
             _maxAttackRange = Storage.Info.get.of(_race, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
@@ -151,6 +152,12 @@ public sealed class Squad : BareObserver<Squad.Actions>
     {
         foreach (var entry in _data)
         {
+            // TODO: Smarter BoundingBox update, only when moving
+            if (entry.Key == DataType.BOUNDING_BOX)
+            {
+                entry.Value.ForceUpdate();
+            }
+
             entry.Value.Update(_units);
         }
     }
@@ -234,6 +241,7 @@ public interface ISquadData
 {
     bool NeedsUpdate { get; }
     void Update(List<Unit> units);
+    void ForceUpdate();
     void OnDestroy();
 }
 
@@ -253,6 +261,7 @@ public abstract class SquadData<T> : Observer, ISquadData
         auto += squad.register(Squad.Actions.UNIT_REMOVED, OnRemoved);
     }
 
+    public void ForceUpdate() { _needsUpdate = true; }
     public virtual void OnAdded(System.Object obj) { _needsUpdate = true; }
     public virtual void OnRemoved(System.Object obj) { _needsUpdate = true; }
 }
@@ -351,6 +360,10 @@ public class SmelledEnemies : SquadData<Squad>
         if (units.Count > 0)
         {
             BoundingBox.BoundingBoxHolder boundingBox = _ownSquad.BoundingBox;
+
+#if UNITY_EDITOR
+            Debug.DrawLine(new Vector3(boundingBox.Bounds.x, units[0].transform.position.y, boundingBox.Bounds.y), new Vector3(boundingBox.Bounds.x + boundingBox.MaxLongitude, units[0].transform.position.y, boundingBox.Bounds.y + boundingBox.MaxLongitude), Color.white);
+#endif
 
             List<Unit> enemyUnits = AISenses.getVisibleUnitsNotOfRaceNearPosition(new Vector3(boundingBox.Bounds.x, units[0].transform.position.y, boundingBox.Bounds.y), boundingBox.MaxLongitude * 3 * _ownSquad.MaxAttackRange, _ownSquad.Race);
             Debug.Log(_ownSquad.Units.Count + " > " + enemyUnits.Count);
