@@ -235,7 +235,7 @@ namespace Managers
         {
             GameObject banner = SelectionDestination.CreateBanner(_ownRace);
             Selectable[] units = _selectedEntities.ToArray();
-            banner.GetComponent<SelectionDestination>().Deploy(units, point);
+            
             foreach (Selectable selected in units)
             {
                 if (selected.entity.info.isUnit)
@@ -245,7 +245,7 @@ namespace Managers
                 }
 
             }
-            
+            banner.GetComponent<SelectionDestination>().Deploy(units, point);
             Debug.Log("Moving there");
 
         }
