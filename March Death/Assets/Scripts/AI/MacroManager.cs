@@ -18,7 +18,8 @@ namespace Assets.Scripts.AI
         /// </summary>
         List<UnitTypes> UnitPref;
         AIController ai;
-        AIArchitect architect;
+        public AIArchitect architect;
+
         public MacroManager(AIController ai)
         {
             this.ai = ai;

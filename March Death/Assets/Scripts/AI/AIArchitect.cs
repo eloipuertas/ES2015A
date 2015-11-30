@@ -33,6 +33,9 @@ namespace Assets.Scripts.AI
         Color emptySpace = new Color(0.000f, 1.000f, 0.000f, 1.000f);
         Color ignorePixel = new Color(1.000f, 0, 1.000f, 1.000f);
         AIController ai;
+
+        public List<Vector3> baseCriticPoints;
+
         string dificultyFolder;
         public float buildingAngle = 0f;
 
@@ -58,6 +61,7 @@ namespace Assets.Scripts.AI
             constructionGrid = GameObject.Find("GameController").GetComponent<ConstructionGrid>();
             buildingsPlaced = 0;
             ai = aiController;
+            baseCriticPoints = new List<Vector3>();
 
             //HACK: Probably would be cool to find a way to get this dinamically
             if (ai.race == Storage.Races.ELVES)
@@ -261,7 +265,8 @@ namespace Assets.Scripts.AI
                     }
                     else if (CompareColors(pixel, defenceZone))
                     {
-                        avaliablePositions[StructureType.DEFENCE_ZONE].Add(processingPos);
+                        baseCriticPoints.Add(processingPos);
+                        Debug.Log(baseCriticPoints.Count);
                     }
                     else if (CompareColors(pixel, emptySpace))
                     {
