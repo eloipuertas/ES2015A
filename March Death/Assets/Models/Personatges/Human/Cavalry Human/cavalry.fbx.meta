@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 7391b6b115cd2d54facfe314e47213c7
-timeCreated: 1447683254
+guid: da8eeccfba73f494a9c770927ad65f37
+timeCreated: 1448897270
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
@@ -8,163 +8,211 @@ ModelImporter:
     100000: Arm_l
     100002: Arm_r
     100004: Armature
-    100006: Camera
-    100008: Camera.001
-    100010: //RootNode
-    100012: Circle
-    100014: Circle.001
-    100016: Circle.002
-    100018: Circle.003
-    100020: Circle.004
-    100022: Circle.005
-    100024: Circle.006
-    100026: Circle.007
-    100028: Circle.008
-    100030: Circle.009
-    100032: Circle.010
-    100034: Foot_l
-    100036: Foot_r
-    100038: forearm_l
-    100040: forearm_r
-    100042: hand_l
-    100044: hand_r
-    100046: Head
-    100048: Head_end
-    100050: index2_l
-    100052: index2_r
-    100054: index3_l
-    100056: index3_l_end
-    100058: index3_r
-    100060: index3_r_end
-    100062: index_l
-    100064: index_r
-    100066: Knee_l
-    100068: Knee_l.001
-    100070: kon
-    100072: Leg_l
-    100074: Leg_r
-    100076: middle2_l
-    100078: middle2_l.001
-    100080: middle3_l
-    100082: middle3_l_end
-    100084: middle3_r
-    100086: middle3_r_end
-    100088: middle_l
-    100090: middle_l.001
-    100092: Neck
-    100094: pinky2_l
-    100096: pinky2_l.001
-    100098: pinky3_l
-    100100: pinky3_l_end
-    100102: pinky3_r
-    100104: pinky3_r_end
-    100106: pinky_l
-    100108: pinky_l.001
-    100110: Rib_cage
-    100112: ring2_l
-    100114: ring2_l.001
-    100116: ring3_l
-    100118: ring3_l.001
-    100120: ring3_l.001_end
-    100122: ring3_l_end
-    100124: ring_l
-    100126: ring_l.001
-    100128: Shoulder_l
-    100130: Shoulder_r
-    100132: Spine
-    100134: thumb2_l
-    100136: thumb2_r
-    100138: thumb3_l
-    100140: thumb3_l_end
-    100142: thumb3_r
-    100144: thumb3_r_end
-    100146: thumb_l
-    100148: thumb_r
-    100150: Toes_l
-    100152: Toes_l_end
-    100154: Toes_r
-    100156: Toes_r_end
-    100158: Torso
+    100006: Armature.001
+    100008: Bone
+    100010: Bone.002
+    100012: Bone.003
+    100014: Bone.004
+    100016: Bone.004_end
+    100018: Bone.008
+    100020: Bone.008_end
+    100022: Bone.009
+    100024: Bone.010
+    100026: Bone.011
+    100028: Bone.011_end
+    100030: Bone.012
+    100032: Bone.013
+    100034: Bone.014
+    100036: Bone.015
+    100038: Bone.016
+    100040: Bone.016_end
+    100042: Bone.017
+    100044: Bone.018
+    100046: Bone.019
+    100048: Bone.019_end
+    100050: Bone.020
+    100052: Bone.020_end
+    100054: Camera.001
+    100056: //RootNode
+    100058: Circle
+    100060: Circle.001
+    100062: Circle.002
+    100064: Circle.003
+    100066: Circle.004
+    100068: Circle.005
+    100070: Circle.006
+    100072: Circle.007
+    100074: Circle.008
+    100076: Circle.009
+    100078: Circle.010
+    100080: Foot_l
+    100082: Foot_r
+    100084: forearm_l
+    100086: forearm_r
+    100088: hand_l
+    100090: hand_r
+    100092: Head
+    100094: Head_end
+    100096: index2_l
+    100098: index2_r
+    100100: index3_l
+    100102: index3_l_end
+    100104: index3_r
+    100106: index3_r_end
+    100108: index_l
+    100110: index_r
+    100112: Knee_l
+    100114: Knee_l.001
+    100116: Leg_l
+    100118: Leg_r
+    100120: Low_Poly_Characte.000_Mesh.000
+    100122: Low_Poly_Characte.000_Mesh.002
+    100124: middle2_l
+    100126: middle2_l.001
+    100128: middle3_l
+    100130: middle3_l_end
+    100132: middle3_r
+    100134: middle3_r_end
+    100136: middle_l
+    100138: middle_l.001
+    100140: Neck
+    100142: pinky2_l
+    100144: pinky2_l.001
+    100146: pinky3_l
+    100148: pinky3_l_end
+    100150: pinky3_r
+    100152: pinky3_r_end
+    100154: pinky_l
+    100156: pinky_l.001
+    100158: Rib_cage
+    100160: ring2_l
+    100162: ring2_l.001
+    100164: ring3_l
+    100166: ring3_l.001
+    100168: ring3_l.001_end
+    100170: ring3_l_end
+    100172: ring_l
+    100174: ring_l.001
+    100176: Shoulder_l
+    100178: Shoulder_r
+    100180: Spine
+    100182: thumb2_l
+    100184: thumb2_r
+    100186: thumb3_l
+    100188: thumb3_l_end
+    100190: thumb3_r
+    100192: thumb3_r_end
+    100194: thumb_l
+    100196: thumb_r
+    100198: Toes_l
+    100200: Toes_l_end
+    100202: Toes_r
+    100204: Toes_r_end
+    100206: Torso
     400000: Arm_l
     400002: Arm_r
     400004: Armature
-    400006: Camera
-    400008: Camera.001
-    400010: //RootNode
-    400012: Circle
-    400014: Circle.001
-    400016: Circle.002
-    400018: Circle.003
-    400020: Circle.004
-    400022: Circle.005
-    400024: Circle.006
-    400026: Circle.007
-    400028: Circle.008
-    400030: Circle.009
-    400032: Circle.010
-    400034: Foot_l
-    400036: Foot_r
-    400038: forearm_l
-    400040: forearm_r
-    400042: hand_l
-    400044: hand_r
-    400046: Head
-    400048: Head_end
-    400050: index2_l
-    400052: index2_r
-    400054: index3_l
-    400056: index3_l_end
-    400058: index3_r
-    400060: index3_r_end
-    400062: index_l
-    400064: index_r
-    400066: Knee_l
-    400068: Knee_l.001
-    400070: kon
-    400072: Leg_l
-    400074: Leg_r
-    400076: middle2_l
-    400078: middle2_l.001
-    400080: middle3_l
-    400082: middle3_l_end
-    400084: middle3_r
-    400086: middle3_r_end
-    400088: middle_l
-    400090: middle_l.001
-    400092: Neck
-    400094: pinky2_l
-    400096: pinky2_l.001
-    400098: pinky3_l
-    400100: pinky3_l_end
-    400102: pinky3_r
-    400104: pinky3_r_end
-    400106: pinky_l
-    400108: pinky_l.001
-    400110: Rib_cage
-    400112: ring2_l
-    400114: ring2_l.001
-    400116: ring3_l
-    400118: ring3_l.001
-    400120: ring3_l.001_end
-    400122: ring3_l_end
-    400124: ring_l
-    400126: ring_l.001
-    400128: Shoulder_l
-    400130: Shoulder_r
-    400132: Spine
-    400134: thumb2_l
-    400136: thumb2_r
-    400138: thumb3_l
-    400140: thumb3_l_end
-    400142: thumb3_r
-    400144: thumb3_r_end
-    400146: thumb_l
-    400148: thumb_r
-    400150: Toes_l
-    400152: Toes_l_end
-    400154: Toes_r
-    400156: Toes_r_end
-    400158: Torso
+    400006: Armature.001
+    400008: Bone
+    400010: Bone.002
+    400012: Bone.003
+    400014: Bone.004
+    400016: Bone.004_end
+    400018: Bone.008
+    400020: Bone.008_end
+    400022: Bone.009
+    400024: Bone.010
+    400026: Bone.011
+    400028: Bone.011_end
+    400030: Bone.012
+    400032: Bone.013
+    400034: Bone.014
+    400036: Bone.015
+    400038: Bone.016
+    400040: Bone.016_end
+    400042: Bone.017
+    400044: Bone.018
+    400046: Bone.019
+    400048: Bone.019_end
+    400050: Bone.020
+    400052: Bone.020_end
+    400054: Camera.001
+    400056: //RootNode
+    400058: Circle
+    400060: Circle.001
+    400062: Circle.002
+    400064: Circle.003
+    400066: Circle.004
+    400068: Circle.005
+    400070: Circle.006
+    400072: Circle.007
+    400074: Circle.008
+    400076: Circle.009
+    400078: Circle.010
+    400080: Foot_l
+    400082: Foot_r
+    400084: forearm_l
+    400086: forearm_r
+    400088: hand_l
+    400090: hand_r
+    400092: Head
+    400094: Head_end
+    400096: index2_l
+    400098: index2_r
+    400100: index3_l
+    400102: index3_l_end
+    400104: index3_r
+    400106: index3_r_end
+    400108: index_l
+    400110: index_r
+    400112: Knee_l
+    400114: Knee_l.001
+    400116: Leg_l
+    400118: Leg_r
+    400120: Low_Poly_Characte.000_Mesh.000
+    400122: Low_Poly_Characte.000_Mesh.002
+    400124: middle2_l
+    400126: middle2_l.001
+    400128: middle3_l
+    400130: middle3_l_end
+    400132: middle3_r
+    400134: middle3_r_end
+    400136: middle_l
+    400138: middle_l.001
+    400140: Neck
+    400142: pinky2_l
+    400144: pinky2_l.001
+    400146: pinky3_l
+    400148: pinky3_l_end
+    400150: pinky3_r
+    400152: pinky3_r_end
+    400154: pinky_l
+    400156: pinky_l.001
+    400158: Rib_cage
+    400160: ring2_l
+    400162: ring2_l.001
+    400164: ring3_l
+    400166: ring3_l.001
+    400168: ring3_l.001_end
+    400170: ring3_l_end
+    400172: ring_l
+    400174: ring_l.001
+    400176: Shoulder_l
+    400178: Shoulder_r
+    400180: Spine
+    400182: thumb2_l
+    400184: thumb2_r
+    400186: thumb3_l
+    400188: thumb3_l_end
+    400190: thumb3_r
+    400192: thumb3_r_end
+    400194: thumb_l
+    400196: thumb_r
+    400198: Toes_l
+    400200: Toes_l_end
+    400202: Toes_r
+    400204: Toes_r_end
+    400206: Torso
     2300000: Circle
     2300002: Circle.001
     2300004: Circle.002
@@ -176,7 +224,6 @@ ModelImporter:
     2300016: Circle.008
     2300018: Circle.009
     2300020: Circle.010
-    2300022: kon
     3300000: Circle
     3300002: Circle.001
     3300004: Circle.002
@@ -188,19 +235,29 @@ ModelImporter:
     3300016: Circle.008
     3300018: Circle.009
     3300020: Circle.010
-    3300022: kon
-    4300000: kon
-    4300002: Circle.010
-    4300004: Circle.009
-    4300006: Circle.008
-    4300008: Circle.007
-    4300010: Circle.006
-    4300012: Circle.005
-    4300014: Circle.004
-    4300016: Circle.003
-    4300018: Circle.002
-    4300020: Circle.001
-    4300022: Circle
+    4300000: Circle.010
+    4300002: Circle.009
+    4300004: Circle.008
+    4300006: Circle.007
+    4300008: Circle.006
+    4300010: Circle.005
+    4300012: Circle.004
+    4300014: Circle.003
+    4300016: Circle.002
+    4300018: Circle.001
+    4300020: Circle
+    4300022: Low_Poly_Characte.000_Mesh.000
+    4300024: Low_Poly_Characte.000_Mesh.002
+    7400000: Armature.001|Death
+    7400002: Armature.001|Idle.002
+    7400004: Armature.001|Attack
+    7400006: Armature|Death
+    7400008: Armature|Walking
+    7400010: Armature|Attack
+    7400012: Low_Poly_Characte.000_Mesh.002|Death
+    9500000: //RootNode
+    13700000: Low_Poly_Characte.000_Mesh.000
+    13700002: Low_Poly_Characte.000_Mesh.002
   materials:
     importMaterials: 1
     materialName: 0
@@ -229,7 +286,7 @@ ModelImporter:
     addColliders: 0
     importBlendShapes: 1
     swapUVChannels: 0
-    generateSecondaryUV: 1
+    generateSecondaryUV: 0
     useFileUnits: 1
     optimizeMeshForGPU: 1
     keepQuads: 0
@@ -259,7 +316,7 @@ ModelImporter:
     rootMotionBoneName: 
     hasTranslationDoF: 0
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 0
+  animationType: 2
   humanoidOversampling: 1
   additionalBone: 0
   userData: 
