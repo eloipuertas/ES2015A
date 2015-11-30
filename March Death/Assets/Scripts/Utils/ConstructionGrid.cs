@@ -5,12 +5,21 @@ using System;
 
 public class ConstructionGrid : MonoBehaviour
 {
+    public static ConstructionGrid instance;
+
     public static Vector3 ERROR = new Vector3(-1, -1, -1);
     private Vector2 dimensions = new Vector2(15f, 15f);
     private ArrayList reservedPositions = new ArrayList();
     private const float DIFERENCE_OF_HEIGHTS_TOLERANCE = 1.5f;
     const int MAX_RECURSION_DEPTH = 10;
     int recursionDepth = 0;
+
+    void Awake()
+    {
+        instance = this;
+    }
+
+
     /// <returns></returns>
 	public Vector3 discretizeMapCoords(Vector3 position)
     {
