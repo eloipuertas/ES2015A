@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using Storage;
 
-public static class AISenses {
+public static class Helpers
+{
 
     /// <summary>
     /// Returns all the gameObjects in some radius
@@ -15,7 +16,7 @@ public static class AISenses {
         Collider[] collidersNearUs = Physics.OverlapSphere(position, radius);
         GameObject[] objectsNearUs = new GameObject[collidersNearUs.Length];
 
-        for(int i = 0; i < collidersNearUs.Length; i++)
+        for (int i = 0; i < collidersNearUs.Length; i++)
         {
             objectsNearUs[i] = collidersNearUs[i].gameObject;
         }
@@ -62,7 +63,7 @@ public static class AISenses {
         {
             GameObject obj = foundGameObjects[i];
             Unit objUnit = obj.GetComponent<Unit>();
-            if(objUnit != null && objUnit.status != EntityStatus.DEAD && objUnit.race == race)
+            if (objUnit != null && objUnit.status != EntityStatus.DEAD && objUnit.race == race)
             {
                 unitsOfRace.Add(objUnit);
             }
@@ -110,7 +111,7 @@ public static class AISenses {
         {
             GameObject obj = foundGameObjects[i];
             Unit objUnit = obj.GetComponent<Unit>();
-            if (objUnit != null && objUnit.race == race && objUnit.status!=EntityStatus.DEAD && obj.GetComponent<FOWEntity>().IsRevealed)
+            if (objUnit != null && objUnit.race == race && objUnit.status != EntityStatus.DEAD && obj.GetComponent<FOWEntity>().IsRevealed)
             {
                 unitsOfRace.Add(objUnit);
             }
