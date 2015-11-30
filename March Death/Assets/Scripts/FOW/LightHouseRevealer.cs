@@ -43,11 +43,8 @@ class LightHouseRevealer : MonoBehaviour
 
     }
 
-    private void CreateLight()
-    {
 
 
-    }
     void Update()
     {
         if (_opening)
@@ -72,6 +69,11 @@ class LightHouseRevealer : MonoBehaviour
         light.transform.LookAt(transform);
     }
 
+    public void ToggleDirection()
+    {
+        direction = direction == Direction.CLOCK ? Direction.COUNTERCLOCK : Direction.CLOCK;
+        Debug.Log("Now rotating " + direction);
+    }
 
 
 }
