@@ -483,10 +483,8 @@ public class Unit : GameEntity<Unit.Actions>
         }
 
         if (_projectileThrown) {
-            float inverseMoveTime = 30f; //This should be an attribute of the unit
-
             //Find a new position proportionally closer to the end, based on the moveTime
-            Vector3 newPostion = Vector3.MoveTowards(_projectile.transform.position, _projectileEndPoint, inverseMoveTime * Time.deltaTime);
+            Vector3 newPostion = Vector3.MoveTowards(_projectile.transform.position, _projectileEndPoint, info.unitAttributes.projectileSpeed * Time.deltaTime);
 
             //Move the object to the new position.
             _projectile.transform.position = newPostion;
@@ -496,7 +494,7 @@ public class Unit : GameEntity<Unit.Actions>
 
             // If we reach the target...            
             if (sqrRemainingDistance <= float.Epsilon) {
-                List<IGameEntity> objectsInRadius = AISenses.getEntitiesNearPosition(_projectileEndPoint, 0.2f);
+                List<IGameEntity> objectsInRadius = AISenses.getEntitiesNearPosition(_projectileEndPoint, info.unitAttributes.projectileRadius);
 
                 // Should I prevent friendly fire?
                 foreach (IGameEntity inRadiusObject in objectsInRadius.ToArray()) {
