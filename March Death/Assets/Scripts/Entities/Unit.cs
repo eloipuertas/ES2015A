@@ -72,7 +72,7 @@ public class Unit : GameEntity<Unit.Actions>
     private Vector3 _projectileEndPoint;
     private bool _projectileThrown = false;
     private GameObject _projectile;
-    //private AISenses _AISenses;
+    //private Helpers _Helpers;
 
     /// <summary>
     /// Set to true if we are following our target (ie. attacking but not in range)
@@ -494,7 +494,7 @@ public class Unit : GameEntity<Unit.Actions>
 
             // If we reach the target...            
             if (sqrRemainingDistance <= float.Epsilon) {
-                List<IGameEntity> objectsInRadius = AISenses.getEntitiesNearPosition(_projectileEndPoint, info.unitAttributes.projectileRadius);
+                List<IGameEntity> objectsInRadius = Helpers.getEntitiesNearPosition(_projectileEndPoint, info.unitAttributes.projectileRadius);
 
                 // Should I prevent friendly fire?
                 foreach (IGameEntity inRadiusObject in objectsInRadius.ToArray()) {
