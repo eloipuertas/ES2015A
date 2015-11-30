@@ -214,10 +214,6 @@ public class ConstructionGrid : MonoBehaviour
             i++;
             if (isNewPositionAbleForConstrucction(discretizeMapCoords(possibilities[i]), false))
             {
-                GameObject cube = GameObject.Find("Cube");
-                if (cube != null) Destroy(cube);
-                cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                cube.transform.position = discretizeMapCoords(possibilities[i]);
                 found = true;
                 recursionDepth = 0;
             }
