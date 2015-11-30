@@ -293,16 +293,6 @@ namespace Pathfinding
                     agent.transform.rotation = lookRotation;
                 }
             }
-
-            foreach (TreeInstance tree in Terrain.activeTerrain.terrainData.treeInstances)
-            {
-                int w = Terrain.activeTerrain.terrainData.heightmapWidth;
-                int h = Terrain.activeTerrain.terrainData.heightmapHeight;
-                Vector3 position = Vector3.Scale(tree.position, Terrain.activeTerrain.terrainData.size) + Terrain.activeTerrain.transform.position;
-                position.y = Terrain.activeTerrain.terrainData.GetHeight((int)position.x, (int)position.z);
-
-                Debug.DrawLine(position, position + new Vector3(0, 1, 0), Color.red);
-            }
         }
     }
 }
