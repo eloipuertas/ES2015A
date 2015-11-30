@@ -79,7 +79,7 @@ GameObject:
   - 4: {fileID: 442964}
   - 82: {fileID: 8264780}
   m_Layer: 0
-  m_Name: audio_game_over
+  m_Name: background_audio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -415,7 +415,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 11431658}
         m_MethodName: RestartGame
         m_Mode: 1
         m_Arguments:
@@ -569,7 +569,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 11431658}
         m_MethodName: ReturnToMainMenu
         m_Mode: 1
         m_Arguments:
