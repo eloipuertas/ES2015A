@@ -12,7 +12,6 @@ public class ConstructionGrid : MonoBehaviour
     private ArrayList reservedPositions = new ArrayList();
     private const float DIFERENCE_OF_HEIGHTS_TOLERANCE = 1.5f;
     const int MAX_RECURSION_DEPTH = 10;
-    int recursionDepth = 0;
 
     void Awake()
     {
@@ -40,11 +39,12 @@ public class ConstructionGrid : MonoBehaviour
             if (Physics.Raycast(ray, out hit, Mathf.Infinity))
             {
                 Debug.Log(hit.point);
-                getFreePositionAbleToConstructNearAPoint(hit.point);
+                Debug.Log(getFreePositionAbleToConstructNearPoint(hit.point));
             }
         }
-    }
-    */
+    }*/
+    
+    
 
     /// <summary>
     /// Sets the new grid dimensions
@@ -179,11 +179,11 @@ public class ConstructionGrid : MonoBehaviour
     /// Gets a free position near somewhere
     /// </summary>
     /// <param name="position"></param>
-    public Vector3 getFreePositionAbleToConstructNearPoint(Vector3 position)
+    public Vector3 getFreePositionAbleToConstructNearPoint(Vector3 position, int recursionDepth = MAX_RECURSION_DEPTH)
     {
-        recursionDepth++;
+        recursionDepth--;
 
-        if (recursionDepth > MAX_RECURSION_DEPTH)
+        if (recursionDepth == 0)
         {
             return ERROR;
         }
@@ -236,7 +236,7 @@ public class ConstructionGrid : MonoBehaviour
         }
 
         //If we don't find anithing we need to search somewhere
-        return getFreePositionAbleToConstructNearPoint(possibilities[UnityEngine.Random.Range(0, 7)]);
+        return getFreePositionAbleToConstructNearPoint(possibilities[UnityEngine.Random.Range(0, 7)], recursionDepth);
     }
 
     public Vector2 getDimensions()
