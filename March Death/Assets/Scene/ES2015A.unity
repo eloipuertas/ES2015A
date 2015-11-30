@@ -591,10 +591,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   polymesh: {fileID: 11400000, guid: 26535da75e2ef5843a869e7e30a2d766, type: 2}
-  navmeshData: {fileID: 11400000, guid: b3dcc37aca5b29b4fa666ab0956e20e2, type: 2}
-  MaxAgents: 1024
-  AgentMaxRadius: 2
-  RenderInEditor: 1
+  navmeshData: {fileID: 11400000, guid: 1718af745ef7d834497935cf22c3c1b5, type: 2}
+  MaxAgents: 4096
+  AgentMaxRadius: 2.5
+  RenderInGame: 0
   material: {fileID: 2100000, guid: 35a4642327730e24e8d16d93def86e86, type: 2}
   Mode: 2
 --- !u!114 &865109085
@@ -856,6 +856,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depth: 0
+--- !u!1 &1231544398
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 1939470488}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1231544399}
+  m_Layer: 0
+  m_Name: Missing Prefab
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1231544399
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 1939470488}
+  m_GameObject: {fileID: 1231544398}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
 --- !u!1001 &1398617358
 Prefab:
   m_ObjectHideFlags: 0
@@ -1203,7 +1230,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
 --- !u!1001 &1939470488
 Prefab:
   m_ObjectHideFlags: 0

@@ -56,7 +56,7 @@ namespace Pathfinding
         #endregion
 
         #region Mesh Debugging
-        public bool RenderInEditor = false;
+        public bool RenderInGame = false;
         public Material material;
         public RenderMode Mode;
         private DbgRenderMesh mesh = new DbgRenderMesh();
@@ -80,7 +80,7 @@ namespace Pathfinding
         private TileCache _tileCache;
 
         private List<DetourAgent> agents = new List<DetourAgent>();
-
+        
         public void OnEnable()
         {
             RecastConfig recastConfig = GameObject.FindObjectOfType<RecastConfig>();
@@ -117,7 +117,7 @@ namespace Pathfinding
             
             Instance = this;
 
-            if (!Application.isPlaying && RenderInEditor)
+            if (RenderInGame)
             {
                 mesh.Clear();
 
@@ -141,7 +141,7 @@ namespace Pathfinding
                         break;
                 }
 
-                RecastDebug.RenderObstacles(_tileCache.TileCacheHandle.Handle);
+                //RecastDebug.RenderObstacles(_tileCache.TileCacheHandle.Handle);
 
                 mesh.CreateGameObjects("RecastRenderer", material);
                 mesh.Rebuild();
@@ -292,6 +292,16 @@ namespace Pathfinding
 
                     agent.transform.rotation = lookRotation;
                 }
+            }
+
+            foreach (TreeInstance tree in Terrain.activeTerrain.terrainData.treeInstances)
+            {
+                int w = Terrain.activeTerrain.terrainData.heightmapWidth;
+                int h = Terrain.activeTerrain.terrainData.heightmapHeight;
+                Vector3 position = Vector3.Scale(tree.position, Terrain.activeTerrain.terrainData.size) + Terrain.activeTerrain.transform.position;
+                position.y = Terrain.activeTerrain.terrainData.GetHeight((int)position.x, (int)position.z);
+
+                Debug.DrawLine(position, position + new Vector3(0, 1, 0), Color.red);
             }
         }
     }

@@ -151,6 +151,14 @@ namespace Pathfinding
 
             Vector2 uvScale = new Vector2(1.0f / (w - 1), 1.0f / (h - 1));
             float[,] tData = terrain.GetHeights(0, 0, w, h);
+            bool[,] tTrees = new bool[w, h];
+
+            // For each tree, let's artifially increment Y
+            foreach (TreeInstance tree in terrain.treeInstances)
+            {
+                Vector3 position = Vector3.Scale(tree.position, new Vector3(w, 1, h));
+                tTrees[(int)position.z, (int)position.x] = true;
+            }
 
             nverts = w * h * 3;
             verts = new float[nverts];
@@ -164,7 +172,7 @@ namespace Pathfinding
                 {
                     Vector3 temp = Vector3.Scale(meshScale, new Vector3(z, tData[x, z], x)) + terrainPos;
                     verts[(z * w + x) * 3 + 0] = temp.x;
-                    verts[(z * w + x) * 3 + 1] = temp.y;
+                    verts[(z * w + x) * 3 + 1] = tTrees[x, z] ? 500f : temp.y;
                     verts[(z * w + x) * 3 + 2] = temp.z;
                 }
             }
