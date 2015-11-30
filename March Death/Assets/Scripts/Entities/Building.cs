@@ -57,6 +57,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     /// </summary>
     protected override void onReceiveDamage()
     {
+		base.onReceiveDamage ();
         fire(DAMAGED);
     }
 
