@@ -489,7 +489,7 @@ public class Unit : GameEntity<Unit.Actions>
 
     public override void setStatus(EntityStatus status)
     {
-        if (!_followingTarget && status == EntityStatus.MOVING)
+        if (!_followingTarget && base.status == EntityStatus.MOVING)
         {
             fire(Actions.MOVEMENT_END);
         }

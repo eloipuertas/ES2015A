@@ -209,8 +209,9 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 480854}
+  - 114: {fileID: 11492592}
   m_Layer: 0
-  m_Name: banner_elves
+  m_Name: elves
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -518,6 +519,17 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 171838}
   m_Mesh: {fileID: 4300000, guid: 4de84b623f388ff4c8e9463100b54141, type: 3}
+--- !u!114 &11492592
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 190968}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 942a0285dcba37c4497fa6635ad10485, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

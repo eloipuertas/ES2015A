@@ -233,7 +233,10 @@ namespace Managers
         /// <param name="point"></param>
         public void MoveTo(Vector3 point)
         {
-            foreach (Selectable selected in _selectedEntities.ToArray())
+            GameObject banner = SelectionDestination.CreateBanner(_ownRace);
+            Selectable[] units = _selectedEntities.ToArray();
+            banner.GetComponent<SelectionDestination>().Deploy(units, point);
+            foreach (Selectable selected in units)
             {
                 if (selected.entity.info.isUnit)
                 {
@@ -242,6 +245,7 @@ namespace Managers
                 }
 
             }
+            
             Debug.Log("Moving there");
 
         }
