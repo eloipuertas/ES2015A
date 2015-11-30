@@ -282,6 +282,7 @@ public class EventsNotifier : MonoBehaviour {
     {
         GameObject g = (GameObject) obj;
         IGameEntity entity = g.GetComponent<IGameEntity>();
+        PopulationInfo.get.Remove(entity);
         DisplayBuildingDestroyed(((Storage.BuildingInfo) entity.info).type);
     }
 
@@ -289,12 +290,14 @@ public class EventsNotifier : MonoBehaviour {
     {
         GameObject g = (GameObject) obj;
         IGameEntity entity = g.GetComponent<IGameEntity>();
+        PopulationInfo.get.Add(entity);
         DisplayBuildingCreated(((Storage.BuildingInfo) entity.info).type);
     }
 
     public void DisplayUnitCreated(System.Object obj)
     {
         Unit entity = (Unit) obj;
+        PopulationInfo.get.Add(entity);
         DisplayUnitCreated(entity.type);
     }
 
@@ -302,6 +305,7 @@ public class EventsNotifier : MonoBehaviour {
     {
         GameObject g = (GameObject) obj;
         Unit entity = (Unit) g.GetComponent<IGameEntity>();
+        PopulationInfo.get.Remove(entity);
         DisplayUnitDead(entity.type);
     }
 }
