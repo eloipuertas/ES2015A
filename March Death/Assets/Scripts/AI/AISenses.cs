@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using Storage;
 
-public class AISenses : MonoBehaviour {
-    
+public static class AISenses {
+
     /// <summary>
     /// Returns all the gameObjects in some radius
     /// </summary>
     /// <param name="position"></param>
     /// <param name="radius"></param>
     /// <returns></returns>
-    public GameObject[] getObjectsNearPosition(Vector3 position, float radius)
+    public static GameObject[] getObjectsNearPosition(Vector3 position, float radius)
     {
         Collider[] collidersNearUs = Physics.OverlapSphere(position, radius);
         GameObject[] objectsNearUs = new GameObject[collidersNearUs.Length];
@@ -23,13 +23,37 @@ public class AISenses : MonoBehaviour {
     }
 
     /// <summary>
+    /// Returns all the gameObjects in some radius
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="radius"></param>
+    /// <returns></returns>
+    public static List<IGameEntity> getEntitiesNearPosition(Vector3 position, float radius)
+    {
+        GameObject[] foundGameObjects = getObjectsNearPosition(position, radius);
+        List<IGameEntity> entities = new List<IGameEntity>();
+
+        for (int i = 0; i < foundGameObjects.Length; i++)
+        {
+            GameObject obj = foundGameObjects[i];
+            IGameEntity objEntity = obj.GetComponent<IGameEntity>();
+
+            if (objEntity != null && objEntity.status != EntityStatus.DEAD && objEntity.status != EntityStatus.DESTROYED)
+            {
+                entities.Add(objEntity);
+            }
+        }
+        return entities;
+    }
+
+    /// <summary>
     /// Gets all the units of a certain race
     /// </summary>
     /// <param name="position"></param>
     /// <param name="radius"></param>
     /// <param name="race"></param>
     /// <returns></returns>
-    public List<Unit> getUnitsOfRaceNearPosition(Vector3 position, float radius, Races race)
+    public static List<Unit> getUnitsOfRaceNearPosition(Vector3 position, float radius, Races race)
     {
         GameObject[] foundGameObjects = getObjectsNearPosition(position, radius);
         List<Unit> unitsOfRace = new List<Unit>();
@@ -53,7 +77,7 @@ public class AISenses : MonoBehaviour {
     /// <param name="radius"></param>
     /// <param name="race"></param>
     /// <returns></returns>
-    public List<IBuilding> getBuildingsOfRaceNearPosition(Vector3 position, float radius, Races race)
+    public static List<IBuilding> getBuildingsOfRaceNearPosition(Vector3 position, float radius, Races race)
     {
         GameObject[] foundGameObjects = getObjectsNearPosition(position, radius);
         List<IBuilding> buldingsOfRace = new List<IBuilding>();
@@ -77,7 +101,7 @@ public class AISenses : MonoBehaviour {
     /// <param name="radius"></param>
     /// <param name="race"></param>
     /// <returns></returns>
-    public List<Unit> getVisibleUnitsOfRaceNearPosition(Vector3 position, float radius, Storage.Races race)
+    public static List<Unit> getVisibleUnitsOfRaceNearPosition(Vector3 position, float radius, Storage.Races race)
     {
         GameObject[] foundGameObjects = getObjectsNearPosition(position, radius);
         List<Unit> unitsOfRace = new List<Unit>();

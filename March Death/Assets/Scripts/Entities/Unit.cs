@@ -69,6 +69,11 @@ public class Unit : GameEntity<Unit.Actions>
     private Vector3 _attackPoint;
     private Vector3 _closestPointToTarget;
 
+    private Vector3 _projectileEndPoint;
+    private bool _projectileThrown = false;
+    private GameObject _projectile;
+    //private AISenses _AISenses;
+
     /// <summary>
     /// Set to true if we are following our target (ie. attacking but not in range)
     /// </summary>
@@ -458,15 +463,50 @@ public class Unit : GameEntity<Unit.Actions>
                     {
                         _followingTarget = true;
                         setStatus(EntityStatus.MOVING);
-                    }
+
                     // Check if we already have to attack
-                    else if (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate))
-                    {
-                        _lastAttack = Time.time;
-                        _target.receiveAttack(this, canDoRangedAttack());
+                    } else if (! _projectileThrown && (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate))) {
+                            if (canDoRangedAttack())  {
+                                _projectile = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                                _projectile.AddComponent<Rigidbody>();
+                                _projectile.transform.position = new Vector3(transform.position.x, transform.position.y + GetComponent<Collider>().bounds.size.y, transform.position.z);  
+                                _projectileEndPoint = new Vector3(_target.getTransform().position.x, _target.getTransform().position.y + _target.getGameObject().GetComponent<Collider>().bounds.size.y, _target.getTransform().position.z);
+                                _projectileThrown = true;
+                            } else {
+                                _target.receiveAttack(this, canDoRangedAttack());
+                            }
+
+                            _lastAttack = Time.time;
                     }
                 }
                 break;
+        }
+
+        if (_projectileThrown) {
+            //Recalculate the remaining distance after moving.
+            float sqrRemainingDistance = (_projectile.transform.position - _projectileEndPoint).sqrMagnitude;
+            float inverseMoveTime = 30f; //This should be an attribute of the unit
+
+            //Find a new position proportionally closer to the end, based on the moveTime
+            Vector3 newPostion = Vector3.MoveTowards(_projectile.transform.position, _projectileEndPoint, inverseMoveTime * Time.deltaTime);
+
+            //Move the object to the new position.
+            _projectile.transform.position = newPostion;
+            
+            // If we reach the target...            
+            if (sqrRemainingDistance <= float.Epsilon)
+            {
+                List<IGameEntity> objectsInRadius = AISenses.getEntitiesNearPosition(_projectileEndPoint, 0.2f);
+
+                // Should I prevent friendly fire?
+                foreach (IGameEntity inRadiusObject in objectsInRadius.ToArray()) {
+                    inRadiusObject.receiveAttack(this, canDoRangedAttack());
+                }
+
+                _projectileThrown = false;
+                GameObject.Destroy(_projectile);
+            }
+
         }
 
 #if UNITY_EDITOR
@@ -549,13 +589,4 @@ public class Unit : GameEntity<Unit.Actions>
                 break;
         }
     }
-
-	public Boolean canThrow()
-	{
-		if (info.unitAttributes.projectileAbility > 0) {
-			return true;
-		}
-
-		return false;
-	}
 }

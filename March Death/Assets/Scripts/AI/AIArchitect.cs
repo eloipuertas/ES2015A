@@ -405,7 +405,7 @@ namespace Assets.Scripts.AI
 
         bool getCornerRotation(Vector3 pos)
         {
-            List<IBuilding> buildings = ai.race == Races.ELVES ? ai.senses.getBuildingsOfRaceNearPosition(pos, 20, ai.race) : ai.senses.getBuildingsOfRaceNearPosition(pos, 22, ai.race);
+            List<IBuilding> buildings = ai.race == Races.ELVES ? AISenses.getBuildingsOfRaceNearPosition(pos, 20, ai.race) : AISenses.getBuildingsOfRaceNearPosition(pos, 22, ai.race);
             Debug.Log(buildings.Count);
             List <GameObject> walls  = new List<GameObject>();
             foreach(IBuilding wall in buildings)

@@ -170,7 +170,7 @@ namespace Assets.Scripts.AI
             if (maxLongitudeOfBox < 1) maxLongitudeOfBox = 1f;
 
             //Smell what is near this position
-            enemySquad.units = ai.senses.getVisibleUnitsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 3 * _maxUnitRange, _enemyRace);
+            enemySquad.units = AISenses.getVisibleUnitsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 3 * _maxUnitRange, _enemyRace);
 
             //Get the enemy squad bounding box
             enemySquad.boudningBox = enemySquad.getSquadBoundingBox();
@@ -185,7 +185,7 @@ namespace Assets.Scripts.AI
             }
             ad.Value = val;
 
-            enemyBuildings = ai.senses.getBuildingsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 3 * _maxUnitRange, _enemyRace);
+            enemyBuildings = AISenses.getBuildingsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 3 * _maxUnitRange, _enemyRace);
         }
 
         float valOfUnit(Unit u)

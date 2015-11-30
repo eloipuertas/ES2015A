@@ -40,7 +40,6 @@ namespace Assets.Scripts.AI
         public Vector3 rootBasePosition;
         public List<Unit> Army { get; set; }
         public List<Unit> Workers { get; set; }
-        public AISenses senses;
 
         // HACK To signal MicroManager that the game has ended when the AI hero is killed
         public bool FinishPlaying { get { return missionStatus.isGameOver(); } }
@@ -66,12 +65,6 @@ namespace Assets.Scripts.AI
             rootBasePosition = new Vector3(pos.X, 80, pos.Y);
             buildPosition = rootBasePosition;
             Macro = new MacroManager(this);
-
-            //We need to implement som kind of senses for te AI so here they are 
-            GameObject sensesContainer = new GameObject("AI Senses");
-            sensesContainer.AddComponent<AISenses>();
-            senses = sensesContainer.GetComponent<AISenses>();
-
             Micro = new MicroManager(this);
             modules.Add(new AIModule(Macro.MacroHigh, 30));
             modules.Add(new AIModule(Macro.MacroLow, 5));
