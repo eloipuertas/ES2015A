@@ -23,7 +23,7 @@ public class Create : Ability
     {
         get
         {
-			return BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, _infoToBuild.resources.food) &&
+            return BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, _infoToBuild.resources.food) &&
 					BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, _infoToBuild.resources.wood) &&
 					BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, _infoToBuild.resources.metal) &&
 					(_entity.status == EntityStatus.IDLE || _entity.status == EntityStatus.WORKING);

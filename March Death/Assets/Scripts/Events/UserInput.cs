@@ -167,7 +167,9 @@ public partial class UserInput : MonoBehaviour
                         sManager.AttackTo(entity);
                         
                     }
-                    else//
+                    else if(entity.info.isResource
+                            && (entity.status == EntityStatus.IDLE
+                            || entity.status == EntityStatus.WORKING))
                     {
                         
                         if((entity.info.isResource)
@@ -176,6 +178,7 @@ public partial class UserInput : MonoBehaviour
                                 sManager.Enter(entity);
                             }                   
                     }
+
                 }
             }
         }
