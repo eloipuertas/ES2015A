@@ -670,7 +670,7 @@ void resetPath(dtCrowd* crowd, int idx)
 	crowd->resetMoveTarget(idx);
 }
 
-void updateTick(dtTileCache* tileCache, dtNavMesh* nav, dtCrowd* crowd, float dt, float* positions, float* velocity, unsigned char* state, unsigned char* targetState, int& nagents)
+void updateTick(dtTileCache* tileCache, dtNavMesh* nav, dtCrowd* crowd, float dt, float* positions, float* velocity, unsigned char* state, unsigned char* targetState, bool* partial, int& nagents)
 {
 	if (!nav || !crowd) return;
 
@@ -693,12 +693,26 @@ void updateTick(dtTileCache* tileCache, dtNavMesh* nav, dtCrowd* crowd, float dt
 
 		state[i] = ag->state;
 		targetState[i] = ag->targetState;
+		partial[i] = ag->partial;
 	}
 }
 
 static float random_float()
 {
 	return (double)rand() / (double)RAND_MAX;
+}
+
+bool isPointValid(dtCrowd* crowd, float* targetPoint)
+{
+	const dtNavMeshQuery* navQuery = crowd->getNavMeshQuery();
+	const dtQueryFilter* filter = crowd->getFilter(0);
+	const float* ext = crowd->getQueryExtents();
+	
+	dtPolyRef ref;
+	float point[3];
+
+	navQuery->findNearestPoly(targetPoint, ext, filter, &ref, point);
+	return navQuery->isValidPolyRef(ref, filter);
 }
 
 bool randomPoint(dtCrowd* crowd, float* targetPoint)

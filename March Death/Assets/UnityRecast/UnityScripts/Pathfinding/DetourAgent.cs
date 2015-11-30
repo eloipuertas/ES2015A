@@ -51,10 +51,12 @@ namespace Pathfinding
         public float Height = 2.0f;
         public float MaxSpeed = 2.0f;
         public float MaxAcceleration = 2.0f;
+
         [SerializeField] [EnumFlagsAttribute]
         public UpdateFlags Flags = UpdateFlags.DT_CROWD_ANTICIPATE_TURNS |
             UpdateFlags.DT_CROWD_OBSTACLE_AVOIDANCE | UpdateFlags.DT_CROWD_SEPARATION |
             UpdateFlags.DT_CROWD_OPTIMIZE_VIS | UpdateFlags.DT_CROWD_OPTIMIZE_TOPO;
+
         public ObstacleAvoidanceType AvoidanceType = ObstacleAvoidanceType.MEDIUM;
         public float SeparationWeight = 0.5f;
 
@@ -81,6 +83,8 @@ namespace Pathfinding
                 return Velocity.sqrMagnitude >= 0.1;
             }
         }
+
+        public bool IsPathPartial { get; set; }
 
         public int ID { get { return idx; } }
 
