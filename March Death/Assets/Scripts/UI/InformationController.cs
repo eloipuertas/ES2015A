@@ -12,6 +12,8 @@ public partial class InformationController : MonoBehaviour
 {
 	private const string IMAGES_PATH = "InformationImages";
 
+	Races playerRace;
+
 	//objects for one unit information
 	private Text txtActorName;
 	private Text txtActorRace;
@@ -31,6 +33,7 @@ public partial class InformationController : MonoBehaviour
 	void Start ()
 	{
 		GameObject gameInformationObject = GameObject.Find("GameInformationObject");
+		playerRace = gameInformationObject.GetComponent<GameInformation>().GetPlayerRace();
 
         //Register to selectable actions
         Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.SELECTED, onUnitSelected, new ActorSelector()
