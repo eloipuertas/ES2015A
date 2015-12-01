@@ -16,6 +16,7 @@ public partial class InformationController : MonoBehaviour {
 	Vector2 creationQueueInitialPoint;
 	Vector2 scaledUnitCreationPanel;
 	Resource currentResource;
+	Barrack currentBarrack;
 
 	ArrayList creationQueueButtons = new ArrayList();
 
@@ -31,6 +32,9 @@ public partial class InformationController : MonoBehaviour {
 			if (currentResource != null) {
 				float percentage = currentResource.getcreationUnitPercentage();
 				image.fillAmount = 1 - percentage / 100f;
+			} else if (currentBarrack != null) {
+				float percentage = currentBarrack.getcreationUnitPercentage();
+				image.fillAmount = 1 - percentage / 100f;
 			}
 		}
 	}
@@ -38,10 +42,14 @@ public partial class InformationController : MonoBehaviour {
 	private void ShowCreationQueue() 
 	{
 		DestroyUnitCreationButtons();
-
-		if (currentResource != null) {
-			creationQueueButtonsCount = currentResource.getNumberElements();
 		
+		if (currentResource != null || currentBarrack != null ) {
+			if (currentResource != null) {
+				creationQueueButtonsCount = currentResource.getNumberElements();
+			} else if (currentBarrack != null) {
+				creationQueueButtonsCount = currentBarrack.getNumberElements();
+			}
+			
 			for (int i = 0; i < creationQueueButtonsCount; i++) {
 				Vector2 buttonCenter = new Vector2();
 				buttonCenter.x = creationQueueInitialPoint.x + scaledUnitCreationPanel.x / 2f + (creationQueueButtonSize.x * i) + creationQueueButtonSize.x / 2f;
