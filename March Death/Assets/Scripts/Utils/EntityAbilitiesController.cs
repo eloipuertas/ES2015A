@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using System;
@@ -13,7 +14,7 @@ public class EntityAbilitiesController : MonoBehaviour
     //private static int Arial_Fifteen_Size_y = 23;
     private static float Arial_Fifteen_Size_X = 7.8f;
     private static int Arial_Fifteen_Size_y = 18;
-    private static int HOVER_TEXT_SIZE = 15;
+    private static int HOVER_TEXT_SIZE = 11;
     private static Color HOVER_TEXT_COLOR = Color.white;
     private static Color HOVER_TEXT_BACKGROUND = Color.black;
     private static float BACKGROUND_ALPHA = 0.5f;
@@ -21,6 +22,8 @@ public class EntityAbilitiesController : MonoBehaviour
     private static int Button_Rows = 3;
     private static int Button_Columns = 4;
     private static Boolean showText = false;
+
+    public static List<Ability> abilities_on_show;
 
     // Use this for initialization
     void Start()
@@ -40,6 +43,7 @@ public class EntityAbilitiesController : MonoBehaviour
             registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
         });
 
+        abilities_on_show = new List<Ability>();
     }
 
     // Update is called once per frame
@@ -90,7 +94,7 @@ public class EntityAbilitiesController : MonoBehaviour
                 // HACK: When this is fired, the button status should be updated! abilityObj.isActive might have changed...
                 UnityAction actionMethod = new UnityAction(() =>
                 {
-                    Debug.Log(abilityObj);
+                    Debug.Log("* " + abilityObj);
                     abilityObj.enable();
                 });
                 image.sprite = CreateSprite(ability, image.rectTransform.sizeDelta);
@@ -120,10 +124,13 @@ public class EntityAbilitiesController : MonoBehaviour
         var abilities = entity.info.abilities;
         var nabilities = abilities.Count;
 
+        abilities_on_show.Clear();
+
         for (int i = 0; i < nabilities; i++)
         {
             String ability = abilities[i].name;
             Ability abilityObj = entity.getAbility(ability);
+            abilities_on_show.Add(abilityObj);
 
             if (abilityObj.isUsable)
             {
@@ -284,7 +291,9 @@ public class EntityAbilitiesController : MonoBehaviour
         Font ArialFont = (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf");
         text.font = ArialFont;
         text.material = ArialFont.material;
-        text.text = name;
+        KeyCode code = KeyCode.Greater;
+        foreach (Ability a in abilities_on_show) { if (name.Equals(a._info.name)) code = a.keyBinding; }
+        text.text = name + " (" + code.ToString() + ")";
         text.fontSize = HOVER_TEXT_SIZE;
         text.color = HOVER_TEXT_COLOR;
         text.enabled = true;

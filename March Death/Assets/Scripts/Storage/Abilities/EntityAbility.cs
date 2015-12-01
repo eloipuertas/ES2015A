@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,6 +26,8 @@ namespace Storage
         public string tooltip = "";
 
         public TooltipFlag tooltipFlags;
+
+        public KeyCode keyBinding;
 
         public EntityType targetType;
         public Races targetRace;
@@ -93,9 +96,65 @@ namespace Storage
                             attrs = "\n\nCan recruit:\n" + attrs;
                         }
 
-                        tooltip = "Create " + buildingTarget.name + " " + tooltip + attrs;
+                        tooltip = "Create " + buildingTarget.name + " " + tooltip + attrs + "\nKey : " + keyBinding.ToString();
                         break;
                 }
+            }
+        }
+
+        // Method to get keybindings
+        public void SetupKeyCode()
+        {
+            switch (name)
+            {
+                case "Create Farm":
+                    keyBinding = KeyCode.F;
+                    break;
+                case "Create Mine":
+                    keyBinding = KeyCode.M;
+                    break;
+                case "Create Sawmill":
+                    keyBinding = KeyCode.S;
+                    break;
+                case "Create Archery":
+                    keyBinding = KeyCode.A;
+                    break;
+                case "Create Stable":
+                    keyBinding = KeyCode.C;
+                    break;
+                case "Create Watchtower":
+                    keyBinding = KeyCode.T;
+                    break;
+                case "Create Wall":
+                    keyBinding = KeyCode.W;
+                    break;
+                case "Create Cavalry":
+                    keyBinding = KeyCode.C;
+                    break;
+                case "Create Thrown":
+                    keyBinding = KeyCode.T;
+                    break;
+                case "Create LightArmor":
+                    keyBinding = KeyCode.L;
+                    break;
+                case "Create HeavyArmor":
+                    keyBinding = KeyCode.H;
+                    break;
+                case "Create Barrack":
+                    keyBinding = KeyCode.B;
+                    break;
+                case "Create WallCorner":
+                    keyBinding = KeyCode.Q;
+                    break;
+                case "Create Civil":
+                    keyBinding = KeyCode.C;
+                    break;
+                case "Sell":
+                    keyBinding = KeyCode.S;
+                    break;
+                default:
+                    keyBinding =  KeyCode.RightShift;
+                    break;
             }
         }
     }

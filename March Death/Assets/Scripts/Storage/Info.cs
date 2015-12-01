@@ -67,6 +67,7 @@ namespace Storage
             {
                 foreach (EntityAbility ability in entry.Value.abilities)
                 {
+                    ability.SetupKeyCode();
                     ability.SetupTooltip(this);
                     ability.tooltip = ability.tooltip.FormatWith(entry.Value, @"\[\[", @"\]\]");
                     ability.tooltip = ability.tooltip.FormatWith(ability, @"\(\(", @"\)\)");

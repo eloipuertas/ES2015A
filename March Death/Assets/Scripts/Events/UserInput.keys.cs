@@ -28,5 +28,19 @@ public partial class UserInput
                 player.setCurrently(Player.status.SELECTED_UNITS);
             }
         }
+        // Displays the Pause Menu
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            PauseMenuLogic.TogglePauseMenu();
+        }
+
+        foreach (Ability ab in EntityAbilitiesController.abilities_on_show)
+        {
+            if (Input.GetKeyUp(ab.keyBinding))
+            {
+                ab.enable();
+            }
+        }
+
     }
 }
