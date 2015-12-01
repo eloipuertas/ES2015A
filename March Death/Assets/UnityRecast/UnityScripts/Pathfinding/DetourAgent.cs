@@ -124,10 +124,18 @@ namespace Pathfinding
             }
         }
 
+        public void Awake()
+        {
+            OnEnable();
+        }
+
         public void OnEnable()
         {
-            UpdateParams();
-            AddToCrowd();
+            if (idx == -1)
+            {
+                UpdateParams();
+                AddToCrowd();
+            }
         }
 
         public void OnDisable()
