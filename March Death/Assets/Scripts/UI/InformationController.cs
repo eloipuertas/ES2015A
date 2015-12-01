@@ -9,26 +9,26 @@ using System.Collections.Generic;
 using UnityEngine.Events;
 
 public partial class InformationController : MonoBehaviour
-{	
+{
 	private const string IMAGES_PATH = "InformationImages";
-	
+
 	//objects for one unit information
 	private Text txtActorName;
 	private Text txtActorRace;
 	private Text txtActorHealth;
 	private Image imgActorDetail;
 	private Slider sliderActorHealth;
-	
+
 	//objects for multiple units information
 	int multiselectionColumns = 10;
 	int multiselectionRows = 2;
 	Vector2 multiselectionButtonSize;
 	Vector2 multiselectionInitialPoint;
-	
+
 	Dictionary<Selectable, GameObject> multiselectionButtons = new Dictionary<Selectable, GameObject>();
-	
+
 	// Use this for initialization
-	void Start () 
+	void Start ()
 	{
 		GameObject gameInformationObject = GameObject.Find("GameInformationObject");
 
@@ -51,7 +51,7 @@ public partial class InformationController : MonoBehaviour
 		txtActorHealth = information.transform.FindChild("ActorHealth").gameObject.GetComponent<Text>();
 		imgActorDetail = information.transform.FindChild ("ActorImage").gameObject.GetComponent<Image>();
 		sliderActorHealth = information.transform.FindChild ("ActorHealthSlider").gameObject.GetComponent<Slider>();
-		
+
 		//Precalculate objects used for show info for multiple units
 		RectTransform rectTransform = GameObject.Find("Information").transform.FindChild ("background").GetComponent<RectTransform>();
 		Vector2 panelSize = rectTransform.sizeDelta;
@@ -76,22 +76,22 @@ public partial class InformationController : MonoBehaviour
         scaledUnitCreationPanel = Vector2.Scale(newpanelSize, globalScaleXY);
         creationQueueButtonSize = new Vector2(scaledUnitCreationPanel.x / 5, scaledUnitCreationPanel.y);
         creationQueueInitialPoint = new Vector2(newcenter.x - scaledUnitCreationPanel.x, newcenter.y + scaledUnitCreationPanel.y);
-        
+
         //Default is hidden
         HideInformation();
 	}
-	
-	private void ShowInformation(GameObject gameObject) 
+
+	private void ShowInformation(GameObject gameObject)
 	{
 		IGameEntity entity = gameObject.GetComponent<IGameEntity> ();
-		
+
 		txtActorName.text = entity.info.name;
 		txtActorName.enabled = true;
 		txtActorRace.text = entity.info.race.ToString ();
 		txtActorRace.enabled = true;
 		txtActorHealth.text = Math.Ceiling(entity.healthPercentage).ToString () + "/100";
-		txtActorHealth.enabled = true;	
-		
+		txtActorHealth.enabled = true;
+
 		sliderActorHealth.value = entity.healthPercentage;
 		sliderActorHealth.enabled = true;
 		Transform sliderBackground = sliderActorHealth.transform.FindChild ("Background");
@@ -110,9 +110,9 @@ public partial class InformationController : MonoBehaviour
             ShowCreationQueue();
         });
     }
-	
-	private void HideInformation() 
-	{	
+
+	private void HideInformation()
+	{
 		txtActorName.enabled = false;
 		txtActorRace.enabled = false;
 		txtActorHealth.enabled = false;
@@ -122,8 +122,8 @@ public partial class InformationController : MonoBehaviour
 		Transform sliderBackground = sliderActorHealth.transform.FindChild ("Background");
 		sliderBackground.GetComponent<Image>().enabled = false;
 	}
-	
-	private void ShowMultipleInformation() 
+
+	private void ShowMultipleInformation()
 	{
         List<Selectable> selectedObjects = BasePlayer.player.selection.SelectedSquad.Selectables;
 
@@ -152,7 +152,7 @@ public partial class InformationController : MonoBehaviour
         }
 		ReloadSquadGenerationButton ();
 	}
-	
+
 	private void modifyButton(GameObject buttonCanvas, Vector2 center) {
 		GameObject button = buttonCanvas.transform.Find ("MultiSelectionButtonButton").gameObject;
 		Image image = button.GetComponent<Image> ();
@@ -160,16 +160,16 @@ public partial class InformationController : MonoBehaviour
 		Text text = button.transform.FindChild ("MultiSelectionButtonText").GetComponent<Text> ();
 		text.rectTransform.position = center;
 	}
-	
+
 	private GameObject CreateMultiselectionButton(Vector2 buttonCenter, Selectable selectable)
     {
 		IGameEntity entity = selectable.GetComponent<IGameEntity>();
-		
+
 		UnityAction selectUnique = new UnityAction(() =>
 		{
 			selectable.SelectOnlyMe();
 		});
-		
+
 		return CreateCustomButton(buttonCenter, multiselectionButtonSize, "MultiSelectionButton", "", buttonImage: GetImageForEntity (entity), actionMethod: selectUnique);
 	}
 
@@ -190,7 +190,7 @@ public partial class InformationController : MonoBehaviour
 			}
 		}
 	}
-	
+
 	public void onUnitSelected(System.Object obj)
 	{
 		GameObject gameObject = (GameObject) obj;
@@ -207,10 +207,10 @@ public partial class InformationController : MonoBehaviour
 			DestroyButtons();
 			ShowInformation(gameObject);
 		}
-		
+
 		//Register for unit events
 		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-		
+
 		entity.doIfUnit(unit =>
 	    {
 			unit.register(Unit.Actions.DAMAGED, onUnitDamaged);
@@ -253,10 +253,10 @@ public partial class InformationController : MonoBehaviour
         // Hide all info
         DestroyButtons();
         HideInformation();
-		
+
 		//Unregister unit events
 		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-		
+
 		entity.doIfUnit(unit =>
 		{
 			unit.unregister(Unit.Actions.DAMAGED, onUnitDamaged);
@@ -282,7 +282,7 @@ public partial class InformationController : MonoBehaviour
             //building.unregister(Barrack.Actions.BUILDING_FINISHED, reloadActionsPanel);
         });
     }
-	
+
 	public void onUnitDamaged(System.Object obj)
 	{
 		GameObject gameObject = (GameObject) obj;
@@ -290,12 +290,12 @@ public partial class InformationController : MonoBehaviour
 		sliderActorHealth.value = entity.healthPercentage;
 		txtActorHealth.text = Math.Ceiling(entity.healthPercentage).ToString () + "/100";
 	}
-	
+
 	public void onUnitDied(System.Object obj)
 	{
 		HideInformation ();
 	}
-	
+
 	void OnDestroy()
 	{
 		Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.SELECTED, onUnitSelected);
@@ -324,8 +324,8 @@ public partial class InformationController : MonoBehaviour
 		String textName = tag + "Text";
 		return CreateButton(center, size, tag, text, canvasName, buttonName, textName, buttonImage, actionMethod);
 	}
-	
-	private GameObject CreateButton(Vector2 center, Vector2 size, String tag = "", String text = "", String canvasName = "", String buttonName = "", 
+
+	private GameObject CreateButton(Vector2 center, Vector2 size, String tag = "", String text = "", String canvasName = "", String buttonName = "",
 	                                String textName = "", Sprite buttonImage = null, UnityAction actionMethod = null)
     {
         GameObject canvasObject = new GameObject(canvasName);

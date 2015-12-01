@@ -266,7 +266,7 @@ public sealed class SquadUpdater : GameEntity<SquadUpdater.DummyActions>
 
     private Squad _squad;
     public Squad UnitsSquad { get { return _squad; } }
-    
+
     public void Initialize(Storage.Races race)
     {
         _squad = new Squad(race);
@@ -409,7 +409,7 @@ public class SmelledEnemies : SquadData<Squad>
     {
         _ownSquad = squad;
     }
-    
+
     public override void Update(List<Unit> units)
     {
         if (units.Count > 0)
@@ -420,7 +420,7 @@ public class SmelledEnemies : SquadData<Squad>
             Debug.DrawLine(new Vector3(boundingBox.Bounds.x, units[0].transform.position.y, boundingBox.Bounds.y), new Vector3(boundingBox.Bounds.x + boundingBox.MaxLongitude, units[0].transform.position.y, boundingBox.Bounds.y + boundingBox.MaxLongitude), Color.white);
 #endif
 
-            List<Unit> enemyUnits = AISenses.getVisibleUnitsNotOfRaceNearPosition(new Vector3(boundingBox.Bounds.x, units[0].transform.position.y, boundingBox.Bounds.y), boundingBox.MaxLongitude * 3 * _ownSquad.MaxAttackRange, _ownSquad.Race);
+            List<Unit> enemyUnits = Helpers.getVisibleUnitsNotOfRaceNearPosition(new Vector3(boundingBox.Bounds.x, units[0].transform.position.y, boundingBox.Bounds.y), boundingBox.MaxLongitude * 3 * _ownSquad.MaxAttackRange, _ownSquad.Race);
             _enemySquad.UpdateUnits(enemyUnits);
             _enemySquad.Update();
         }

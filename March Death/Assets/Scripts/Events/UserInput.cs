@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using Managers;
+using Utils;
 
 public partial class UserInput : MonoBehaviour
 {
@@ -37,7 +38,7 @@ public partial class UserInput : MonoBehaviour
     private float height() { return (Screen.height - mouseButtonCurrentPoint.y) - (Screen.height - mouseButtonDownPoint.y); }
 
     // minimap related
-    private Camera minimapCamera; 
+    private Camera minimapCamera;
 
 
     Texture2D selectionTexture;
@@ -190,7 +191,7 @@ public partial class UserInput : MonoBehaviour
                             || entity.status == EntityStatus.WORKING))
                     {
                         sManager.Enter(entity);
-                    }   
+                    }
                 }
             }
         }
@@ -327,7 +328,7 @@ public partial class UserInput : MonoBehaviour
         Physics.Raycast(Camera.main.ScreenPointToRay(screenPosition), out hit, Mathf.Infinity);
         return hit.point;
     }
-    
+
     private void SelectUnitsInArea()
     {
         Vector3[] selectedArea = new Vector3[4];
@@ -340,9 +341,9 @@ public partial class UserInput : MonoBehaviour
 
         Vector3 center = topLeft + (bottomRight - topLeft) / 2;
         float radius = Mathf.Max(Vector3.Distance(topRight, topLeft), Vector3.Distance(bottomRight, topRight));
-        GameObject[] objects = AISenses.getObjectsNearPosition(center, radius);
+        GameObject[] objects = Helpers.getObjectsNearPosition(center, radius);
         List<Unit> newInArea = new List<Unit>();
-        
+
         foreach (GameObject gob in objects)
         {
             IGameEntity entity = gob.GetComponent<IGameEntity>();

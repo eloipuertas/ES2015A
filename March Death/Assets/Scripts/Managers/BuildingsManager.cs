@@ -23,7 +23,7 @@ namespace Managers
             public Storage.Races race;
             public Storage.BuildingTypes type;
             public bool placing;
-            public bool continuousConstruction;
+            public bool continuousConstruction; 
             public Material material;
 
         }

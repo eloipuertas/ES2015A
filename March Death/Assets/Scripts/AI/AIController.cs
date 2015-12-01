@@ -9,7 +9,7 @@ using Utils;
 /// <summary>
 /// Class tasked with deciding what the enemy will do.
 /// </summary>
-namespace Assets.Scripts.AI 
+namespace Assets.Scripts.AI
 {
     public class AIController : BasePlayer
     {
@@ -26,7 +26,7 @@ namespace Assets.Scripts.AI
 
         List<AIModule> modules;
         float[] timers;
-        //TODO: change this when decided about what do we really need to keep about buildings 
+        //TODO: change this when decided about what do we really need to keep about buildings
         public List<Resource> OwnResources { get; set; }
         public List<Barrack> OwnBarracks { get; set; }
         public List<IGameEntity> EnemyBuildings { get; set; }
@@ -65,7 +65,6 @@ namespace Assets.Scripts.AI
             rootBasePosition = new Vector3(pos.X, 80, pos.Y);
             buildPosition = rootBasePosition;
             Macro = new MacroManager(this);
-            
             Micro = new MicroManager(this);
             modules.Add(new AIModule(Macro.MacroHigh, 30));
             modules.Add(new AIModule(Macro.MacroLow, 5));
@@ -94,7 +93,7 @@ namespace Assets.Scripts.AI
             missionStatus = new MissionStatus(playerId);
 
         }
-        
+
         void Update()
         {
             if (!missionStatus.isGameOver())
@@ -227,7 +226,7 @@ namespace Assets.Scripts.AI
                 addToArmy(u);
             }
         }
-        
+
         public override void removeEntity(IGameEntity entity) {
             if (entity.info.isBuilding)
             {
@@ -243,7 +242,7 @@ namespace Assets.Scripts.AI
             else
             {
                 Unit u = (Unit)entity;
-                
+
                 if (entity.info.isArmy)
                 {
                     if (Army.Contains(u))
@@ -271,7 +270,7 @@ namespace Assets.Scripts.AI
             buildPosition = entity.getTransform().position + new Vector3(0,0,30);
             OnBuildingCreated(entity);
         }
-        
+
         public void addToArmy(List<Unit> units)
         {
             foreach (Unit u in units)
@@ -295,5 +294,5 @@ namespace Assets.Scripts.AI
         /// </summary>
         public int period;
     }
-    
+
 }

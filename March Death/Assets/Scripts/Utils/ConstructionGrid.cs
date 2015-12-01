@@ -3,22 +3,49 @@ using System.Collections;
 using System.Linq;
 using System;
 
-public class ConstructionGrid : MonoBehaviour {
+public class ConstructionGrid : MonoBehaviour
+{
+    public static ConstructionGrid instance;
 
+    public static Vector3 ERROR = new Vector3(-1, -1, -1);
     private Vector2 dimensions = new Vector2(15f, 15f);
     private ArrayList reservedPositions = new ArrayList();
     private const float DIFERENCE_OF_HEIGHTS_TOLERANCE = 1.5f;
+    const int MAX_RECURSION_DEPTH = 10;
+
+    void Awake()
+    {
+        instance = this;
+    }
+
 
     /// <returns></returns>
 	public Vector3 discretizeMapCoords(Vector3 position)
     {
         Vector3 discretizedCoords = new Vector3();
-        discretizedCoords.x = (float) Math.Floor(position.x / dimensions.x) * dimensions.x + dimensions.x / 2;
-        discretizedCoords.z = (float) Math.Floor(position.z / dimensions.y) * dimensions.y + dimensions.y / 2;
+        discretizedCoords.x = (float)Math.Floor(position.x / dimensions.x) * dimensions.x + dimensions.x / 2;
+        discretizedCoords.z = (float)Math.Floor(position.z / dimensions.y) * dimensions.y + dimensions.y / 2;
         discretizedCoords.y = position.y;
         return discretizedCoords;
     }
-  
+
+    /*
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity))
+            {
+                Debug.Log(hit.point);
+                Debug.Log(getFreePositionAbleToConstructNearPoint(hit.point));
+            }
+        }
+    }*/
+    
+    
+
     /// <summary>
     /// Sets the new grid dimensions
     /// </summary>
@@ -76,7 +103,7 @@ public class ConstructionGrid : MonoBehaviour {
         float BottomLeftHeight = getPointHeight(new Vector3(discretizedPosition.x + dimensions.x / 2, discretizedPosition.y, discretizedPosition.z - dimensions.y / 2));
         float BottomRightHeight = getPointHeight(new Vector3(discretizedPosition.x + dimensions.x / 2, discretizedPosition.y, discretizedPosition.z + dimensions.y / 2));
 
-        var heights = new float[]{ centerHeight, topLeftHeight, topRightHeight, BottomLeftHeight, BottomRightHeight };
+        var heights = new float[] { centerHeight, topLeftHeight, topRightHeight, BottomLeftHeight, BottomRightHeight };
         float max_height = heights.Max();
         float min_height = heights.Min();
 
@@ -95,17 +122,17 @@ public class ConstructionGrid : MonoBehaviour {
     /// </summary>
     /// <param name="discretizedPosition"></param>
     /// <returns></returns>
-    public bool isNewPositionAbleForConstrucction(Vector3 discretizedPosition)
+    public bool isNewPositionAbleForConstrucction(Vector3 discretizedPosition, bool checkFlat = true)
     {
         //If this position is contained on the array return false
         if (reservedPositions.Contains(new Vector2(discretizedPosition.x, discretizedPosition.z)))
         {
-            Debug.Log("This position is already reserved");
             return false;
         }
 
         //next check if the zone is flat enought for construction
-        return isFlatEnoughtForConstruction(discretizedPosition);
+        if (checkFlat) return isFlatEnoughtForConstruction(discretizedPosition);
+        else return true;
     }
 
     /// <summary>
@@ -146,6 +173,70 @@ public class ConstructionGrid : MonoBehaviour {
         reservePosition(discretizeMapCoords(bottom));
         reservePosition(discretizeMapCoords(bottomRight));
 
+    }
+
+    /// <summary>
+    /// Gets a free position near somewhere
+    /// </summary>
+    /// <param name="position"></param>
+    public Vector3 getFreePositionAbleToConstructNearPoint(Vector3 position, int recursionDepth = MAX_RECURSION_DEPTH)
+    {
+        recursionDepth--;
+
+        if (recursionDepth == 0)
+        {
+            return ERROR;
+        }
+
+        Vector3 discretizedPosition = discretizeMapCoords(position);
+        bool found = false;
+        Vector3 topLeft, top, topRight,
+                left, right,
+                bottomLeft, bottom, bottomRight;
+
+        Vector3[] possibilities;
+
+        possibilities = new Vector3[8];
+        topLeft = new Vector3(discretizedPosition.x - dimensions.x, discretizedPosition.y, discretizedPosition.z - dimensions.y);
+        top = new Vector3(discretizedPosition.x, discretizedPosition.y, discretizedPosition.z - dimensions.y);
+        topRight = new Vector3(discretizedPosition.x + dimensions.x, discretizedPosition.y, discretizedPosition.z - dimensions.y);
+
+        left = new Vector3(discretizedPosition.x - dimensions.x, discretizedPosition.y, discretizedPosition.z);
+        right = new Vector3(discretizedPosition.x + dimensions.x, discretizedPosition.y, discretizedPosition.z);
+
+        bottomLeft = new Vector3(discretizedPosition.x - dimensions.x, discretizedPosition.y, discretizedPosition.z + dimensions.y);
+        bottom = new Vector3(discretizedPosition.x, discretizedPosition.y, discretizedPosition.z + dimensions.y);
+        bottomRight = new Vector3(discretizedPosition.x + dimensions.x, discretizedPosition.y, discretizedPosition.z + dimensions.y);
+
+        //We sort them in order of preferences
+        possibilities[0] = bottomLeft;
+        possibilities[1] = bottom;
+        possibilities[2] = left;
+        possibilities[3] = bottomRight;
+        possibilities[4] = right;
+        possibilities[5] = topLeft;
+        possibilities[6] = top;
+        possibilities[7] = topRight;
+        int i = -1;
+        do
+        {
+            i++;
+            if (isNewPositionAbleForConstrucction(discretizeMapCoords(possibilities[i]), false))
+            {
+                found = true;
+                recursionDepth = 0;
+            }
+
+        } while (!found && i < possibilities.Length - 1);
+
+
+        if (found)
+        {
+            return discretizeMapCoords(possibilities[i]);
+        }
+
+        //If we don't find anithing we need to search somewhere
+        return getFreePositionAbleToConstructNearPoint(possibilities[UnityEngine.Random.Range(0, 7)], recursionDepth);
     }
 
     public Vector2 getDimensions()

@@ -6,7 +6,7 @@ using System;
 
 public class AIDebugSystem : MonoBehaviour {
 
-	//Used to visualize spheres when our Aisenses asks for it
+	//Used to visualize spheres when our Helpers asks for it
     public struct DebugSphere
     {
         public Vector3 center;

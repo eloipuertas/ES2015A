@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using Storage;
 
-public static class AISenses
+public static class Helpers
 {
-    
     /// <summary>
     /// Returns all the gameObjects in some radius
     /// </summary>
@@ -16,11 +15,35 @@ public static class AISenses
         Collider[] collidersNearUs = Physics.OverlapSphere(position, radius);
         GameObject[] objectsNearUs = new GameObject[collidersNearUs.Length];
 
-        for(int i = 0; i < collidersNearUs.Length; i++)
+        for (int i = 0; i < collidersNearUs.Length; i++)
         {
             objectsNearUs[i] = collidersNearUs[i].gameObject;
         }
         return objectsNearUs;
+    }
+
+    /// <summary>
+    /// Returns all the gameObjects in some radius
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="radius"></param>
+    /// <returns></returns>
+    public static List<IGameEntity> getEntitiesNearPosition(Vector3 position, float radius)
+    {
+        GameObject[] foundGameObjects = getObjectsNearPosition(position, radius);
+        List<IGameEntity> entities = new List<IGameEntity>();
+
+        for (int i = 0; i < foundGameObjects.Length; i++)
+        {
+            GameObject obj = foundGameObjects[i];
+            IGameEntity objEntity = obj.GetComponent<IGameEntity>();
+
+            if (objEntity != null && objEntity.status != EntityStatus.DEAD && objEntity.status != EntityStatus.DESTROYED)
+            {
+                entities.Add(objEntity);
+            }
+        }
+        return entities;
     }
 
     /// <summary>
@@ -39,7 +62,7 @@ public static class AISenses
         {
             GameObject obj = foundGameObjects[i];
             Unit objUnit = obj.GetComponent<Unit>();
-            if(objUnit != null && objUnit.status != EntityStatus.DEAD && objUnit.race == race)
+            if (objUnit != null && objUnit.status != EntityStatus.DEAD && objUnit.race == race)
             {
                 unitsOfRace.Add(objUnit);
             }
@@ -87,7 +110,7 @@ public static class AISenses
         {
             GameObject obj = foundGameObjects[i];
             Unit objUnit = obj.GetComponent<Unit>();
-            if (objUnit != null && objUnit.race == race && objUnit.status!=EntityStatus.DEAD && obj.GetComponent<FOWEntity>().IsRevealed)
+            if (objUnit != null && objUnit.race == race && objUnit.status != EntityStatus.DEAD && obj.GetComponent<FOWEntity>().IsRevealed)
             {
                 unitsOfRace.Add(objUnit);
             }

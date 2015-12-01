@@ -18,10 +18,14 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public Races race = Races.MEN;
     public Races getRace() { return race; }
     public abstract E getType<E>() where E : struct, IConvertible;
+    public T HEALTH_UPDATED { get; set; }
 
     protected Collider _collider;
     protected Pathfinding.DetourObstacle _obstacle;
     protected Terrain _terrain;
+
+	private float _autoRecoveryTimer = -1;
+	private float _autoRecoveryAccom = 0;
 
     /// <summary>
     /// Called when Start has been called
@@ -251,6 +255,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     public override void Awake()
     {
         base.Awake();
+        HEALTH_UPDATED = (T)Enum.Parse(typeof(T), "HEALTH_UPDATED", true);
 
 #if !DISABLE_ANIMATOR
         // Get the Animator
@@ -292,6 +297,24 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         {
             ability.Update();
         }
+		if (_autoRecoveryTimer > -1) {
+			_autoRecoveryTimer += Time.deltaTime;
+
+			if (_autoRecoveryTimer >= 60) {
+				_autoRecoveryTimer -= 60;
+				_autoRecoveryAccom += (_info.attributes.wounds * _info.attributes.autoRecoveryRate);
+				if (_autoRecoveryAccom >= 1) {
+					_woundsReceived -= 1;
+					_autoRecoveryAccom -= 1;
+                    fire(HEALTH_UPDATED);
+
+					if (_woundsReceived == 0) {
+						_autoRecoveryAccom = 0;
+						_autoRecoveryTimer = -1;
+					}
+				}
+			}
+		}
     }
 
     /// <summary>
@@ -361,7 +384,14 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         return HitTables.wounds[attackerStrength - 1, defenderResistance - 1] <= dice;
     }
 
-    protected abstract void onReceiveDamage();
+    protected virtual void onReceiveDamage()
+	{
+		// If _autoRepairTimer is -1, means that the building was fully recovered before the attack.
+		if (_autoRecoveryTimer == -1) {
+			_autoRecoveryTimer = 0;
+		}
+	}
+
     protected abstract void onFatalWounds();
 
     public abstract IKeyGetter registerFatalWounds(Action<System.Object> func);
