@@ -34,7 +34,7 @@ namespace Storage
 	        parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Military", buildingStore, EntityType.BUILDING);
             parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Defense", buildingStore, EntityType.BUILDING);
             parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Barracks", buildingStore, EntityType.BUILDING);
-            parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Stable", buildingStore, EntityType.BUILDING);
+            //parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Stable", buildingStore, EntityType.BUILDING);
 
             // Tooltips
             parseTooltips(buildingStore);

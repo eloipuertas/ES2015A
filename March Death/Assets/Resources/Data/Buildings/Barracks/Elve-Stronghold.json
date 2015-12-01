@@ -80,6 +80,26 @@
 
         {
             "ability": "Create",
+            "name":"Create Artillery",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "ELVES",
+            "targetBuilding": "ARTILLERY"
+        },
+
+		{
+            "ability": "Create",
+            "name":"Create Gryphon",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "ELVES",
+            "targetBuilding": "GRYPHON"
+        },
+
+        {
+            "ability": "Create",
             "name":"Create Wall",
 
             "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
@@ -96,6 +116,16 @@
             "targetType": "BUILDING",
             "targetRace": "ELVES",
             "targetBuilding": "WALLCORNER"
+        },
+
+        {
+            "ability": "Create",
+            "name":"Create WallGate",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "ELVES",
+            "targetBuilding": "WALLGATE"
         },
 
         {

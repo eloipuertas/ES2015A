@@ -19,7 +19,7 @@ public class EntityAbilitiesController : MonoBehaviour
     private static float BACKGROUND_ALPHA = 0.5f;
 
     private static int Button_Rows = 3;
-    private static int Button_Columns = 3;
+    private static int Button_Columns = 4;
     private static Boolean showText = false;
 
     // Use this for initialization
@@ -98,7 +98,7 @@ public class EntityAbilitiesController : MonoBehaviour
                     abilityObj.enable();
                 });
                 var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
-                buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Rows) + 1));
+                buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Columns) + 1));
                 CreateButton(rectTransform, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
             }
         }

@@ -6078,7 +6078,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   race: 0
-  type: 5
+  type: 12
 --- !u!137 &13725572
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
@@ -9720,6 +9720,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: Size.z
       value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: type
+      value: 12
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

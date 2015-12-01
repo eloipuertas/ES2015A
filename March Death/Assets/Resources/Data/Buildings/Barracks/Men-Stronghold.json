@@ -83,6 +83,26 @@
 
         {
             "ability": "Create",
+            "name":"Create Artillery",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "MEN",
+            "targetBuilding": "ARTILLERY"
+        },
+
+		{
+            "ability": "Create",
+            "name":"Create Gryphon",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "MEN",
+            "targetBuilding": "GRYPHON"
+        },
+
+        {
+            "ability": "Create",
             "name":"Create Wall",
 
             "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
@@ -101,6 +121,16 @@
             "targetBuilding": "WALLCORNER"
         },
 
+		{
+            "ability": "Create",
+            "name":"Create WallGate",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "BUILDING",
+            "targetRace": "MEN",
+            "targetBuilding": "WALLGATE"
+        },
+		
         {
             "ability": "Create",
             "name":"Create Watchtower",
