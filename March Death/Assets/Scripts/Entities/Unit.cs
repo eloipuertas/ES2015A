@@ -384,6 +384,10 @@ public class Unit : GameEntity<Unit.Actions>
     /// 
     public void vanish()
     {
+        // this should work
+        gameObject.SetActive(false);
+        return;
+
         //Disable FOW
         if (GetComponent<FOWEntity>())
         {
@@ -445,7 +449,10 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     public void bringBack()
     {
-       
+        // this should work
+        gameObject.SetActive(true);
+        return;
+
         if (GetComponent<FOWEntity>())
         {
             GetComponent<FOWEntity>().enabled = true;

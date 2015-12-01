@@ -222,7 +222,9 @@ public class ConstructionGrid : MonoBehaviour
         do
         {
             i++;
-            if (isNewPositionAbleForConstrucction(discretizeMapCoords(possibilities[i]), false))
+
+            if (isNewPositionAbleForConstrucction(discretizeMapCoords(possibilities[i])))
+            //if (isNewPositionAbleForConstrucction(discretizeMapCoords(possibilities[i]), false))
             {
                 found = true;
                 recursionDepth = 0;
