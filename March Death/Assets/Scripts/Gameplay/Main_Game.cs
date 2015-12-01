@@ -55,10 +55,17 @@ public class Main_Game : MonoBehaviour
                 LoadCampaign();
                 break;
             case GameInformation.GameMode.SKIRMISH:
+                LoadSkirmish();
                 break;
         }
 
         BasePlayer.Setup();
+    }
+
+    private void LoadSkirmish()
+    {
+        // TODO Replace with appropriate functionality
+        LoadCampaign();
     }
 
     private void LoadCampaign()

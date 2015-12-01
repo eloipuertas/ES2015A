@@ -28,6 +28,10 @@ public class GameSetupScript : MonoBehaviour
 
     private enum ErrorType { CIVILIZATION_MISSING, SKILL_MISSING, GAME_MODE_MISSING }
 
+	private const string ERROR_DIALOG_CIVILIZATION = "ErrorDialog-0";
+	private const string ERROR_DIALOG_GAME_MODE = "ErrorDialog-1";
+	private const string ERROR_DIALOG_SKILL = "ErrorDialog-2";
+
     /// <summary>
     /// Holds the reference to the prefabs that have the error messages.
     /// </summary>
@@ -64,30 +68,43 @@ public class GameSetupScript : MonoBehaviour
         difficultySelected = true;
     }
 
-    public void SetGameMode(GameInformation.GameMode mode)
+    public void SetGameMode(bool isCampaign)
     {
-        info.setGameMode(mode);
+        if (isCampaign)
+		{
+			info.setGameMode(GameInformation.GameMode.CAMPAIGN);
+		}
+		else
+		{
+			info.setGameMode(GameInformation.GameMode.SKIRMISH);
+		}
         gameModeSelected = true;
     }
 
     private void showErrorMessage(ErrorType error)
     {
         GameObject msgBox = null; // Set to null to avoid errors on compilation time
+        string dialogName = null;
         switch (error)
         {
             case ErrorType.CIVILIZATION_MISSING:
                 msgBox = (GameObject) Instantiate(prefabs[0]);
+                msgBox.name = ERROR_DIALOG_CIVILIZATION;
+                dialogName = ERROR_DIALOG_CIVILIZATION;
                 break;
             case ErrorType.GAME_MODE_MISSING:
                 msgBox = (GameObject) Instantiate(prefabs[1]);
+                msgBox.name = ERROR_DIALOG_GAME_MODE;
+                dialogName = ERROR_DIALOG_GAME_MODE;
                 break;
             case ErrorType.SKILL_MISSING:
                 msgBox = (GameObject) Instantiate(prefabs[2]);
+                msgBox.name = ERROR_DIALOG_SKILL;
+                dialogName = ERROR_DIALOG_SKILL;
                 break;
         }
-        msgBox.name = "ErrorDialog";
-        msgBox.GetComponent<Button>().onClick.AddListener(() => {
-            GameObject obj = GameObject.Find("ErrorDialog");
+		msgBox.GetComponentInChildren<Button>().onClick.AddListener(() => {
+            GameObject obj = GameObject.Find(dialogName);
             Destroy(obj);
         });
     }

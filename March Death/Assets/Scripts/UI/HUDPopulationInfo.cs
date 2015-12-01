@@ -150,15 +150,13 @@ public class HUDPopulationInfo : MonoBehaviour
     {
         canvasUnits = new GameObject("canvasUnits");
         canvasUnits.layer = 5; // UI LAYER
-        canvasUnits.AddComponent<Canvas>();
-        cUnits = canvasUnits.GetComponent<Canvas>();
+        cUnits = canvasUnits.AddComponent<Canvas>();
         cUnits.GetComponent<RectTransform>().SetParent(windowInfo.GetComponent<RectTransform>(), false);
         cUnits.GetComponent<RectTransform>().sizeDelta = windowInfo.GetComponent<RectTransform>().sizeDelta;
 
         canvasBuildings = new GameObject("canvasBuildings");
         canvasBuildings.layer = 5; // UI LAYER
-        canvasBuildings.AddComponent<Canvas>();
-        cBuildings = canvasBuildings.GetComponent<Canvas>();
+        cBuildings = canvasBuildings.AddComponent<Canvas>();
         cBuildings.GetComponent<RectTransform>().SetParent(windowInfo.GetComponent<RectTransform>(), false);
         cBuildings.GetComponent<RectTransform>().sizeDelta = windowInfo.GetComponent<RectTransform>().sizeDelta;
 
