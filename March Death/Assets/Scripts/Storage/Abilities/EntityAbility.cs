@@ -123,13 +123,19 @@ namespace Storage
                     keyBinding = KeyCode.C;
                     break;
                 case "Create Watchtower":
+                    keyBinding = KeyCode.T;
+                    break;
+                case "Create Wall":
                     keyBinding = KeyCode.W;
+                    break;
+                case "Create Cavalry":
+                    keyBinding = KeyCode.C;
                     break;
                 case "Create Thrown":
                     keyBinding = KeyCode.T;
                     break;
                 case "Create LightArmor":
-                    keyBinding = KeyCode.I;
+                    keyBinding = KeyCode.L;
                     break;
                 case "Create HeavyArmor":
                     keyBinding = KeyCode.H;
@@ -138,7 +144,7 @@ namespace Storage
                     keyBinding = KeyCode.B;
                     break;
                 case "Create WallCorner":
-                    keyBinding = KeyCode.Y;
+                    keyBinding = KeyCode.Q;
                     break;
                 case "Create Civil":
                     keyBinding = KeyCode.C;
@@ -147,7 +153,7 @@ namespace Storage
                     keyBinding = KeyCode.S;
                     break;
                 default:
-                    keyBinding =  KeyCode.Insert;
+                    keyBinding =  KeyCode.RightShift;
                     break;
             }
         }
