@@ -109,6 +109,11 @@ public partial class InformationController : MonoBehaviour
             currentResource = resource;
             ShowCreationQueue();
         });
+		entity.doIfBarrack(barrack =>
+		                   {
+			currentBarrack = barrack;
+			ShowCreationQueue();
+		});
     }
 
 	private void HideInformation()
@@ -222,7 +227,7 @@ public partial class InformationController : MonoBehaviour
 			resource.register(Resource.Actions.DAMAGED, onUnitDamaged);
 			resource.register(Resource.Actions.DESTROYED, onUnitDied);
             resource.register(Resource.Actions.CREATE_UNIT, onBuildingUnitCreated);
-            //resource.register(Resource.Actions.LOAD_UNIT, onBuildingUnitCreated);
+			//resource.register(Resource.Actions.ADDED_QUEUE, onBuildingLoadNewUnit);
         });
 
 		entity.doIfBarrack(building =>
@@ -230,6 +235,7 @@ public partial class InformationController : MonoBehaviour
 			building.register(Barrack.Actions.DAMAGED, onUnitDamaged);
 			building.register(Barrack.Actions.DESTROYED, onUnitDied);
             building.register(Barrack.Actions.CREATE_UNIT, onBuildingUnitCreated);
+			//resource.register(Barrack.Actions.ADDED_QUEUE, onBuildingLoadNewUnit);
             //TODO: reload actions on building created -> building.register(Barrack.Actions.BUILDING_FINISHED, reloadActionsPanel);
         });
     }
@@ -268,7 +274,7 @@ public partial class InformationController : MonoBehaviour
             resource.unregister(Resource.Actions.DAMAGED, onUnitDamaged);
             resource.unregister(Resource.Actions.DESTROYED, onUnitDied);
             resource.unregister(Resource.Actions.CREATE_UNIT, onBuildingUnitCreated);
-            //resource.unregister(Resource.Actions.LOAD_UNIT, onBuildingUnitCreated);
+			//resource.unregister(Resource.Actions.ADDED_QUEUE, onBuildingLoadNewUnit);
 
             currentResource = null;
             DestroyUnitCreationButtons();
@@ -279,7 +285,11 @@ public partial class InformationController : MonoBehaviour
             building.unregister(Barrack.Actions.DAMAGED, onUnitDamaged);
             building.unregister(Barrack.Actions.DESTROYED, onUnitDied);
             building.unregister(Barrack.Actions.CREATE_UNIT, onBuildingUnitCreated);
+			//resource.unregister(Barrack.Actions.ADDED_QUEUE, onBuildingLoadNewUnit);
             //building.unregister(Barrack.Actions.BUILDING_FINISHED, reloadActionsPanel);
+
+			currentBarrack = null;
+			DestroyUnitCreationButtons();
         });
     }
 
