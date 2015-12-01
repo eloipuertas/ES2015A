@@ -20,6 +20,8 @@ namespace Storage
         private Dictionary<Tuple<Races, BuildingTypes>, EntityInfo> buildingStore = new Dictionary<Tuple<Races, BuildingTypes>, EntityInfo>();
         private Dictionary<Tuple<Races, BuildingTypes>, List<string>> buildingPrefabs = new Dictionary<Tuple<Races, BuildingTypes>, List<string>>();
 
+        private Dictionary<Tuple<Races, byte>, EntityInfo> squadsStore = new Dictionary<Tuple<Races, byte>, EntityInfo>();
+
         public enum BuildingVariant { REAL = 0, GHOST = 1 }
 
         /// <summary>
@@ -35,6 +37,9 @@ namespace Storage
             parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Defense", buildingStore, EntityType.BUILDING);
             parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Barracks", buildingStore, EntityType.BUILDING);
             parseJSONFiles<BarrackInfo, BuildingTypes>("Data/Buildings/Stable", buildingStore, EntityType.BUILDING);
+
+            // Squad JSON
+            parseJSONFiles<SquadInfo, byte>("Data/Squads", squadsStore, EntityType.SQUAD);
 
             // Tooltips
             parseTooltips(buildingStore);
@@ -87,7 +92,16 @@ namespace Storage
                     EntityInfo entityInfo = JsonConvert.DeserializeObject<JSONType>(json.text);
                     entityInfo.entityType = entityType;
 
-                    Tuple<Races, EnumType> key = new Tuple<Races, EnumType>(entityInfo.race, entityInfo.getType<EnumType>());
+                    Tuple<Races, EnumType> key;
+
+                    if (entityInfo.hasType())
+                    {
+                        key = new Tuple<Races, EnumType>(entityInfo.race, entityInfo.getType<EnumType>());
+                    }
+                    else
+                    {
+                        key = new Tuple<Races, EnumType>(entityInfo.race, default(EnumType));
+                    }
 
                     if (store.ContainsKey(key))
                     {
@@ -167,6 +181,25 @@ namespace Storage
             }
 
             return (BuildingInfo)buildingStore[key];
+        }
+
+        /// <summary>
+        /// Gathers information for a race and type.
+        /// </summary>
+        /// <param name="race">Race to look for</param>
+        /// <param name="type">Type to look for</param>
+        /// <exception cref="System.ArgumentException">Thrown when a race/type combination is not found</exception>
+        /// <returns>The UnitInfo object of that race/type combination</returns>
+        public SquadInfo of(Races race)
+        {
+            Tuple<Races, byte> key = new Tuple<Races, byte>(race, 0);
+
+            if (!squadsStore.ContainsKey(key))
+            {
+                throw new System.ArgumentException("Race (" + race + ") and Type (" + 0 + ") does not exist");
+            }
+
+            return (SquadInfo)squadsStore[key];
         }
 
         /// <sumary>

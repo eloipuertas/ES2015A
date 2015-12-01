@@ -12,19 +12,21 @@ public class Main_Game : MonoBehaviour
     public Managers.BuildingsManager BuildingsMgr { get { return bm; } }
 
     // Use this for initialization
-    void Start ()
+    void Start()
     {
-        if (GameObject.Find ("GameInformationObject"))
-            info = (GameInformation)GameObject.Find ("GameInformationObject").GetComponent ("GameInformation");
+        if (GameObject.Find("GameInformationObject"))
+            info = (GameInformation)GameObject.Find("GameInformationObject").GetComponent("GameInformation");
         bm = new Managers.BuildingsManager();
         sounds = GameObject.Find("GameController").GetComponent<Managers.SoundsManager>();
-        if (info) info.LoadHUD ();
+        if (info) info.LoadHUD();
+        //if (info) info.LoadActionButtons();
         StartGame();
         bm.Player = user;
         UserInput inputs = gameObject.AddComponent<UserInput>();
         inputs.TerrainLayerMask = new LayerMask();
         inputs.TerrainLayerMask = 520;// HACK LayerMask.NameToLayer("Terrain"); didn't work
-        bm.Inputs = inputs; 
+        bm.Inputs = inputs;
+
     }
 
     public GameInformation GetGameInformationObject()
@@ -46,7 +48,7 @@ public class Main_Game : MonoBehaviour
         BasePlayer.Setup();
     }
 
-    private void LoadCampaign ()
+    private void LoadCampaign()
     {
         int id = 1;
         foreach (Battle.PlayerInformation player in info.GetBattle().GetPlayerInformationList())
@@ -69,6 +71,7 @@ public class Main_Game : MonoBehaviour
 
     public void ClearGame()
     {
+        Debug.LogError("Terminando el juego!");
         GameObject obj;
         obj = GameObject.Find("GameInformationObject").gameObject;
         Destroy(obj);

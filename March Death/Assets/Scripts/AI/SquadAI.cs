@@ -8,6 +8,7 @@ using UnityEngine;
 /// </summary>
 namespace Assets.Scripts.AI
 {
+    /*
     public class SquadAI
     {
 
@@ -170,7 +171,7 @@ namespace Assets.Scripts.AI
             if (maxLongitudeOfBox < 1) maxLongitudeOfBox = 1f;
 
             //Smell what is near this position
-            enemySquad.units = ai.senses.getVisibleUnitsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 3 * _maxUnitRange, _enemyRace);
+            enemySquad.units = Helpers.getVisibleUnitsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 3 * _maxUnitRange, _enemyRace);
 
             //Get the enemy squad bounding box
             enemySquad.boudningBox = enemySquad.getSquadBoundingBox();
@@ -185,7 +186,7 @@ namespace Assets.Scripts.AI
             }
             ad.Value = val;
 
-            enemyBuildings = ai.senses.getBuildingsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 3 * _maxUnitRange, _enemyRace);
+            enemyBuildings = Helpers.getBuildingsOfRaceNearPosition(new Vector3(boudningBox.x, units[0].transform.position.y, boudningBox.y), maxLongitudeOfBox * 3 * _maxUnitRange, _enemyRace);
         }
 
         float valOfUnit(Unit u)
@@ -193,16 +194,11 @@ namespace Assets.Scripts.AI
             return u.healthPercentage / 100 * (u.info.unitAttributes.resistance + u.info.unitAttributes.attackRate * u.info.unitAttributes.strength);
         }
     }
-    /* Small class to save data for each agent on this squad
-    Implements the following events:
-        OnUnitLeft  (could leave for death or just reshuffling squads)
-        OnUnitJoined
 
-    Must have a nonParametized constructor
-    */
     public class AgentData
     {
         public virtual void OnUnitLeft(Unit u) { }
         public virtual void OnUnitJoined(Unit u) { }
     }
+    */
 }

@@ -2,11 +2,12 @@ os:
 - linux
 sudo: required
 dist: trusty
+group: edge
 language: generic
 install:
-- ./Scripts/install.sh
+- ./TravisScripts/install.sh
 script:
-- ./Scripts/build.sh && ./Scripts/tests.sh
+- ./TravisScripts/build.sh && ./TravisScripts/tests.sh
 env:
   global:
   - secure: X8MyRyzLprI0P3xv1yzoGdWTaoti/xp3Lf5+cdI5GZaGpp//tIgiGmaC4TMu3ahvcuzVCRfsWAcxu2M40nAW+mTgs7fObUYnu3+cxzRc7RwvyOjpbYlbUoLGV8JXxeKfNU4Uds1pru267CAcTiTpLZb6nJOhX+RJX+Zv+HeQshBo5VsESrX07eODkBsdfu98uSYhh0Kff1d3Oa3bd/2PI6Qcblcl0Au6NGFTKeXDFvmtL3iZwHw+JjCq42ABUfVT9tKXUqBOC9AKdAQEkIIzQMyioKsVVSpsTBhXsfrNWtArioQLGOpiB249TB4AZT8y2hHguHEBatrQf0fngzAQ+FYB1uYZTw5MFLU+kKp5OAPYm5owDKwozsvPn0u6BDZn1W8bZa0Bd0HJPWhywuqKLxCfM6HyaiPK/2KUPAsd6mLX7WH11naHLk94FIq7/Lt1HVAWDclB146ax1VgwIAbgckAFfcyy8R7cUFHEYZdDD3oUf8FX/PM4LfixlCYMDOinhhE4Uz6CapydjK2Sp2ZXPABAySbbxUE0ZzxwhQ/KuXcUdLQoVn1fBl/rsOi619IeJ5cIGccivqWmEI05Bza3InW4lodMDJbDTGMoMd0lCsHiGEzujNZusaRUz/ZLxk+wr8/yl8xiWnfp4f/ZUoNucW9VvzzlbEGi5ik+fJ4jvY=

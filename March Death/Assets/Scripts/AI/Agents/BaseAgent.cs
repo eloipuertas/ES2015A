@@ -23,8 +23,12 @@ namespace Assets.Scripts.AI.Agents
             modifier = 1;
             agentName = name;
         }
-        public abstract int getConfidence(SquadAI squad);
-        public abstract void controlUnits(SquadAI squad);
+        public abstract int getConfidence(Squad squad);
+        public abstract void controlUnits(Squad squad);
+
+        public virtual void PreUpdate() { }
+        public virtual void PostSquad() { }
+        public virtual void PostUpdate() { }
 
 		/// <summary>
 		/// Transfers confidence to the agent.

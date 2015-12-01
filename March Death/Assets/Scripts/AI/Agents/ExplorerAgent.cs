@@ -26,18 +26,21 @@ namespace Assets.Scripts.AI.Agents
         int RescheduleRandomPointValue { get; set; }
         int RescheduleRandomDirectionValue { get; set; }
         int RescheduleRandomAroundTargetValue { get; set; }
+        int MaxExplorerSquads { get; set; }
 
         //Those are the confidence posibilities of our Explorer Agent
+        const int CONFIDENCE_TOO_MANY_EXPLORING = -25;
         const int CONFIDENCE_EXPLORER_BY_DEFAULT = 50;
 		const int CONFIDENCE_EXPLORER_ALL_CIVILS = 50;
 		const int CONFIDENCE_EXPLORER_DISABLED = -1;
 		const int CONFIDENCE_HERO_ALREADY_FOUND = 0;
 
+        bool isEnabled = true;
+        int numberSquadsExploring = 0;
         bool heroVisible;
 		bool allCivils;
 
         AssistAgent assistAgent;
-
         FOWManager fowManager;
 
         /// <summary>
@@ -48,12 +51,7 @@ namespace Assets.Scripts.AI.Agents
 
         // Known enemy building positions
         List<Vector3> knownPositions = new List<Vector3>();
-
-        /// <summary>
-        /// Helper array for fast explroe.
-        /// </summary>
-        int[,] dirHelper = new int[8,2]{ { 0, -1 }, { -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 } };
-		int confidence = 0;
+        
         
 		public ExplorerAgent(AIController ai, AssistAgent assist, String name) : base(ai, name)
         {
@@ -65,11 +63,42 @@ namespace Assets.Scripts.AI.Agents
             Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.DISCOVERED, OnEntityFound, selector);
             Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.HIDDEN, OnEntityLost, selector);
 
-            RescheduleSightRange = 30;
-            ReschuduleDiceFaces = 1000;
-            RescheduleRandomPointValue = 1000;
-            RescheduleRandomAroundTargetValue = 990;
-            RescheduleRandomDirectionValue = 970;
+            // Setup difficulty levels
+            switch (ai.DifficultyLvl)
+            {
+                case 0:
+                    isEnabled = false;
+                    break;
+
+                case 1:
+                    RescheduleSightRange = 0;
+                    ReschuduleDiceFaces = 1000;
+                    RescheduleRandomPointValue = 1000;
+                    RescheduleRandomAroundTargetValue = 990;
+                    RescheduleRandomDirectionValue = 970;
+                    MaxExplorerSquads = 1;
+                    break;
+
+                case 2:
+                    RescheduleSightRange = 15;
+                    ReschuduleDiceFaces = 1000;
+                    RescheduleRandomPointValue = 1000;
+                    RescheduleRandomAroundTargetValue = 990;
+                    RescheduleRandomDirectionValue = 970;
+                    MaxExplorerSquads = 2;
+                    break;
+                    
+                case 3:
+                default:
+                    RescheduleSightRange = 30;
+                    ReschuduleDiceFaces = 1000;
+                    RescheduleRandomPointValue = 1000;
+                    RescheduleRandomAroundTargetValue = 990;
+                    RescheduleRandomDirectionValue = 970;
+                    MaxExplorerSquads = 2;
+                    break;
+            }
+            
 
             heroVisible = false;
             fowManager = FOWManager.Instance;
@@ -77,12 +106,15 @@ namespace Assets.Scripts.AI.Agents
             assistAgent = assist;
         }
 
-        public override void controlUnits(SquadAI squad)
+        public override void controlUnits(Squad squad)
         {
-            if (squad.units.Count == 0)
+            if (!isEnabled || squad.Units.Count == 0)
             {
                 return;
             }
+
+            // Update squads exploring
+            ++numberSquadsExploring;
 
             if (fowManager.Enabled)
             {
@@ -90,19 +122,19 @@ namespace Assets.Scripts.AI.Agents
                 TODO: takeArms Explorer
                 if (squad.units.Count < 2)
                 {
-                    int num = 2 - squad.units.Count();
+                    int num = 2 - squad.Units.Count();
                     if (ai.Macro.canTakeArms() >= num)
                         ai.Macro.takeArms(num);
                 }
                 */
-                bool lostHero = (heroLastPos != Vector3.zero && !heroVisible && squad.units.Count > 0);
+                bool lostHero = (heroLastPos != Vector3.zero && !heroVisible && squad.Units.Count > 0);
 
                 // Static values
                 FOWManager.visible[] grid = fowManager.aiVision;
                 Vector2 gridSize = fowManager.getGridSize();
 
                 // Get a random unit as a reference point
-                Unit reference = squad.units[D6.get.rollN(squad.units.Count)];
+                Unit reference = squad.Units[D6.get.rollN(squad.Units.Count)];
                 DetourAgent agent = reference.GetComponent<DetourAgent>();
 
                 // Check if target is already explored
@@ -192,7 +224,7 @@ namespace Assets.Scripts.AI.Agents
                 }
 
                 // If we have a point, move there
-                foreach (Unit u in squad.units)
+                foreach (Unit u in squad.Units)
                 {
                     if (lostHero)
                     {
@@ -216,6 +248,11 @@ namespace Assets.Scripts.AI.Agents
                     }
                 }
             }
+        }
+
+        public override void PreUpdate()
+        {
+            numberSquadsExploring = 0;
         }
 
         static float angleDirection(Vector3 from, Vector3 initialTo, Vector3 newTo)
@@ -299,10 +336,10 @@ namespace Assets.Scripts.AI.Agents
 		/// </summary>
 		/// <returns>The confidence.</returns>
 		/// <param name="units">Units.</param>
-        public override int getConfidence(SquadAI squad)
+        public override int getConfidence(Squad squad)
         {
-			//Explorer agent has some confidence by default
-			confidence = CONFIDENCE_EXPLORER_BY_DEFAULT;
+            //Explorer agent has some confidence by default
+            int confidence = CONFIDENCE_EXPLORER_BY_DEFAULT;
             
 			//If fow manager is not enabled this agent will never act
 			if (!fowManager.Enabled)
@@ -317,7 +354,7 @@ namespace Assets.Scripts.AI.Agents
 			}
 
 			//If all units of the squad adds some more confidence to this behaivour
-			foreach(Unit unit in squad.units)
+			foreach(Unit unit in squad.Units)
 			{
 				if(unit.type != Storage.UnitTypes.CIVIL)
 				{
@@ -325,10 +362,16 @@ namespace Assets.Scripts.AI.Agents
 				}
 			}
 
-			if(allCivils)
+			if (allCivils)
 			{
 				confidence += CONFIDENCE_EXPLORER_ALL_CIVILS;
 			}
+
+
+            if (numberSquadsExploring > MaxExplorerSquads)
+            {
+                confidence += CONFIDENCE_TOO_MANY_EXPLORING;
+            }
 
 			return confidence;
         }

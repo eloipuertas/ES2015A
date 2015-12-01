@@ -17,6 +17,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     private GameObject controller;
     private GameObject plane;
     private EntitySelection _unitSelection;
+    private Quaternion _LifeBarDefaultRotation;
 
     public bool currentlySelected { get; set; }
     private float healthRatio = 1f;
@@ -36,6 +37,8 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public override void Awake()
     {
         base.Awake();
+
+        entity = GetComponent<IGameEntity>();
         currentlySelected = false;
         controller = GameObject.Find("GameController");
         player = controller.GetComponent<Player>();
@@ -47,26 +50,46 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
         base.Start();
         fire(Actions.CREATED, this.gameObject);
-        entity = GetComponent<IGameEntity>();
+
         if (entity.info.isBuilding == true)
         {
         	selectedBox = SelectionOverlay.CreateTexture(false);
-        } else 
+            plane = SelectionOverlay.getPlane(gameObject, selectedBox, true);
+        }
+        else 
         {
         	bool ownUnit = entity.info.race == player.race;
         	selectedBox = SelectionOverlay.CreateTexture(ownUnit);
+            plane = SelectionOverlay.getPlane(gameObject, selectedBox, false);
         }
 
-        plane = SelectionOverlay.getPlane(gameObject, selectedBox);
-
+        //ponemos el plane dentro del gameobject
+        _LifeBarDefaultRotation = plane.transform.rotation;
+        plane.transform.parent = transform;
         entity.doIfUnit(unit =>
         {
             unit.register(Unit.Actions.DIED, onUnitDied);
         });
 
-        // only apply for units
-        if (entity.info.isUnit) RetrieveLightSelection();
+        // only apply for units of the player
+        if (entity.info.isUnit && player.race == race) RetrieveLightSelection();
         else _unitSelection = null;
+    }
+
+    public void OnDisable()
+    {
+        if (currentlySelected)
+        {
+            // As this is an special case, let's first remove us form the squad
+            Unit unit = GetComponent<Unit>();
+            unit.Squad.RemoveUnit(unit);
+
+            // Now remove us from the squad, so that it doesn't get completely unselected
+            unit.Squad = null;
+
+            // Deselect now
+            DeselectEntity();
+        }
     }
 
     public override void Update() { }
@@ -75,8 +98,16 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
         if (!(currentlySelected ^ _changedVisible))
         {
-            if (currentlySelected) plane = SelectionOverlay.getPlane(gameObject, selectedBox);
-            else Destroy(plane, 0f); _lastHealth = 100f;
+            if (!currentlySelected)
+            {
+                plane.SetActive(false);
+            }
+            else
+            {
+
+                plane.SetActive(true);
+            };
+            //else Destroy(plane, 0f); _lastHealth = 100f;
 
             _changedVisible = !currentlySelected;
         }
@@ -91,21 +122,25 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
                 healthRatio = _lastHealth / 100f;
                 SelectionOverlay.UpdateTexture(plane, selectedBox, healthRatio);
             }
-            plane.transform.position = this.gameObject.transform.position + SelectionOverlay.getOffset(_collider);
+
+            Vector3 position = this.gameObject.transform.position;
+            position.y = _collider.bounds.max.y + (_collider.bounds.size.y * .5f);
+            // move the plane a little bit from the center
+            plane.transform.position = position;
+            // rotate the plain to its original position
+            plane.transform.rotation = _LifeBarDefaultRotation;
+            
+
         }
 
     }
-
-    protected virtual void OnGUI(){}
-
 
     /// <summary>
     /// Individual operation for the current selectable object. Selects only the object
     /// </summary>
     public virtual void SelectOnlyMe()
     {
-        player.selection.SelectUnique(this);
-
+        player.selection.Select(entity);
     }
 
     /// <summary>
@@ -113,7 +148,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     /// </summary>
 	public virtual void DeselectMe()
     {
-        player.selection.Deselect(this);
+        player.selection.Deselect(entity);
     }
 
 
@@ -183,6 +218,6 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         if (!selection) throw new System.Exception("FIX: " + entity.info.race + " - "  + entity.info.name + " prefab needs the EntitySelection prefab which is in Resources/prefab/selection");
         _unitSelection = selection.GetComponent<EntitySelection>();
         _unitSelection.SetColorRace(race);
-        
     }
+
 }

@@ -6,8 +6,8 @@ namespace Assets.Scripts.AI.Agents
 	public class AssistAgent : BaseAgent
 	{
 		Unit hero;
-        List<KeyValuePair<SquadAI, int>> requests;
-        KeyValuePair<SquadAI, int> mostImportantRequest;
+        List<KeyValuePair<Squad, int>> requests;
+        KeyValuePair<Squad, int> mostImportantRequest;
 
         public AssistAgent(AIController ai, string name) : base(ai, name)
 		{
@@ -19,20 +19,20 @@ namespace Assets.Scripts.AI.Agents
 					hero = u;
 				}
 			}
-            requests = new List<KeyValuePair<SquadAI, int>>();
+            requests = new List<KeyValuePair<Squad, int>>();
 		}
 		
-		public override void controlUnits(SquadAI squad)
+		public override void controlUnits(Squad squad)
 		{
             //Go to the most important request squad
-            foreach(Unit u in squad.units)
+            foreach(Unit u in squad.Units)
             {
-                u.moveTo(mostImportantRequest.Key.units[0].transform.position);
+                u.moveTo(mostImportantRequest.Key.Units[0].transform.position);
             }
 		}
 		
 		
-		public override int getConfidence(SquadAI squad)
+		public override int getConfidence(Squad squad)
 		{
             if (requests.Count == 0)
             {
@@ -44,10 +44,10 @@ namespace Assets.Scripts.AI.Agents
             confidence = requests[0].Value;
 
             //Go to help the closest request
-            foreach(KeyValuePair<SquadAI, int> request in requests)
+            foreach(KeyValuePair<Squad, int> request in requests)
             {
-                if(Vector2.Distance(request.Key.boudningBox.center, squad.boudningBox.center) < 
-                    Vector2.Distance(mostImportantRequest.Key.boudningBox.center, squad.boudningBox.center))
+                if(Vector2.Distance(request.Key.BoundingBox.Bounds.center, squad.BoundingBox.Bounds.center) < 
+                    Vector2.Distance(mostImportantRequest.Key.BoundingBox.Bounds.center, squad.BoundingBox.Bounds.center))
                 {
                     mostImportantRequest = request;
                     confidence = request.Value;
@@ -58,12 +58,13 @@ namespace Assets.Scripts.AI.Agents
 			return confidence;
 		}
 
-        public void requestHelp(KeyValuePair<SquadAI, int> request)
+        public void requestHelp(KeyValuePair<Squad, int> request)
         {
+            extraConfidence = 0;
             requests.Add(request);
         }
 
-        public void clearRequests()
+        public override void PostSquad()
         {
             requests.Clear();
         }
