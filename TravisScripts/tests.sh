@@ -66,8 +66,9 @@ then
 
     if [[ "$COMMIT_AUTHOR" == *" "* ]]
     then
-        echo -e "\n\033[31;1mGit commit author has spaces, it is probably invalid\033[0m\n"
-        exit 1
+        COMMIT_AUTHOR="Unkown GitHub username ($COMMIT_AUTHOR)"
+    else
+        COMMIT_AUTHOR="@$COMMIT_AUTHOR"
     fi
 
     case $GITHUB_NOTIFICATIONS in

@@ -80,8 +80,9 @@ COMMIT_AUTHOR=`git log -1 | grep -Po "(?<=Author: ).*(?= <)"`
 
 if [[ "$COMMIT_AUTHOR" == *" "* ]]
 then
-    echo -e "\n\033[31;1mGit commit author has spaces, it is probably invalid\033[0m\n"
-    exit 1
+    COMMIT_AUTHOR="Unkown GitHub username ($COMMIT_AUTHOR)"
+else
+    COMMIT_AUTHOR="@$COMMIT_AUTHOR"
 fi
 
 case $GITHUB_NOTIFICATIONS in
@@ -90,12 +91,12 @@ case $GITHUB_NOTIFICATIONS in
     issue)
         curl -i -X POST -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/json" \
             https://api.github.com/repos/$TRAVIS_REPO_SLUG/issues \
-            -d "{\"title\":\"Commit failed to build [$COMMIT_AUTHOR]\",\"body\":\"Commit by: @${COMMIT_AUTHOR}\nBranch: ${TRAVIS_BRANCH}\nCommit hash: ${TRAVIS_COMMIT}\nDetailed log: https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/${TRAVIS_BUILD_ID}\"}" > /dev/null
+            -d "{\"title\":\"Commit failed to build [$COMMIT_AUTHOR]\",\"body\":\"Commit by: ${COMMIT_AUTHOR}\nBranch: ${TRAVIS_BRANCH}\nCommit hash: ${TRAVIS_COMMIT}\nDetailed log: https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/${TRAVIS_BUILD_ID}\"}" > /dev/null
         ;;
     comment)
         curl -i -X POST -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/json" \
             https://api.github.com/repos/$TRAVIS_REPO_SLUG/issues/$GITHUB_ISSUE_ID/comments \
-            -d "{\"body\":\"Commit failed to **build**.\n\nCommit by: @${COMMIT_AUTHOR}\nBranch: ${TRAVIS_BRANCH}\nCommit hash: ${TRAVIS_COMMIT}\nDetailed log: https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/${TRAVIS_BUILD_ID}\"}" > /dev/null
+            -d "{\"body\":\"Commit failed to **build**.\n\nCommit by: ${COMMIT_AUTHOR}\nBranch: ${TRAVIS_BRANCH}\nCommit hash: ${TRAVIS_COMMIT}\nDetailed log: https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/${TRAVIS_BUILD_ID}\"}" > /dev/null
         ;;
 esac
 
