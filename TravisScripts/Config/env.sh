@@ -18,7 +18,7 @@ BUILD_DIR=$HOME/Build
 
 # Find Unity project folder
 # Find ProjectSettings folder
-PROJECT_NAME=$(find $HOME/$REPOSITORY_NAME -type d -iname "ProjectSettings" -print0)
+PROJECT_NAME=$(find $HOME/$REPOSITORY_NAME -maxdepth 3 -type f -iname "ProjectSettings.asset" | head -n1)
 # Find base dirname (parent dir)
 PROJECT_NAME=$(dirname "$PROJECT_NAME")
 # Get only the path beyond $REPOSITORY_NAME

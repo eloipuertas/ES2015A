@@ -3,13 +3,16 @@
 sudo -E apt-get -yq update
 sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install build-essential debconf gconf-service lib32gcc1 lib32stdc++6 libasound2 libc6 libc6-i386 libcairo2 libcap2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libfreetype6 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libgl1-mesa-glx libglib2.0-0 libglu1-mesa libgtk2.0-0 libnspr4 libnss3 libpango1.0-0 libstdc++6 libx11-6 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxtst6 zlib1g libpng12-0 xvfb rsync cmake
 
+# Print some debug info
+. "$(dirname "$0")/debug.sh"
+
 # Source config, env and travis_wait
 . "$(dirname "$0")/Config/env.sh"  # Sets $TRAVIS_SCRIPTS and $CURRENT_DIR, among others
 . "$TRAVIS_SCRIPTS/Config/config.cfg"
 . "$TRAVIS_SCRIPTS/travis_wait.sh"
 
 echo 'Downloading from $UNITY_URL'
-axel -q -n 10 -o Unity.sh $UNITY_URL
+"$TRAVIS_SCRIPTS/bin/axel" -q -n 10 -o Unity.sh $UNITY_URL
 
 if [ $USE_CACHE == 1 ]
 then
@@ -17,7 +20,7 @@ then
     # Use ; and not && to actually do all of them, even if one doesn't succeed
     (touch $HOME/.CACHE_LOCK; \
         echo -e "\t> Library" && \
-            axel -q -n 10 ${CACHE_URL}Library.tar.gz; \
+            "$TRAVIS_SCRIPTS/bin/axel" -q -n 10 ${CACHE_URL}Library.tar.gz; \
     rm $HOME/.CACHE_LOCK) &
 fi
 
