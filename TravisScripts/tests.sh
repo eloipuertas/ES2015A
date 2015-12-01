@@ -77,12 +77,12 @@ then
         issue)
             curl -i -X POST -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/json" \
                 https://api.github.com/repos/$TRAVIS_REPO_SLUG/issues \
-                -d "{\"title\":\"Commit failed tests [$COMMIT_AUTHOR]\",\"body\":\"Commit by: @${COMMIT_AUTHOR}\nBranch: ${TRAVIS_BRANCH}\nCommit hash: ${TRAVIS_COMMIT}\nDetailed log: https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/${TRAVIS_BUILD_ID}\"}" > /dev/null
+                -d "{\"title\":\"Commit failed tests [$COMMIT_AUTHOR]\",\"body\":\"Commit by: ${COMMIT_AUTHOR}\nBranch: ${TRAVIS_BRANCH}\nCommit hash: ${TRAVIS_COMMIT}\nDetailed log: https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/${TRAVIS_BUILD_ID}\"}" > /dev/null
             ;;
         comment)
             curl -i -X POST -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/json" \
                 https://api.github.com/repos/$TRAVIS_REPO_SLUG/issues/$GITHUB_ISSUE_ID/comments \
-                -d "{\"body\":\"Commit failed **tests**.\n\nCommit by: @${COMMIT_AUTHOR}\nBranch: ${TRAVIS_BRANCH}\nCommit hash: ${TRAVIS_COMMIT}\nDetailed log: https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/${TRAVIS_BUILD_ID}\"}" > /dev/null
+                -d "{\"body\":\"Commit failed **tests**.\n\nCommit by: ${COMMIT_AUTHOR}\nBranch: ${TRAVIS_BRANCH}\nCommit hash: ${TRAVIS_COMMIT}\nDetailed log: https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/${TRAVIS_BUILD_ID}\"}" > /dev/null
             ;;
     esac
 fi
