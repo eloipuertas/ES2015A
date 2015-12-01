@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class PauseMenuLogic : MonoBehaviour
 {
     Main_Game mg;
+    public static bool isPauseMenuShown;
 	
 	// Use this for initialization
 	void Start ()
@@ -14,6 +15,8 @@ public class PauseMenuLogic : MonoBehaviour
 			QuitPauseMenu (); });
 		GameObject.Find ("Exit").GetComponent<Button> ().onClick.AddListener (() => {
 			QuitToMainMenu (); });
+
+        isPauseMenuShown = false;
 	}
 
 	/// <summary>
@@ -29,12 +32,24 @@ public class PauseMenuLogic : MonoBehaviour
 	/// <summary>
 	/// This method destroys the pausemenu panel.
 	/// </summary>
-	void QuitPauseMenu ()
+	static void QuitPauseMenu ()
 	{
         GameObject root = GameObject.Find ("PausePanel");
 		Destroy (root);
 
 		MenuButtonLogic.Pause_Play ();
 	}
+
+    public static void TogglePauseMenu()
+    {
+        if (MenuButtonLogic.bPaused)
+        {
+            QuitPauseMenu();
+        }
+        else
+        {
+            MenuButtonLogic.Pause_Play();
+        }
+    }
 
 }
