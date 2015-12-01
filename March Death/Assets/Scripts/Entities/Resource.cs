@@ -354,20 +354,17 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     public Unit recruitExplorer()
     {
-       
+        Vector3 deploymentPoint = getDeploymentPoint();
         if (harvestUnits > 0)
         {
             Unit worker;
             worker = workersList.PopAt(0);
             _collectionRate -= worker.info.attributes.capacity;
             harvestUnits--;
-            _xDisplacement = totalUnits % 5;
-            _yDisplacement = totalUnits / 5;
-            _unitPosition.Set(_center.x + 10 + _xDisplacement, _center.y, _center.z + 10 +  _yDisplacement);
-
-           
-            worker.transform.position = _unitPosition;
+            
+            worker.transform.position = getDeploymentPoint();
             worker.bringBack();
+            worker.moveTo(getMeetingPoint());
             worker.setStatus(EntityStatus.IDLE);
 
             if (harvestUnits == 0)
@@ -392,7 +389,7 @@ public class Resource : Building<Resource.Actions>
 
         if (harvestUnits < info.resourceAttributes.maxUnits)
         {
-            _collectionRate -= explorer.info.attributes.capacity;
+            _collectionRate += explorer.info.attributes.capacity;
             harvestUnits++;
             
             explorer.setStatus(EntityStatus.WORKING);
