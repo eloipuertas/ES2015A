@@ -23,11 +23,7 @@ public class Player : BasePlayer
 
     //the list of player units in the scene
     public ArrayList currentUnits = new ArrayList ();
-
-    // i order to mantain InformationController working
-	//public ArrayList SelectedObjects = new ArrayList();
-    public ArrayList SelectedObjects { get { return _selection.ToArrayList(); } }
-
+    
     private EventsNotifier events;
 
     private bool isGameOverScreenDisplayed = false;
@@ -116,10 +112,12 @@ public class Player : BasePlayer
         }
     }
 
-    void OnDestroy()
+    public override void OnDestroy()
     {
         _currently = status.TERMINATED;
         Utils.Subscriber<FOWEntity.Actions, FOWEntity>.get.unregisterFromAll(FOWEntity.Actions.DISCOVERED, OnEntityFound);
+
+        base.OnDestroy();
     }
 
     public override void removeEntity(IGameEntity entity)
@@ -174,11 +172,6 @@ public class Player : BasePlayer
         _currently = newStatus;
     }
 
-    public ArrayList getSelectedObjects()
-    {
-        return (ArrayList) SelectedObjects.Clone();
-    }
-
     private void displayResourceInfo(WorldResources.Type resourceType, int tolerance)
     {
         int amount;
@@ -210,7 +203,7 @@ public class Player : BasePlayer
         displayResourceInfo(WorldResources.Type.GOLD, minGoldTolerance);
         events.DisplayUnitCreated(obj);
     }
-
+    
     private void signalMissionUpdate(System.Object obj)
     {
         IGameEntity entity = ((GameObject) obj).GetComponent<IGameEntity>();
@@ -221,8 +214,6 @@ public class Player : BasePlayer
                 break;
             case Storage.EntityType.UNIT:
                 missionStatus.OnUnitKilled(entity.info.getType<Storage.UnitTypes>());
-                break;
-            case Storage.EntityType.RESOURCE:
                 break;
         }
     }

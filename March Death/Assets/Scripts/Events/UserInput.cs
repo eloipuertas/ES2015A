@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using Managers;
+using Utils;
 
 public partial class UserInput : MonoBehaviour
 {
@@ -37,7 +38,7 @@ public partial class UserInput : MonoBehaviour
     private float height() { return (Screen.height - mouseButtonCurrentPoint.y) - (Screen.height - mouseButtonDownPoint.y); }
 
     // minimap related
-    private Camera minimapCamera; 
+    private Camera minimapCamera;
 
 
     Texture2D selectionTexture;
@@ -93,7 +94,16 @@ public partial class UserInput : MonoBehaviour
     {
         CheckKeyboard();
 
+        bool oldLeftMouseDown = leftButtonIsDown;
+        action oldAction = currentAction;
         currentAction = GetMouseAction();
+
+        // Initial drag
+        if (oldAction != action.DRAG && currentAction == action.DRAG)
+        {
+            sManager.DragStart();
+        }
+
         // FIXME: add HUD colliders
         if (rectActions.Contains(Input.mousePosition) || rectInformation.Contains(Input.mousePosition) || minimapCamera.pixelRect.Contains(Input.mousePosition) )
         {
@@ -115,6 +125,12 @@ public partial class UserInput : MonoBehaviour
         else if (currentAction == action.DRAG)
         {
             Drag();
+        }
+
+        // End drag
+        if (oldAction == action.DRAG && currentAction == action.NONE && oldLeftMouseDown && !leftButtonIsDown)
+        {
+            sManager.DragEnd();
         }
     }
 
@@ -175,7 +191,7 @@ public partial class UserInput : MonoBehaviour
                             || entity.status == EntityStatus.WORKING))
                     {
                         sManager.Enter(entity);
-                    }   
+                    }
                 }
             }
         }
@@ -208,18 +224,15 @@ public partial class UserInput : MonoBehaviour
         GameObject hitObject = FindHitObject();
         if (hitObject)
         {
-            Selectable selectedObject = hitObject.GetComponent<Selectable>();
+            IGameEntity selectedObject = hitObject.GetComponent<IGameEntity>();
 
             // We just be sure that is a selectable object
-            if (selectedObject)
+            if (selectedObject != null)
             {
-                // if it is the unique selected element, return
-                if (sManager.UniqueSelected(selectedObject)) return;
-
                 if (sManager.CanBeSelected(selectedObject))
                 {
                     Deselect();
-                    sManager.SelectUnique(selectedObject);
+                    sManager.Select(selectedObject);
                     player.setCurrently(Player.status.SELECTED_UNITS);
                 }
                 else
@@ -240,9 +253,8 @@ public partial class UserInput : MonoBehaviour
 
     private void Deselect()
     {
-
         //Deselect all
-        sManager.EmptySelection();
+        sManager.DeselectCurrent();
         player.setCurrently(Player.status.IDLE);
     }
 
@@ -317,14 +329,8 @@ public partial class UserInput : MonoBehaviour
         return hit.point;
     }
 
-    private void DeselectBuildings()
-    {
-        sManager.RemoveBuildinds();
-    }
-
     private void SelectUnitsInArea()
     {
-        DeselectBuildings();
         Vector3[] selectedArea = new Vector3[4];
 
         //set the array with the 4 points of the polygon
@@ -333,42 +339,35 @@ public partial class UserInput : MonoBehaviour
         selectedArea[2] = bottomRight;
         selectedArea[3] = bottomLeft;
 
-        GameObject unit;
-        Vector3 unitPosition;
-        Selectable selectedObject;
-        foreach (IGameEntity entity in player.activeEntities)
+        Vector3 center = topLeft + (bottomRight - topLeft) / 2;
+        float radius = Mathf.Max(Vector3.Distance(topRight, topLeft), Vector3.Distance(bottomRight, topRight));
+        GameObject[] objects = Helpers.getObjectsNearPosition(center, radius);
+        List<Unit> newInArea = new List<Unit>();
+
+        foreach (GameObject gob in objects)
         {
+            IGameEntity entity = gob.GetComponent<IGameEntity>();
             if (entity == null)
             {
                 continue;
             }
 
-            //Check if is unit
-            if (entity.info.isBuilding)
+            // Check if it is an unit and race
+            if (entity.info.isBuilding || entity.info.race != player.race)
             {
                 continue;
             }
 
             //Check if is selectable
-            unit = entity.getGameObject();
-            selectedObject = unit.GetComponent<Selectable>();
-            if (selectedObject == null)
+            if (AreaContainsObject(selectedArea, entity.getTransform().position))
             {
-                continue;
-            }
-
-            unitPosition = unit.transform.position;
-            if (AreaContainsObject(selectedArea, unitPosition))
-            {
-                sManager.Select(selectedObject);
-            }
-            else
-            {
-                sManager.Deselect(selectedObject);
+                newInArea.Add((Unit)entity);
             }
         }
 
-        Player.status currentAction = player.SelectedObjects.Count > 0 ? Player.status.SELECTED_UNITS : Player.status.IDLE;
+        sManager.DragUpdate(newInArea);
+
+        Player.status currentAction = (sManager.SelectedSquad != null && sManager.SelectedSquad.Units.Count > 0) ? Player.status.SELECTED_UNITS : Player.status.IDLE;
         player.setCurrently(currentAction);
     }
 

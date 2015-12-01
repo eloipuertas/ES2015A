@@ -25,11 +25,11 @@ namespace Assets.Scripts.AI
         /// Commite of agents who will each vote at what to do with every squad
         /// </summary>
         public List<BaseAgent> agents;
-        public List<SquadAI> squads;
+        public List<Squad> squads;
         public MicroManager(AIController ai)
         {
             agents = new List<BaseAgent>();
-            squads = new List<SquadAI>();
+            squads = new List<Squad>();
             this.ai = ai;
             AssistAgent assistAgent = new AssistAgent(ai, "Assist");
             AttackAgent aA = new AttackAgent(ai, assistAgent, "Atack");
@@ -37,8 +37,8 @@ namespace Assets.Scripts.AI
             agents.Add(aA);
             agents.Add(new RetreatAgent(ai, aA, assistAgent, "Retreat"));
 			agents.Add(assistAgent);
-            squads.Add(new SquadAI(1, ai));
-            squads.Add(new SquadAI(2, ai));
+            squads.Add(new Squad(ai.race));
+            squads.Add(new Squad(ai.race));
         }
         /// <summary>
         /// Called pretty fast, it's just like Update()
@@ -48,12 +48,19 @@ namespace Assets.Scripts.AI
             //difficulty == 0 means the AI is disabled
             if (ai.DifficultyLvl > 0)
             {
+                foreach (BaseAgent agent in agents)
+                {
+                    agent.PreUpdate();
+                }
+
                 float bVal = float.MinValue;
                 BaseAgent bAgent = agents[0];
                 int val;
-                foreach (SquadAI sq in squads)
+                foreach (Squad sq in squads)
                 {
-                    sq.recalculateSquadValues();
+                    // Update squad
+                    sq.Update();
+
                     foreach (BaseAgent a in agents)
                     {
                         val = a.getConfidence(sq);
@@ -64,15 +71,24 @@ namespace Assets.Scripts.AI
                             bAgent = a;
                         }
                     }
-                    sq.lastAgent = bAgent;
+
+                    sq.UserData = bAgent;
                     if (AIController.AI_DEBUG_ENABLED)
                     {
                         ai.aiDebug.setControllingAgent(bAgent.agentName, bVal);
                     }
 
                     bAgent.controlUnits(sq);
-                    agents[AGENT_ASSIST].extraConfidence = 0;
-                    ((AssistAgent)agents[AGENT_ASSIST]).clearRequests();
+
+                    foreach (BaseAgent agent in agents)
+                    {
+                        agent.PostSquad();
+                    }
+                }
+
+                foreach (BaseAgent agent in agents)
+                {
+                    agent.PostUpdate();
                 }
             }
         }
@@ -91,8 +107,8 @@ namespace Assets.Scripts.AI
         private void addSquad(List<Unit> units)
         {
             //Squad id 0 is used by temp squads
-            SquadAI s = new SquadAI(squads.Count + 1, ai);
-            s.addUnits(units);
+            Squad s = new Squad(ai.race);
+            s.AddUnits(units);
             squads.Add(s);
         }
         public void setPersonality(List<float> rates)
@@ -115,12 +131,6 @@ namespace Assets.Scripts.AI
                 agents[i].modifier = rate;
         }
 
-        public void OnUnitDead(Unit u)
-        {
-            foreach (SquadAI s in squads)
-                if (s.units.Contains(u))
-                    s.removeUnit(u);
-        }
         /// <summary>
         /// Function tasked with deciding which squad should take care of the new created units
         /// </summary>
@@ -129,9 +139,9 @@ namespace Assets.Scripts.AI
         {
             //TODO: placeholder until we know how to split the squads
             if (u.type == Storage.UnitTypes.HERO)
-                squads[1].addUnit(u);
+                squads[1].AddUnit(u);
             else
-                squads[0].addUnit(u);
+                squads[0].AddUnit(u);
         }
     }
 }

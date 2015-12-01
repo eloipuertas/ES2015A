@@ -37,6 +37,8 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public override void Awake()
     {
         base.Awake();
+
+        entity = GetComponent<IGameEntity>();
         currentlySelected = false;
         controller = GameObject.Find("GameController");
         player = controller.GetComponent<Player>();
@@ -48,7 +50,6 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
         base.Start();
         fire(Actions.CREATED, this.gameObject);
-        entity = GetComponent<IGameEntity>();
 
         if (entity.info.isBuilding == true)
         {
@@ -73,6 +74,22 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         // only apply for units of the player
         if (entity.info.isUnit && player.race == race) RetrieveLightSelection();
         else _unitSelection = null;
+    }
+
+    public void OnDisable()
+    {
+        if (currentlySelected)
+        {
+            // As this is an special case, let's first remove us form the squad
+            Unit unit = GetComponent<Unit>();
+            unit.Squad.RemoveUnit(unit);
+
+            // Now remove us from the squad, so that it doesn't get completely unselected
+            unit.Squad = null;
+
+            // Deselect now
+            DeselectEntity();
+        }
     }
 
     public override void Update() { }
@@ -123,8 +140,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     /// </summary>
     public virtual void SelectOnlyMe()
     {
-        player.selection.SelectUnique(this);
-
+        player.selection.Select(entity);
     }
 
     /// <summary>
@@ -132,7 +148,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     /// </summary>
 	public virtual void DeselectMe()
     {
-        player.selection.Deselect(this);
+        player.selection.Deselect(entity);
     }
 
 
@@ -202,7 +218,6 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         if (!selection) throw new System.Exception("FIX: " + entity.info.race + " - "  + entity.info.name + " prefab needs the EntitySelection prefab which is in Resources/prefab/selection");
         _unitSelection = selection.GetComponent<EntitySelection>();
         _unitSelection.SetColorRace(race);
-        
     }
 
 }

@@ -114,6 +114,36 @@ public class Unit : GameEntity<Unit.Actions>
     /// <summary>
     /// Max. euclidean distance to the target
     /// </summary>
+    private Squad _squad;
+    private SquadUpdater _squadUpdater;
+    public Squad Squad
+    {
+        get
+        {
+            if (_squad == null)
+            {
+                _squadUpdater = gameObject.AddComponent<SquadUpdater>();
+                _squadUpdater.Initialize(info.race);
+                _squad = _squadUpdater.UnitsSquad;
+                _squad.AddUnit(this);
+            }
+
+            return _squad;
+        }
+        set
+        {
+            if (_squadUpdater && value != _squad)
+            {
+                GameObject.Destroy(_squadUpdater);
+            }
+
+            _squad = value;
+        }
+    }
+
+    /// <summary>
+    /// Max. euclidean distance to the target
+    /// </summary>
     public float currentAttackRange()
     {
         if (isRanged)
@@ -134,10 +164,10 @@ public class Unit : GameEntity<Unit.Actions>
     /// <param name="gob"></param>
     private void onTargetDied(System.Object obj)
     {
-        // TODO: Our target died, select next? Do nothing?
         setStatus(EntityStatus.IDLE);
         // TODO: After merge, I had a conflich in this line and I hesitated what to do
         fire(Actions.TARGET_TERMINATED, obj);
+
         _target = null;
     }
 
@@ -285,7 +315,8 @@ public class Unit : GameEntity<Unit.Actions>
 
             // if target has changed, hide old target health
             Selectable selectable = null;
-            if (_target != null) {
+            if (_target != null)
+            {
             	selectable = _target.getGameObject().GetComponent<Selectable>();
             	selectable.NotAttackedEntity();
             }
@@ -415,9 +446,8 @@ public class Unit : GameEntity<Unit.Actions>
         if (GetComponent<Selectable>())
         {
             GetComponent<Selectable>().enabled = false;
-            GetComponent<Selectable>().DeselectMe();
-            
-        }  
+        }
+
         // Disable ligths if any    
         if (GetComponent<Light>())
         {

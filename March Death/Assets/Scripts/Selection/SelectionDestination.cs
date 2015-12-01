@@ -23,13 +23,12 @@ public class SelectionDestination : MonoBehaviour {
     /// </summary>
     /// <param name="members"></param>
     /// <param name="position"></param>
-    public void Deploy(Selectable[] members, Vector3 position)
+    public void Deploy(IEnumerable<Selectable> members, Vector3 position)
     {
         transform.position = position;
         _members = new List<Selectable>(members);
         gameObject.SetActive(true);
         RegisterToMembers();
-
     }
 
 
@@ -40,8 +39,6 @@ public class SelectionDestination : MonoBehaviour {
             Unit unit = selected.gameObject.GetComponent<Unit>();
 
             unit.register(Unit.Actions.MOVEMENT_END, OnUnitActionChanges);
-
-
         }
 
     }

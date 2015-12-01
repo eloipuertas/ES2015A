@@ -4,7 +4,6 @@ using Storage;
 
 public static class Helpers
 {
-
     /// <summary>
     /// Returns all the gameObjects in some radius
     /// </summary>
@@ -112,6 +111,23 @@ public static class Helpers
             GameObject obj = foundGameObjects[i];
             Unit objUnit = obj.GetComponent<Unit>();
             if (objUnit != null && objUnit.race == race && objUnit.status != EntityStatus.DEAD && obj.GetComponent<FOWEntity>().IsRevealed)
+            {
+                unitsOfRace.Add(objUnit);
+            }
+        }
+        return unitsOfRace;
+    }
+
+    public static List<Unit> getVisibleUnitsNotOfRaceNearPosition(Vector3 position, float radius, Storage.Races race)
+    {
+        GameObject[] foundGameObjects = getObjectsNearPosition(position, radius);
+        List<Unit> unitsOfRace = new List<Unit>();
+
+        for (int i = 0; i < foundGameObjects.Length; i++)
+        {
+            GameObject obj = foundGameObjects[i];
+            Unit objUnit = obj.GetComponent<Unit>();
+            if (objUnit != null && objUnit.race != race && objUnit.status != EntityStatus.DEAD && obj.GetComponent<FOWEntity>().IsRevealed)
             {
                 unitsOfRace.Add(objUnit);
             }

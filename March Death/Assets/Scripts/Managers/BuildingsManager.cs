@@ -11,7 +11,7 @@ namespace Managers
         private Player _player;
         private UserInput _inputs;
         public Player Player { set { _player = value; } }
-        public UserInput Inputs { set { _inputs = value; } }
+        public UserInput Inputs { get { return _inputs; } set { _inputs = value; } }
         private CursorManager cursor;
         private ConstructionGrid grid;
         private Color red = Color.red;

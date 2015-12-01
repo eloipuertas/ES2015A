@@ -144,7 +144,7 @@ namespace Assets.Scripts.AI
                     BuildingTypes.STABLE,
                 };
                 int elvesDiscounter = ai.race == Races.ELVES ? 5 : 0;
-               
+
                 for (int i = 0; i < 30 - elvesDiscounter; i++)
                 {
                     buildingPrefs.Add(BuildingTypes.WATCHTOWER);
@@ -172,7 +172,7 @@ namespace Assets.Scripts.AI
                 {
                     buildingPrefs.Add(BuildingTypes.WALL);
                 }
-                
+
                 for(int i = 0; i < 10; i++)
                 {
                     buildingPrefs.Add(BuildingTypes.WALLCORNER);
@@ -186,7 +186,7 @@ namespace Assets.Scripts.AI
         }
 
         /// <summary>
-        /// Reads a file containing the map (we can read any map inside the folders an chooses one 
+        /// Reads a file containing the map (we can read any map inside the folders an chooses one
         /// randomly)
         /// </summary>
         /// <param name="mapName"></param>
@@ -209,10 +209,10 @@ namespace Assets.Scripts.AI
 
             Vector2 center = ai.race == Races.ELVES ? new Vector2(mapData.width / 2 + 0.5f, mapData.height / 2 - 0.5f) : new Vector2(mapData.width / 2 -0.5f, mapData.height / 2 - 1f);
 
-            // Math Facts: 
+            // Math Facts:
             // The equation to find te position of something is
             // Offset = (i , j) - Center
-            // centerPos + GridSize * Offset 
+            // centerPos + GridSize * Offset
 
             Vector3 processingPos = Vector3.zero;
             Vector2 processingOffset = Vector2.zero;
@@ -430,6 +430,7 @@ namespace Assets.Scripts.AI
         bool getCornerRotation(Vector3 pos)
         {
             List<IBuilding> buildings = ai.race == Races.ELVES ? Helpers.getBuildingsOfRaceNearPosition(pos, 20, ai.race) : Helpers.getBuildingsOfRaceNearPosition(pos, 22, ai.race);
+
             Debug.Log(buildings.Count);
             List <GameObject> walls  = new List<GameObject>();
             foreach(IBuilding wall in buildings)
@@ -447,10 +448,10 @@ namespace Assets.Scripts.AI
                 for(int i = 0; i < walls.Count; i++)
                 {
                     GameObject wall = walls[i];
-                   
+
                     if (choosenAngle) return choosenAngle;
                     float angle = Mathf.Round(wall.transform.rotation.eulerAngles.y);
-                    
+
                     if(angle == 90f)
                     {
                         if(ai.race == Races.ELVES)
@@ -462,7 +463,7 @@ namespace Assets.Scripts.AI
                                     GameObject horWall = i == 0 ? walls[1] : walls[0];
                                     if (horWall.transform.position.z > pos.z)
                                     {
-                                        buildingAngle = ai.race == Races.ELVES ? 0f : 0f; 
+                                        buildingAngle = ai.race == Races.ELVES ? 0f : 0f;
                                         choosenAngle = true;
                                     }
                                     else
@@ -481,7 +482,7 @@ namespace Assets.Scripts.AI
                                     GameObject horWall = i == 0 ? walls[1] : walls[0];
                                     if (horWall.transform.position.z < pos.z)
                                     {
-                                        buildingAngle = ai.race == Races.ELVES ? 180f : 180f; 
+                                        buildingAngle = ai.race == Races.ELVES ? 180f : 180f;
                                         choosenAngle = true;
                                     }
                                     else
@@ -502,12 +503,12 @@ namespace Assets.Scripts.AI
                                     GameObject horWall = i == 0 ? walls[1] : walls[0];
                                     if (horWall.transform.position.x > pos.x)
                                     {
-                                        buildingAngle =  0f; 
+                                        buildingAngle =  0f;
                                         choosenAngle = true;
                                     }
                                     else
                                     {
-                                        buildingAngle =  90f; 
+                                        buildingAngle =  90f;
                                         choosenAngle = true;
                                     }
 
@@ -521,12 +522,12 @@ namespace Assets.Scripts.AI
                                     GameObject horWall = i == 0 ? walls[1] : walls[0];
                                     if (horWall.transform.position.z < pos.z)
                                     {
-                                        buildingAngle = 180f; 
+                                        buildingAngle = 180f;
                                         choosenAngle = true;
                                     }
                                     else
                                     {
-                                        buildingAngle = 270f; 
+                                        buildingAngle = 270f;
                                         choosenAngle = true;
                                     }
 
@@ -534,7 +535,7 @@ namespace Assets.Scripts.AI
                             }
                         }
                     }
-                       
+
                 }
             }
 
@@ -548,7 +549,7 @@ namespace Assets.Scripts.AI
 
             stronghold = GameObject.Find(sName);
             stronghold.transform.position = constructionGrid.discretizeMapCoords(stronghold.transform.position);
-            
+
         }
 
         /// <summary>
@@ -591,7 +592,7 @@ namespace Assets.Scripts.AI
                 case BuildingTypes.WALL:
                     if(Mathf.Round(yRot) == 90f)
                     {
-                        buildingType = ai.race == Races.MEN ? StructureType.HORIZONTALL_WALL : StructureType.VERTICALL_WALL; 
+                        buildingType = ai.race == Races.MEN ? StructureType.HORIZONTALL_WALL : StructureType.VERTICALL_WALL;
                     }
                     else
                     {
