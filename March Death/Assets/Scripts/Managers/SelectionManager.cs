@@ -29,6 +29,12 @@ namespace Managers
         public bool IsQuad { get { return _isSquad; } }
         private IBuilding _selectedBuilding;
 
+        // Debounce multiselection
+        private const float DEBOUCE_EVERY_SECS = 0.1f;
+        private float _lastDebounce = DEBOUCE_EVERY_SECS;
+        private List<Unit> _lastDebouncedUnits;
+
+
         // the own race
         private Storage.Races _ownRace;
 
@@ -216,6 +222,60 @@ namespace Managers
             else if (!_isSquad && _selectedBuilding != null)
             {
                 Deselect(_selectedBuilding);
+            }
+        }
+
+        public void UpdateWith(List<Unit> units)
+        {
+            foreach (Unit unit in units)
+            {
+                if (_selectedSquad == null || !_selectedSquad.Units.Contains(unit))
+                {
+                    Select(unit);
+                }
+            }
+
+            if (_selectedSquad != null)
+            {
+                foreach (Unit unit in _selectedSquad.Units.ToArray())
+                {
+                    if (!units.Contains(unit))
+                    {
+                        Deselect(unit);
+                    }
+                }
+            }
+        }
+
+        public void DragStart()
+        {
+            DeselectCurrent();
+        }
+
+        public void DragUpdate(List<Unit> units)
+        {
+            if (_lastDebounce < DEBOUCE_EVERY_SECS)
+            {
+                _lastDebouncedUnits = units;
+                _lastDebounce += Time.deltaTime;
+                return;
+            }
+            _lastDebounce = 0;
+
+            UpdateWith(units);
+        }
+
+        public void DragEnd()
+        {
+            _lastDebounce = DEBOUCE_EVERY_SECS;
+            UpdateWith(_lastDebouncedUnits);
+
+            if (_selectedSquad != null)
+            {
+                foreach (Selectable selectable in _selectedSquad.Selectables)
+                {
+                    fire(Actions.SELECT, selectable);
+                }
             }
         }
 

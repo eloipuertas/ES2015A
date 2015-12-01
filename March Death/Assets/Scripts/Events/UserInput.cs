@@ -93,7 +93,16 @@ public partial class UserInput : MonoBehaviour
     {
         CheckKeyboard();
 
+        bool oldLeftMouseDown = leftButtonIsDown;
+        action oldAction = currentAction;
         currentAction = GetMouseAction();
+
+        // Initial drag
+        if (oldAction == action.NONE && currentAction == action.DRAG && !oldLeftMouseDown && leftButtonIsDown)
+        {
+            sManager.DragStart();
+        }
+
         // FIXME: add HUD colliders
         if (rectActions.Contains(Input.mousePosition) || rectInformation.Contains(Input.mousePosition) || minimapCamera.pixelRect.Contains(Input.mousePosition) )
         {
@@ -115,6 +124,12 @@ public partial class UserInput : MonoBehaviour
         else if (currentAction == action.DRAG)
         {
             Drag();
+        }
+
+        // End drag
+        if (oldAction == action.DRAG && currentAction == action.NONE && oldLeftMouseDown && !leftButtonIsDown)
+        {
+            sManager.DragEnd();
         }
     }
 
@@ -315,8 +330,6 @@ public partial class UserInput : MonoBehaviour
     
     private void SelectUnitsInArea()
     {
-        sManager.DeselectCurrent();
-
         Vector3[] selectedArea = new Vector3[4];
 
         //set the array with the 4 points of the polygon
@@ -328,6 +341,7 @@ public partial class UserInput : MonoBehaviour
         Vector3 center = topLeft + (bottomRight - topLeft) / 2;
         float radius = Mathf.Max(Vector3.Distance(topRight, topLeft), Vector3.Distance(bottomRight, topRight));
         GameObject[] objects = AISenses.getObjectsNearPosition(center, radius);
+        List<Unit> newInArea = new List<Unit>();
         
         foreach (GameObject gob in objects)
         {
@@ -346,9 +360,11 @@ public partial class UserInput : MonoBehaviour
             //Check if is selectable
             if (AreaContainsObject(selectedArea, entity.getTransform().position))
             {
-                sManager.Select(entity);
+                newInArea.Add((Unit)entity);
             }
         }
+
+        sManager.DragUpdate(newInArea);
 
         Player.status currentAction = (sManager.SelectedSquad != null && sManager.SelectedSquad.Units.Count > 0) ? Player.status.SELECTED_UNITS : Player.status.IDLE;
         player.setCurrently(currentAction);
