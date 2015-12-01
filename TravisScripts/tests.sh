@@ -30,7 +30,8 @@ TESTS_RESULT=$?
 
 # Wait for cache upload if appliable
 if [ $USE_CACHE == 1 ]
-    if [ "$TRAVIS_BRANCH" == "devel-travis_cache" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]
+then
+    if [ "$TRAVIS_BRANCH" == "$CACHE_BRANCH" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]
     then
         echo -n "Waiting for cache to end uploading."
         while [ -f "$HOME/.RSYNC_LOCK" ]
