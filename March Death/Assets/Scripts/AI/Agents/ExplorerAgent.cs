@@ -35,6 +35,7 @@ namespace Assets.Scripts.AI.Agents
 		const int CONFIDENCE_EXPLORER_DISABLED = -1;
 		const int CONFIDENCE_HERO_ALREADY_FOUND = 0;
 
+        bool isEnabled = true;
         int numberSquadsExploring = 0;
         bool heroVisible;
 		bool allCivils;
@@ -62,12 +63,42 @@ namespace Assets.Scripts.AI.Agents
             Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.DISCOVERED, OnEntityFound, selector);
             Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.HIDDEN, OnEntityLost, selector);
 
-            RescheduleSightRange = 30;
-            ReschuduleDiceFaces = 1000;
-            RescheduleRandomPointValue = 1000;
-            RescheduleRandomAroundTargetValue = 990;
-            RescheduleRandomDirectionValue = 970;
-            MaxExplorerSquads = 2;
+            // Setup difficulty levels
+            switch (ai.DifficultyLvl)
+            {
+                case 0:
+                    isEnabled = false;
+                    break;
+
+                case 1:
+                    RescheduleSightRange = 0;
+                    ReschuduleDiceFaces = 1000;
+                    RescheduleRandomPointValue = 1000;
+                    RescheduleRandomAroundTargetValue = 990;
+                    RescheduleRandomDirectionValue = 970;
+                    MaxExplorerSquads = 1;
+                    break;
+
+                case 2:
+                    RescheduleSightRange = 15;
+                    ReschuduleDiceFaces = 1000;
+                    RescheduleRandomPointValue = 1000;
+                    RescheduleRandomAroundTargetValue = 990;
+                    RescheduleRandomDirectionValue = 970;
+                    MaxExplorerSquads = 2;
+                    break;
+                    
+                case 3:
+                default:
+                    RescheduleSightRange = 30;
+                    ReschuduleDiceFaces = 1000;
+                    RescheduleRandomPointValue = 1000;
+                    RescheduleRandomAroundTargetValue = 990;
+                    RescheduleRandomDirectionValue = 970;
+                    MaxExplorerSquads = 2;
+                    break;
+            }
+            
 
             heroVisible = false;
             fowManager = FOWManager.Instance;
@@ -77,7 +108,7 @@ namespace Assets.Scripts.AI.Agents
 
         public override void controlUnits(Squad squad)
         {
-            if (squad.Units.Count == 0)
+            if (!isEnabled || squad.Units.Count == 0)
             {
                 return;
             }
