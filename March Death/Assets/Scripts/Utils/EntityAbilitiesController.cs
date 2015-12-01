@@ -46,32 +46,38 @@ public class EntityAbilitiesController : MonoBehaviour
         abilities_on_show = new List<Ability>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    void OnGUI()
-    {
-        //GUI.skin.label.fontSize = 15;
-        //GUI.skin.label.font= (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf"); 
-        //var textDimensions = GUI.skin.label.CalcSize(new GUIContent("A"));
-        //Debug.LogError("Dimensiones: " + textDimensions.x + ", " + textDimensions.y);
-        //Debug.LogError("Size of label: "+GUI.skin.label.fontSize);
-    }
-
     public void onActorSelected(System.Object obj)
     {
+		GameObject gameObject = (GameObject) obj;
+
         destroyButtons();
-        showActions((GameObject)obj);
-        //showActionButtons((GameObject)obj);
+        showActions(gameObject);
+
+        IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+
+        entity.doIfResource(resource => {
+            resource.register(Resource.Actions.BUILDING_FINISHED, showActions);
+        });
+
+        entity.doIfBarrack(barrack => {
+            barrack.register(Barrack.Actions.BUILDING_FINISHED, showActions);
+        });
     }
 
     public void onActorDeselected(System.Object obj)
     {
         destroyButtons();
-        //hideActionButtons((GameObject)obj);
+
+        GameObject gameObject = (GameObject) obj;
+        IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+
+        entity.doIfResource(resource => {
+            resource.unregister(Resource.Actions.BUILDING_FINISHED, showActions);
+        });
+
+        entity.doIfBarrack(barrack => {
+            barrack.unregister(Barrack.Actions.BUILDING_FINISHED, showActions);
+        });
     }
 
     private void showActionButtons(GameObject objeto)
@@ -104,12 +110,12 @@ public class EntityAbilitiesController : MonoBehaviour
                 eventTrigger.enabled = true;
                 buttonComponent.interactable = true;
             }
-
         }
     }
 
-    void showActions(GameObject gameObject)
+	void showActions(System.Object obj)
     {
+		GameObject gameObject = (GameObject) obj;
         GameObject actionPanel = GameObject.Find("HUD/actions");
         
         if (!actionPanel) return;
