@@ -44,7 +44,7 @@ namespace Managers
 
         // the amount of troops made
         public int TroopsCount { get { return _troops.Count; } }
-        
+
         public bool IsUnique
         {
             get
@@ -161,10 +161,17 @@ namespace Managers
                 // Simply create a new temporary troop
                 if (_troops.ContainsValue(_selectedSquad) && _selectedSquad != unit.Squad)
                 {
-                    // TODO: Doing so will make the squad never update :(
-                    Squad temp = new Squad(BasePlayer.player.race);
-                    temp.AddUnits(_selectedSquad);
-                    _selectedSquad = temp;
+                    // Hack: There must be a more beautiful way of doing this
+                    unit.Squad = null;
+
+                    // Update other units
+                    foreach (Unit oldUnit in _selectedSquad.Units)
+                    {
+                        oldUnit.Squad = unit.Squad;
+                    }
+
+                    // Update selected squad
+                    _selectedSquad = unit.Squad;
                 }
 
                 // Add the unit to this crowd (if not already in)
@@ -366,7 +373,7 @@ namespace Managers
 
             _troops.Remove(key);
         }
-        
+
         /// <summary>
         /// Basic movement operation for the selected entities
         /// </summary>
@@ -399,9 +406,9 @@ namespace Managers
         }
 
         /// <summary>
-        /// Entering resource building. only civilians units are able to do this 
+        /// Entering resource building. only civilians units are able to do this
         /// </summary>
-        /// 
+        ///
         public void Enter(IGameEntity building_resource)
         {
             if (_selectedSquad != null && _selectedSquad.Units.Count > 0)
