@@ -48,12 +48,17 @@ namespace Assets.Scripts.AI
             //difficulty == 0 means the AI is disabled
             if (ai.DifficultyLvl > 0)
             {
+                foreach (BaseAgent agent in agents)
+                {
+                    agent.PreUpdate();
+                }
+
                 float bVal = float.MinValue;
                 BaseAgent bAgent = agents[0];
                 int val;
                 foreach (Squad sq in squads)
                 {
-                    // TODO: This will be updated by the Unit itself
+                    // Update squad
                     sq.Update();
 
                     foreach (BaseAgent a in agents)
@@ -74,8 +79,16 @@ namespace Assets.Scripts.AI
                     }
 
                     bAgent.controlUnits(sq);
-                    agents[AGENT_ASSIST].extraConfidence = 0;
-                    ((AssistAgent)agents[AGENT_ASSIST]).clearRequests();
+
+                    foreach (BaseAgent agent in agents)
+                    {
+                        agent.PostSquad();
+                    }
+                }
+
+                foreach (BaseAgent agent in agents)
+                {
+                    agent.PostUpdate();
                 }
             }
         }
