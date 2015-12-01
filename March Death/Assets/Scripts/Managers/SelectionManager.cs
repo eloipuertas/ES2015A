@@ -247,6 +247,8 @@ namespace Managers
             bool deselectBuilding = ((!force && !_isSquad) || force) &&
                 _selectedBuilding != null;
 
+            Debug.Log(deselectSquad + " " + deselectBuilding);
+
             if (deselectSquad)
             {
                 Deselect(_selectedSquad.Units[0]);
@@ -282,6 +284,7 @@ namespace Managers
 
         public void DragStart()
         {
+            Debug.Log("DragStart");
             DeselectCurrent(true);
         }
 

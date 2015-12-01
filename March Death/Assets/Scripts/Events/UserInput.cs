@@ -99,7 +99,7 @@ public partial class UserInput : MonoBehaviour
         currentAction = GetMouseAction();
 
         // Initial drag
-        if (oldAction == action.NONE && currentAction == action.DRAG && !oldLeftMouseDown && leftButtonIsDown)
+        if (oldAction != action.DRAG && currentAction == action.DRAG)
         {
             sManager.DragStart();
         }
