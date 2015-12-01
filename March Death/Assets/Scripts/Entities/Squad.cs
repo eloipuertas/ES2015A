@@ -110,7 +110,6 @@ public sealed class Squad : BareObserver<Squad.Actions>
         if (!_units.Contains(unit))
         {
             _units.Add(unit);
-            unit.Squad = this;
             _auto += unit.register(Unit.Actions.DIED, OnUnitDied);
 
             fire(Actions.UNIT_ADDED, unit);

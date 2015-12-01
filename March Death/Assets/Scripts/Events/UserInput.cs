@@ -332,8 +332,8 @@ public partial class UserInput : MonoBehaviour
                 continue;
             }
 
-            // Check if is unit
-            if (entity.info.isBuilding)
+            // Check if it is an unit and race
+            if (entity.info.isBuilding || entity.info.race != player.race)
             {
                 continue;
             }

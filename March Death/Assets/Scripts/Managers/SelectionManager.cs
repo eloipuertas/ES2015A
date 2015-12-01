@@ -10,6 +10,7 @@ namespace Managers
     public class SelectionManager : SubscribableActor<SelectionManager.Actions, SelectionManager>
     {
         public enum Actions { SELECT, ATTACK, MOVE};
+
         // class controller for the selected entities
         private Squad _selectedSquad;
         public Squad SelectedSquad
@@ -60,6 +61,20 @@ namespace Managers
             _ownRace = race;
         }
 
+        // TODO: Should be optimized out
+        public bool IsInTroop(Unit unit)
+        {
+            foreach (var entry in _troops)
+            {
+                if (entry.Value.Units.Contains(unit))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Creates a new troop from the currently selected elements.
         /// Returns true if the troop is created succesfully , returns false if not.
@@ -73,8 +88,23 @@ namespace Managers
 
             if (_selectedSquad.Units.Count > 1)
             {
+                // Set unit squad for fast access
+                foreach (Unit unit in _selectedSquad.Units)
+                {
+                    // Is it already in another troop?
+                    foreach (var entry in _troops)
+                    {
+                        if (entry.Value.Units.Contains(unit))
+                        {
+                            entry.Value.RemoveUnit(unit);
+                        }
+                    }
+
+                    unit.Squad = _selectedSquad;
+                }
+
                 _troops.Add(key, _selectedSquad);
-                
+
                 Debug.Log("Created troop: " + key);
                 return true;
             }
@@ -120,6 +150,7 @@ namespace Managers
                 // Simply create a new temporary troop
                 if (_troops.ContainsValue(_selectedSquad) && _selectedSquad != unit.Squad)
                 {
+                    // TODO: Doing so will make the squad never update :(
                     Squad temp = new Squad(BasePlayer.player.race);
                     temp.AddUnits(_selectedSquad);
                     _selectedSquad = temp;
@@ -127,7 +158,7 @@ namespace Managers
 
                 // Add the unit to this crowd (if not already in)
                 _selectedSquad.AddUnit(unit);
-                unit.Squad = _selectedSquad;
+                //unit.Squad = _selectedSquad;
 
                 // Select the entity
                 Selectable selectable = unit.GetComponent<Selectable>();
@@ -153,7 +184,7 @@ namespace Managers
             // In case we are doing units
             if (entity.info.isUnit)
             {
-                Squad squad = ((Unit)entity).Squad;
+                Squad squad = _selectedSquad != null ? _selectedSquad : ((Unit)entity).Squad;
 
                 // Deselect all units in the unit squad
                 foreach (Unit unit in squad.Units)
@@ -168,11 +199,8 @@ namespace Managers
                     }
                 }
 
-                // If we were unselecting the currently selected squad, deselect it
-                if (squad == _selectedSquad)
-                {
-                    _selectedSquad = null;
-                }
+                // Deselect current squad
+                _selectedSquad = null;
             }
             else if (entity == _selectedBuilding)
             {
@@ -218,6 +246,10 @@ namespace Managers
         {
             Assert.IsTrue(_troops.ContainsKey(key));
 
+            // Deselect current selection
+            DeselectCurrent();
+
+            // Select troop
             Squad selected = _troops[key];
             SelectSquad(selected);
 
