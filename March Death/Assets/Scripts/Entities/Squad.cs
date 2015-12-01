@@ -107,10 +107,14 @@ public sealed class Squad : BareObserver<Squad.Actions>
 
     public void AddUnit(Unit unit)
     {
-        _units.Add(unit);
-        _auto += unit.register(Unit.Actions.DIED, OnUnitDied);
+        if (!_units.Contains(unit))
+        {
+            _units.Add(unit);
+            unit.Squad = this;
+            _auto += unit.register(Unit.Actions.DIED, OnUnitDied);
 
-        fire(Actions.UNIT_ADDED, unit);
+            fire(Actions.UNIT_ADDED, unit);
+        }
     }
 
     public void AddUnits(IEnumerable<Unit> units)
@@ -119,6 +123,11 @@ public sealed class Squad : BareObserver<Squad.Actions>
         {
             AddUnit(unit);
         }
+    }
+
+    public void AddUnits(Squad squad)
+    {
+        AddUnits(squad.Units);
     }
 
     public void RemoveUnit(Unit unit)
@@ -144,6 +153,48 @@ public sealed class Squad : BareObserver<Squad.Actions>
             if (!units.Contains(unit))
             {
                 RemoveUnit(unit);
+            }
+        }
+    }
+
+    public void MoveTo(Vector3 target, Action<Unit> callback = null)
+    {
+        foreach (Unit unit in _units)
+        {
+            unit.moveTo(target);
+
+            if (callback != null)
+            {
+                callback(unit);
+            }
+        }
+    }
+
+    public void AttackTo(IGameEntity target, Action<Unit> callback = null)
+    {
+        foreach (Unit unit in _units)
+        {
+            unit.attackTarget(target);
+
+            if (callback != null)
+            {
+                callback(unit);
+            }
+        }
+    }
+
+    public void EnterTo(IGameEntity target, Action<Unit> callback = null)
+    {
+        foreach (Unit unit in _units)
+        {
+            if (unit.info.isCivil)
+            {
+                unit.goToBuilding(target);
+
+                if (callback != null)
+                {
+                    callback(unit);
+                }
             }
         }
     }
@@ -222,6 +273,9 @@ public sealed class SquadUpdater : GameEntity<SquadUpdater.DummyActions>
         _squad = new Squad(race);
     }
 
+    public override void Awake() { }
+    public override void Start() { }
+
     public override void Update()
     {
         base.Update();
@@ -245,8 +299,10 @@ public interface ISquadData
     void OnDestroy();
 }
 
-public abstract class SquadData<T> : Observer, ISquadData
+public abstract class SquadData<T> : BareObserver<SquadData<T>.Actions>, ISquadData
 {
+    public enum Actions { }
+
     public abstract T Value { get; }
 
     protected bool _needsUpdate = true;
@@ -366,7 +422,6 @@ public class SmelledEnemies : SquadData<Squad>
 #endif
 
             List<Unit> enemyUnits = AISenses.getVisibleUnitsNotOfRaceNearPosition(new Vector3(boundingBox.Bounds.x, units[0].transform.position.y, boundingBox.Bounds.y), boundingBox.MaxLongitude * 3 * _ownSquad.MaxAttackRange, _ownSquad.Race);
-            Debug.Log(_ownSquad.Units.Count + " > " + enemyUnits.Count);
             _enemySquad.UpdateUnits(enemyUnits);
             _enemySquad.Update();
         }

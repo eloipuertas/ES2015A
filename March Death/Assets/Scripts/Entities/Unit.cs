@@ -121,6 +121,7 @@ public class Unit : GameEntity<Unit.Actions>
                 _squadUpdater = gameObject.AddComponent<SquadUpdater>();
                 _squadUpdater.Initialize(info.race);
                 _squad = _squadUpdater.UnitsSquad;
+                _squad.AddUnit(this);
             }
 
             return _squad;
@@ -129,7 +130,7 @@ public class Unit : GameEntity<Unit.Actions>
         {
             if (_squadUpdater)
             {
-                Destroy(_squadUpdater);
+                GameObject.Destroy(_squadUpdater);
             }
 
             _squad = value;
@@ -439,8 +440,8 @@ public class Unit : GameEntity<Unit.Actions>
         {
             GetComponent<Selectable>().enabled = false;
             GetComponent<Selectable>().DeselectMe();
-            
-        }  
+        }
+
         // Disable ligths if any    
         if (GetComponent<Light>())
         {

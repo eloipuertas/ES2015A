@@ -11,17 +11,40 @@ namespace Managers
     {
         public enum Actions { SELECT, ATTACK, MOVE};
         // class controller for the selected entities
-        private SelectableGroup _selectedEntities = new SelectableGroup();
-        //Troops
-        private Dictionary<string, SelectableTroop> _troops = new Dictionary<string, SelectableTroop>();
+        private Squad _selectedSquad;
+        public Squad SelectedSquad
+        {
+            get
+            {
+                return _selectedSquad;
+            }
+        }
+
+        // Troops
+        private Dictionary<string, Squad> _troops = new Dictionary<string, Squad>();
+
+        // Do we have squads or buildings?
+        private bool _isSquad = true;
+        public bool IsQuad { get { return _isSquad; } }
+        private IBuilding _selectedBuilding;
+
         // the own race
         private Storage.Races _ownRace;
+
         // to know whether the current selection is a troop or is just a bunch of selected entities
         private bool _isTroop = false;
         public bool IsTroop { get { return _isTroop; } }
 
         // the amount of troops made
         public int TroopsCount { get { return _troops.Count; } }
+
+        public bool IsUnique
+        {
+            get
+            {
+                return (!_isSquad && _selectedBuilding != null) || (_selectedSquad != null && _selectedSquad.Units.Count == 1);
+            }
+        }
 
         public override void Start()
         {
@@ -37,29 +60,6 @@ namespace Managers
             _ownRace = race;
         }
 
-
-        /// <summary>
-        /// This method selects just an element, if there are more elements in the selected list, it will remove them
-        /// Also changes the stat of the selection to a not troop selection
-        /// </summary>
-        /// <param name="selectable"></param>
-        public void SelectUnique(Selectable selectable)
-        {
-            // firstly it checks if an entity can be selected
-            //if (!CanBeSelected(selectable)) return;
-            Assert.IsTrue(CanBeSelected(selectable));
-
-
-            _isTroop = false;
-
-             if( _selectedEntities.Count > 0 ) _selectedEntities.Clear();
-
-            _selectedEntities.Select(selectable);
-            fire(Actions.SELECT, selectable);
-
-
-        }
-
         /// <summary>
         /// Creates a new troop from the currently selected elements.
         /// Returns true if the troop is created succesfully , returns false if not.
@@ -70,12 +70,11 @@ namespace Managers
         public bool NewTroop(String key)
         {
             Assert.IsFalse(_troops.ContainsKey(key));
-            if(_selectedEntities.Count > 1)
-            {
 
-                SelectableTroop troop = new SelectableTroop(_selectedEntities.ToList());
-                _troops.Add(key, troop);
-                _isTroop = true;
+            if (_selectedSquad.Units.Count > 1)
+            {
+                _troops.Add(key, _selectedSquad);
+                
                 Debug.Log("Created troop: " + key);
                 return true;
             }
@@ -91,27 +90,107 @@ namespace Managers
         /// Select performs a simple selection of the entity specified by paramater
         /// </summary>
         /// <param name="selectable">The entity that is going to be selected </param>
-        public void Select(Selectable selectable)
+        public void Select(IGameEntity entity)
         {
-            if (!_selectedEntities.Contains(selectable))
+            Assert.IsTrue(CanBeSelected(entity));
+
+            _isSquad = entity.info.isUnit;
+            if (_isSquad)
             {
-                _selectedEntities.Select(selectable);
-                fire(Actions.SELECT, selectable);
-                _isTroop = false;
+                SelectSquad(((Unit)entity).Squad);
+            }
+            else
+            {
+                _selectedBuilding = (IBuilding)entity;
+                _selectedBuilding.getGameObject().GetComponent<Selectable>().SelectEntity();
             }
         }
 
+        public void SelectSquad(Squad squad)
+        {
+            // If we have no selected squad, use the provided one
+            if (_selectedSquad == null)
+            {
+                _selectedSquad = squad;
+            }
+
+            foreach (Unit unit in squad.Units)
+            {
+                // If we were adding to a troop but the new incoming unit is not of that troop
+                // Simply create a new temporary troop
+                if (_troops.ContainsValue(_selectedSquad) && _selectedSquad != unit.Squad)
+                {
+                    Squad temp = new Squad(BasePlayer.player.race);
+                    temp.AddUnits(_selectedSquad);
+                    _selectedSquad = temp;
+                }
+
+                // Add the unit to this crowd (if not already in)
+                _selectedSquad.AddUnit(unit);
+                unit.Squad = _selectedSquad;
+
+                // Select the entity
+                Selectable selectable = unit.GetComponent<Selectable>();
+                selectable.SelectEntity();
+
+                // Fire selected
+                fire(Actions.SELECT, selectable);
+            }
+        }
 
         /// <summary>
         /// Deselects the specified entity from the selected entities
         /// </summary>
         /// <param name="entity"></param>
-        public void Deselect(Selectable selectable)
+        public void Deselect(IGameEntity entity)
         {
-            if (_selectedEntities.Contains(selectable))
+            // Avoid getting AI calls
+            if (entity.info.race != BasePlayer.player.race)
             {
-                _selectedEntities.Deselect(selectable);
-                _isTroop = false;
+                return;
+            }
+
+            // In case we are doing units
+            if (entity.info.isUnit)
+            {
+                Squad squad = ((Unit)entity).Squad;
+
+                // Deselect all units in the unit squad
+                foreach (Unit unit in squad.Units)
+                {
+                    // Deselect entity
+                    unit.GetComponent<Selectable>().DeselectEntity();
+
+                    // Unless this unit is part of a squad saved as a troop, null it out
+                    if (!_troops.ContainsValue(unit.Squad))
+                    {
+                        unit.Squad = null;
+                    }
+                }
+
+                // If we were unselecting the currently selected squad, deselect it
+                if (squad == _selectedSquad)
+                {
+                    _selectedSquad = null;
+                }
+            }
+            else if (entity == _selectedBuilding)
+            {
+                // Deselect current building
+                _selectedBuilding.getGameObject().GetComponent<Selectable>().DeselectEntity();
+                _selectedBuilding = null;
+            }
+        }
+
+        public void DeselectCurrent()
+        {
+            if (_isSquad && _selectedSquad != null && _selectedSquad.Units.Count > 0)
+            {
+                Deselect(_selectedSquad.Units[0]);
+            }
+            else if (!_isSquad && _selectedBuilding != null)
+            {
+                Deselect(_selectedBuilding);
             }
         }
 
@@ -139,39 +218,11 @@ namespace Managers
         {
             Assert.IsTrue(_troops.ContainsKey(key));
 
-            List<Selectable> selected = _troops[key].ToList();
+            Squad selected = _troops[key];
+            SelectSquad(selected);
 
-            _selectedEntities.Select(selected);
-            
-            foreach(Selectable selectable in selected)
-                fire(Actions.SELECT, selectable);
-
-            _isTroop = true;
             Debug.Log("Selected troop: " + key);
         }
-
-
-
-        /// <summary>
-        /// Deselect and entity from the selected entitite without notify to the selectable element. This method should be used only from a selectable object
-        /// </summary>
-        /// <param name="selectable"></param>
-        public void DeselectFromSelected(Selectable selectable)
-        {
-            if(_selectedEntities.Contains(selectable))
-                _selectedEntities.Remove(selectable);
-        }
-
-
-        /// <summary>
-        /// Emptyes the list of selected units, also notify every unit that is not selected anymore
-        /// </summary>
-        public void EmptySelection()
-        {
-            _selectedEntities.Clear();
-            _isTroop = false;
-        }
-
 
         /// <summary>
         /// Returns if an entity can be selected, now just checking if it is the same race
@@ -179,20 +230,9 @@ namespace Managers
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public bool CanBeSelected(Selectable selectable)
+        public bool CanBeSelected(IGameEntity entity)
         {
-            return _ownRace == selectable.entity.getRace();
-        }
-
-
-        /// <summary>
-        /// Returns if is the unique selected element
-        /// </summary>
-        /// <param name="selectable"></param>
-        /// <returns></returns>
-        public bool UniqueSelected(Selectable selectable)
-        {
-            return _selectedEntities.Count == 1 && _selectedEntities.Contains(selectable);
+            return _ownRace == entity.getRace();
         }
 
         /// <summary>
@@ -201,7 +241,7 @@ namespace Managers
         /// <returns></returns>
         public bool Any()
         {
-            return _selectedEntities.Count > 0;
+            return _selectedSquad.Units.Count > 0;
         }
 
         /// <summary>
@@ -211,15 +251,16 @@ namespace Managers
         /// <param name="key"></param>
         public void DeleteTroop(string key)
         {
-            if(_isTroop) EmptySelection();
             _troops.Remove(key);
         }
 
         /// <summary>
         /// Removes all the buildings from the current selection
         /// </summary>
+        [Obsolete]
         public void RemoveBuildinds()
         {
+            /*
             foreach (Selectable selected in _selectedEntities.ToArray())
             {
                 if (selected.entity.info.isBuilding)
@@ -229,6 +270,7 @@ namespace Managers
 
                 }
             }
+            */
         }
 
 
@@ -238,17 +280,8 @@ namespace Managers
         /// <param name="point"></param>
         public void MoveTo(Vector3 point)
         {
-            foreach (Selectable selected in _selectedEntities.ToArray())
-            {
-                if (selected.entity.info.isUnit)
-                {
-                    selected.GetComponent<Unit>().moveTo(point);
-                    fire(Actions.MOVE, selected);
-                }
-
-            }
+            _selectedSquad.MoveTo(point, unit => fire(Actions.MOVE, unit));
             Debug.Log("Moving there");
-
         }
 
 
@@ -259,16 +292,7 @@ namespace Managers
         /// <param name="point"></param>
         public void AttackTo(IGameEntity enemy)
         {
-            foreach (Selectable selected in _selectedEntities.ToArray())
-            {
-
-                if (selected.entity.info.isUnit)
-                {
-                    Unit unit = selected.GetComponent<Unit>();
-                    unit.attackTarget(enemy);
-                    fire(Actions.ATTACK, selected);
-                }
-            }
+            _selectedSquad.AttackTo(enemy, unit => fire(Actions.ATTACK, unit));
             Debug.Log("attacking");
         }
 
@@ -278,21 +302,7 @@ namespace Managers
         /// 
         public void Enter(IGameEntity building_resource)
         {
-           
-            foreach (Selectable selected in _selectedEntities.ToArray())
-            {
-
-                if (selected.entity.info.isCivil)
-                {
-                    Unit unit = selected.GetComponent<Unit>();
-                    if (unit.info.isCivil)
-                    {
-                        unit.goToBuilding(building_resource);
-                    }
-                    
-                    fire(Actions.MOVE, selected.gameObject);
-                }
-            }
+            _selectedSquad.EnterTo(building_resource, unit => fire(Actions.MOVE, unit));
             Debug.Log("Walking to building");
         }
 
@@ -303,20 +313,13 @@ namespace Managers
         public bool IsBuilding()
         {
             //there aren't buildings in multiple selection
+            /*
             if (_selectedEntities.Count == 1)
             {
                 if(_selectedEntities.ToArray()[0].entity.info.isBuilding) return true;
             }
+            */
             return false;
-        }
-
-        /// <summary>
-        /// Returns an array list with the current selected entities
-        /// </summary>
-        /// <returns></returns>
-        public ArrayList ToArrayList()
-        {
-            return new ArrayList(_selectedEntities.ToArray());
         }
     }
 }

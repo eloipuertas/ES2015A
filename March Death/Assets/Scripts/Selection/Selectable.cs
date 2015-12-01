@@ -36,6 +36,8 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public override void Awake()
     {
         base.Awake();
+
+        entity = GetComponent<IGameEntity>();
         currentlySelected = false;
         controller = GameObject.Find("GameController");
         player = controller.GetComponent<Player>();
@@ -47,7 +49,6 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
         base.Start();
         fire(Actions.CREATED, this.gameObject);
-        entity = GetComponent<IGameEntity>();
         if (entity.info.isBuilding == true)
         {
         	selectedBox = SelectionOverlay.CreateTexture(false);
@@ -104,8 +105,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     /// </summary>
     public virtual void SelectOnlyMe()
     {
-        player.selection.SelectUnique(this);
-
+        player.selection.Select(entity);
     }
 
     /// <summary>
@@ -113,7 +113,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     /// </summary>
 	public virtual void DeselectMe()
     {
-        player.selection.Deselect(this);
+        player.selection.Deselect(entity);
     }
 
 

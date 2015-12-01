@@ -116,7 +116,8 @@ public partial class InformationController : MonoBehaviour
 	
 	private void ShowMultipleInformation() 
 	{
-		ArrayList selectedObjects = BasePlayer.player.getSelectedObjects();
+        List<Selectable> selectedObjects = BasePlayer.player.selection.SelectedSquad.Selectables;
+
 		for (int i = 0; i < selectedObjects.Count && i < multiselectionColumns * multiselectionRows; i++)
 		{
 			double lineDivision = (double)(i / multiselectionColumns);
@@ -180,14 +181,15 @@ public partial class InformationController : MonoBehaviour
 	public void onUnitSelected(System.Object obj)
 	{
 		GameObject gameObject = (GameObject) obj;
-		
-		//Check if is simple click or multiple
-		if (BasePlayer.player.SelectedObjects.Count > 1)
-		{
-			HideInformation();
-			ShowMultipleInformation();
-			
-		} else
+
+        //Check if is simple click or multiple
+        if (!BasePlayer.player.selection.IsUnique)
+        {
+            DestroyButtons();
+            HideInformation();
+            ShowMultipleInformation();
+        }
+        else
 		{
 			DestroyButtons();
 			ShowInformation(gameObject);
@@ -197,7 +199,7 @@ public partial class InformationController : MonoBehaviour
 		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 		
 		entity.doIfUnit(unit =>
-		                {
+	    {
 			unit.register(Unit.Actions.DAMAGED, onUnitDamaged);
 			unit.register(Unit.Actions.DIED, onUnitDied);
 		});
@@ -218,31 +220,32 @@ public partial class InformationController : MonoBehaviour
 	public void onUnitDeselected(System.Object obj)
 	{
 		GameObject gameObject = (GameObject)obj;
-		
-		//Check if is simple click or multiple
-		if (BasePlayer.player.SelectedObjects.Count > 1)
-		{
-			ShowMultipleInformation();
-			
-		} else if (BasePlayer.player.SelectedObjects.Count == 1)
-		{
-			DestroyButtons();
-			ShowInformation(gameObject);
-		} else
-		{
-			DestroyButtons();
-			HideInformation();
-		}
+
+        // Hide all info
+        DestroyButtons();
+        HideInformation();
 		
 		//Unregister unit events
 		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 		
 		entity.doIfUnit(unit =>
-		                {
+		{
 			unit.unregister(Unit.Actions.DAMAGED, onUnitDamaged);
 			unit.unregister(Unit.Actions.DIED, onUnitDied);
 		});
-	}
+
+        entity.doIfResource(resource =>
+        {
+            resource.unregister(Resource.Actions.DAMAGED, onUnitDamaged);
+            resource.unregister(Resource.Actions.DESTROYED, onUnitDied);
+        });
+
+        entity.doIfBarrack(building =>
+        {
+            building.unregister(Barrack.Actions.DAMAGED, onUnitDamaged);
+            building.unregister(Barrack.Actions.DESTROYED, onUnitDied);
+        });
+    }
 	
 	public void onUnitDamaged(System.Object obj)
 	{

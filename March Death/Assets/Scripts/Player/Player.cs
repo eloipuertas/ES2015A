@@ -23,11 +23,7 @@ public class Player : BasePlayer
 
     //the list of player units in the scene
     public ArrayList currentUnits = new ArrayList ();
-
-    // i order to mantain InformationController working
-	//public ArrayList SelectedObjects = new ArrayList();
-    public ArrayList SelectedObjects { get { return _selection.ToArrayList(); } }
-
+    
     private EventsNotifier events;
 
     private bool isGameOverScreenDisplayed = false;
@@ -150,12 +146,7 @@ public class Player : BasePlayer
     {
         _currently = newStatus;
     }
-
-    public ArrayList getSelectedObjects()
-    {
-        return (ArrayList) SelectedObjects.Clone();
-    }
-
+    
     private void signalMissionUpdate(System.Object obj)
     {
         Storage.EntityInfo e = (Storage.EntityInfo) obj;
