@@ -64,7 +64,14 @@ public class EventsNotifier : MonoBehaviour {
 
     private const float TIME_TO_UPDATE = 5f;
 
+    /// <summary>
+    /// Time remaining for the next update for the entire messages.
+    /// </summary>
     private float countdown;
+
+    /// <summary>
+    /// Indicates whether messages should be updated from time to time.
+    /// </summary>
     private bool updateMessages;
 
     private const float UNDER_ATTACK_TIME = 5f;
@@ -107,7 +114,11 @@ public class EventsNotifier : MonoBehaviour {
         if (updateMessages)
         {
             countdown -= Time.deltaTime;
-            if (countdown <= 0.0f || trimming.Count > MAX_LINES)
+            while (trimming.Count > MAX_LINES)
+            {
+                messages.Remove(0, trimming.Dequeue());
+            }
+            if (countdown <= 0.0f)
             {
                 messages.Remove(0, trimming.Dequeue());
                 countdown = TIME_TO_UPDATE;
