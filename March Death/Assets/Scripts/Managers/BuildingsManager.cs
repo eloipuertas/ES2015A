@@ -154,12 +154,14 @@ namespace Managers
         /// <param name="type">The type of building.</param>
         /// <param name="race">The race this building belongs to.</param>
         public GameObject createBuilding(Vector3 position, Quaternion rotation,
-                                         Storage.BuildingTypes type, Storage.Races race)
+                                         Storage.BuildingTypes type, Storage.Races race, float yOffset = 0)
         {
             GameObject obj = null;
+            position.y += yOffset;
             position = grid.discretizeMapCoords(position);
             if (grid.isNewPositionAbleForConstrucction(position))
             {
+                position.y -= yOffset - 0.1f;
                 obj = Storage.Info.get.createBuilding(race, type, position, rotation);
                 grid.reservePosition(position);
             }
@@ -190,7 +192,7 @@ namespace Managers
             Vector3 newDestination = GetNewDestination();
             // if is not a vaild point, the building remains quiet
             if (newDestination == _inputs.invalidPosition) return false;
-
+            
             // alter the color if is not a valid location
             if (checkLocation(newDestination) && isAffordable(_newBuilding.race, _newBuilding.type))
             {
@@ -198,6 +200,7 @@ namespace Managers
                 GameObject finalBuilding = CreateFinalBuilding(_newBuilding.race, _newBuilding.type);
                 //TODO : (hermetico) restar recursos necesarios para crear el building
                 grid.reservePosition(newDestination);
+                newDestination.y -= yoffset - 0.1f;
                 finalBuilding.transform.position = newDestination;
                 finalBuilding.transform.rotation = _newBuilding.ghost.transform.rotation;
 

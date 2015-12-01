@@ -8,9 +8,8 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 437300}
-  - 33: {fileID: 3349618}
-  - 23: {fileID: 2311658}
-  - 114: {fileID: 11439812}
+  - 33: {fileID: 3368058}
+  - 23: {fileID: 2380056}
   m_Layer: 0
   m_Name: GHOST_HumanWallCorner
   m_TagString: Untagged
@@ -25,12 +24,12 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 107982}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 793.5, y: 79.3211746, z: 842.885864}
+  m_LocalPosition: {x: 657.533081, y: 79.0026245, z: 947.311157}
   m_LocalScale: {x: 100, y: 750, z: 150}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
---- !u!23 &2311658
+--- !u!23 &2380056
 MeshRenderer:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -48,32 +47,21 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_MinimumChartSize: 4
   m_AutoUVMaxDistance: .5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!33 &3349618
+--- !u!33 &3368058
 MeshFilter:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 107982}
   m_Mesh: {fileID: 4300002, guid: eae03bfec22d4064d9a00b2f49fe6b5a, type: 3}
---- !u!114 &11439812
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 107982}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc4dbd7bbbda4e14baa3f054762b3ca9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  race: 0
-  type: 8
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
