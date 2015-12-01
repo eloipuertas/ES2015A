@@ -497,18 +497,11 @@ public class Unit : GameEntity<Unit.Actions>
         _info = Info.get.of(race, type);
         _auto = this;
 
-        
-
         // Call GameEntity awake
         base.Awake();
 
         // Get DetourAgent and set basic variables
         _detourAgent = GetComponent<DetourAgent>();
-        _detourAgent.MaxSpeed = info.unitAttributes.movementRate * 5;
-        _detourAgent.MaxAcceleration = info.unitAttributes.movementRate * 20;
-        _detourAgent.UpdateParams();
-
-
     }
 
     /// <summary>
@@ -535,13 +528,13 @@ public class Unit : GameEntity<Unit.Actions>
             register(Actions.CREATED, res_pl.onStatisticsUpdate);
         }
 
+        // Set detour params (can't be done until Start is done)
+        _detourAgent.MaxSpeed = info.unitAttributes.movementRate * 5;
+        _detourAgent.MaxAcceleration = info.unitAttributes.movementRate * 20;
+        _detourAgent.UpdateParams();
+
         statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -5);
-
         fire(Actions.CREATED, statistics);
-
-        
-
-
     }
 
     /// <summary>
