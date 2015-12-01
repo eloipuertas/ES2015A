@@ -91,7 +91,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 174364}
-  m_LocalRotation: {x: .169075713, y: -.755880356, z: .272171319, w: .570947468}
+  m_LocalRotation: {x: .169075727, y: -.755880415, z: .272171348, w: .570947528}
   m_LocalPosition: {x: -3.75180411, y: .484018654, z: .786613703}
   m_LocalScale: {x: 100.000015, y: 100, z: 100.000008}
   m_Children: []
@@ -143,7 +143,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 106666}
-  m_LocalRotation: {x: .707106829, y: 0, z: 0, w: .707106709}
+  m_LocalRotation: {x: .707106888, y: 0, z: 0, w: .707106769}
   m_LocalPosition: {x: 0, y: 50, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -261,6 +261,9 @@ MonoBehaviour:
   Height: 2
   MaxSpeed: 2
   MaxAcceleration: 2
+  Flags: -1
+  AvoidanceType: 1
+  SeparationWeight: .5
 --- !u!114 &11486442
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -274,6 +277,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   race: 1
   type: 6
+  gender: 0
   _distanceToTarget: 0
 --- !u!119 &11958914
 Projector:
@@ -343,6 +347,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: Radius
       value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Flags
+      value: -1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
