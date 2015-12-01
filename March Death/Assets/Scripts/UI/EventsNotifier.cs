@@ -70,6 +70,10 @@ public class EventsNotifier : MonoBehaviour {
     private const float UNDER_ATTACK_TIME = 10;
     private Dictionary<IGameEntity, float> entityTimer;
 
+    private const float ON_SIGHT_WAIT_TIME = 8f;
+    // private const int LIMIT_SIGHT_UNITS = 3; in case we want to restrict the number of units in the dictionary in case of spam on melee attacks.
+    private Dictionary<IGameEntity, float> onSightTimer;
+
     private const int MAX_LINES = 10;
 
     private GUIText text;
@@ -94,6 +98,7 @@ public class EventsNotifier : MonoBehaviour {
         countdown = TIME_TO_UPDATE;
         updateMessages = false;
         entityTimer = new Dictionary<IGameEntity, float>();
+        onSightTimer = new Dictionary<IGameEntity, float>();
     }
 	
     // Update is called once per frame
@@ -366,7 +371,7 @@ public class EventsNotifier : MonoBehaviour {
     public void DisplayUnitCreated(System.Object obj)
     {
         Unit entity = (Unit) obj;
-	PopulationInfo.get.Add(entity);
+	    PopulationInfo.get.Add(entity);
         DisplayUnitCreated(entity.type);
     }
 
@@ -375,13 +380,30 @@ public class EventsNotifier : MonoBehaviour {
         GameObject g = (GameObject) obj;
         Unit entity = (Unit) g.GetComponent<IGameEntity>();
         entityTimer.Remove(entity);
-	PopulationInfo.get.Remove(entity);
+	    PopulationInfo.get.Remove(entity);
         DisplayUnitDead(entity.type);
     }
 
     public void DisplayEnemySpotted(GameObject go)
     {
         AppendMessage(ENEMY_ON_SIGHT);
-		go.GetComponent<EntityMarker>().entityOnSight();
+
+        IGameEntity entity = go.GetComponent<IGameEntity>();
+        if (onSightTimer.ContainsKey(entity))
+        {
+            if ((Time.time - onSightTimer[entity]) >= ON_SIGHT_WAIT_TIME)
+            {
+                go.GetComponent<EntityMarker>().entityOnSight();
+                onSightTimer[entity] = Time.time;
+            }
+        }
+        else
+        {
+            go.GetComponent<EntityMarker>().entityOnSight();
+            onSightTimer.Add(entity, Time.time);
+        }
+
+        
+		
     }
 }
