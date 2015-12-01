@@ -51,33 +51,33 @@ public class EntityAbilitiesController : MonoBehaviour
 		GameObject gameObject = (GameObject) obj;
 
         destroyButtons();
-		showActions(gameObject);
-	
-		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+        showActions(gameObject);
 
-		entity.doIfResource(resource => {
-			resource.register(Resource.Actions.BUILDING_FINISHED, showActions);
-		});
-		
-		entity.doIfBarrack(barrack => {
-			barrack.register(Barrack.Actions.BUILDING_FINISHED, showActions);
-		});
+        IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+
+        entity.doIfResource(resource => {
+            resource.register(Resource.Actions.BUILDING_FINISHED, showActions);
+        });
+
+        entity.doIfBarrack(barrack => {
+            barrack.register(Barrack.Actions.BUILDING_FINISHED, showActions);
+        });
     }
 
     public void onActorDeselected(System.Object obj)
     {
         destroyButtons();
 
-		GameObject gameObject = (GameObject) obj;
-		IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+        GameObject gameObject = (GameObject) obj;
+        IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 
-		entity.doIfResource(resource => {
-			resource.unregister(Resource.Actions.BUILDING_FINISHED, showActions);
-		});
-		
-		entity.doIfBarrack(barrack => {
-			barrack.unregister(Barrack.Actions.BUILDING_FINISHED, showActions);
-		});
+        entity.doIfResource(resource => {
+            resource.unregister(Resource.Actions.BUILDING_FINISHED, showActions);
+        });
+
+        entity.doIfBarrack(barrack => {
+            barrack.unregister(Barrack.Actions.BUILDING_FINISHED, showActions);
+        });
     }
 
     private void showActionButtons(GameObject objeto)
