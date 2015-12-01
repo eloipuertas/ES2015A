@@ -228,8 +228,8 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     {
         if (_creationQueue.Count < info.buildingAttributes.creationQueueCapacity)
         {
-            fire(ADDED_QUEUE, type);
             _creationQueue.Enqueue(type);
+            fire(ADDED_QUEUE, type);
             return true;
         }
         else
