@@ -7,7 +7,7 @@ using Utils;
 
 namespace Managers
 {
-    public class SelectionManager : SubscribableActor<SelectionManager.Actions, SelectionManager>
+    public class SelectionManager : Actor<SelectionManager.Actions>
     {
         public enum Actions { SELECT, ATTACK, MOVE};
 
@@ -38,7 +38,7 @@ namespace Managers
 
         // the amount of troops made
         public int TroopsCount { get { return _troops.Count; } }
-
+        
         public bool IsUnique
         {
             get
@@ -46,12 +46,7 @@ namespace Managers
                 return (!_isSquad && _selectedBuilding != null) || (_selectedSquad != null && _selectedSquad.Units.Count == 1);
             }
         }
-
-        public override void Start()
-        {
-            base.Start();
-        }
-
+        
         /// <summary>
         /// Setter for the race
         /// </summary>
@@ -114,7 +109,6 @@ namespace Managers
                 return false;
             }
         }
-
 
         /// <summary>
         /// Select performs a simple selection of the entity specified by paramater
@@ -315,7 +309,11 @@ namespace Managers
         /// <param name="point"></param>
         public void MoveTo(Vector3 point)
         {
+            GameObject banner = SelectionDestination.CreateBanner(_ownRace);
+            banner.GetComponent<SelectionDestination>().Deploy(_selectedSquad.Selectables, point);
+
             _selectedSquad.MoveTo(point, unit => fire(Actions.MOVE, unit));
+
             Debug.Log("Moving there");
         }
 

@@ -4,6 +4,7 @@ using System.Collections;
 using Storage;
 using System.Collections.Generic;
 using Utils;
+using System;
 
 public class ResourcesPlacer : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class ResourcesPlacer : MonoBehaviour
     private WorldResources.Type[] t = { WorldResources.Type.FOOD, WorldResources.Type.WOOD, WorldResources.Type.METAL };
     private List<Text> res_amounts;
     private List<Text> res_stats;
+    private Text pop;
     private Player player;
 
     private float[] _statistics = { 0f, 0f, 0f };
@@ -32,9 +34,36 @@ public class ResourcesPlacer : MonoBehaviour
 
         for (int i = 0; i < txt_names.Length; i++)
         {
-            res_amounts.Add(GameObject.Find("HUD/resources/text_" + txt_names[i]).GetComponent<Text>());
-            res_stats.Add(GameObject.Find("HUD/resources/text_" + txt_names[i] + "_hour").GetComponent<Text>());
+
+            GameObject obj;
+            Text text;
+
+            string _text = "HUD/resources/text_" + txt_names[i];
+            string _stats = "HUD/resources/text_" + txt_names[i] + "_hour";
+
+
+            obj = GameObject.Find(_text);
+            if (!obj) throw new Exception("Object " + _text + " not found!");
+
+            text = obj.GetComponent<Text>();
+            if (!text) throw new Exception("Component " + _text + " not found!");
+
+            res_amounts.Add(text);
+
+
+            obj = GameObject.Find(_stats);
+            if (!obj) throw new Exception("Object " + _text + " not found!");
+
+            text = obj.GetComponent<Text>();
+            if (!text) throw new Exception("Component " + _text + " not found!");
+
+            res_stats.Add(text);
         }
+
+        GameObject go = GameObject.Find("HUD/resources/text_population");
+        if (!go) throw new Exception("Object text_population not found!");
+
+        pop = go.GetComponent<Text>();
 
         setupText();
         updateAmounts();
@@ -51,6 +80,7 @@ public class ResourcesPlacer : MonoBehaviour
         if (_timer >= UPDATE_STATS)
         {
             updateStatistics();
+            updatePopulation();
             _timer = 0f;
         }
         else _timer += Time.deltaTime;
@@ -83,6 +113,11 @@ public class ResourcesPlacer : MonoBehaviour
         {
             res_amounts[i].text = "" + player.resources.getAmount(t[i]);
         }
+    }
+
+    public void updatePopulation()
+    {
+        pop.text = PopulationInfo.get.number_of_units.ToString();
     }
 
     public void updateStatistics()

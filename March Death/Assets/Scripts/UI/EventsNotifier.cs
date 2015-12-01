@@ -8,6 +8,7 @@ using System.Collections.Generic;
 public class EventsNotifier : MonoBehaviour {
 
     private readonly string UNDER_ATTACK = "You're under attack!";
+    private readonly string ENEMY_ON_SIGHT = "Enemy on sight!";
 
     // Unit creation messages
     private readonly string CIVILIAN_CREATED = "Civilian created.";
@@ -23,6 +24,10 @@ public class EventsNotifier : MonoBehaviour {
     private readonly string SAWMILL_CREATED = "Sawmill created.";
     private readonly string SHOOTING_RANGE_CREATED = "Shooting range created.";
     private readonly string STABLE_CREATED = "Stable created.";
+    private readonly string WATCHTOWER_CREATED = "Watchtower created.";
+    // TODO Find a better way to display these two messages: creation of wall and wall corner.
+    private readonly string WALL_CREATED = "Wall created.";
+    private readonly string WALL_CORNER_CREATED = "Wall tower created.";
 
     // Resource related messages
     private readonly string FOOD_LOW = "Your food supplies are low!";
@@ -54,11 +59,16 @@ public class EventsNotifier : MonoBehaviour {
     private readonly string SHOOTING_RANGE_LOST = "You have lost a shooting range.";
     private readonly string BARRACK_LOST = "You have lost a barrack.";
     private readonly string STABLE_LOST = "You have lost a stable.";
+    private readonly string WATCHTOWER_LOST = "You have lost a watchtower";
+    private readonly string WALL_LOST = "Your wall has been wrecked.";
 
     private const float TIME_TO_UPDATE = 5f;
 
     private float countdown;
     private bool updateMessages;
+
+    private const float UNDER_ATTACK_TIME = 10;
+    private Dictionary<IGameEntity, float> entityTimer;
 
     private const int MAX_LINES = 10;
 
@@ -66,9 +76,14 @@ public class EventsNotifier : MonoBehaviour {
     private Queue<int> trimming;
     private System.Text.StringBuilder messages;
 
+    private Camera mainCam;
+    private Managers.SoundsManager sounds;
+
     void Awake()
     {
+        mainCam = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
         text = GameObject.Find("ScreenMessages").GetComponent<GUIText>();
+        sounds = GameObject.FindWithTag("GameController").GetComponent<Managers.SoundsManager>();
     }
 
     // Use this for initialization
@@ -78,6 +93,7 @@ public class EventsNotifier : MonoBehaviour {
         messages = new System.Text.StringBuilder();
         countdown = TIME_TO_UPDATE;
         updateMessages = false;
+        entityTimer = new Dictionary<IGameEntity, float>();
     }
 	
     // Update is called once per frame
@@ -104,10 +120,10 @@ public class EventsNotifier : MonoBehaviour {
         messages.Append("\n");
     }
 
-    private void DisplayUnderAttack(Vector3 where)
+    private void DisplayUnderAttack(GameObject target)
     {
         AppendMessage(UNDER_ATTACK);
-        // TODO Display information on the mini-map
+        target.GetComponent<EntityMarker>().entityUnderAttack();
     }
 
     private void DisplayBuildingCreated(Storage.BuildingTypes type)
@@ -134,7 +150,17 @@ public class EventsNotifier : MonoBehaviour {
             case Storage.BuildingTypes.SAWMILL:
                 AppendMessage(SAWMILL_CREATED);
                 break;
+            case Storage.BuildingTypes.WATCHTOWER:
+                AppendMessage(WATCHTOWER_CREATED);
+                break;
+            case Storage.BuildingTypes.WALL:
+                AppendMessage(WALL_CREATED);
+                break;
+            case Storage.BuildingTypes.WALLCORNER:
+                AppendMessage(WALL_CORNER_CREATED);
+                break;
         }
+        sounds.onBuildingCreated(type);
     }
 
     private void DisplayUnitCreated(Storage.UnitTypes type)
@@ -157,6 +183,7 @@ public class EventsNotifier : MonoBehaviour {
                 AppendMessage(HEAVY_ARMY_CREATED);
                 break;
         }
+        sounds.onUnitCreated();
     }
 
     private void DisplayUnitDead(Storage.UnitTypes type)
@@ -182,6 +209,7 @@ public class EventsNotifier : MonoBehaviour {
                 AppendMessage(HERO_DEAD);
                 break;
         }
+        sounds.onUnitDead();
     }
 
     private void DisplayBuildingDestroyed(Storage.BuildingTypes type)
@@ -209,10 +237,18 @@ public class EventsNotifier : MonoBehaviour {
             case Storage.BuildingTypes.STABLE:
                 AppendMessage(STABLE_LOST);
                 break;
+            case Storage.BuildingTypes.WATCHTOWER:
+                AppendMessage(WATCHTOWER_LOST);
+                break;
+            case Storage.BuildingTypes.WALLCORNER:
+            case Storage.BuildingTypes.WALL:
+                AppendMessage(WALL_LOST);
+                break;
         }
+        sounds.onBuildingDestroyed();
     }
 
-    private void DisplayResourceIsLow(WorldResources.Type type)
+    public void DisplayResourceIsLow(WorldResources.Type type)
     {
         switch (type)
         {
@@ -231,7 +267,7 @@ public class EventsNotifier : MonoBehaviour {
         }
     }
 
-    private void DisplayNotEnoughResources(WorldResources.Type type)
+    public void DisplayNotEnoughResources(WorldResources.Type type)
     {
         switch (type)
         {
@@ -250,7 +286,7 @@ public class EventsNotifier : MonoBehaviour {
         }
     }
 
-    private void DisplayResourceDepleted(WorldResources.Type type)
+    public void DisplayResourceDepleted(WorldResources.Type type)
     {
         switch (type)
         {
@@ -272,16 +308,50 @@ public class EventsNotifier : MonoBehaviour {
     // TODO Display troop's messages
     private void DisplayTroopCreated(string info) {}
 
+    /// <summary>
+    /// Returns <code>true</code> if the entity is under the camera.
+    /// </summary>
+    /// <returns><c>true</c>, if the entity is under the camera, <c>false</c> otherwise.</returns>
+    /// <param name="entity">Entity.</param>
+    private bool isEntityUnderCamera(IGameEntity entity)
+    {
+        Vector3 vp = mainCam.WorldToViewportPoint(entity.getTransform().position);
+        return vp.x >= 0 && vp.y >= 0 && vp.x <= 1 && vp.y <= 1 && vp.z >= 0;
+    }
+
+    /// <summary>
+    /// Displays a message warning the user that a game entity is under attack.
+    /// 
+    /// The message will only be displayed if the object has not been attacked before
+    /// and if it is not visible by the user.
+    /// </summary>
+    /// <param name="obj">Object that represents the entity being attacked.</param>
     public void DisplayUnderAttack(System.Object obj)
     {
         GameObject g = (GameObject) obj;
-        DisplayUnderAttack(g.transform.position);
+        IGameEntity entity = g.GetComponent<IGameEntity>();
+        if (entityTimer.ContainsKey(entity))
+        {
+            if (Time.time - entityTimer[entity] >= UNDER_ATTACK_TIME)
+            {
+                entityTimer[entity] = Time.time;
+                if (!isEntityUnderCamera(entity))
+                    DisplayUnderAttack(g);
+            }
+        }
+        else
+        {
+            entityTimer.Add(entity, Time.time);
+            DisplayUnderAttack(g);
+        }
     }
 
     public void DisplayBuildingDestroyed(System.Object obj)
     {
         GameObject g = (GameObject) obj;
         IGameEntity entity = g.GetComponent<IGameEntity>();
+        entityTimer.Remove(entity);
+	PopulationInfo.get.Remove(entity);
         DisplayBuildingDestroyed(((Storage.BuildingInfo) entity.info).type);
     }
 
@@ -289,12 +359,14 @@ public class EventsNotifier : MonoBehaviour {
     {
         GameObject g = (GameObject) obj;
         IGameEntity entity = g.GetComponent<IGameEntity>();
+	PopulationInfo.get.Add(entity);
         DisplayBuildingCreated(((Storage.BuildingInfo) entity.info).type);
     }
 
     public void DisplayUnitCreated(System.Object obj)
     {
         Unit entity = (Unit) obj;
+	PopulationInfo.get.Add(entity);
         DisplayUnitCreated(entity.type);
     }
 
@@ -302,6 +374,14 @@ public class EventsNotifier : MonoBehaviour {
     {
         GameObject g = (GameObject) obj;
         Unit entity = (Unit) g.GetComponent<IGameEntity>();
+        entityTimer.Remove(entity);
+	PopulationInfo.get.Remove(entity);
         DisplayUnitDead(entity.type);
+    }
+
+    public void DisplayEnemySpotted(GameObject go)
+    {
+        AppendMessage(ENEMY_ON_SIGHT);
+		go.GetComponent<EntityMarker>().entityOnSight();
     }
 }

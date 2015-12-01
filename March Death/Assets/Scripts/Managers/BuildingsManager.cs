@@ -11,7 +11,7 @@ namespace Managers
         private Player _player;
         private UserInput _inputs;
         public Player Player { set { _player = value; } }
-        public UserInput Inputs { set { _inputs = value; } }
+        public UserInput Inputs { get { return _inputs; } set { _inputs = value; } }
         private CursorManager cursor;
         private ConstructionGrid grid;
         private Color red = Color.red;
@@ -31,6 +31,11 @@ namespace Managers
         private NewBuilding _newBuilding;
         float yoffset = 1f;
 
+        private EventsNotifier notifier;
+        private bool IsEnoughFood { get; set; }
+        private bool IsEnoughMetal { get; set; }
+        private bool IsEnoughWood { get; set; }
+
         // Use this for initialization
         //void Start()
         public BuildingsManager()
@@ -43,6 +48,8 @@ namespace Managers
             red.a = 0.5f;
             green.a = 0.5f;
             InitBuildingStruct();
+
+            notifier = GameObject.FindWithTag("GameController").GetComponent<EventsNotifier>();
 
         }
 
@@ -113,9 +120,10 @@ namespace Managers
         {
             Storage.BuildingInfo i = Storage.Info.get.of(race, type);
 
-            return (_player.resources.getAmount(WorldResources.Type.FOOD) >= i.resources.food &&
-                    _player.resources.getAmount(WorldResources.Type.WOOD) >= i.resources.wood &&
-                    _player.resources.getAmount(WorldResources.Type.METAL) >= i.resources.metal);
+            IsEnoughFood = _player.resources.getAmount(WorldResources.Type.FOOD) >= i.resources.food;
+            IsEnoughWood = _player.resources.getAmount(WorldResources.Type.WOOD) >= i.resources.wood;
+            IsEnoughMetal = _player.resources.getAmount(WorldResources.Type.METAL) >= i.resources.metal;
+            return IsEnoughFood && IsEnoughWood && IsEnoughMetal;
         }
 
 
@@ -220,8 +228,15 @@ namespace Managers
                     return false;
             }
             else
+            {
+                if (!IsEnoughFood)
+                    notifier.DisplayNotEnoughResources(WorldResources.Type.FOOD);
+                if (!IsEnoughMetal)
+                    notifier.DisplayNotEnoughResources(WorldResources.Type.METAL);
+                if (!IsEnoughWood)
+                    notifier.DisplayNotEnoughResources(WorldResources.Type.WOOD);
                 return false;
-
+            }
 
         }
 

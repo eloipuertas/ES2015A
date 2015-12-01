@@ -459,5 +459,6 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         FOWEntity fe = gameObject.AddComponent<FOWEntity>();
         fe.Range = info.attributes.sightRange;
         fe.Activate(info.race);
+		gameObject.AddComponent<EntityMarker>();  // For the mini-map
     }
 }

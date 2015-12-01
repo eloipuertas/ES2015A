@@ -36,6 +36,10 @@ public partial class UserInput : MonoBehaviour
     private float width() { return mouseButtonCurrentPoint.x - mouseButtonDownPoint.x; }
     private float height() { return (Screen.height - mouseButtonCurrentPoint.y) - (Screen.height - mouseButtonDownPoint.y); }
 
+    // minimap related
+    private Camera minimapCamera; 
+
+
     Texture2D selectionTexture;
     Texture2D cursorAttack;
 
@@ -63,6 +67,7 @@ public partial class UserInput : MonoBehaviour
 
         cursorAttack = (Texture2D)Resources.Load("cursor_attack");
         camera = GameObject.Find("Main Camera").GetComponent("CameraController") as CameraController;
+        minimapCamera = GameObject.Find("Minimap Camera").GetComponent<Camera>();
 
         //Get hud components rect
         RectTransform actions = GameObject.Find("actions").GetComponent<RectTransform>();
@@ -90,7 +95,7 @@ public partial class UserInput : MonoBehaviour
 
         currentAction = GetMouseAction();
         // FIXME: add HUD colliders
-        if (rectActions.Contains(Input.mousePosition) || rectInformation.Contains(Input.mousePosition))
+        if (rectActions.Contains(Input.mousePosition) || rectInformation.Contains(Input.mousePosition) || minimapCamera.pixelRect.Contains(Input.mousePosition) )
         {
             currentAction = action.NONE;
             return;

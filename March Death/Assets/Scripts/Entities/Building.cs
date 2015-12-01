@@ -129,14 +129,13 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         _deploymentPoint = new Vector3(transform.position.x + 10, transform.position.y, transform.position.z + 10);
         activateFOWEntity();
 
-        if (DefaultStatus == EntityStatus.BUILDING_PHASE_1)
+        /*if (DefaultStatus == EntityStatus.BUILDING_PHASE_1)
         {
             _woundsReceived = info.buildingAttributes.wounds;
             _woundsBuildControl = info.buildingAttributes.wounds;
-        }
+        }*/
 
         //return (info.buildingAttributes.wounds - _woundsReceived) * 100f / info.buildingAttributes.wounds;
-
         // Set the status
         setStatus(DefaultStatus);
     }
