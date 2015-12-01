@@ -128,7 +128,7 @@ public class Unit : GameEntity<Unit.Actions>
         }
         set
         {
-            if (_squadUpdater)
+            if (_squadUpdater && value != _squad)
             {
                 GameObject.Destroy(_squadUpdater);
             }

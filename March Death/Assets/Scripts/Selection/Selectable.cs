@@ -76,6 +76,14 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         else _unitSelection = null;
     }
 
+    public void OnDisable()
+    {
+        if (currentlySelected)
+        {
+            DeselectEntity();
+        }
+    }
+
     public override void Update() { }
 
     protected virtual void LateUpdate()

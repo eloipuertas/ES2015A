@@ -169,7 +169,7 @@ namespace Managers
 
                 // Add the unit to this crowd (if not already in)
                 _selectedSquad.AddUnit(unit);
-                //unit.Squad = _selectedSquad;
+                unit.Squad = _selectedSquad;
 
                 // Select the entity
                 Selectable selectable = unit.GetComponent<Selectable>();
@@ -204,7 +204,18 @@ namespace Managers
                     unit.GetComponent<Selectable>().DeselectEntity();
 
                     // Unless this unit is part of a squad saved as a troop, null it out
-                    if (!_troops.ContainsValue(unit.Squad))
+                    bool inTroop = false;
+                    foreach (var entry in _troops)
+                    {
+                        if (entry.Value.Units.Contains(unit))
+                        {
+                            // Restore squad
+                            unit.Squad = entry.Value;
+                            inTroop = true;
+                        }
+                    }
+
+                    if (!inTroop)
                     {
                         unit.Squad = null;
                     }
@@ -362,11 +373,14 @@ namespace Managers
         /// <param name="point"></param>
         public void MoveTo(Vector3 point)
         {
-            GameObject banner = SelectionDestination.CreateBanner(_ownRace);
-            banner.GetComponent<SelectionDestination>().Deploy(_selectedSquad.Selectables, point);
+            if (_selectedSquad != null && _selectedSquad.Units.Count > 0)
+            {
+                GameObject banner = SelectionDestination.CreateBanner(_ownRace);
+                banner.GetComponent<SelectionDestination>().Deploy(_selectedSquad.Selectables, point);
 
-            _selectedSquad.MoveTo(point, unit => fire(Actions.MOVE, unit));
-            Debug.Log("Moving there");
+                _selectedSquad.MoveTo(point, unit => fire(Actions.MOVE, unit));
+                Debug.Log("Moving there");
+            }
         }
 
 
@@ -377,8 +391,11 @@ namespace Managers
         /// <param name="point"></param>
         public void AttackTo(IGameEntity enemy)
         {
-            _selectedSquad.AttackTo(enemy, unit => fire(Actions.ATTACK, unit));
-            Debug.Log("attacking");
+            if (_selectedSquad != null && _selectedSquad.Units.Count > 0)
+            {
+                _selectedSquad.AttackTo(enemy, unit => fire(Actions.ATTACK, unit));
+                Debug.Log("attacking");
+            }
         }
 
         /// <summary>
@@ -387,8 +404,11 @@ namespace Managers
         /// 
         public void Enter(IGameEntity building_resource)
         {
-            _selectedSquad.EnterTo(building_resource, unit => fire(Actions.MOVE, unit));
-            Debug.Log("Walking to building");
+            if (_selectedSquad != null && _selectedSquad.Units.Count > 0)
+            {
+                _selectedSquad.EnterTo(building_resource, unit => fire(Actions.MOVE, unit));
+                Debug.Log("Walking to building");
+            }
         }
     }
 }

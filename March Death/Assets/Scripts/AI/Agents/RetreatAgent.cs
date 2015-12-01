@@ -73,7 +73,7 @@ namespace Assets.Scripts.AI.Agents
         {
             if (ai.EnemyUnits.Count == 0)
                 return 0;
-            
+
             minDistanceBetweenHeroAndNearestEnemy = 0;
 
             //Get the squad bounding box

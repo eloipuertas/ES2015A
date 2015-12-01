@@ -301,8 +301,8 @@ namespace Assets.Scripts.AI.Agents
 		/// <param name="units">Units.</param>
         public override int getConfidence(Squad squad)
         {
-			//Explorer agent has some confidence by default
-			confidence = CONFIDENCE_EXPLORER_BY_DEFAULT;
+            //Explorer agent has some confidence by default
+            confidence = CONFIDENCE_EXPLORER_BY_DEFAULT;
             
 			//If fow manager is not enabled this agent will never act
 			if (!fowManager.Enabled)
