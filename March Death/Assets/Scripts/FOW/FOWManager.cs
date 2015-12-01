@@ -181,47 +181,50 @@ public class FOWManager : MonoBehaviour
         int yCen = Mathf.RoundToInt(yOff);
         int texWidth = fowTex.width;
         int dRange = range * 2;
-        if (entity.IsOwnedByPlayer)
+        if(xCen > 0 && yCen > 0)
         {
-            Vector2 offset = new Vector2(xOff - xCen, yOff - yCen);
-            for (int x = 0; x <= dRange; x++)
+            if (entity.IsOwnedByPlayer)
             {
-                for (int y = 0; y <= dRange; y++)
+                Vector2 offset = new Vector2(xOff - xCen, yOff - yCen);
+                for (int x = 0; x <= dRange; x++)
                 {
-                    int n = x + y * dRange;
-                    int n2 = (xCen+x) + (yCen+y) * texWidth;
-                    if (n2 < pixels.Length)
+                    for (int y = 0; y <= dRange; y++)
                     {
-
-                        if (table[n].b > 0)
+                        int n = x + y * dRange;
+                        int n2 = (xCen+x) + (yCen+y) * texWidth;
+                        if (n2 < pixels.Length)
                         {
-                            if (table[n].b == 255)
+
+                            if (table[n].b > 0)
                             {
-                                pixels[n2].b = (byte)Mathf.Max(pixels[n2].b, table[n].b);
-                                pixels[n2].g = (byte)Mathf.Max(pixels[n2].g, table[n].g);
-                            }
-                            else
-                            {
-                                int valOff = Mathf.RoundToInt(offset.x * (x - range) + offset.y * (y - range));
-                                pixels[n2].b = (byte)Mathf.Max(pixels[n2].b, Mathf.Min(table[n].b + valOff, 255));
-                                pixels[n2].g = (byte)Mathf.Max(pixels[n2].g, Mathf.Min(table[n].g + valOff, 255));
+                                if (table[n].b == 255)
+                                {
+                                    pixels[n2].b = (byte)Mathf.Max(pixels[n2].b, table[n].b);
+                                    pixels[n2].g = (byte)Mathf.Max(pixels[n2].g, table[n].g);
+                                }
+                                else
+                                {
+                                    int valOff = Mathf.RoundToInt(offset.x * (x - range) + offset.y * (y - range));
+                                    pixels[n2].b = (byte)Mathf.Max(pixels[n2].b, Mathf.Min(table[n].b + valOff, 255));
+                                    pixels[n2].g = (byte)Mathf.Max(pixels[n2].g, Mathf.Min(table[n].g + valOff, 255));
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        else
-        {
-            for (int x = 0; x <= dRange; x++)
+            else
             {
-                for (int y = 0; y <= dRange; y++)
+                for (int x = 0; x <= dRange; x++)
                 {
-                    int n = x + y * dRange;
-                    int n2 = (xCen + x) + (yCen + y) * texWidth;
-                    if (n2 < pixels.Length && table[n].b > 1)
+                    for (int y = 0; y <= dRange; y++)
                     {
-                        aiVision[n2] = (visible.explored | visible.visible);
+                        int n = x + y * dRange;
+                        int n2 = (xCen + x) + (yCen + y) * texWidth;
+                        if (n2 < pixels.Length && table[n].b > 1)
+                        {
+                            aiVision[n2] = (visible.explored | visible.visible);
+                        }
                     }
                 }
             }
