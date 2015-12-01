@@ -6,9 +6,10 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
 {
     public enum Actions { BEING_ATTACKED, NORMAL};
 
-
     private const float REFRESH_TIME = 1.0f;
     private float tot_timer = 1f;
+
+    private float res;
 
     private const float ANIMATION_TIME = 0.6f;
     private float creation_timer = 0f;
@@ -61,6 +62,8 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
 		onSightTimer = 0f;
 		onSightTexture = new Texture2D(32, 32);
 		onSightTexture = (Texture2D) Resources.Load("redcross");
+
+        res = Screen.currentResolution.width;
     }
 
     // Update is called once per frame
@@ -137,13 +140,13 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
 
     private void showAttack(int index)
     {
-        underAttack_rect = MinimapOverlays.CalculateBoxFromCntr(this.transform.position, mainCam, (int)((15f * 3f)/(index + 1))); // 3f : hack to make less vig the texture raul_hack
+        underAttack_rect = MinimapOverlays.CalculateBoxFromCntr(this.transform.position, mainCam, (int)((13f * 3f)/(index + 1))); // 3f : hack to make less vig the texture raul_hack
         GUI.DrawTexture(underAttack_rect, underAttack_tex);
     }
 
 	private void showOnSight(int index)
 	{
-		onSightRect = MinimapOverlays.CalculateBoxFromCntr(transform.position, mainCam, (int)((15f * 3f)/(index + 1)));
+		onSightRect = MinimapOverlays.CalculateBoxFromCntr(transform.position, mainCam, (int)((5f * 3f)/(index + 1)));
 		GUI.DrawTexture(onSightRect, onSightTexture);
 	}
 

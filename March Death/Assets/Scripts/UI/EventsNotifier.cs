@@ -67,11 +67,11 @@ public class EventsNotifier : MonoBehaviour {
     private float countdown;
     private bool updateMessages;
 
-    private const float UNDER_ATTACK_TIME = 10;
+    private const float UNDER_ATTACK_TIME = 5f;
     private Dictionary<IGameEntity, float> entityTimer;
 
-    private const float ON_SIGHT_WAIT_TIME = 8f;
-    // private const int LIMIT_SIGHT_UNITS = 3; in case we want to restrict the number of units in the dictionary in case of spam on melee attacks.
+    private const float ON_SIGHT_WAIT_TIME = 15f;
+    private const int LIMIT_SIGHT_UNITS = 3; //in case we want to restrict the number of units in the dictionary in case of spam on melee attacks.
     private Dictionary<IGameEntity, float> onSightTimer;
 
     private const int MAX_LINES = 10;
@@ -399,8 +399,11 @@ public class EventsNotifier : MonoBehaviour {
         }
         else
         {
-            go.GetComponent<EntityMarker>().entityOnSight();
-            onSightTimer.Add(entity, Time.time);
+            if (onSightTimer.Count < LIMIT_SIGHT_UNITS)
+            {
+                go.GetComponent<EntityMarker>().entityOnSight();
+                onSightTimer.Add(entity, Time.time);
+            }
         }
 
         
