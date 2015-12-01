@@ -26,12 +26,25 @@ public class Main_Game : MonoBehaviour
         inputs.TerrainLayerMask = new LayerMask();
         inputs.TerrainLayerMask = 520;// HACK LayerMask.NameToLayer("Terrain"); didn't work
         bm.Inputs = inputs;
-
+        LoadInitialScreen();
     }
 
     public GameInformation GetGameInformationObject()
     {
         return info;
+    }
+
+    void LoadInitialScreen()
+    {
+        switch (info.GetPlayerRace())
+        {
+            case Races.ELVES:
+                Instantiate(Resources.Load("WelcomeScreen-Elf")).name = "Welcome-Screen";
+                break;
+            case Races.MEN:
+                Instantiate(Resources.Load("WelcomeScreen-Human")).name = "Welcome-Screen";
+                break;
+        }
     }
 
     public void StartGame()
