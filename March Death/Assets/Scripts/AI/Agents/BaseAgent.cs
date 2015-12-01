@@ -26,6 +26,10 @@ namespace Assets.Scripts.AI.Agents
         public abstract int getConfidence(Squad squad);
         public abstract void controlUnits(Squad squad);
 
+        public virtual void PreUpdate() { }
+        public virtual void PostSquad() { }
+        public virtual void PostUpdate() { }
+
 		/// <summary>
 		/// Transfers confidence to the agent.
 		/// </summary>
