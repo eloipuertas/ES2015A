@@ -618,7 +618,7 @@ public class Unit : GameEntity<Unit.Actions>
         }
 
         if (_projectileThrown) {
-            //Find a new position proportionally closer to the end, based on the moveTime
+            //Find a new position proportionally closer to the end, based on the projectileSpeed
             Vector3 newPostion = Vector3.MoveTowards(_projectile.transform.position, _projectileEndPoint, info.unitAttributes.projectileSpeed * Time.deltaTime);
 
             //Move the object to the new position.
