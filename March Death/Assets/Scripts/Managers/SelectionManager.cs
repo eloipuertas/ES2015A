@@ -132,7 +132,10 @@ namespace Managers
             else
             {
                 _selectedBuilding = (IBuilding)entity;
-                _selectedBuilding.getGameObject().GetComponent<Selectable>().SelectEntity();
+
+                Selectable selectable = _selectedBuilding.getGameObject().GetComponent<Selectable>();
+                selectable.SelectEntity();
+                fire(Actions.SELECT, selectable);
             }
         }
 
