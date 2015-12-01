@@ -78,6 +78,12 @@ echo -e "\tLinux: ${BUILD_LINUX}\n"
 # Notify on github
 COMMIT_AUTHOR=`git log -1 | grep -Po "(?<=Author: ).*(?= <)"`
 
+if [[ "$COMMIT_AUTHOR" == *" "* ]]
+then
+    echo -e "\n\033[31;1mGit commit author has spaces, it is probably invalid\033[0m\n"
+    exit 1
+fi
+
 case $GITHUB_NOTIFICATIONS in
     none)
         ;;
