@@ -24,6 +24,8 @@ namespace Utils
         /// </summary>
         private AudioSource[] _aSource;
 
+        private float _volume = .7f;
+
         /// <summary>
         /// Creates an AudioPool, attaches the sources to the gameObject
         /// </summary>
@@ -45,7 +47,7 @@ namespace Utils
             for (int i = 0; i < _numSources; i++)
             {
                 _aSource[i] = _baseComponent.AddComponent<AudioSource>();
-                _aSource[i].volume = .7f;
+                _aSource[i].volume = _volume;
             }
         }
 

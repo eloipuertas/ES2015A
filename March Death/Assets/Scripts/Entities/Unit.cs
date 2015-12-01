@@ -136,9 +136,8 @@ public class Unit : GameEntity<Unit.Actions>
     {
         // TODO: Our target died, select next? Do nothing?
         setStatus(EntityStatus.IDLE);
-        IGameEntity entity = ((GameObject) obj).GetComponent<IGameEntity>();
         // TODO: After merge, I had a conflich in this line and I hesitated what to do
-        fire(Actions.TARGET_TERMINATED, entity.info);
+        fire(Actions.TARGET_TERMINATED, obj);
         _target = null;
     }
 
@@ -665,7 +664,7 @@ public class Unit : GameEntity<Unit.Actions>
 
     public override void setStatus(EntityStatus status)
     {
-        if (!_followingTarget && status == EntityStatus.MOVING)
+        if (!_followingTarget && base.status == EntityStatus.MOVING)
         {
             fire(Actions.MOVEMENT_END);
         }

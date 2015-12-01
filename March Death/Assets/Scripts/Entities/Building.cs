@@ -40,7 +40,8 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     public T CREATE_UNIT { get; set; }
     public T BUILDING_FINISHED { get; set; }
     public T HEALTH_UPDATED { get; set; }
-
+    public T ADDED_QUEUE { get; set; }
+    
     private float _totalBuildTime = 0;
     private float _creationTimer = 0;
     private int _woundsBuildControl = 0;
@@ -113,8 +114,9 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         DESTROYED = (T)Enum.Parse(typeof(T), "DESTROYED", true);
         CREATE_UNIT = (T)Enum.Parse(typeof(T), "CREATE_UNIT", true);
         BUILDING_FINISHED = (T) Enum.Parse(typeof(T), "BUILDING_FINISHED", true);
-        HEALTH_UPDATED = (T)Enum.Parse(typeof(T), "HEALTH_UPDATED", true); 
-
+        HEALTH_UPDATED = (T)Enum.Parse(typeof(T), "HEALTH_UPDATED", true);
+        ADDED_QUEUE = (T)Enum.Parse(typeof(T), "ADDED_QUEUE", true);
+        
         // Call GameEntity start
         base.Awake();
     }
@@ -139,7 +141,6 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         }
 
         //return (info.buildingAttributes.wounds - _woundsReceived) * 100f / info.buildingAttributes.wounds;
-
         // Set the status
         setStatus(DefaultStatus);
     }
@@ -166,7 +167,6 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
                 _woundsReceived -= diffWounds;
                 _woundsBuildControl = woundsBuilt;
                 fire(HEALTH_UPDATED);
-                Debug.Log("entra health");
             }
 
 			// TODO: What if we have more than 3 phases... maybe we should add the number of phases in the JSON, instead of harcoding it...
@@ -228,6 +228,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     {
         if (_creationQueue.Count < info.buildingAttributes.creationQueueCapacity)
         {
+            fire(ADDED_QUEUE, type);
             _creationQueue.Enqueue(type);
             return true;
         }
