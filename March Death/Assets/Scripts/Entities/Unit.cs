@@ -441,7 +441,6 @@ public class Unit : GameEntity<Unit.Actions>
         if (GetComponent<Selectable>())
         {
             GetComponent<Selectable>().enabled = false;
-            GetComponent<Selectable>().DeselectMe();
         }
 
         // Disable ligths if any    

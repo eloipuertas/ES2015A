@@ -52,7 +52,15 @@ namespace Managers
                 return (!_isSquad && _selectedBuilding != null) || (_selectedSquad != null && _selectedSquad.Units.Count == 1);
             }
         }
-        
+
+        public bool IsBuilding
+        {
+            get
+            {
+                return !_isSquad && _selectedBuilding != null;
+            }
+        }
+
         /// <summary>
         /// Setter for the race
         /// </summary>
@@ -340,29 +348,14 @@ namespace Managers
         /// <param name="key"></param>
         public void DeleteTroop(string key)
         {
+            foreach (Unit unit in _troops[key].Units)
+            {
+                unit.Squad = null;
+            }
+
             _troops.Remove(key);
         }
-
-        /// <summary>
-        /// Removes all the buildings from the current selection
-        /// </summary>
-        [Obsolete]
-        public void RemoveBuildinds()
-        {
-            /*
-            foreach (Selectable selected in _selectedEntities.ToArray())
-            {
-                if (selected.entity.info.isBuilding)
-                {
-                    selected.DeselectEntity();
-                    _selectedEntities.Remove(selected);
-
-                }
-            }
-            */
-        }
-
-
+        
         /// <summary>
         /// Basic movement operation for the selected entities
         /// </summary>
@@ -373,7 +366,6 @@ namespace Managers
             banner.GetComponent<SelectionDestination>().Deploy(_selectedSquad.Selectables, point);
 
             _selectedSquad.MoveTo(point, unit => fire(Actions.MOVE, unit));
-
             Debug.Log("Moving there");
         }
 
@@ -397,22 +389,6 @@ namespace Managers
         {
             _selectedSquad.EnterTo(building_resource, unit => fire(Actions.MOVE, unit));
             Debug.Log("Walking to building");
-        }
-
-        /// <summary>
-        /// This method checks if the current selection is a building, returns true or false.
-        /// </summary>
-        /// <returns></returns>
-        public bool IsBuilding()
-        {
-            //there aren't buildings in multiple selection
-            /*
-            if (_selectedEntities.Count == 1)
-            {
-                if(_selectedEntities.ToArray()[0].entity.info.isBuilding) return true;
-            }
-            */
-            return false;
         }
     }
 }

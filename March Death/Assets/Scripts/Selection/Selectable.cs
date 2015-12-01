@@ -202,7 +202,6 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         if (!selection) throw new System.Exception("FIX: " + entity.info.race + " - "  + entity.info.name + " prefab needs the EntitySelection prefab which is in Resources/prefab/selection");
         _unitSelection = selection.GetComponent<EntitySelection>();
         _unitSelection.SetColorRace(race);
-        
     }
 
 }
