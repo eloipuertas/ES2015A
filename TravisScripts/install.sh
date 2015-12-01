@@ -11,7 +11,7 @@ sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes in
 . "$TRAVIS_SCRIPTS/Config/config.cfg"
 . "$TRAVIS_SCRIPTS/travis_wait.sh"
 
-echo 'Downloading from $UNITY_URL'
+echo "Downloading from $UNITY_URL"
 "$TRAVIS_SCRIPTS/bin/axel" -q -n 10 -o Unity.sh $UNITY_URL
 
 if [ $USE_CACHE == 1 ]
