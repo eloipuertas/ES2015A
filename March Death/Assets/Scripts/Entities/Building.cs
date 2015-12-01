@@ -20,13 +20,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     /// </summary>
     public BuildingTypes type = BuildingTypes.STRONGHOLD;
     public override E getType<E>() { return (E)Convert.ChangeType(type, typeof(E)); }
-
-    /// <summary>
-    /// AISenses class needed to use method getObjectsNearPosition to locate valid 
-    /// deployment point for new units.
-    /// </summary>
-    private AISenses senses = new AISenses();
-
+    
     /// <summary>
     /// Used to store values returned from getObjectsNearPosition method.
     /// </summary>
