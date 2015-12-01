@@ -239,13 +239,20 @@ namespace Managers
             }
         }
 
-        public void DeselectCurrent()
+        public void DeselectCurrent(bool force = false)
         {
-            if (_isSquad && _selectedSquad != null && _selectedSquad.Units.Count > 0)
+            bool deselectSquad = ((!force && _isSquad) || force) &&
+                _selectedSquad != null && _selectedSquad.Units.Count > 0;
+
+            bool deselectBuilding = ((!force && !_isSquad) || force) &&
+                _selectedBuilding != null;
+
+            if (deselectSquad)
             {
                 Deselect(_selectedSquad.Units[0]);
             }
-            else if (!_isSquad && _selectedBuilding != null)
+
+            if (deselectBuilding)
             {
                 Deselect(_selectedBuilding);
             }
@@ -275,7 +282,7 @@ namespace Managers
 
         public void DragStart()
         {
-            DeselectCurrent();
+            DeselectCurrent(true);
         }
 
         public void DragUpdate(List<Unit> units)
