@@ -367,7 +367,7 @@ public class EventsNotifier : MonoBehaviour {
         GameObject g = (GameObject) obj;
         IGameEntity entity = g.GetComponent<IGameEntity>();
         entityTimer.Remove(entity);
-	PopulationInfo.get.Remove(entity);
+        PopulationInfo.get.Remove(entity);
         DisplayBuildingDestroyed(((Storage.BuildingInfo) entity.info).type);
     }
 
@@ -375,7 +375,7 @@ public class EventsNotifier : MonoBehaviour {
     {
         GameObject g = (GameObject) obj;
         IGameEntity entity = g.GetComponent<IGameEntity>();
-	PopulationInfo.get.Add(entity);
+        PopulationInfo.get.Add(entity);
         DisplayBuildingCreated(((Storage.BuildingInfo) entity.info).type);
     }
 
