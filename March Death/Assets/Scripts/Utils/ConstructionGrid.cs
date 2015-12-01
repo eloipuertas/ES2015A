@@ -1,3 +1,4 @@
+
 ﻿using UnityEngine;
 using System.Collections;
 using System.Linq;
@@ -104,7 +105,11 @@ public class ConstructionGrid : MonoBehaviour
         float BottomRightHeight = getPointHeight(new Vector3(discretizedPosition.x + dimensions.x / 2, discretizedPosition.y, discretizedPosition.z + dimensions.y / 2));
 
         var heights = new float[] { centerHeight, topLeftHeight, topRightHeight, BottomLeftHeight, BottomRightHeight };
+<<<<<<< HEAD
         float max_height = heights.Max();
+=======
+        float max_height = heights.Max();
+>>>>>>> devel_d-issue387
         float min_height = heights.Min();
 
         if (min_height < 79.0f)
@@ -175,6 +180,7 @@ public class ConstructionGrid : MonoBehaviour
 
     }
 
+
     /// <summary>
     /// Gets a free position near somewhere
     /// </summary>
@@ -221,7 +227,9 @@ public class ConstructionGrid : MonoBehaviour
         do
         {
             i++;
-            if (isNewPositionAbleForConstrucction(discretizeMapCoords(possibilities[i]), false))
+
+            if (isNewPositionAbleForConstrucction(discretizeMapCoords(possibilities[i])))
+
             {
                 found = true;
                 recursionDepth = 0;

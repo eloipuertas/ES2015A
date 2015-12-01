@@ -419,6 +419,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// 
     public void vanish()
     {
+        
         //Disable FOW
         if (GetComponent<FOWEntity>())
         {
@@ -479,7 +480,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     public void bringBack()
     {
-       
+
         if (GetComponent<FOWEntity>())
         {
             GetComponent<FOWEntity>().enabled = true;
@@ -532,6 +533,9 @@ public class Unit : GameEntity<Unit.Actions>
 
         // Call GameEntity awake
         base.Awake();
+
+        // Get DetourAgent and set basic variables
+        _detourAgent = GetComponent<DetourAgent>();
     }
 
     /// <summary>
@@ -558,15 +562,13 @@ public class Unit : GameEntity<Unit.Actions>
             register(Actions.CREATED, res_pl.onStatisticsUpdate);
         }
 
-        statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -5);
-
-        fire(Actions.CREATED, statistics);
-
-        // Get DetourAgent and set basic variables
-        _detourAgent = GetComponent<DetourAgent>();
+        // Set detour params (can't be done until Start is done)
         _detourAgent.MaxSpeed = info.unitAttributes.movementRate * 5;
         _detourAgent.MaxAcceleration = info.unitAttributes.movementRate * 20;
         _detourAgent.UpdateParams();
+
+        statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -5);
+        fire(Actions.CREATED, statistics);
     }
 
     /// <summary>
@@ -721,9 +723,10 @@ public class Unit : GameEntity<Unit.Actions>
                     // method is triggered.
 
                     if (_target.info.race == this.race)
-                    {                      
+                    {
                         if (_distanceToTarget <= _target.info.resourceAttributes.trapRange)
-                        {
+                        
+                        {                   
                             _detourAgent.ResetPath();
                             setStatus(EntityStatus.IDLE);
                             _followingTarget = false;

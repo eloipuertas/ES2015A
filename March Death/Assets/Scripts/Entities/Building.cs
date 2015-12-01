@@ -21,6 +21,16 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     public BuildingTypes type = BuildingTypes.STRONGHOLD;
     public override E getType<E>() { return (E)Convert.ChangeType(type, typeof(E)); }
 
+    /// <summary>
+    /// AISenses class needed to use method getObjectsNearPosition to locate valid 
+    /// deployment point for new units.
+    /// </summary>
+    private AISenses senses = new AISenses();
+
+    /// <summary>
+    /// Used to store values returned from getObjectsNearPosition method.
+    /// </summary>
+    private GameObject[] nearObjects;
     private EntityStatus _defaultStatus = EntityStatus.BUILDING_PHASE_1;
     public override EntityStatus DefaultStatus
     {
@@ -207,21 +217,54 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         }
     }
 
-    protected void createUnit(UnitTypes type)
+    /// <summary>
+    /// Meeting point where new units walk from deployment point
+    /// </summary>
+    /// <returns>position of meetingpoint</returns>
+    public Vector3 getMeetingPoint()
+    {
+        Vector3 position = new Vector3();
+
+        Vector2 dimension = new Vector2(15F, 15F);
+        ConstructionGrid grid = new ConstructionGrid();
+        grid.setNewGridDimensions(dimension);
+        position = grid.getFreePositionAbleToConstructNearPoint(_center);
+        Debug.Log("POS: " + position);
+        return position;
+
+    }
+
+    public Vector3 getDeploymentPoint()
     {
 
-        // TODO which position????
-        int xDisplacement = _totalUnits % 5;
-        int yDisplacement = _totalUnits / 5;
-        Vector3 unitPosition = new Vector3(_deploymentPoint.x + xDisplacement, _deploymentPoint.y, _deploymentPoint.z + yDisplacement);
+        Vector3 position = new Vector3();
+
+        Vector2 dimension = new Vector2(5F, 5F);
+        ConstructionGrid grid = new ConstructionGrid();
+        
+        grid.setNewGridDimensions(dimension);
+        position = grid.getFreePositionAbleToConstructNearPoint(_center);
+
+        return position;
+    }
+    protected void createUnit(UnitTypes type)
+    {
+        
+        
+        //Debug.Log("Meeting_Point: " + (getMeetingPoint() - _center));
+        
+        Vector3 unitPosition = getDeploymentPoint();
         GameObject gob = Info.get.createUnit(race, type, unitPosition, transform.rotation, -1);
-
-        Unit new_unit = gob.GetComponent<Unit>();
-
+        Unit new_unit = gob.GetComponent<Unit>(); 
         BasePlayer.getOwner(this).addEntity(new_unit);
         fire(CREATE_UNIT, new_unit);
-
         _totalUnits++;
+        //Debug.Log("Meeting:" + getMeetingPoint());
+        //Debug.Log("Deploy: " + getDeploymentPoint());
+
+        gob.GetComponent<Unit>().moveTo(getMeetingPoint());
+        
+
     }
 
     public bool addUnitQueue(UnitTypes type)
