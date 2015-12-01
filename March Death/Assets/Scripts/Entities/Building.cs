@@ -213,9 +213,14 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         }
     }
 
+    /// <summary>
+    /// Meeting point where new units walk from deployment point
+    /// </summary>
+    /// <returns>position of meetingpoint</returns>
     private Vector3 getMeetingPoint()
     {
         Vector3 position = new Vector3();
+
         Vector2 dimension = new Vector2(15F, 15F);
         ConstructionGrid grid = new ConstructionGrid();
         grid.setNewGridDimensions(dimension);
@@ -223,35 +228,46 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         Debug.Log("POS: " + position);
         return position;
 
-    }  
-       /* 
-        nearObjects = senses.getObjectsNearPosition(_center, 20);
-        foreach (GameObject g in nearObjects)
-        {
-            IBuilding objBuilding = g.GetComponent<IBuilding>();
+    }
+    /* 
+     nearObjects = senses.getObjectsNearPosition(_center, 20);
+     foreach (GameObject g in nearObjects)
+     {
+         IBuilding objBuilding = g.GetComponent<IBuilding>();
 
-            if (g.GetComponent<IBuilding>() != null)
-            {
-                Debug.Log(" pos:" + (_center - g.transform.position));
-            }    
-        }
-        return position;
-     */
-    
+         if (g.GetComponent<IBuilding>() != null)
+         {
+             Debug.Log(" pos:" + (_center - g.transform.position));
+         }    
+     }
+     return position;
+  */
+
     private Vector3 getDeploymentPoint()
     {
 
         Vector3 position = new Vector3();
-        Vector2 dimension = new Vector2(14F, 14F);
+
+        Vector2 dimension = new Vector2(9F, 9F);
         ConstructionGrid grid = new ConstructionGrid();
+
+        //set dimension of grid to 10 to recover corner position.
         grid.setNewGridDimensions(dimension);
         position = grid.getFreePositionAbleToConstructNearPoint(_center);
+
+        nearObjects = senses.getObjectsNearPosition(_center, 5);
+        foreach (GameObject g in nearObjects)
+        {
+            if (g.GetComponent<Unit>() != null)
+            {
+                Debug.Log(" pos:" + (_center - g.transform.position));
+            }
+        }
         return position;
     }
-    
     protected void createUnit(UnitTypes type)
     {
-        Debug.Log("***********");
+        
         
         Debug.Log("Meeting_Point: " + (getMeetingPoint() - _center));
         // TODO which position????
@@ -266,8 +282,9 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         _totalUnits++;
         Debug.Log("Meeting:" + getMeetingPoint());
         Debug.Log("Deploy: " + getDeploymentPoint());
-        
-       // gob.GetComponent<Unit>().moveTo(getMeetingPoint());
+
+        new_unit.Start();
+        gob.GetComponent<Unit>().moveTo(getMeetingPoint());
         
         
         

@@ -384,6 +384,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// 
     public void vanish()
     {
+        
         //Disable FOW
         if (GetComponent<FOWEntity>())
         {
@@ -445,7 +446,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     public void bringBack()
     {
-       
+
         if (GetComponent<FOWEntity>())
         {
             GetComponent<FOWEntity>().enabled = true;
@@ -496,8 +497,18 @@ public class Unit : GameEntity<Unit.Actions>
         _info = Info.get.of(race, type);
         _auto = this;
 
+        
+
         // Call GameEntity awake
         base.Awake();
+
+        // Get DetourAgent and set basic variables
+        _detourAgent = GetComponent<DetourAgent>();
+        _detourAgent.MaxSpeed = info.unitAttributes.movementRate * 5;
+        _detourAgent.MaxAcceleration = info.unitAttributes.movementRate * 20;
+        _detourAgent.UpdateParams();
+
+
     }
 
     /// <summary>
@@ -528,11 +539,9 @@ public class Unit : GameEntity<Unit.Actions>
 
         fire(Actions.CREATED, statistics);
 
-        // Get DetourAgent and set basic variables
-        _detourAgent = GetComponent<DetourAgent>();
-        _detourAgent.MaxSpeed = info.unitAttributes.movementRate * 5;
-        _detourAgent.MaxAcceleration = info.unitAttributes.movementRate * 20;
-        _detourAgent.UpdateParams();
+        
+
+
     }
 
     /// <summary>
