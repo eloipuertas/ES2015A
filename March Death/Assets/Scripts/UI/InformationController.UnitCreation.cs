@@ -82,7 +82,12 @@ public partial class InformationController : MonoBehaviour {
 		button.targetGraphic = image;
 		button.onClick.AddListener(() =>
 		{
-			currentResource.cancelUnitQueue();
+			if (currentResource != null) {
+				currentResource.cancelUnitQueue();
+			} else if (currentBarrack != null) {
+				currentBarrack.cancelUnitQueue();
+			}
+
 			ShowCreationQueue();
 		});
 
