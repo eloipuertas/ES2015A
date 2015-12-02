@@ -284,10 +284,13 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         BasePlayer.getOwner(this).removeEntity(this);
 
         // Stop detour agent
-        if (info.isUnit)
+        doIfUnit(unit =>
         {
-            GetComponent<DetourAgent>().enabled = false;
-        }
+            if (!unit.isImmobile)
+            {
+                GetComponent<Pathfinding.DetourAgent>().enabled = false;
+            }
+        });
 
         // Play dead and/or destroy
         Destroy(this.gameObject, immediately ? 0.0f : 5.0f);
