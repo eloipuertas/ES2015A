@@ -350,6 +350,18 @@ public partial class InformationController : MonoBehaviour
     {
         char separator = '/';
         string path = IMAGES_PATH + separator + entity.getRace() + "_" + entity.info.name;
+
+        Unit.Gender gender;
+        if (entity.info.name == "Civil") {
+            entity.doIfUnit(unit =>
+                            {
+                gender = unit.gender;
+                 if (gender == Unit.Gender.FEMALE) {
+                    path = IMAGES_PATH + separator + entity.getRace() + "_" + entity.info.name + "_woman";
+                }
+            });
+        } 
+         
         Texture2D texture = (Texture2D)Resources.Load(path);
         if (texture)
         {
