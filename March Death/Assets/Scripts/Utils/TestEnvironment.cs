@@ -181,6 +181,10 @@ class TestEnvironment : SingletonMono<TestEnvironment>
                     // Hack to make camera stop moving
                     Camera.main.GetComponent<CameraController>().setCameraSpeed(0);
 
+                    // Remove welcome screen
+                    Time.timeScale = 1;
+                    Destroy(GameObject.Find("Welcome-Screen"));
+
                     if (!Wait(1)) return;
 
                     RunAllTests(States.IN_GAME);
