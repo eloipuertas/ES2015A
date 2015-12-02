@@ -1,7 +1,7 @@
 {
     "race": "ELVES",
     "type": "STRONGHOLD",
-    "name": "Stronghold",
+    "name": "Stronhold",
 
     "attributes": {
         "resistance": 3,
@@ -80,22 +80,22 @@
 
         {
             "ability": "Create",
-            "name":"Create Artillery",
+            "name":"Create Ent",
 
             "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
             "targetType": "BUILDING",
             "targetRace": "ELVES",
-            "targetBuilding": "ARTILLERY"
+            "targetBuilding": "ENT"
         },
 
 		{
             "ability": "Create",
-            "name":"Create Gryphon",
+            "name":"Create WorkShop",
 
             "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
             "targetType": "BUILDING",
             "targetRace": "ELVES",
-            "targetBuilding": "GRYPHON"
+            "targetBuilding": "WORKSHOP"
         },
 
         {
