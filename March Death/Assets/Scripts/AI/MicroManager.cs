@@ -19,6 +19,7 @@ namespace Assets.Scripts.AI
 		public const int AGENT_EXPLORER = 1;
 		public const int AGENT_RETREAT = 2;
 		public const int AGENT_ASSIST = 3;
+        public const int AGENT_STRATEGY = 4;
 
         AIController ai;
         /// <summary>
@@ -37,7 +38,8 @@ namespace Assets.Scripts.AI
             agents.Add(aA);
             agents.Add(new RetreatAgent(ai, aA, assistAgent, "Retreat"));
 			agents.Add(assistAgent);
-            squads.Add(new Squad(ai.race));
+            agents.Add(new StrategyAgent(ai, assistAgent, "Strategy"));
+            squads.Add(new Squad(ai.race)); //Hero
             squads.Add(new Squad(ai.race));
         }
         /// <summary>
@@ -48,17 +50,22 @@ namespace Assets.Scripts.AI
             //difficulty == 0 means the AI is disabled
             if (ai.DifficultyLvl > 0)
             {
-                float bVal = float.MinValue;
-                BaseAgent bAgent = agents[0];
-                int val;
-                foreach (Squad sq in squads)
+                foreach (BaseAgent agent in agents)
                 {
-                    // TODO: This will be updated by the Unit itself
-                    sq.Update();
+                    agent.PreUpdate();
+                }
 
+
+                for(int i =0;i<squads.Count;i++)
+                {
+                    // Update squad
+                    squads[i].Update();
+                    float bVal = float.MinValue;
+                    BaseAgent bAgent = agents[0];
+                    int val;
                     foreach (BaseAgent a in agents)
                     {
-                        val = a.getConfidence(sq);
+                        val = a.getConfidence(squads[i]);
                         if (AIController.AI_DEBUG_ENABLED) ai.aiDebug.setAgentConfidence(a.agentName, val);
                         if (val > bVal)
                         {
@@ -67,15 +74,23 @@ namespace Assets.Scripts.AI
                         }
                     }
 
-                    sq.UserData = bAgent;
+                    squads[i].UserData = bAgent;
                     if (AIController.AI_DEBUG_ENABLED)
                     {
                         ai.aiDebug.setControllingAgent(bAgent.agentName, bVal);
                     }
 
-                    bAgent.controlUnits(sq);
-                    agents[AGENT_ASSIST].extraConfidence = 0;
-                    ((AssistAgent)agents[AGENT_ASSIST]).clearRequests();
+                    bAgent.controlUnits(squads[i]);
+
+                    foreach (BaseAgent agent in agents)
+                    {
+                        agent.PostSquad();
+                    }
+                }
+
+                foreach (BaseAgent agent in agents)
+                {
+                    agent.PostUpdate();
                 }
             }
         }
@@ -126,9 +141,25 @@ namespace Assets.Scripts.AI
         {
             //TODO: placeholder until we know how to split the squads
             if (u.type == Storage.UnitTypes.HERO)
-                squads[1].AddUnit(u);
-            else
+            {
                 squads[0].AddUnit(u);
+            }
+            else if(u.type == Storage.UnitTypes.CIVIL)
+            {
+                Squad s = new Squad(ai.race);
+                squads.Add(s);
+                s.AddUnit(u);
+            }
+            else
+            {
+                Squad s = squads[squads.Count-1];
+                if (s.Units.Count > 0)
+                {
+                    s = new Squad(ai.race);
+                    squads.Add(s);
+                }
+                s.AddUnit(u);
+            }
         }
     }
 }

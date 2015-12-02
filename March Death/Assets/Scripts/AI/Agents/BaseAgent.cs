@@ -26,6 +26,10 @@ namespace Assets.Scripts.AI.Agents
         public abstract int getConfidence(Squad squad);
         public abstract void controlUnits(Squad squad);
 
+        public virtual void PreUpdate() { }
+        public virtual void PostSquad() { }
+        public virtual void PostUpdate() { }
+
 		/// <summary>
 		/// Transfers confidence to the agent.
 		/// </summary>
@@ -43,15 +47,5 @@ namespace Assets.Scripts.AI.Agents
 
 		}
 
-		/// <summary>
-		/// Uses the extra confidence.
-		/// </summary>
-		/// <returns>The extra confidence.</returns>
-		public int useExtraConfidence(){
-			int c;
-			c = extraConfidence;
-			extraConfidence = 0;
-			return c;
-		}
     }
 }

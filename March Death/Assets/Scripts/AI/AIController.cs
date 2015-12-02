@@ -138,6 +138,7 @@ namespace Assets.Scripts.AI
             {
                 if (!EnemyBuildings.Contains(g))
                 {
+                    Debug.Log(g.info.name);
                     g.registerFatalWounds(OnEnemyDied);
                     EnemyBuildings.Add(g);
                 }
@@ -150,11 +151,6 @@ namespace Assets.Scripts.AI
             {
                 g.unregisterFatalWounds(OnEnemyDied);
                 EnemyUnits.Remove((Unit)g);
-            }
-            else if (g.info.isBuilding)
-            {
-                g.unregisterFatalWounds(OnEnemyDied);
-                EnemyBuildings.Remove(g);
             }
         }
 
@@ -182,16 +178,6 @@ namespace Assets.Scripts.AI
             resources.SubstractAmount(WorldResources.Type.FOOD, entity.info.resources.food);
             resources.SubstractAmount(WorldResources.Type.WOOD, entity.info.resources.wood);
             resources.SubstractAmount(WorldResources.Type.METAL, entity.info.resources.metal);
-        }
-
-        public void CreateBuilding(BuildingTypes btype)
-        {
-            GameObject g = Info.get.createBuilding(_selfRace, btype, buildPosition, Quaternion.Euler(0, 0, 0));
-            buildPosition += new Vector3(0, 0, 20);
-            IGameEntity entity = g.GetComponent<IGameEntity>();
-            OnBuildingCreated(entity);
-            checkout(entity);
-
         }
 
         public void CreateBuilding(BuildingTypes btype, Vector3 position, Quaternion rotation, AIArchitect architect)

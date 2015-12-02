@@ -184,13 +184,21 @@ public partial class UserInput : MonoBehaviour
                     && entity.status != EntityStatus.DEAD
                     && entity.status != EntityStatus.DESTROYED)
                     {
+
                         sManager.AttackTo(entity);
+                        
                     }
                     else if (entity.info.isResource
                             && (entity.status == EntityStatus.IDLE
                             || entity.status == EntityStatus.WORKING))
+
                     {
-                        sManager.Enter(entity);
+                        
+                        if((entity.info.isResource)
+                            && (entity.status == EntityStatus.IDLE || entity.status == EntityStatus.WORKING))
+                            {
+                                sManager.Enter(entity);
+                            }                   
                     }
                     else // HACK!! go there to by the point in the terrain
                     {

@@ -60,10 +60,11 @@ namespace Assets.Scripts.AI.Agents
 
         public void requestHelp(KeyValuePair<Squad, int> request)
         {
+            extraConfidence = 0;
             requests.Add(request);
         }
 
-        public void clearRequests()
+        public override void PostSquad()
         {
             requests.Clear();
         }

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using Utils;
 using Pathfinding;
@@ -26,18 +24,22 @@ namespace Assets.Scripts.AI.Agents
         int RescheduleRandomPointValue { get; set; }
         int RescheduleRandomDirectionValue { get; set; }
         int RescheduleRandomAroundTargetValue { get; set; }
+        int MaxExplorerSquads { get; set; }
 
         //Those are the confidence posibilities of our Explorer Agent
+        const int CONFIDENCE_TOO_MANY_EXPLORING = -25;
         const int CONFIDENCE_EXPLORER_BY_DEFAULT = 50;
 		const int CONFIDENCE_EXPLORER_ALL_CIVILS = 50;
 		const int CONFIDENCE_EXPLORER_DISABLED = -1;
 		const int CONFIDENCE_HERO_ALREADY_FOUND = 0;
 
+        bool isEnabled = true;
+        int numberSquadsExploring = 0;
         bool heroVisible;
 		bool allCivils;
 
+        Terrain terrain;
         AssistAgent assistAgent;
-
         FOWManager fowManager;
 
         /// <summary>
@@ -48,12 +50,7 @@ namespace Assets.Scripts.AI.Agents
 
         // Known enemy building positions
         List<Vector3> knownPositions = new List<Vector3>();
-
-        /// <summary>
-        /// Helper array for fast explroe.
-        /// </summary>
-        int[,] dirHelper = new int[8,2]{ { 0, -1 }, { -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 } };
-		int confidence = 0;
+        
         
 		public ExplorerAgent(AIController ai, AssistAgent assist, String name) : base(ai, name)
         {
@@ -65,13 +62,45 @@ namespace Assets.Scripts.AI.Agents
             Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.DISCOVERED, OnEntityFound, selector);
             Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.HIDDEN, OnEntityLost, selector);
 
-            RescheduleSightRange = 30;
-            ReschuduleDiceFaces = 1000;
-            RescheduleRandomPointValue = 1000;
-            RescheduleRandomAroundTargetValue = 990;
-            RescheduleRandomDirectionValue = 970;
+            // Setup difficulty levels
+            switch (ai.DifficultyLvl)
+            {
+                case 0:
+                    isEnabled = false;
+                    break;
+
+                case 1:
+                    RescheduleSightRange = 0;
+                    ReschuduleDiceFaces = 1000;
+                    RescheduleRandomPointValue = 1000;
+                    RescheduleRandomAroundTargetValue = 990;
+                    RescheduleRandomDirectionValue = 970;
+                    MaxExplorerSquads = 1;
+                    break;
+
+                case 2:
+                    RescheduleSightRange = 15;
+                    ReschuduleDiceFaces = 1000;
+                    RescheduleRandomPointValue = 1000;
+                    RescheduleRandomAroundTargetValue = 990;
+                    RescheduleRandomDirectionValue = 970;
+                    MaxExplorerSquads = 2;
+                    break;
+                    
+                case 3:
+                default:
+                    RescheduleSightRange = 30;
+                    ReschuduleDiceFaces = 1000;
+                    RescheduleRandomPointValue = 1000;
+                    RescheduleRandomAroundTargetValue = 990;
+                    RescheduleRandomDirectionValue = 970;
+                    MaxExplorerSquads = 2;
+                    break;
+            }
+            
 
             heroVisible = false;
+            terrain = Terrain.activeTerrain;
             fowManager = FOWManager.Instance;
             heroLastPos = Vector3.zero;
             assistAgent = assist;
@@ -79,23 +108,17 @@ namespace Assets.Scripts.AI.Agents
 
         public override void controlUnits(Squad squad)
         {
-            if (squad.Units.Count == 0)
+            if (!isEnabled || squad.Units.Count == 0)
             {
                 return;
             }
 
+            // Update squads exploring
+            ++numberSquadsExploring;
+
             if (fowManager.Enabled)
             {
-                /*
-                TODO: takeArms Explorer
-                if (squad.units.Count < 2)
-                {
-                    int num = 2 - squad.Units.Count();
-                    if (ai.Macro.canTakeArms() >= num)
-                        ai.Macro.takeArms(num);
-                }
-                */
-                bool lostHero = (heroLastPos != Vector3.zero && !heroVisible && squad.Units.Count > 0);
+                bool lostHero = (heroLastPos != Vector3.zero && !heroVisible);
 
                 // Static values
                 FOWManager.visible[] grid = fowManager.aiVision;
@@ -103,7 +126,14 @@ namespace Assets.Scripts.AI.Agents
 
                 // Get a random unit as a reference point
                 Unit reference = squad.Units[D6.get.rollN(squad.Units.Count)];
-                DetourAgent agent = reference.GetComponent<DetourAgent>();
+                DetourAgent agent = reference.Agent;
+
+                if (agent.TargetState == DetourAgent.MoveRequestState.DT_CROWDAGENT_TARGET_REQUESTING ||
+                    agent.TargetState == DetourAgent.MoveRequestState.DT_CROWDAGENT_TARGET_WAITING_FOR_PATH ||
+                    agent.TargetState == DetourAgent.MoveRequestState.DT_CROWDAGENT_TARGET_WAITING_FOR_QUEUE)
+                {
+                    return;
+                }
 
                 // Check if target is already explored
                 Vector3 direction = (agent.TargetPoint - reference.transform.position).normalized;
@@ -165,7 +195,7 @@ namespace Assets.Scripts.AI.Agents
                 switch (reschedule)
                 {
                     case RescheduleType.NONE:
-                        break;
+                        return;
 
                     case RescheduleType.RANDOM_IN_DIRECTION:
                         result = findPlaceToExplore(grid, gridSize, out targetPos, true, reference.transform.position, agent.TargetPoint);
@@ -186,38 +216,53 @@ namespace Assets.Scripts.AI.Agents
                 }
 
                 // If we failed to find a valid target and we are not moving (thus we are IDLE), find a random point along all the map
-                if (!result && !agent.IsMoving)
+                if (!result && (!agent.IsMoving || targetExplored))
                 {
                     result = findPlaceToExplore(fowManager.aiVision, fowManager.getGridSize(), out targetPos);
                 }
 
-                // If we have a point, move there
-                foreach (Unit u in squad.Units)
+                if (!result)
                 {
-                    if (lostHero)
-                    {
-                        u.moveTo(heroLastPos);
-                    }
-                    else if (result)
-                    {
-                        u.moveTo(targetPos);
+                    return;
+                }
 
+                if (lostHero)
+                {
+                    squad.MoveTo(heroLastPos, u =>
+                    {
                         if (AIController.AI_DEBUG_ENABLED)
                         {
                             ai.aiDebug.registerDebugInfoAboutUnit(u, agentName);
                         }
-                    }
-                    else
+                    });
+                }
+                else
+                {
+                    targetPos.y = terrain.SampleHeight(targetPos);
+                    squad.MoveTo(targetPos, u =>
                     {
                         if (AIController.AI_DEBUG_ENABLED)
                         {
-                            ai.aiDebug.registerDebugInfoAboutUnit(u, agentName + " -> No Target");
+                            ai.aiDebug.registerDebugInfoAboutUnit(u, agentName);
                         }
-                    }
+                    });
                 }
             }
         }
 
+        public override void PreUpdate()
+        {
+            numberSquadsExploring = 0;
+        }
+
+        public override void PostUpdate()
+        {
+            if (numberSquadsExploring < MaxExplorerSquads && numberSquadsExploring>0)
+            {
+                if (ai.Macro.canTakeArms() >= 2)
+                    ai.Macro.takeArms(2);
+            }
+        }
         static float angleDirection(Vector3 from, Vector3 initialTo, Vector3 newTo)
         {
             Vector3 referenceForward = (initialTo - from).normalized;
@@ -302,7 +347,7 @@ namespace Assets.Scripts.AI.Agents
         public override int getConfidence(Squad squad)
         {
             //Explorer agent has some confidence by default
-            confidence = CONFIDENCE_EXPLORER_BY_DEFAULT;
+            int confidence = CONFIDENCE_EXPLORER_BY_DEFAULT;
             
 			//If fow manager is not enabled this agent will never act
 			if (!fowManager.Enabled)
@@ -325,10 +370,15 @@ namespace Assets.Scripts.AI.Agents
 				}
 			}
 
-			if(allCivils)
+			if (allCivils)
 			{
 				confidence += CONFIDENCE_EXPLORER_ALL_CIVILS;
 			}
+            
+            if (numberSquadsExploring > MaxExplorerSquads)
+            {
+                confidence += CONFIDENCE_TOO_MANY_EXPLORING;
+            }
 
 			return confidence;
         }

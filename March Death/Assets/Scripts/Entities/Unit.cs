@@ -427,6 +427,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// 
     public void vanish()
     {
+        
         //Disable FOW
         if (GetComponent<FOWEntity>())
         {
@@ -487,7 +488,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     public void bringBack()
     {
-       
+
         if (GetComponent<FOWEntity>())
         {
             GetComponent<FOWEntity>().enabled = true;
@@ -517,7 +518,6 @@ public class Unit : GameEntity<Unit.Actions>
         if (GetComponent<DetourAgent>())
         {
             GetComponent<DetourAgent>().enabled = true;
-            GetComponent<DetourAgent>().AddToCrowd();
         }
         Component[] allRenderers = GetComponentsInChildren<Renderer>();
         foreach (Renderer r in allRenderers)
@@ -527,7 +527,6 @@ public class Unit : GameEntity<Unit.Actions>
         if (GetComponent<Selectable>())
         {
             GetComponent<Selectable>().enabled = true;
-            //GetComponent<Selectable>().SelectOnlyMe();
         }
     }
     /// <summary>
@@ -540,6 +539,9 @@ public class Unit : GameEntity<Unit.Actions>
 
         // Call GameEntity awake
         base.Awake();
+
+        // Get DetourAgent and set basic variables
+        _detourAgent = GetComponent<DetourAgent>();
     }
 
     /// <summary>
@@ -566,15 +568,13 @@ public class Unit : GameEntity<Unit.Actions>
             register(Actions.CREATED, res_pl.onStatisticsUpdate);
         }
 
-        statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -5);
-
-        fire(Actions.CREATED, statistics);
-
-        // Get DetourAgent and set basic variables
-        _detourAgent = GetComponent<DetourAgent>();
+        // Set detour params (can't be done until Start is done)
         _detourAgent.MaxSpeed = info.unitAttributes.movementRate * 5;
         _detourAgent.MaxAcceleration = info.unitAttributes.movementRate * 20;
         _detourAgent.UpdateParams();
+
+        statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -5);
+        fire(Actions.CREATED, statistics);
     }
 
     /// <summary>
@@ -659,7 +659,7 @@ public class Unit : GameEntity<Unit.Actions>
         }
 
         if (_projectileThrown) {
-            //Find a new position proportionally closer to the end, based on the moveTime
+            //Find a new position proportionally closer to the end, based on the projectileSpeed
             Vector3 newPostion = Vector3.MoveTowards(_projectile.transform.position, _projectileEndPoint, info.unitAttributes.projectileSpeed * Time.deltaTime);
 
             //Move the object to the new position.
@@ -732,9 +732,10 @@ public class Unit : GameEntity<Unit.Actions>
                     // method is triggered.
 
                     if (_target.info.race == this.race)
-                    {                      
+                    {
                         if (_distanceToTarget <= _target.info.resourceAttributes.trapRange)
-                        {
+                        
+                        {                   
                             _detourAgent.ResetPath();
                             setStatus(EntityStatus.IDLE);
                             _followingTarget = false;
@@ -746,9 +747,10 @@ public class Unit : GameEntity<Unit.Actions>
                     }
 
                     // Update destination only if target has moved
+                    Vector3 destination = _closestPointToTarget;
+
                     if (!isImmobile)
                     {
-                        Vector3 destination = _closestPointToTarget;
                         if ((destination - _movePoint).sqrMagnitude > SQR_UPDATE_DISTANCE)
                         {
                             // Try to predict next point!
@@ -773,6 +775,12 @@ public class Unit : GameEntity<Unit.Actions>
                         setStatus(EntityStatus.ATTACKING);
                         _followingTarget = false;
                         return;
+                    }
+                    else if(!isImmobile)
+                    {
+                        // Save move point
+                        _movePoint = destination;
+                        _detourAgent.MoveTo(destination);
                     }
                 }
 

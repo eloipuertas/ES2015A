@@ -14,13 +14,11 @@ namespace Assets.Scripts.AI.Agents
 
         int conf;
         float supremaciIndex;
-        float valOfCitizen;
 
         AssistAgent assistAgent;
 
         public AttackAgent(AIController ai, AssistAgent assist, string name) : base(ai, name)
         {
-            valOfCitizen = 1f;
 			if (ai.race == Storage.Races.ELVES)
 			{
 				_maxUnitRange = Storage.Info.get.of(Storage.Races.MEN, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;

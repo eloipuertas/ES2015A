@@ -20,7 +20,11 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     /// </summary>
     public BuildingTypes type = BuildingTypes.STRONGHOLD;
     public override E getType<E>() { return (E)Convert.ChangeType(type, typeof(E)); }
-
+    
+    /// <summary>
+    /// Used to store values returned from getObjectsNearPosition method.
+    /// </summary>
+    private GameObject[] nearObjects;
     private EntityStatus _defaultStatus = EntityStatus.BUILDING_PHASE_1;
     public override EntityStatus DefaultStatus
     {
@@ -40,7 +44,8 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     public T CREATE_UNIT { get; set; }
     public T BUILDING_FINISHED { get; set; }
     public T HEALTH_UPDATED { get; set; }
-
+    public T ADDED_QUEUE { get; set; }
+    
     private float _totalBuildTime = 0;
     private float _creationTimer = 0;
     private int _woundsBuildControl = 0;
@@ -113,8 +118,9 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         DESTROYED = (T)Enum.Parse(typeof(T), "DESTROYED", true);
         CREATE_UNIT = (T)Enum.Parse(typeof(T), "CREATE_UNIT", true);
         BUILDING_FINISHED = (T) Enum.Parse(typeof(T), "BUILDING_FINISHED", true);
-        HEALTH_UPDATED = (T)Enum.Parse(typeof(T), "HEALTH_UPDATED", true); 
-
+        HEALTH_UPDATED = (T)Enum.Parse(typeof(T), "HEALTH_UPDATED", true);
+        ADDED_QUEUE = (T)Enum.Parse(typeof(T), "ADDED_QUEUE", true);
+        
         // Call GameEntity start
         base.Awake();
     }
@@ -132,11 +138,11 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         _deploymentPoint = new Vector3(transform.position.x + 10, transform.position.y, transform.position.z + 10);
         activateFOWEntity();
 
-        /*if (DefaultStatus == EntityStatus.BUILDING_PHASE_1)
+        if (DefaultStatus == EntityStatus.BUILDING_PHASE_1)
         {
             _woundsReceived = info.buildingAttributes.wounds;
             _woundsBuildControl = info.buildingAttributes.wounds;
-        }*/
+        }
 
         //return (info.buildingAttributes.wounds - _woundsReceived) * 100f / info.buildingAttributes.wounds;
         // Set the status
@@ -165,7 +171,6 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
                 _woundsReceived -= diffWounds;
                 _woundsBuildControl = woundsBuilt;
                 fire(HEALTH_UPDATED);
-                Debug.Log("entra health");
             }
 
 			// TODO: What if we have more than 3 phases... maybe we should add the number of phases in the JSON, instead of harcoding it...
@@ -206,21 +211,40 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         }
     }
 
+    /// <summary>
+    /// Meeting point where new units walk from deployment point
+    /// </summary>
+    /// <returns>position of meetingpoint</returns>
+    public Vector3 getMeetingPoint()
+    {
+        Vector3 position = new Vector3();
+
+        position = ConstructionGrid.instance.getFreePositionAbleToConstructNearPoint(_center);
+
+        //Debug.Log("POS: " + position);
+        return position;
+
+    }
+
+    
     protected void createUnit(UnitTypes type)
     {
-
-        // TODO which position????
-        int xDisplacement = _totalUnits % 5;
-        int yDisplacement = _totalUnits / 5;
-        Vector3 unitPosition = new Vector3(_deploymentPoint.x + xDisplacement, _deploymentPoint.y, _deploymentPoint.z + yDisplacement);
-        GameObject gob = Info.get.createUnit(race, type, unitPosition, transform.rotation, -1);
-
-        Unit new_unit = gob.GetComponent<Unit>();
-
+        
+        
+        //Debug.Log("Meeting_Point: " + (getMeetingPoint() - _center));
+        
+        
+        GameObject gob = Info.get.createUnit(race, type, getMeetingPoint(), transform.rotation, -1);
+        Unit new_unit = gob.GetComponent<Unit>(); 
         BasePlayer.getOwner(this).addEntity(new_unit);
         fire(CREATE_UNIT, new_unit);
-
         _totalUnits++;
+        //Debug.Log("Meeting:" + getMeetingPoint());
+        //Debug.Log("Deploy: " + getDeploymentPoint());
+
+        gob.GetComponent<Unit>().moveTo(getMeetingPoint());
+        
+
     }
 
     public bool addUnitQueue(UnitTypes type)
@@ -228,6 +252,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         if (_creationQueue.Count < info.buildingAttributes.creationQueueCapacity)
         {
             _creationQueue.Enqueue(type);
+            fire(ADDED_QUEUE, type);
             return true;
         }
         else

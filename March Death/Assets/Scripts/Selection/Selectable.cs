@@ -80,6 +80,17 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
         if (currentlySelected)
         {
+            
+            // As this is an special case, let's first remove us form the squad
+            Unit unit = GetComponent<Unit>();
+            if (unit != null)
+            {
+                unit.Squad.RemoveUnit(unit);
+
+                // Now remove us from the squad, so that it doesn't get completely unselected
+                unit.Squad = null;
+            }
+            // Deselect now
             DeselectEntity();
         }
     }
@@ -188,8 +199,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         if (race == player.race)
         {
             Debug.Log("Unit died, deselecting and other stuff");
-            DeselectMe();
-
+            OnDisable();
         }
         else
         {

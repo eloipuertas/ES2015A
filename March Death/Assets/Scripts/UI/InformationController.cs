@@ -223,14 +223,17 @@ public partial class InformationController : MonoBehaviour
 	    {
 			unit.register(Unit.Actions.DAMAGED, onUnitDamaged);
 			unit.register(Unit.Actions.DIED, onUnitDied);
-		});
+            unit.register(Unit.Actions.HEALTH_UPDATED, onHealthUpdated);
+        });
 
 		entity.doIfResource(resource =>
 		{
 			resource.register(Resource.Actions.DAMAGED, onUnitDamaged);
 			resource.register(Resource.Actions.DESTROYED, onUnitDied);
             resource.register(Resource.Actions.CREATE_UNIT, onBuildingUnitCreated);
-			//resource.register(Resource.Actions.ADDED_QUEUE, onBuildingLoadNewUnit);
+            resource.register(Resource.Actions.ADDED_QUEUE, onBuildingLoadNewUnit);
+            resource.register(Resource.Actions.HEALTH_UPDATED, onHealthUpdated);
+            //resource.register(Resource.Actions.LOAD_UNIT, onBuildingUnitCreated);
         });
 
 		entity.doIfBarrack(building =>
@@ -238,7 +241,8 @@ public partial class InformationController : MonoBehaviour
 			building.register(Barrack.Actions.DAMAGED, onUnitDamaged);
 			building.register(Barrack.Actions.DESTROYED, onUnitDied);
             building.register(Barrack.Actions.CREATE_UNIT, onBuildingUnitCreated);
-			//resource.register(Barrack.Actions.ADDED_QUEUE, onBuildingLoadNewUnit);
+            building.register(Barrack.Actions.ADDED_QUEUE, onBuildingLoadNewUnit);
+            building.register(Barrack.Actions.HEALTH_UPDATED, onHealthUpdated);
             //TODO: reload actions on building created -> building.register(Barrack.Actions.BUILDING_FINISHED, reloadActionsPanel);
         });
     }
@@ -270,14 +274,17 @@ public partial class InformationController : MonoBehaviour
 		{
 			unit.unregister(Unit.Actions.DAMAGED, onUnitDamaged);
 			unit.unregister(Unit.Actions.DIED, onUnitDied);
-		});
+            unit.unregister(Unit.Actions.HEALTH_UPDATED, onHealthUpdated);
+        });
 
         entity.doIfResource(resource =>
         {
             resource.unregister(Resource.Actions.DAMAGED, onUnitDamaged);
             resource.unregister(Resource.Actions.DESTROYED, onUnitDied);
             resource.unregister(Resource.Actions.CREATE_UNIT, onBuildingUnitCreated);
-			//resource.unregister(Resource.Actions.ADDED_QUEUE, onBuildingLoadNewUnit);
+            resource.unregister(Resource.Actions.ADDED_QUEUE, onBuildingLoadNewUnit);
+            resource.unregister(Resource.Actions.HEALTH_UPDATED, onHealthUpdated);
+            //resource.unregister(Resource.Actions.ADDED_QUEUE, onBuildingLoadNewUnit);
 
             currentResource = null;
             DestroyUnitCreationButtons();
@@ -288,23 +295,34 @@ public partial class InformationController : MonoBehaviour
             building.unregister(Barrack.Actions.DAMAGED, onUnitDamaged);
             building.unregister(Barrack.Actions.DESTROYED, onUnitDied);
             building.unregister(Barrack.Actions.CREATE_UNIT, onBuildingUnitCreated);
-			//resource.unregister(Barrack.Actions.ADDED_QUEUE, onBuildingLoadNewUnit);
+            building.unregister(Barrack.Actions.ADDED_QUEUE, onBuildingLoadNewUnit);
+            building.unregister(Barrack.Actions.HEALTH_UPDATED, onHealthUpdated);
             //building.unregister(Barrack.Actions.BUILDING_FINISHED, reloadActionsPanel);
 
-			currentBarrack = null;
+            currentBarrack = null;
 			DestroyUnitCreationButtons();
         });
     }
 
-	public void onUnitDamaged(System.Object obj)
-	{
-		GameObject gameObject = (GameObject) obj;
-		IGameEntity entity = gameObject.GetComponent<IGameEntity> ();
-		sliderActorHealth.value = entity.healthPercentage;
-		txtActorHealth.text = Math.Ceiling(entity.healthPercentage).ToString () + "/100";
-	}
+    public void onUnitDamaged(System.Object obj)
+    {
+        updateHealth(obj);
+    }
 
-	public void onUnitDied(System.Object obj)
+    public void onHealthUpdated(System.Object obj)
+    {
+        updateHealth(obj);
+    }
+
+    public void updateHealth(System.Object obj)
+    {
+        GameObject gameObject = (GameObject)obj;
+        IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+        sliderActorHealth.value = entity.healthPercentage;
+        txtActorHealth.text = Math.Ceiling(entity.healthPercentage).ToString() + "/100";
+    }
+
+    public void onUnitDied(System.Object obj)
 	{
 		HideInformation ();
 	}
@@ -349,7 +367,7 @@ public partial class InformationController : MonoBehaviour
 
         GameObject buttonObject = new GameObject(buttonName);
         Image image = buttonObject.AddComponent<Image>();
-        image.transform.parent = canvas.transform;
+        image.transform.SetParent(canvas.transform, false);
         image.rectTransform.sizeDelta = size * 0.9f;
         image.rectTransform.position = center;
         if (buttonImage != null)
@@ -369,7 +387,7 @@ public partial class InformationController : MonoBehaviour
         }
 
         GameObject textObject = new GameObject(textName);
-        textObject.transform.parent = buttonObject.transform;
+        textObject.transform.SetParent(buttonObject.transform, false);
         Text lblText = textObject.AddComponent<Text>();
         lblText.rectTransform.sizeDelta = size * 0.9f;
         lblText.rectTransform.position = center;
