@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class HUDPopulationInfo : MonoBehaviour
 {
-    public bool onShow; // to show if info is shown
-    public bool UnitsMarked; // units (true) or buildings (false) are displayed.
+    public static bool  onShow; // to show if info is shown
+    public static bool UnitsMarked; // units (true) or buildings (false) are displayed.
 
     private float REPAINT_TIME = 0.3f;
     private float _timer = 0.3f;
@@ -17,8 +17,8 @@ public class HUDPopulationInfo : MonoBehaviour
     private GameObject container;
     private GameObject canvasUnits;
     private GameObject canvasBuildings;
-    private Canvas cUnits;
-    private Canvas cBuildings;
+    private static Canvas cUnits;
+    private static Canvas cBuildings;
     private List<Text> building;
     private List<Text> unit;
     private List<Text> building_val;
@@ -44,7 +44,7 @@ public class HUDPopulationInfo : MonoBehaviour
         SetupBuildingCanvas();
 
         cBuildings.enabled = false;
-        onShow = true;
+        cUnits.enabled = false;
     }
 	
 	// Update is called once per frame
@@ -65,7 +65,7 @@ public class HUDPopulationInfo : MonoBehaviour
     /// Toggles the current info between units and building
     /// if thy are being shown.
     /// </summary>
-    public void Toggle()
+    public static void Toggle()
     {
         if (onShow)
         {
@@ -78,13 +78,18 @@ public class HUDPopulationInfo : MonoBehaviour
     /// <summary>
     /// Toggles the current info panel between being shown and not.
     /// </summary>
-    public void ToggleVision()
+    public static void ToggleVision()
     {
         onShow ^= true;
 
         if (onShow)
+        {
             cUnits.enabled = true;
-        else {
+            cBuildings.enabled = false;
+            UnitsMarked = true;
+        }
+        else
+        {
             if (UnitsMarked) cUnits.enabled = false;
             else cBuildings.enabled = false;
         }
@@ -130,7 +135,7 @@ public class HUDPopulationInfo : MonoBehaviour
 
     private void initializeContainer()
     {
-        windowInfo = GameObject.Find("HUD/windowInfo");
+        windowInfo = GameObject.Find("HUD/populationInfo");
         container = new GameObject("container");
         container.AddComponent<RectTransform>();
         
