@@ -50,7 +50,7 @@ public class GameInformation : MonoBehaviour
     {
         // TODO: reload different hud while playing
         //if (currentHud) Destroy(currentHud);
-        Debug.LogError("Creando el hud");
+        //Debug.LogError("Creando el hud");
         switch (playerRace)
         {
             case Races.ELVES:
