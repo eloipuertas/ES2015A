@@ -221,36 +221,22 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     {
         Vector3 position = new Vector3();
 
-        Vector2 dimension = new Vector2(15F, 15F);
-        ConstructionGrid grid = new ConstructionGrid();
-        grid.setNewGridDimensions(dimension);
-        position = grid.getFreePositionAbleToConstructNearPoint(_center);
-        Debug.Log("POS: " + position);
+        position = ConstructionGrid.instance.getFreePositionAbleToConstructNearPoint(_center);
+
+        //Debug.Log("POS: " + position);
         return position;
 
     }
 
-    public Vector3 getDeploymentPoint()
-    {
-
-        Vector3 position = new Vector3();
-
-        Vector2 dimension = new Vector2(5F, 5F);
-        ConstructionGrid grid = new ConstructionGrid();
-        
-        grid.setNewGridDimensions(dimension);
-        position = grid.getFreePositionAbleToConstructNearPoint(_center);
-
-        return position;
-    }
+    
     protected void createUnit(UnitTypes type)
     {
         
         
         //Debug.Log("Meeting_Point: " + (getMeetingPoint() - _center));
         
-        Vector3 unitPosition = getDeploymentPoint();
-        GameObject gob = Info.get.createUnit(race, type, unitPosition, transform.rotation, -1);
+        
+        GameObject gob = Info.get.createUnit(race, type, getMeetingPoint(), transform.rotation, -1);
         Unit new_unit = gob.GetComponent<Unit>(); 
         BasePlayer.getOwner(this).addEntity(new_unit);
         fire(CREATE_UNIT, new_unit);
