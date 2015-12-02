@@ -239,40 +239,25 @@ namespace Assets.Scripts.AI.Agents
 
                 if (lostHero)
                 {
-                    squad.MoveTo(heroLastPos);
-                }
-                else
-                {
-                    targetPos.y = terrain.SampleHeight(targetPos);
-                    squad.MoveTo(targetPos);
-                }
-
-                /*
-                // If we have a point, move there
-                foreach (Unit u in squad.Units)
-                {
-                    if (lostHero)
+                    squad.MoveTo(heroLastPos, u =>
                     {
-                        u.moveTo(heroLastPos);
-                    }
-                    else if (result)
-                    {
-                        u.moveTo(targetPos);
-
                         if (AIController.AI_DEBUG_ENABLED)
                         {
                             ai.aiDebug.registerDebugInfoAboutUnit(u, agentName);
                         }
-                    }
-                    else
+                    });
+                }
+                else
+                {
+                    targetPos.y = terrain.SampleHeight(targetPos);
+                    squad.MoveTo(targetPos, u =>
                     {
                         if (AIController.AI_DEBUG_ENABLED)
                         {
-                            ai.aiDebug.registerDebugInfoAboutUnit(u, agentName + " -> No Target");
+                            ai.aiDebug.registerDebugInfoAboutUnit(u, agentName);
                         }
-                    }
+                    });
                 }
-                */
             }
         }
 
