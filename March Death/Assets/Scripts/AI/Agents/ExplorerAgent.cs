@@ -118,15 +118,6 @@ namespace Assets.Scripts.AI.Agents
 
             if (fowManager.Enabled)
             {
-                /*
-                TODO: takeArms Explorer
-                if (squad.units.Count < 2)
-                {
-                    int num = 2 - squad.Units.Count();
-                    if (ai.Macro.canTakeArms() >= num)
-                        ai.Macro.takeArms(num);
-                }
-                */
                 bool lostHero = (heroLastPos != Vector3.zero && !heroVisible);
 
                 // Static values
@@ -264,6 +255,14 @@ namespace Assets.Scripts.AI.Agents
             numberSquadsExploring = 0;
         }
 
+        public override void PostUpdate()
+        {
+            if (numberSquadsExploring < MaxExplorerSquads && numberSquadsExploring>0)
+            {
+                if (ai.Macro.canTakeArms() >= 2)
+                    ai.Macro.takeArms(2);
+            }
+        }
         static float angleDirection(Vector3 from, Vector3 initialTo, Vector3 newTo)
         {
             Vector3 referenceForward = (initialTo - from).normalized;
@@ -375,8 +374,7 @@ namespace Assets.Scripts.AI.Agents
 			{
 				confidence += CONFIDENCE_EXPLORER_ALL_CIVILS;
 			}
-
-
+            
             if (numberSquadsExploring > MaxExplorerSquads)
             {
                 confidence += CONFIDENCE_TOO_MANY_EXPLORING;

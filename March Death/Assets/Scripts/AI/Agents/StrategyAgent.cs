@@ -21,9 +21,8 @@ namespace Assets.Scripts.AI.Agents
         /// </summary>
         Stack<int> timings;
         bool attacking;
-        Vector3 targetPos;
-        ///TODO: temp variable until we have patrolls
-        Vector3 basePosition;
+        IGameEntity target;
+        List<Vector3> patrolPoints;
         System.Random rnd;
         public StrategyAgent(AIController ai, AssistAgent assist, string name) : base(ai, name)
         {
@@ -34,23 +33,49 @@ namespace Assets.Scripts.AI.Agents
             timings.Push(rnd.Next(400, 600));
             if (rnd.Next(0, 9) < 3) //add a rush
                 timings.Push(rnd.Next(60,100));
-            timings.Push(20);
-            basePosition = ai.rootBasePosition + new Vector3(50, 0, 50);
-            targetPos = basePosition;
+            patrolPoints = ai.Macro.architect.baseCriticPoints;
             attacking = false;
         }
         public override void controlUnits(Squad squad)
         {
-            foreach(Unit u in squad.Units)
+            if (attacking)
             {
-                if (Vector3.Distance(u.transform.position, targetPos) > 20)
+                if(target.status != EntityStatus.DESTROYED)
                 {
-                    u.moveTo(targetPos);
+                    squad.AttackTo(target);
                 }
-                if (AIController.AI_DEBUG_ENABLED)
+                else
+                {
+                    findTarget();
+                }
+            }
+            else
+            {
+                int posInd = squad.PatrolPosition;
+                Vector3 targetPos = patrolPoints[posInd];
+                Vector2 sc = squad.BoundingBox.Bounds.center;
+                if (Vector3.Distance(new Vector3(sc.x, targetPos.y, sc.y), targetPos) < 5)
+                {
+                    //Got to the destination, let's go for the next one
+                    if (posInd >= patrolPoints.Count-1)
+                    {
+                        posInd = 0;
+                    }
+                    else
+                    {
+                        posInd++;
+                    }
+                    targetPos = patrolPoints[posInd];
+                    squad.PatrolPosition = posInd;
+                }
+                squad.MoveTo(targetPos);
+            }
+            if (AIController.AI_DEBUG_ENABLED)
+            {
+                foreach (Unit u in squad.Units)
                 {
                     ai.aiDebug.registerDebugInfoAboutUnit(u, agentName);
-                }
+                }                
             }
         }
 
@@ -79,20 +104,11 @@ namespace Assets.Scripts.AI.Agents
                 }
                 if(armyValue > (EarmyValue * 1.1))
                 {
-                    if(!attacking)
+                    if (!attacking)
                     {
                         //If we aren't already attacking we find a target to attack 
                         attacking = true;
-                        int eBuild = ai.EnemyBuildings.Count;
-                        if (eBuild > 0)
-                        {
-                            targetPos = ai.EnemyBuildings[rnd.Next(0, eBuild)].closestPointTo(ai.rootBasePosition);
-                        }
-                        else
-                        {
-                            //If we haven't found any enemy building we can't attack this time
-                            RemovePush();
-                        }
+                        findTarget();
                     }
                 }
                 //We are attacking but the other army is bigger than ours
@@ -102,9 +118,21 @@ namespace Assets.Scripts.AI.Agents
                 }
             }       
         }
-        public void RemovePush()
+        private void findTarget()
         {
-            targetPos = basePosition;
+            int eBuild = ai.EnemyBuildings.Count;
+            if (eBuild > 0)
+            {
+                target = ai.EnemyBuildings[rnd.Next(0, eBuild)];
+            }
+            else
+            {
+                //If we haven't found any enemy building we can't attack this time
+                RemovePush();
+            }
+        }
+        private void RemovePush()
+        {
             attacking = false;
             //If we have a bigger timer to attack we delete this timing, as it was clearly unsuccsefull
             if (timings.Count > 1)

@@ -284,7 +284,7 @@ public class Player : BasePlayer
             Resource resourcesBuilding = (Resource) entity;
             resourcesBuilding.unregister(Resource.Actions.DAMAGED, events.DisplayUnderAttack);
             resourcesBuilding.unregister(Resource.Actions.DESTROYED, events.DisplayBuildingDestroyed);
-            resourcesBuilding.unregister(Barrack.Actions.BUILDING_FINISHED, events.DisplayBuildingCreated);
+            resourcesBuilding.unregister(Resource.Actions.BUILDING_FINISHED, events.DisplayBuildingCreated);
             resourcesBuilding.unregister(Resource.Actions.CREATE_UNIT, OnUnitCreated);
         }
         else if (entity.info.isUnit)
