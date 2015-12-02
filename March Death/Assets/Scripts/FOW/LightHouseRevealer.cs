@@ -137,7 +137,7 @@ class LightHouseRevealer : MonoBehaviour
         IGameEntity entity = obj.GetComponent<IGameEntity>();
         if (entity != null)
         {
-            if (IsEnemy(entity))
+            if (IsEnemy(entity) && entity.status != EntityStatus.DEAD)
             {
                 _target = obj;
                 _lastTargetPosition = _target.transform.position;
