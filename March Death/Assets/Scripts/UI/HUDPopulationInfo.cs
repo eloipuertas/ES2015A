@@ -220,10 +220,10 @@ public class HUDPopulationInfo : MonoBehaviour
             GameObject newText = new GameObject(bKeys[i]);
             newText.layer = 5; // UI LAYER
             newText.AddComponent<Text>();
-            newText.transform.Translate(0, maxY / 2 - i * step - 25, 0); // raul_hack
+            newText.transform.Translate(0, maxY / 2 - i * (step+2) - 25, 0); // raul_hack
             newText.GetComponent<RectTransform>().SetParent(cBuildings.GetComponent<RectTransform>(), false);
             building.Add(newText.GetComponent<Text>());
-            building[i] = SetupText(building[i], bKeys[i], 8);
+            building[i] = SetupText(building[i], bKeys[i], 6);
         }
 
         List<string> l = PopulationInfo.get.GetBuildingValues();
@@ -233,10 +233,10 @@ public class HUDPopulationInfo : MonoBehaviour
             GameObject newText = new GameObject(bKeys[i]);
             newText.layer = 5; // UI LAYER
             newText.AddComponent<Text>();
-            newText.transform.Translate(0, maxY / 2 - i * step - 40, 0); // raul_hack
+            newText.transform.Translate(0, maxY / 2 - i * (step+2) - 35, 0); // raul_hack
             newText.GetComponent<RectTransform>().SetParent(cBuildings.GetComponent<RectTransform>(), false);
             building_val.Add(newText.GetComponent<Text>());
-            building_val[i] = SetupText(building_val[i], l[i].ToString(), 15);
+            building_val[i] = SetupText(building_val[i], l[i].ToString(), 12);
         }
     }
 
