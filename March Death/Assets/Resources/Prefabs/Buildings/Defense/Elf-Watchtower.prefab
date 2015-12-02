@@ -2223,6 +2223,7 @@ GameObject:
   - 114: {fileID: 11434178}
   - 114: {fileID: 11409626}
   - 114: {fileID: 11427206}
+  - 114: {fileID: 11498060}
   m_Layer: 0
   m_Name: Elf-Watchtower
   m_TagString: Untagged
@@ -5039,6 +5040,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsActor: 1
   Range: 50
+--- !u!114 &11498060
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 185688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40d423a6be68c17458a847c1bf328e80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 1
+  type: 8
+  gender: 0
+  _distanceToTarget: 0
 --- !u!135 &13508944
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -7630,7 +7646,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: type
-      value: 10
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: race

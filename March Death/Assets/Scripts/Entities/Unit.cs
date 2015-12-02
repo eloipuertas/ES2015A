@@ -111,6 +111,14 @@ public class Unit : GameEntity<Unit.Actions>
         }
     }
 
+    public bool isImmobile
+    {
+        get
+        {
+            return info.unitAttributes.movementRate == 0;
+        }
+    }
+
     /// <summary>
     /// Max. euclidean distance to the target
     /// </summary>
@@ -621,7 +629,10 @@ public class Unit : GameEntity<Unit.Actions>
                 if (_target != null)
                 {
                     // Look at it
-                    faceTo(_closestPointToTarget);
+                    if (!isImmobile)
+                    {
+                        faceTo(_closestPointToTarget);
+                    }
 
                     // Check if we are still in range
                     if (_distanceToTarget > currentAttackRange())
@@ -732,20 +743,27 @@ public class Unit : GameEntity<Unit.Actions>
                             return;
                         }
                        
-                    } 
-                    // Update destination only if target has moved
-                    Vector3 destination = _closestPointToTarget;
-                    if ((destination - _movePoint).sqrMagnitude > SQR_UPDATE_DISTANCE)
-                    {
-                        // Try to predict next point!
-                        if (_target.info.isUnit)
-                        {
-                            destination = _closestPointToTarget + ((Unit)_target).Agent.Velocity.normalized * (float)Math.Sqrt(SQR_UPDATE_DISTANCE);
-                        }
+                    }
 
-                        // Save move point
-                        _movePoint = destination;
-                        _detourAgent.MoveTo(destination);
+                    // Update destination only if target has moved
+                    if (!isImmobile)
+                    {
+                        Vector3 destination = _closestPointToTarget;
+                        if ((destination - _movePoint).sqrMagnitude > SQR_UPDATE_DISTANCE)
+                        {
+                            // Try to predict next point!
+                            _target.doIfUnit(u =>
+                            {
+                                if (!u.isImmobile)
+                                {
+                                    destination = _closestPointToTarget + u.Agent.Velocity.normalized * (float)Math.Sqrt(SQR_UPDATE_DISTANCE);
+                                }
+                            });
+
+                            // Save move point
+                            _movePoint = destination;
+                            _detourAgent.MoveTo(destination);
+                        }
                     }
 
                     // If we are already close enough, stop and attack
