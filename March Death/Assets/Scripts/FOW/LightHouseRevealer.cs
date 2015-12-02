@@ -59,17 +59,7 @@ class LightHouseRevealer : MonoBehaviour
             transform.RotateAround(_center, rotateDirection, RevealerAngleStep);
             _light.transform.LookAt(transform);
         }
-        /*
-        else if (_target) 
-        {
-            // checks if the target is moving by comparing the last and the current position, so we need to readjust the orbitation
-            if (_lastTargetPosition != _target.transform.position)
-            {
-                _orbitating = true;
-                return;
-            }
-        }
-        */
+
         if (_target)
         {
             Debug.DrawLine(transform.parent.position,_target.transform.position, Color.yellow);
@@ -142,6 +132,7 @@ class LightHouseRevealer : MonoBehaviour
                 _target = obj;
                 _lastTargetPosition = _target.transform.position;
                 _attacker.attackTarget(entity);
+                RegisterEvents(entity);
             }
 
         }
@@ -155,16 +146,14 @@ class LightHouseRevealer : MonoBehaviour
     {
         GameObject obj = col.gameObject;
         IGameEntity entity = obj.GetComponent<IGameEntity>();
-        if (entity != null)
+        if (_target)
         {
-            if (IsEnemy(entity))
+            if (entity == _target.GetComponent<IGameEntity>())
             {
-                _target = null;
-                _orbitating = true;
-                _attacker.stopAttack();
-                RestartLastPosition();
+                
+                PerformUnitDiedOrOutOfBounds();
+                UnregisterEvents(entity);
             }
-
         }
     }
 
@@ -228,6 +217,34 @@ class LightHouseRevealer : MonoBehaviour
 
         return (entity.info.isUnit && entity.info.race != _race);
         //return entity.info.isUnit;
+    }
+
+
+    public void RegisterEvents(IGameEntity entity)
+    {
+
+        Unit unit = (Unit)entity;
+        unit.register(Unit.Actions.DIED, OnUnitDied);
+    }
+
+    public void UnregisterEvents(IGameEntity entity)
+    {
+        Unit unit = (Unit)entity;
+        unit.unregister(Unit.Actions.DIED, OnUnitDied);
+    }
+
+    public void OnUnitDied(object obj)
+    {
+        IGameEntity entity = ((GameObject)obj).GetComponent<IGameEntity>();
+        UnregisterEvents(entity);
+    }
+
+    private void PerformUnitDiedOrOutOfBounds()
+    {
+        _target = null;
+        _orbitating = true;
+        _attacker.stopAttack();
+        RestartLastPosition();
     }
 }
 
