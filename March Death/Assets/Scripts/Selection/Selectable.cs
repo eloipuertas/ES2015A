@@ -196,8 +196,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         if (race == player.race)
         {
             Debug.Log("Unit died, deselecting and other stuff");
-            DeselectMe();
-
+            OnDisable();
         }
         else
         {
