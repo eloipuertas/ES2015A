@@ -59,6 +59,17 @@ public sealed class Squad : BareObserver<Squad.Actions>
             return ((SmelledEnemies)_data[DataType.SMELLED_ENEMIES]).Value;
         }
     }
+    public int PatrolPosition
+    {
+        get
+        {
+            return ((PatrolData)_data[DataType.PATROL_DATA]).PatrolPosition;
+        }
+        set
+        {
+            ((PatrolData)_data[DataType.PATROL_DATA]).PatrolPosition = value;
+        }
+    }
 
     private Storage.Races _race;
     public Storage.Races Race
@@ -87,6 +98,7 @@ public sealed class Squad : BareObserver<Squad.Actions>
 
         _data.Add(DataType.BOUNDING_BOX, new BoundingBox(this));
         _data.Add(DataType.ATTACK_VALUE, new AttackValue(this));
+        _data.Add(DataType.PATROL_DATA, new PatrolData(this));
 
         // Smelled squads can not smell enemies or we would run into endless recursion
         if (smellEnemies)
@@ -288,7 +300,7 @@ public sealed class SquadUpdater : GameEntity<SquadUpdater.DummyActions>
     }
 }
 
-public enum DataType { BOUNDING_BOX, ATTACK_VALUE, SMELLED_ENEMIES }
+public enum DataType { BOUNDING_BOX, ATTACK_VALUE, SMELLED_ENEMIES, PATROL_DATA }
 
 public interface ISquadData
 {
@@ -424,5 +436,18 @@ public class SmelledEnemies : SquadData<Squad>
             _enemySquad.UpdateUnits(enemyUnits);
             _enemySquad.Update();
         }
+    }
+}
+
+public class PatrolData : SquadData<int>
+{
+    public int PatrolPosition { get; set; }
+    public override int Value { get { return PatrolPosition; } }
+    public PatrolData(Squad squad) : base(squad) {
+        PatrolPosition = 0;
+    }
+    public override void Update(List<Unit> units)
+    {
+        //updated externally
     }
 }
