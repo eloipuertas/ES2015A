@@ -283,6 +283,12 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         // TODO: Should this be automatically handled with events?
         BasePlayer.getOwner(this).removeEntity(this);
 
+        // Stop detour agent
+        if (info.isUnit)
+        {
+            GetComponent<DetourAgent>().enabled = false;
+        }
+
         // Play dead and/or destroy
         Destroy(this.gameObject, immediately ? 0.0f : 5.0f);
     }
