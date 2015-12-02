@@ -186,12 +186,20 @@ public partial class UserInput : MonoBehaviour
                     {
                         sManager.AttackTo(entity);
                     }
-                    else if(entity.info.isResource
+                    else if (entity.info.isResource
                             && (entity.status == EntityStatus.IDLE
                             || entity.status == EntityStatus.WORKING))
                     {
                         sManager.Enter(entity);
                     }
+                    else // HACK!! go there to by the point in the terrain
+                    {
+                        sManager.MoveTo(Layer.get.PointIn(Layer.Layers.TERRAIN));
+                    }
+                }
+                else // COMBO HACK go there to by the point in the terrain
+                {
+                    sManager.MoveTo(Layer.get.PointIn(Layer.Layers.TERRAIN));
                 }
             }
         }
@@ -219,12 +227,32 @@ public partial class UserInput : MonoBehaviour
 
     private void Select()
     {
+        GameObject hitObject;
+        IGameEntity selectedObject;
 
-        //Select if exists unit
-        GameObject hitObject = FindHitObject();
-        if (hitObject)
+        //HACK, first checks if there is a unit there
+        if (Layer.get.IsUnit())
         {
-            IGameEntity selectedObject = hitObject.GetComponent<IGameEntity>();
+
+            hitObject = Layer.get.Unit();
+            selectedObject = hitObject.GetComponent<IGameEntity>();
+
+            if (sManager.CanBeSelected(selectedObject))
+            {
+                Deselect();
+                sManager.Select(selectedObject);
+                player.setCurrently(Player.status.SELECTED_UNITS);
+            }
+            else
+            {
+                Deselect();
+
+
+            }
+        }
+        else if ((hitObject = FindHitObject()))
+        {
+            selectedObject = hitObject.GetComponent<IGameEntity>();
 
             // We just be sure that is a selectable object
             if (selectedObject != null)
