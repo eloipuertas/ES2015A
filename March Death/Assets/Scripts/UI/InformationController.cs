@@ -80,8 +80,15 @@ public partial class InformationController : MonoBehaviour
         creationQueueButtonSize = new Vector2(scaledUnitCreationPanel.x / 5, scaledUnitCreationPanel.y);
         creationQueueInitialPoint = new Vector2(newcenter.x - scaledUnitCreationPanel.x, newcenter.y + scaledUnitCreationPanel.y);
 
+        //Inicializate windows extended info
+        windowInfo = GameObject.Find("HUD/windowInfo");
+        ArialFont = (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf");
+        currentTitles = new List<GameObject>();
+        currentValues = new List<GameObject>();
+
         //Default is hidden
         HideInformation();
+        hideExtendedInformationPanel();
 	}
 
 	private void ShowInformation(GameObject gameObject)
@@ -224,6 +231,8 @@ public partial class InformationController : MonoBehaviour
 			unit.register(Unit.Actions.DAMAGED, onUnitDamaged);
 			unit.register(Unit.Actions.DIED, onUnitDied);
             unit.register(Unit.Actions.HEALTH_UPDATED, onHealthUpdated);
+            displayInformationForUnit(entity);
+
         });
 
 		entity.doIfResource(resource =>
@@ -233,6 +242,7 @@ public partial class InformationController : MonoBehaviour
             resource.register(Resource.Actions.CREATE_UNIT, onBuildingUnitCreated);
             resource.register(Resource.Actions.ADDED_QUEUE, onBuildingLoadNewUnit);
             resource.register(Resource.Actions.HEALTH_UPDATED, onHealthUpdated);
+            displayInformationForResource(resource);
             //resource.register(Resource.Actions.LOAD_UNIT, onBuildingUnitCreated);
         });
 
@@ -244,6 +254,7 @@ public partial class InformationController : MonoBehaviour
             building.register(Barrack.Actions.ADDED_QUEUE, onBuildingLoadNewUnit);
             building.register(Barrack.Actions.HEALTH_UPDATED, onHealthUpdated);
             //TODO: reload actions on building created -> building.register(Barrack.Actions.BUILDING_FINISHED, reloadActionsPanel);
+            displayInformationForStronghold(entity);
         });
     }
 
@@ -262,6 +273,8 @@ public partial class InformationController : MonoBehaviour
     public void onUnitDeselected(System.Object obj)
 	{
 		GameObject gameObject = (GameObject)obj;
+        hideExtendedInformationPanel();
+
 
         // Hide all info
         DestroyButtons();
@@ -337,6 +350,18 @@ public partial class InformationController : MonoBehaviour
     {
         char separator = '/';
         string path = IMAGES_PATH + separator + entity.getRace() + "_" + entity.info.name;
+
+        Unit.Gender gender;
+        if (entity.info.name == "Civil") {
+            entity.doIfUnit(unit =>
+                            {
+                gender = unit.gender;
+                 if (gender == Unit.Gender.FEMALE) {
+                    path = IMAGES_PATH + separator + entity.getRace() + "_" + entity.info.name + "_woman";
+                }
+            });
+        } 
+         
         Texture2D texture = (Texture2D)Resources.Load(path);
         if (texture)
         {
