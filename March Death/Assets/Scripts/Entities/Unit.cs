@@ -510,7 +510,6 @@ public class Unit : GameEntity<Unit.Actions>
         if (GetComponent<DetourAgent>())
         {
             GetComponent<DetourAgent>().enabled = true;
-            GetComponent<DetourAgent>().AddToCrowd();
         }
         Component[] allRenderers = GetComponentsInChildren<Renderer>();
         foreach (Renderer r in allRenderers)
@@ -520,7 +519,6 @@ public class Unit : GameEntity<Unit.Actions>
         if (GetComponent<Selectable>())
         {
             GetComponent<Selectable>().enabled = true;
-            //GetComponent<Selectable>().SelectOnlyMe();
         }
     }
     /// <summary>

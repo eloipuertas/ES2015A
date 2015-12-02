@@ -46,7 +46,7 @@ void dtFreeCrowd(dtCrowd* ptr)
 }
 
 
-static const int MAX_ITERS_PER_UPDATE = 100;
+static const int MAX_ITERS_PER_UPDATE = 512;
 
 static const int MAX_PATHQUEUE_NODES = 4096;
 static const int MAX_COMMON_NODES = 512;
@@ -417,7 +417,7 @@ bool dtCrowd::init(const int maxAgents, const float maxAgentRadius, dtNavMesh* n
 		params->adaptiveDepth = 5;
 	}
 	// Allocate temp buffer for merging paths.
-	m_maxPathResult = 256;
+	m_maxPathResult = 1024;
 	m_pathResult = (dtPolyRef*)dtAlloc(sizeof(dtPolyRef)*m_maxPathResult, DT_ALLOC_PERM);
 	if (!m_pathResult)
 		return false;
@@ -670,7 +670,7 @@ int dtCrowd::getActiveAgents(dtCrowdAgent** agents, const int maxAgents)
 
 void dtCrowd::updateMoveRequest(const float /*dt*/)
 {
-	const int PATH_MAX_AGENTS = 8;
+	const int PATH_MAX_AGENTS = 1024;
 	dtCrowdAgent* queue[PATH_MAX_AGENTS];
 	int nqueue = 0;
 	
@@ -691,13 +691,13 @@ void dtCrowd::updateMoveRequest(const float /*dt*/)
 			const int npath = ag->corridor.getPathCount();
 			dtAssert(npath);
 
-			static const int MAX_RES = 32;
+			static const int MAX_RES = 1024;
 			float reqPos[3];
 			dtPolyRef reqPath[MAX_RES];	// The path to the request location
 			int reqPathCount = 0;
 
 			// Quick search towards the goal.
-			static const int MAX_ITER = 20;
+			static const int MAX_ITER = 512;
 			m_navquery->initSlicedFindPath(path[0], ag->targetRef, ag->npos, ag->targetPos, &m_filters[ag->params.queryFilterType]);
 			m_navquery->updateSlicedFindPath(MAX_ITER, 0);
 			dtStatus status = 0;
@@ -904,7 +904,7 @@ void dtCrowd::updateTopologyOptimization(dtCrowdAgent** agents, const int nagent
 		return;
 	
 	const float OPT_TIME_THR = 0.5f; // seconds
-	const int OPT_MAX_AGENTS = 1;
+	const int OPT_MAX_AGENTS = 16;
 	dtCrowdAgent* queue[OPT_MAX_AGENTS];
 	int nqueue = 0;
 	
@@ -933,7 +933,7 @@ void dtCrowd::updateTopologyOptimization(dtCrowdAgent** agents, const int nagent
 
 void dtCrowd::checkPathValidity(dtCrowdAgent** agents, const int nagents, const float dt)
 {
-	static const int CHECK_LOOKAHEAD = 10;
+	static const int CHECK_LOOKAHEAD = 128;
 	static const float TARGET_REPLAN_DELAY = 1.0; // seconds
 	
 	for (int i = 0; i < nagents; ++i)

@@ -374,7 +374,7 @@ public class BoundingBox : SquadData<BoundingBox.BoundingBoxHolder>
         {
             Rect boundingBox = CalculateOf(units);
             _boundingBox.Bounds = boundingBox;
-            _boundingBox.MaxLongitude = boundingBox.width > boundingBox.height ? boundingBox.width : boundingBox.height;
+            _boundingBox.MaxLongitude = boundingBox.width > boundingBox.height ? boundingBox.height : boundingBox.width;
             _boundingBox.MaxLongitude = _boundingBox.MaxLongitude < 1f ? 1f : _boundingBox.MaxLongitude;
 
             _needsUpdate = false;

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using Utils;
 using Pathfinding;
@@ -40,6 +38,7 @@ namespace Assets.Scripts.AI.Agents
         bool heroVisible;
 		bool allCivils;
 
+        Terrain terrain;
         AssistAgent assistAgent;
         FOWManager fowManager;
 
@@ -101,6 +100,7 @@ namespace Assets.Scripts.AI.Agents
             
 
             heroVisible = false;
+            terrain = Terrain.activeTerrain;
             fowManager = FOWManager.Instance;
             heroLastPos = Vector3.zero;
             assistAgent = assist;
@@ -118,7 +118,7 @@ namespace Assets.Scripts.AI.Agents
 
             if (fowManager.Enabled)
             {
-                bool lostHero = (heroLastPos != Vector3.zero && !heroVisible && squad.Units.Count > 0);
+                bool lostHero = (heroLastPos != Vector3.zero && !heroVisible);
 
                 // Static values
                 FOWManager.visible[] grid = fowManager.aiVision;
@@ -126,7 +126,14 @@ namespace Assets.Scripts.AI.Agents
 
                 // Get a random unit as a reference point
                 Unit reference = squad.Units[D6.get.rollN(squad.Units.Count)];
-                DetourAgent agent = reference.GetComponent<DetourAgent>();
+                DetourAgent agent = reference.Agent;
+
+                if (agent.TargetState == DetourAgent.MoveRequestState.DT_CROWDAGENT_TARGET_REQUESTING ||
+                    agent.TargetState == DetourAgent.MoveRequestState.DT_CROWDAGENT_TARGET_WAITING_FOR_PATH ||
+                    agent.TargetState == DetourAgent.MoveRequestState.DT_CROWDAGENT_TARGET_WAITING_FOR_QUEUE)
+                {
+                    return;
+                }
 
                 // Check if target is already explored
                 Vector3 direction = (agent.TargetPoint - reference.transform.position).normalized;
@@ -188,7 +195,7 @@ namespace Assets.Scripts.AI.Agents
                 switch (reschedule)
                 {
                     case RescheduleType.NONE:
-                        break;
+                        return;
 
                     case RescheduleType.RANDOM_IN_DIRECTION:
                         result = findPlaceToExplore(grid, gridSize, out targetPos, true, reference.transform.position, agent.TargetPoint);
@@ -209,34 +216,36 @@ namespace Assets.Scripts.AI.Agents
                 }
 
                 // If we failed to find a valid target and we are not moving (thus we are IDLE), find a random point along all the map
-                if (!result && !agent.IsMoving)
+                if (!result && (!agent.IsMoving || targetExplored))
                 {
                     result = findPlaceToExplore(fowManager.aiVision, fowManager.getGridSize(), out targetPos);
                 }
 
-                // If we have a point, move there
-                foreach (Unit u in squad.Units)
+                if (!result)
                 {
-                    if (lostHero)
-                    {
-                        u.moveTo(heroLastPos);
-                    }
-                    else if (result)
-                    {
-                        u.moveTo(targetPos);
+                    return;
+                }
 
+                if (lostHero)
+                {
+                    squad.MoveTo(heroLastPos, u =>
+                    {
                         if (AIController.AI_DEBUG_ENABLED)
                         {
                             ai.aiDebug.registerDebugInfoAboutUnit(u, agentName);
                         }
-                    }
-                    else
+                    });
+                }
+                else
+                {
+                    targetPos.y = terrain.SampleHeight(targetPos);
+                    squad.MoveTo(targetPos, u =>
                     {
                         if (AIController.AI_DEBUG_ENABLED)
                         {
-                            ai.aiDebug.registerDebugInfoAboutUnit(u, agentName + " -> No Target");
+                            ai.aiDebug.registerDebugInfoAboutUnit(u, agentName);
                         }
-                    }
+                    });
                 }
             }
         }

@@ -180,16 +180,6 @@ namespace Assets.Scripts.AI
             resources.SubstractAmount(WorldResources.Type.METAL, entity.info.resources.metal);
         }
 
-        public void CreateBuilding(BuildingTypes btype)
-        {
-            GameObject g = Info.get.createBuilding(_selfRace, btype, buildPosition, Quaternion.Euler(0, 0, 0));
-            buildPosition += new Vector3(0, 0, 20);
-            IGameEntity entity = g.GetComponent<IGameEntity>();
-            OnBuildingCreated(entity);
-            checkout(entity);
-
-        }
-
         public void CreateBuilding(BuildingTypes btype, Vector3 position, Quaternion rotation, AIArchitect architect)
         {
             GameObject g = Info.get.createBuilding(_selfRace, btype, position, rotation);

@@ -51,10 +51,12 @@ namespace Pathfinding
         public float Height = 2.0f;
         public float MaxSpeed = 2.0f;
         public float MaxAcceleration = 2.0f;
-        [SerializeField] [EnumFlagsAttribute]
+
+        [SerializeField]
         public UpdateFlags Flags = UpdateFlags.DT_CROWD_ANTICIPATE_TURNS |
             UpdateFlags.DT_CROWD_OBSTACLE_AVOIDANCE | UpdateFlags.DT_CROWD_SEPARATION |
             UpdateFlags.DT_CROWD_OPTIMIZE_VIS | UpdateFlags.DT_CROWD_OPTIMIZE_TOPO;
+
         public ObstacleAvoidanceType AvoidanceType = ObstacleAvoidanceType.MEDIUM;
         public float SeparationWeight = 0.5f;
 
@@ -110,7 +112,7 @@ namespace Pathfinding
             ap.maxSpeed = MaxSpeed;
             ap.collisionQueryRange = ap.radius * 12.0f;
         	ap.pathOptimizationRange = ap.radius * 30.0f;
-            ap.updateFlags = (byte)Flags;
+            ap.updateFlags = (byte)(UpdateFlags.DT_CROWD_OBSTACLE_AVOIDANCE);
             ap.obstacleAvoidanceType = (byte)AvoidanceType;
             ap.separationWeight = SeparationWeight;
 

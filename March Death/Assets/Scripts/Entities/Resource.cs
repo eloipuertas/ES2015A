@@ -354,7 +354,7 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     public Unit recruitExplorer()
     {
-        Vector3 deploymentPoint = getDeploymentPoint();
+        
         if (harvestUnits > 0)
         {
             Unit worker;
@@ -362,9 +362,9 @@ public class Resource : Building<Resource.Actions>
             _collectionRate -= worker.info.attributes.capacity;
             harvestUnits--;
             
-            worker.transform.position = getDeploymentPoint();
+            worker.transform.position = getMeetingPoint();
             worker.bringBack();
-            worker.moveTo(getMeetingPoint());
+            
             worker.setStatus(EntityStatus.IDLE);
 
             if (harvestUnits == 0)

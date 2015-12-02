@@ -351,7 +351,7 @@ public partial class InformationController : MonoBehaviour
 
         GameObject buttonObject = new GameObject(buttonName);
         Image image = buttonObject.AddComponent<Image>();
-        image.transform.parent = canvas.transform;
+        image.transform.SetParent(canvas.transform, false);
         image.rectTransform.sizeDelta = size * 0.9f;
         image.rectTransform.position = center;
         if (buttonImage != null)
@@ -371,7 +371,7 @@ public partial class InformationController : MonoBehaviour
         }
 
         GameObject textObject = new GameObject(textName);
-        textObject.transform.parent = buttonObject.transform;
+        textObject.transform.SetParent(buttonObject.transform, false);
         Text lblText = textObject.AddComponent<Text>();
         lblText.rectTransform.sizeDelta = size * 0.9f;
         lblText.rectTransform.position = center;
