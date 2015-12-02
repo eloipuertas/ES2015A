@@ -408,6 +408,11 @@ public class Unit : GameEntity<Unit.Actions>
     /// <param name="movePoint">Point to move to</param>
     public bool moveTo(Vector3 movePoint)
     {
+        if (isImmobile)
+        {
+            return false;
+        }
+
         _detourAgent.MoveTo(movePoint);
 
         _followingTarget = false;
@@ -569,9 +574,12 @@ public class Unit : GameEntity<Unit.Actions>
         }
 
         // Set detour params (can't be done until Start is done)
-        _detourAgent.MaxSpeed = info.unitAttributes.movementRate * 5;
-        _detourAgent.MaxAcceleration = info.unitAttributes.movementRate * 20;
-        _detourAgent.UpdateParams();
+        if (!isImmobile)
+        {
+            _detourAgent.MaxSpeed = info.unitAttributes.movementRate * 5;
+            _detourAgent.MaxAcceleration = info.unitAttributes.movementRate * 20;
+            _detourAgent.UpdateParams();
+        }
 
         statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -5);
         fire(Actions.CREATED, statistics);
