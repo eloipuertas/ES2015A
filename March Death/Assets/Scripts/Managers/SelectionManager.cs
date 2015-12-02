@@ -32,7 +32,7 @@ namespace Managers
         // Debounce multiselection
         private const float DEBOUCE_EVERY_SECS = 0.1f;
         private float _lastDebounce = DEBOUCE_EVERY_SECS;
-        private List<Unit> _lastDebouncedUnits;
+        private List<Unit> _lastDebouncedUnits = new List<Unit>();
 
 
         // the own race
