@@ -5,8 +5,8 @@ using System.Text;
 
 namespace Storage
 {
-    public enum EntityType { UNIT, BUILDING, RESOURCE };
-    public enum Races { MEN, ELVES, DWARFS, LIZARDMEN, GREENSKINS, CHAOS, SKAVEN, UNDEAD, OGRES };
+    public enum EntityType { UNIT, BUILDING, SQUAD };
+    public enum Races { MEN, ELVES, DWARFS, LIZARDMEN, GREENSKINS, CHAOS, SKAVEN, UNDEAD, OGRES, RESERVED_UNSPECIFIED };
 
     public abstract class EntityInfo
     {
@@ -18,6 +18,7 @@ namespace Storage
         public abstract EntityAttributes attributes { get; set; }
         public abstract List<EntityAbility> abilities { get; set; }
 
+        public virtual bool hasType() { return true; }
         public abstract T getType<T>() where T : struct, IConvertible;
 
         /// <summary>
@@ -83,6 +84,17 @@ namespace Storage
             get
             {
                 return isBuilding && !isResource;
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the entity is a squad, false otherwise
+        /// </summary>
+        public bool isSquad
+        {
+            get
+            {
+                return entityType == EntityType.SQUAD;
             }
         }
 

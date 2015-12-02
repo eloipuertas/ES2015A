@@ -7,6 +7,8 @@ public class GameOver : MonoBehaviour
     void Start()
     {
         mg = GameObject.FindWithTag("GameController").GetComponent<Main_Game>();
+        AudioSource sc = GameObject.FindWithTag("MainCamera").GetComponent<AudioSource>();
+        sc.Stop();
     }
 
     void Update() {}

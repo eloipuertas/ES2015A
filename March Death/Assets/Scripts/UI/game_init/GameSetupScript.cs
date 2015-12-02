@@ -17,45 +17,40 @@ public class GameSetupScript : MonoBehaviour
     private bool raceSelected;
 
     /// <summary>
-    /// Indicates if the message box should be shown
+    /// Indicates whether the difficulty level has been selected or not.
     /// </summary>
-    private bool showMsgBox;
+    private bool difficultySelected;
 
     /// <summary>
-    /// The message box rectangle.
+    /// Indicates whether the game mode has been selected or not.
     /// </summary>
-    private Rect messageBox = new Rect((Screen.width - 200) / 2, (Screen.height - 300) / 2, 200, 150);
+    private bool gameModeSelected;
+
+    private enum ErrorType { CIVILIZATION_MISSING, SKILL_MISSING, GAME_MODE_MISSING }
+
+	private const string ERROR_DIALOG_CIVILIZATION = "ErrorDialog-0";
+	private const string ERROR_DIALOG_GAME_MODE = "ErrorDialog-1";
+	private const string ERROR_DIALOG_SKILL = "ErrorDialog-2";
+
+    /// <summary>
+    /// Holds the reference to the prefabs that have the error messages.
+    /// </summary>
+    private Object[] prefabs;
 
     // Use this for initialization
-    void Start ()
+    void Start()
     {
         info = (GameInformation) GameObject.Find("GameInformationObject").GetComponent("GameInformation");
         raceSelected = false;
-        showMsgBox = false;
+        difficultySelected = false;
+        gameModeSelected = false;
+        prefabs = new Object[3];
+        prefabs[0] = Resources.Load("Prefabs/ErrorMessages/SelectCivilizationMessageError");
+        prefabs[1] = Resources.Load("Prefabs/ErrorMessages/ChooseGameModeMessageError");
+        prefabs[2] = Resources.Load("Prefabs/ErrorMessages/SkillLevelMessageError");
     }
 
-    void OnGUI()
-    {
-        if (showMsgBox)
-        {
-            messageBox = GUI.Window(0, messageBox, DrawWindow, "Select Race");
-        }
-    }
-
-    /// <summary>
-    /// Draws the message box.
-    /// </summary>
-    /// <param name="window">Window.</param>
-    void DrawWindow(int window)
-    {
-        GUI.Label(new Rect(5, 20, messageBox.width, 20), "Please, select a civilization");
-        if (GUI.Button(new Rect(5, 120, messageBox.width - 10, 20), "Ok"))
-        {
-            showMsgBox = false;
-        }
-    }
-
-    public void SetPlayerRaceToElf ()
+    public void SetPlayerRaceToElf()
     {
         info.SetPlayerRace(Races.ELVES);
         raceSelected = true;
@@ -70,29 +65,69 @@ public class GameSetupScript : MonoBehaviour
     public void SetDifficultyLevel(int level)
     {
         info.Difficulty = level;
+        difficultySelected = true;
     }
 
-    // TODO Implement mechanism to select game mode
-    public void SetGameMode ()
+    public void SetGameMode(bool isCampaign)
     {
-        info.setGameMode(GameInformation.GameMode.CAMPAIGN);
+        if (isCampaign)
+		{
+			info.setGameMode(GameInformation.GameMode.CAMPAIGN);
+		}
+		else
+		{
+			info.setGameMode(GameInformation.GameMode.SKIRMISH);
+		}
+        gameModeSelected = true;
+    }
+
+    private void showErrorMessage(ErrorType error)
+    {
+        GameObject msgBox = null; // Set to null to avoid errors on compilation time
+        string dialogName = null;
+        switch (error)
+        {
+            case ErrorType.CIVILIZATION_MISSING:
+                msgBox = (GameObject) Instantiate(prefabs[0]);
+                msgBox.name = ERROR_DIALOG_CIVILIZATION;
+                dialogName = ERROR_DIALOG_CIVILIZATION;
+                break;
+            case ErrorType.GAME_MODE_MISSING:
+                msgBox = (GameObject) Instantiate(prefabs[1]);
+                msgBox.name = ERROR_DIALOG_GAME_MODE;
+                dialogName = ERROR_DIALOG_GAME_MODE;
+                break;
+            case ErrorType.SKILL_MISSING:
+                msgBox = (GameObject) Instantiate(prefabs[2]);
+                msgBox.name = ERROR_DIALOG_SKILL;
+                dialogName = ERROR_DIALOG_SKILL;
+                break;
+        }
+		msgBox.GetComponentInChildren<Button>().onClick.AddListener(() => {
+            GameObject obj = GameObject.Find(dialogName);
+            Destroy(obj);
+        });
     }
 
     public void StartGame()
     {
-        if (raceSelected)
+        if (raceSelected && gameModeSelected && difficultySelected)
         {
             GameObject menuMusic = GameObject.Find("BackgroundMusic");
             if (menuMusic)
             {
                 Destroy(menuMusic);
             }
-            SetGameMode();
             Application.LoadLevel(3);
         }
         else
         {
-            showMsgBox = true;
+            if (!raceSelected)
+                showErrorMessage(ErrorType.CIVILIZATION_MISSING);
+            if (!difficultySelected)
+                showErrorMessage(ErrorType.SKILL_MISSING);
+            if (!gameModeSelected)
+                showErrorMessage(ErrorType.GAME_MODE_MISSING);
         }
     }
 

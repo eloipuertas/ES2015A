@@ -6,7 +6,7 @@ using Storage;
 
 public class Barrack : Building<Barrack.Actions>
 {
-    public enum Actions {DAMAGED, DESTROYED, CREATE_UNIT, BUILDING_FINISHED};
+    public enum Actions {DAMAGED, DESTROYED, CREATE_UNIT, BUILDING_FINISHED, HEALTH_UPDATED};
 
     /// <summary>
     /// Object initialization

@@ -13,7 +13,9 @@ public abstract class Ability : BareActor<Ability.Actions>
     public enum Actions { ENABLED, DISABLED };
 
     protected GameObject _gameObject = null;
-    protected EntityAbility _info = null;
+    public EntityAbility _info = null;
+
+    public KeyCode keyBinding;
 
     public T info<T>() where T: EntityAbility
     {
@@ -24,6 +26,7 @@ public abstract class Ability : BareActor<Ability.Actions>
     {
         _info = info;
         _gameObject = gameObject;
+        keyBinding = _info.keyBinding;
     }
 
     public abstract bool isActive { get; }

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using System;
@@ -13,14 +14,16 @@ public class EntityAbilitiesController : MonoBehaviour
     //private static int Arial_Fifteen_Size_y = 23;
     private static float Arial_Fifteen_Size_X = 7.8f;
     private static int Arial_Fifteen_Size_y = 18;
-    private static int HOVER_TEXT_SIZE = 15;
-    private static Color HOVER_TEXT_COLOR = Color.black;
-    private static Color HOVER_TEXT_BACKGROUND = Color.white;
+    private static int HOVER_TEXT_SIZE = 11;
+    private static Color HOVER_TEXT_COLOR = Color.white;
+    private static Color HOVER_TEXT_BACKGROUND = Color.black;
     private static float BACKGROUND_ALPHA = 0.5f;
 
     private static int Button_Rows = 3;
     private static int Button_Columns = 4;
     private static Boolean showText = false;
+
+    public static List<Ability> abilities_on_show;
 
     // Use this for initialization
     void Start()
@@ -40,37 +43,80 @@ public class EntityAbilitiesController : MonoBehaviour
             registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
         });
 
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    void OnGUI()
-    {
-        //GUI.skin.label.fontSize = 15;
-        //GUI.skin.label.font= (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf"); 
-        //var textDimensions = GUI.skin.label.CalcSize(new GUIContent("A"));
-        //Debug.LogError("Dimensiones: " + textDimensions.x + ", " + textDimensions.y);
-        //Debug.LogError("Size of label: "+GUI.skin.label.fontSize);
+        abilities_on_show = new List<Ability>();
     }
 
     public void onActorSelected(System.Object obj)
     {
+		GameObject gameObject = (GameObject) obj;
+
         destroyButtons();
-        showActions((GameObject)obj);
+        showActions(gameObject);
+
+        IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+
+        entity.doIfResource(resource => {
+            resource.register(Resource.Actions.BUILDING_FINISHED, showActions);
+        });
+
+        entity.doIfBarrack(barrack => {
+            barrack.register(Barrack.Actions.BUILDING_FINISHED, showActions);
+        });
     }
 
     public void onActorDeselected(System.Object obj)
     {
         destroyButtons();
+
+        GameObject gameObject = (GameObject) obj;
+        IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+
+        entity.doIfResource(resource => {
+            resource.unregister(Resource.Actions.BUILDING_FINISHED, showActions);
+        });
+
+        entity.doIfBarrack(barrack => {
+            barrack.unregister(Barrack.Actions.BUILDING_FINISHED, showActions);
+        });
     }
 
-    void showActions(GameObject gameObject)
+    private void showActionButtons(GameObject objeto)
     {
-        GameObject actionPanel = GameObject.Find("actions");
+        IGameEntity entity = objeto.GetComponent<IGameEntity>();
+        var abilities = entity.info.abilities;
+        var nabilities = abilities.Count;
+        for (int i = 0; i < nabilities; i++)
+        {
+            GameObject button = GameObject.Find("Button " + i);
+            String ability = abilities[i].name;
+            Ability abilityObj = entity.getAbility(ability);
+            var buttonComponent = button.GetComponent<Button>();
+            var image = buttonComponent.GetComponent<Image>();
+            var eventTrigger = button.GetComponent<EventTrigger>();
+            buttonComponent.onClick.RemoveAllListeners();
+
+            if (abilityObj.isUsable)
+            {
+                // HACK: When this is fired, the button status should be updated! abilityObj.isActive might have changed...
+                UnityAction actionMethod = new UnityAction(() =>
+                {
+                    Debug.Log("* " + abilityObj);
+                    abilityObj.enable();
+                });
+                image.sprite = CreateSprite(ability, image.rectTransform.sizeDelta);
+                buttonComponent.targetGraphic = image;
+                buttonComponent.onClick.AddListener(() => actionMethod());
+                image.enabled = true;
+                eventTrigger.enabled = true;
+                buttonComponent.interactable = true;
+            }
+        }
+    }
+
+	void showActions(System.Object obj)
+    {
+		GameObject gameObject = (GameObject) obj;
+        GameObject actionPanel = GameObject.Find("HUD/actions");
         
         if (!actionPanel) return;
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
@@ -84,10 +130,13 @@ public class EntityAbilitiesController : MonoBehaviour
         var abilities = entity.info.abilities;
         var nabilities = abilities.Count;
 
+        abilities_on_show.Clear();
+
         for (int i = 0; i < nabilities; i++)
         {
             String ability = abilities[i].name;
             Ability abilityObj = entity.getAbility(ability);
+            abilities_on_show.Add(abilityObj);
 
             if (abilityObj.isUsable)
             {
@@ -104,6 +153,25 @@ public class EntityAbilitiesController : MonoBehaviour
         }
     }
 
+    void hideActionButtons(GameObject objeto)
+    {
+        IGameEntity entity = objeto.GetComponent<IGameEntity>();
+        var abilities = entity.info.abilities;
+        var nabilities = abilities.Count;
+        for (int i = 0; i < nabilities; i++)
+        {
+            GameObject button = GameObject.Find("Button " + i);
+            var buttonComponent = button.GetComponent<Button>();
+            var image = buttonComponent.GetComponent<Image>();
+            var eventTrigger = button.GetComponent<EventTrigger>();
+            image.enabled = false;
+            eventTrigger.enabled = false;
+            buttonComponent.interactable = false;
+
+        }
+    }
+
+
     void destroyButtons()
     {
         GameObject[] actionButtons = GameObject.FindGameObjectsWithTag("ActionButton");
@@ -115,6 +183,7 @@ public class EntityAbilitiesController : MonoBehaviour
             }
         }
     }
+
 
     /// <summary>
     /// Methodto create a new button in a panel
@@ -134,10 +203,11 @@ public class EntityAbilitiesController : MonoBehaviour
 
         var image = buttonObject.AddComponent<Image>();
         image.tag = "ActionButton";
-        //image.transform.SetParent(panelTransform);
+        //image.rectTransform.SetParent(panelTransform);
         image.rectTransform.localScale = panelTransform.localScale;
         image.rectTransform.sizeDelta = 1.5f * extends;
         image.rectTransform.position = center;
+        //image.rectTransform.position = transform.position;
         image.sprite = CreateSprite(ability, image.rectTransform.sizeDelta);
         //Debug.LogError("Button position: " + center);
         var button = buttonObject.AddComponent<Button>();
@@ -166,7 +236,10 @@ public class EntityAbilitiesController : MonoBehaviour
                                                                          button.GetComponent<RectTransform>().localPosition.y,
                                                                          0f);
 
-        button.enabled = enabled;
+        //button.enabled = false;
+        //button.interactable = false;
+        //button.enabled = false;
+        //button.gameObject.SetActive(false);
     }
 
     public void mouseEnter(BaseEventData baseEvent)
@@ -199,14 +272,14 @@ public class EntityAbilitiesController : MonoBehaviour
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
 
         var desplazamiento = new Vector2(Screen.width / 4.0f, Screen.height / 4.0f);
-        var desplazamientoInterno = new Vector2(buttonTransform.position.x, buttonTransform.position .y) - panelOrigin;
+        var desplazamientoInterno = new Vector2(buttonTransform.position.x, buttonTransform.position.y) - panelOrigin;
         var aspectRatio = Screen.width / Screen.height;
 
         var imageObject = new GameObject("Background");
         var image = imageObject.AddComponent<Image>();
         var imageTransform = imageObject.GetComponent<RectTransform>();
         imageTransform.SetParent(tooltipTransform);
-        imageTransform.localPosition = new Vector2((desplazamiento.x-buttonExtents.x) + (Math.Abs(desplazamientoInterno.x)-Math.Abs(buttonExtents.x)), -desplazamiento.y * aspectRatio - (Math.Abs(desplazamientoInterno.y) - Math.Abs(buttonExtents.y)));
+        imageTransform.localPosition = new Vector2((desplazamiento.x - buttonExtents.x) + (Math.Abs(desplazamientoInterno.x) - Math.Abs(buttonExtents.x)), -desplazamiento.y * aspectRatio - (Math.Abs(desplazamientoInterno.y) - Math.Abs(buttonExtents.y)));
         imageTransform.localScale = panelTransform.localScale;
         imageTransform.sizeDelta = new Vector2(Arial_Fifteen_Size_X * name.Length, Arial_Fifteen_Size_y);
 
@@ -224,18 +297,20 @@ public class EntityAbilitiesController : MonoBehaviour
         Font ArialFont = (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf");
         text.font = ArialFont;
         text.material = ArialFont.material;
-        text.text = name;
+        KeyCode code = KeyCode.Greater;
+        foreach (Ability a in abilities_on_show) { if (name.Equals(a._info.name)) code = a.keyBinding; }
+        text.text = name + " (" + code.ToString() + ")";
         text.fontSize = HOVER_TEXT_SIZE;
         text.color = HOVER_TEXT_COLOR;
         text.enabled = true;
-        
+
         //text.supportRichText = true;
     }
 
     private void mouseExit(BaseEventData baseEvent)
     {
         var tooltip = GameObject.Find("tooltip");
-        Destroy(tooltip);  
+        Destroy(tooltip);
     }
 
     /// <summary>
@@ -273,7 +348,7 @@ public class EntityAbilitiesController : MonoBehaviour
 
     void OnDestroy()
     {
-        Clear ();
+        Clear();
     }
 
 }

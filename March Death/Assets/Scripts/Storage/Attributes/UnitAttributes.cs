@@ -14,6 +14,8 @@ namespace Storage
         public float attackRange = 2.0f;
         public float rangedAttackFurthest = 0;
         public float rangedAttackNearest = 0;
+        public float projectileRadius = 0;
+        public int projectileSpeed = 0;
 
         public float attackRate;
         public float movementRate;

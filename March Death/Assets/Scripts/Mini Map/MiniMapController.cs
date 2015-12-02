@@ -209,12 +209,12 @@ public class MiniMapController : MonoBehaviour
 			break;
 		case Storage.Races.ELVES:
 			viewPortPosX = 0.018f;
-			viewPortPosY = 0.02f;
+			viewPortPosY = 0.025f;
 			
 			// The minimap size
-			viewPortW = (1f / (float)Screen.width) * ((float)Screen.width / 5.6701f);
+			viewPortW = (1f / (float)Screen.width) * ((float)Screen.width / 5.8701f);
 			// the height will be the ratio of the hole for the map 140/201
-			viewPortH = (1f / (float)Screen.height) * (((float)Screen.width / 4.0701f) * (140f / 201f));
+			viewPortH = (1f / (float)Screen.height) * (((float)Screen.width / 4.7701f) * (140f / 201f));
 			break;
 		default:
 			viewPortPosX = 0; viewPortPosY = 0;

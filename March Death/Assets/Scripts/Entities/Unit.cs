@@ -13,8 +13,7 @@ using Pathfinding;
 /// </summary>
 public class Unit : GameEntity<Unit.Actions>
 {
-    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT, TARGET_TERMINATED };
-    public enum Roles { PRODUCING, WANDERING };
+    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT, TARGET_TERMINATED, HEALTH_UPDATED };
     public enum Gender { MALE, FEMALE }
 
     private EntityStatus _defaultStatus = EntityStatus.IDLE;
@@ -62,12 +61,22 @@ public class Unit : GameEntity<Unit.Actions>
     public Gender gender = Gender.MALE;
 
     /// <summary>
+    /// List of components needed to deactivate at Vanish() and activate at bringback()
+    /// </summary>
+    protected List<Component> unitConponents = new List<Component>();
+
+    /// <summary>
     /// If in battle, this is the target and last attack time
     /// </summary>
     private IGameEntity _target = null;
     public float _distanceToTarget = 0;
     private Vector3 _attackPoint;
     private Vector3 _closestPointToTarget;
+
+    private Vector3 _projectileEndPoint;
+    private bool _projectileThrown = false;
+    private GameObject _projectile;
+    //private Helpers _Helpers;
 
     /// <summary>
     /// Set to true if we are following our target (ie. attacking but not in range)
@@ -81,11 +90,6 @@ public class Unit : GameEntity<Unit.Actions>
     private float _lastAttack = 0;
 
     /// <summary>
-    /// Get and set current role (mostly for CIVILS)
-    /// </summary>
-    public Roles role { get; set; }
-
-    /// <summary>
     /// Point to move to
     /// </summary>
     private Vector3 _movePoint;
@@ -95,7 +99,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     private DetourAgent _detourAgent;
     public DetourAgent Agent { get { return _detourAgent; } }
-
+    
     /// <summary>
     /// Can this unit perform ranged attacks?
     /// </summary>
@@ -104,6 +108,36 @@ public class Unit : GameEntity<Unit.Actions>
         get
         {
             return info.unitAttributes.rangedAttackFurthest > 0;
+        }
+    }
+
+    /// <summary>
+    /// Max. euclidean distance to the target
+    /// </summary>
+    private Squad _squad;
+    private SquadUpdater _squadUpdater;
+    public Squad Squad
+    {
+        get
+        {
+            if (_squad == null)
+            {
+                _squadUpdater = gameObject.AddComponent<SquadUpdater>();
+                _squadUpdater.Initialize(info.race);
+                _squad = _squadUpdater.UnitsSquad;
+                _squad.AddUnit(this);
+            }
+
+            return _squad;
+        }
+        set
+        {
+            if (_squadUpdater && value != _squad)
+            {
+                GameObject.Destroy(_squadUpdater);
+            }
+
+            _squad = value;
         }
     }
 
@@ -130,11 +164,10 @@ public class Unit : GameEntity<Unit.Actions>
     /// <param name="gob"></param>
     private void onTargetDied(System.Object obj)
     {
-        // TODO: Our target died, select next? Do nothing?
         setStatus(EntityStatus.IDLE);
-        IGameEntity entity = ((GameObject) obj).GetComponent<IGameEntity>();
         // TODO: After merge, I had a conflich in this line and I hesitated what to do
-        fire(Actions.TARGET_TERMINATED, entity.info);
+        fire(Actions.TARGET_TERMINATED, obj);
+
         _target = null;
     }
 
@@ -150,11 +183,14 @@ public class Unit : GameEntity<Unit.Actions>
         }
     }
 
+    
+
     /// <summary>
     /// When a wound is received, this is called
     /// </summary>
     protected override void onReceiveDamage()
-    {
+	{
+		base.onReceiveDamage ();
         fire(Actions.DAMAGED);
     }
 
@@ -238,6 +274,29 @@ public class Unit : GameEntity<Unit.Actions>
         _distanceToTarget = Vector3.Distance(_attackPoint, _closestPointToTarget);
     }
 
+
+
+
+    /// <summary>
+    /// Starts unit travel to building resource
+    /// </summary>
+    /// <param name="building"></param>
+    /// <returns></returns>
+    public bool goToBuilding(IGameEntity building)
+    {
+        
+        _target = building;
+        _followingTarget = true;
+        _movePoint = building.getTransform().position;
+        _detourAgent.MoveTo(_movePoint);
+        setStatus(EntityStatus.MOVING);
+        fire(Actions.MOVEMENT_START);
+        updateDistanceToTarget();
+        Debug.Log("Unit: GoToBuilding()");
+        
+        return true;
+    }
+
     /// <summary>
     /// Sets up our attack target, registers callback for its death and
     /// updates our state.
@@ -256,7 +315,8 @@ public class Unit : GameEntity<Unit.Actions>
 
             // if target has changed, hide old target health
             Selectable selectable = null;
-            if (_target != null) {
+            if (_target != null)
+            {
             	selectable = _target.getGameObject().GetComponent<Selectable>();
             	selectable.NotAttackedEntity();
             }
@@ -352,6 +412,117 @@ public class Unit : GameEntity<Unit.Actions>
     }
 
     /// <summary>
+    /// Vanish unit from game just disabling components attached.
+    /// If some new component is added you must add it to this method
+    /// and to bringback method too.
+    /// </summary>
+    /// 
+    public void vanish()
+    {
+        //Disable FOW
+        if (GetComponent<FOWEntity>())
+        {
+            GetComponent<FOWEntity>().enabled = false;
+        }
+        //disable EntityMarker
+        if (GetComponent<EntityMarker>())
+        {   
+            GetComponent<EntityMarker>().enabled = false;
+        }
+        // Disable animator
+        if (GetComponent<Animator>())
+        {
+            GetComponent<Animator>().enabled = false;
+        }
+        // Rigidbody can't be disabled. Must toggle detectCollisions and iskinematic
+        if (GetComponent<Rigidbody>())
+        {
+            GetComponent<Rigidbody>().detectCollisions = false;
+            GetComponent<Rigidbody>().isKinematic = true;
+        }
+        //Disable Selectable
+        // TODO: can't disable square border and lifebar
+        
+        if (GetComponent<Selectable>())
+        {
+            GetComponent<Selectable>().enabled = false;
+        }
+
+        // Disable ligths if any    
+        if (GetComponent<Light>())
+        {
+            GetComponent<Light>().enabled = false;
+        }
+        //disable collider
+        if(GetComponent<Collider>())
+        {
+            GetComponent<Collider>().enabled = false;
+        }
+        // Disable DetourAgent. Must remove form crowd first
+        if (GetComponent<DetourAgent>())
+        {  
+            GetComponent<DetourAgent>().RemoveFromCrowd();
+            GetComponent<DetourAgent>().enabled = false;
+        }
+        // Disable render
+        Component[] allRenderers = GetComponentsInChildren<Renderer>();
+        foreach (Renderer r in allRenderers)
+        {
+            r.enabled = false;
+        }
+        
+
+    }
+    /// <summary>
+    /// Units vanished with vanish method needs to uses BringBack method in 
+    /// order to enable components.
+    /// </summary>
+    public void bringBack()
+    {
+       
+        if (GetComponent<FOWEntity>())
+        {
+            GetComponent<FOWEntity>().enabled = true;
+        }
+        if (GetComponent<EntityMarker>())
+        {
+            GetComponent<EntityMarker>().enabled = true;
+        }
+        if (GetComponent<Animator>())
+        {
+            GetComponent<Animator>().enabled = true;
+        }
+        if (GetComponent<Rigidbody>())
+        {
+            GetComponent<Rigidbody>().detectCollisions = true;
+            GetComponent<Rigidbody>().isKinematic = false;
+        }
+        if (GetComponent<Collider>())
+        {
+            GetComponent<Collider>().enabled = true;
+        }
+        
+        if (GetComponent<Light>())
+        {
+            GetComponent<Light>().enabled = true;
+        }
+        if (GetComponent<DetourAgent>())
+        {
+            GetComponent<DetourAgent>().enabled = true;
+            GetComponent<DetourAgent>().AddToCrowd();
+        }
+        Component[] allRenderers = GetComponentsInChildren<Renderer>();
+        foreach (Renderer r in allRenderers)
+        {
+            r.enabled = true;
+        }
+        if (GetComponent<Selectable>())
+        {
+            GetComponent<Selectable>().enabled = true;
+            //GetComponent<Selectable>().SelectOnlyMe();
+        }
+    }
+    /// <summary>
     /// Object initialization
     /// </summary>
     public override void Awake()
@@ -404,7 +575,7 @@ public class Unit : GameEntity<Unit.Actions>
     public override void Update()
     {
         base.Update();
-
+        
         // Precompute distance to our target if we have target
         // Avoids computing it serveral (5+ times)
         if (_target != null)
@@ -424,7 +595,7 @@ public class Unit : GameEntity<Unit.Actions>
             float goldProduced = 0;
 
             // Civils produce gold when working and doesn't consume it
-            if (info.isCivil && role == Roles.PRODUCING)
+            if (info.isCivil && status == EntityStatus.WORKING)
             {
                 goldProduced = info.unitAttributes.goldProduction * resourcesElapsed;
                 goldConsumed = 0;
@@ -457,15 +628,48 @@ public class Unit : GameEntity<Unit.Actions>
                     {
                         _followingTarget = true;
                         setStatus(EntityStatus.MOVING);
-                    }
+
                     // Check if we already have to attack
-                    else if (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate))
-                    {
-                        _lastAttack = Time.time;
-                        _target.receiveAttack(this, canDoRangedAttack());
+                    } else if (! _projectileThrown && (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate))) {
+                            if (canDoRangedAttack())  {
+                                _projectile = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                                _projectile.AddComponent<Rigidbody>();
+                                _projectile.transform.position = new Vector3(transform.position.x, transform.position.y + GetComponent<Collider>().bounds.size.y, transform.position.z);  
+                                _projectileEndPoint = new Vector3(_target.getTransform().position.x, _target.getTransform().position.y + _target.getGameObject().GetComponent<Collider>().bounds.size.y, _target.getTransform().position.z);
+                                _projectileThrown = true;
+                            } else {
+                                _target.receiveAttack(this, canDoRangedAttack());
+                            }
+
+                            _lastAttack = Time.time;
                     }
                 }
                 break;
+        }
+
+        if (_projectileThrown) {
+            //Find a new position proportionally closer to the end, based on the moveTime
+            Vector3 newPostion = Vector3.MoveTowards(_projectile.transform.position, _projectileEndPoint, info.unitAttributes.projectileSpeed * Time.deltaTime);
+
+            //Move the object to the new position.
+            _projectile.transform.position = newPostion;
+
+            //Recalculate the remaining distance after moving.
+            float sqrRemainingDistance = (_projectile.transform.position - _projectileEndPoint).sqrMagnitude;
+
+            // If we reach the target...            
+            if (sqrRemainingDistance <= float.Epsilon) {
+                List<IGameEntity> objectsInRadius = Helpers.getEntitiesNearPosition(_projectileEndPoint, info.unitAttributes.projectileRadius);
+
+                // Should I prevent friendly fire?
+                foreach (IGameEntity inRadiusObject in objectsInRadius.ToArray()) {
+                    inRadiusObject.receiveAttack(this, canDoRangedAttack());
+                }
+
+                _projectileThrown = false;
+                GameObject.Destroy(_projectile);
+            }
+
         }
 
 #if UNITY_EDITOR
@@ -490,7 +694,7 @@ public class Unit : GameEntity<Unit.Actions>
 
     public override void setStatus(EntityStatus status)
     {
-        if (!_followingTarget && status == EntityStatus.MOVING)
+        if (!_followingTarget && base.status == EntityStatus.MOVING)
         {
             fire(Actions.MOVEMENT_END);
         }
@@ -511,6 +715,24 @@ public class Unit : GameEntity<Unit.Actions>
                 // would be otherwise outdated
                 if (_followingTarget)
                 {
+                    // If we are just civilian unit travelling to our own building resource.
+                    // Check distance to target to know if we are close enough.
+                    // When capture distance is reached resource building capture 
+                    // method is triggered.
+
+                    if (_target.info.race == this.race)
+                    {                      
+                        if (_distanceToTarget <= _target.info.resourceAttributes.trapRange)
+                        {
+                            _detourAgent.ResetPath();
+                            setStatus(EntityStatus.IDLE);
+                            _followingTarget = false;
+                            fire(Actions.MOVEMENT_END);
+                            ((Resource)_target).trapUnit(this);
+                            return;
+                        }
+                       
+                    } 
                     // Update destination only if target has moved
                     Vector3 destination = _closestPointToTarget;
                     if ((destination - _movePoint).sqrMagnitude > SQR_UPDATE_DISTANCE)

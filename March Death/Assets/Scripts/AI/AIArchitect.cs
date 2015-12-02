@@ -33,6 +33,9 @@ namespace Assets.Scripts.AI
         Color emptySpace = new Color(0.000f, 1.000f, 0.000f, 1.000f);
         Color ignorePixel = new Color(1.000f, 0, 1.000f, 1.000f);
         AIController ai;
+
+        public List<Vector3> baseCriticPoints;
+
         string dificultyFolder;
         public float buildingAngle = 0f;
 
@@ -58,6 +61,7 @@ namespace Assets.Scripts.AI
             constructionGrid = GameObject.Find("GameController").GetComponent<ConstructionGrid>();
             buildingsPlaced = 0;
             ai = aiController;
+            baseCriticPoints = new List<Vector3>();
 
             //HACK: Probably would be cool to find a way to get this dinamically
             if (ai.race == Storage.Races.ELVES)
@@ -82,8 +86,6 @@ namespace Assets.Scripts.AI
         /// </summary>
         public void planifyBuildingsAccordingToDifficulty()
         {
-
-
             if (ai.DifficultyLvl == 1)
             {
                 dificultyFolder = "Easy";
@@ -95,6 +97,10 @@ namespace Assets.Scripts.AI
                     BuildingTypes.ARCHERY,
                     BuildingTypes.BARRACK,
                     BuildingTypes.STABLE,
+                    BuildingTypes.FARM,
+                    BuildingTypes.MINE,
+                    BuildingTypes.SAWMILL,
+                    BuildingTypes.BARRACK,
                 };
             }
 
@@ -107,17 +113,19 @@ namespace Assets.Scripts.AI
                     BuildingTypes.MINE,
                     BuildingTypes.SAWMILL,
                     BuildingTypes.ARCHERY,
+                    BuildingTypes.FARM,
+                    BuildingTypes.MINE,
+                    BuildingTypes.SAWMILL,
                     BuildingTypes.BARRACK,
                     BuildingTypes.WATCHTOWER,
                     BuildingTypes.STABLE,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
+
                 };
+
+                for(int i = 0; i < 20; i++)
+                {
+                    buildingPrefs.Add(BuildingTypes.WATCHTOWER);
+                }
             }
 
             else
@@ -126,20 +134,34 @@ namespace Assets.Scripts.AI
                 buildingPrefs = new List<BuildingTypes>()
                 {
                     BuildingTypes.FARM,
+                    BuildingTypes.FARM,
                     BuildingTypes.MINE,
                     BuildingTypes.SAWMILL,
+                    BuildingTypes.FARM,
                     BuildingTypes.ARCHERY,
                     BuildingTypes.BARRACK,
                     BuildingTypes.WATCHTOWER,
                     BuildingTypes.STABLE,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.WALL,
-                    BuildingTypes.WALL,
-                    BuildingTypes.WALL,
                 };
+                int elvesDiscounter = ai.race == Races.ELVES ? 5 : 0;
+
+                for (int i = 0; i < 30 - elvesDiscounter; i++)
+                {
+                    buildingPrefs.Add(BuildingTypes.WATCHTOWER);
+                }
+
+                if(ai.race == Races.ELVES)
+                {
+                    for(int i = 0; i < 40; i++)
+                    {
+                        buildingPrefs.Add(BuildingTypes.WALL);
+                    }
+
+                    for(int i = 0; i < 6; i++)
+                    {
+                        buildingPrefs.Add(BuildingTypes.WALLCORNER);
+                    }
+                }
             }
 
             // Need this in case we want to be creative
@@ -150,7 +172,7 @@ namespace Assets.Scripts.AI
                 {
                     buildingPrefs.Add(BuildingTypes.WALL);
                 }
-                
+
                 for(int i = 0; i < 10; i++)
                 {
                     buildingPrefs.Add(BuildingTypes.WALLCORNER);
@@ -164,7 +186,7 @@ namespace Assets.Scripts.AI
         }
 
         /// <summary>
-        /// Reads a file containing the map (we can read any map inside the folders an chooses one 
+        /// Reads a file containing the map (we can read any map inside the folders an chooses one
         /// randomly)
         /// </summary>
         /// <param name="mapName"></param>
@@ -187,10 +209,10 @@ namespace Assets.Scripts.AI
 
             Vector2 center = ai.race == Races.ELVES ? new Vector2(mapData.width / 2 + 0.5f, mapData.height / 2 - 0.5f) : new Vector2(mapData.width / 2 -0.5f, mapData.height / 2 - 1f);
 
-            // Math Facts: 
+            // Math Facts:
             // The equation to find te position of something is
             // Offset = (i , j) - Center
-            // centerPos + GridSize * Offset 
+            // centerPos + GridSize * Offset
 
             Vector3 processingPos = Vector3.zero;
             Vector2 processingOffset = Vector2.zero;
@@ -243,7 +265,8 @@ namespace Assets.Scripts.AI
                     }
                     else if (CompareColors(pixel, defenceZone))
                     {
-                        avaliablePositions[StructureType.DEFENCE_ZONE].Add(processingPos);
+                        baseCriticPoints.Add(processingPos);
+                        Debug.Log(baseCriticPoints.Count);
                     }
                     else if (CompareColors(pixel, emptySpace))
                     {
@@ -277,7 +300,7 @@ namespace Assets.Scripts.AI
             }
             return false;
         }
-        
+
         /// <summary>
         /// Translates type to structuretype
         /// </summary>
@@ -350,13 +373,14 @@ namespace Assets.Scripts.AI
 
             while (positionsForType.Count > 0 && !found)
             {
+                int pos = UnityEngine.Random.Range(0, positionsForType.Count);
                 // Recheck positions in order to know if player has constructed on this position
-                if (constructionGrid.isNewPositionAbleForConstrucction(positionsForType[0]))
+                if (constructionGrid.isNewPositionAbleForConstrucction(positionsForType[pos]))
                 {
-                    requestedPosition = positionsForType[0];
+                    requestedPosition = positionsForType[pos];
                     found = true;
                 }
-                positionsForType.RemoveAt(0);
+                positionsForType.RemoveAt(pos);
             }
 
             return requestedPosition;
@@ -397,7 +421,7 @@ namespace Assets.Scripts.AI
                         return;
                     }
                 }
-                ai.CreateBuilding(buildingPrefs[0], position, Quaternion.Euler(0, buildingAngle, 0));
+                ai.CreateBuilding(buildingPrefs[0], position, Quaternion.Euler(0, buildingAngle, 0), this);
                 buildingPrefs.RemoveAt(0);
                 buildingsPlaced++;
             }
@@ -405,7 +429,8 @@ namespace Assets.Scripts.AI
 
         bool getCornerRotation(Vector3 pos)
         {
-            List<IBuilding> buildings = ai.race == Races.ELVES ? ai.senses.getBuildingsOfRaceNearPosition(pos, 20, ai.race) : ai.senses.getBuildingsOfRaceNearPosition(pos, 22, ai.race);
+            List<IBuilding> buildings = ai.race == Races.ELVES ? Helpers.getBuildingsOfRaceNearPosition(pos, 20, ai.race) : Helpers.getBuildingsOfRaceNearPosition(pos, 22, ai.race);
+
             Debug.Log(buildings.Count);
             List <GameObject> walls  = new List<GameObject>();
             foreach(IBuilding wall in buildings)
@@ -423,10 +448,10 @@ namespace Assets.Scripts.AI
                 for(int i = 0; i < walls.Count; i++)
                 {
                     GameObject wall = walls[i];
-                   
+
                     if (choosenAngle) return choosenAngle;
                     float angle = Mathf.Round(wall.transform.rotation.eulerAngles.y);
-                    
+
                     if(angle == 90f)
                     {
                         if(ai.race == Races.ELVES)
@@ -438,12 +463,12 @@ namespace Assets.Scripts.AI
                                     GameObject horWall = i == 0 ? walls[1] : walls[0];
                                     if (horWall.transform.position.z > pos.z)
                                     {
-                                        buildingAngle = ai.race == Races.ELVES ? 0f : 0f; // Elves OK Human NO
+                                        buildingAngle = ai.race == Races.ELVES ? 0f : 0f;
                                         choosenAngle = true;
                                     }
                                     else
                                     {
-                                        buildingAngle = ai.race == Races.ELVES ? 90f : 90f; // Elves OK Human NO
+                                        buildingAngle = ai.race == Races.ELVES ? 90f : 90f;
                                         choosenAngle = true;
                                     }
 
@@ -457,12 +482,12 @@ namespace Assets.Scripts.AI
                                     GameObject horWall = i == 0 ? walls[1] : walls[0];
                                     if (horWall.transform.position.z < pos.z)
                                     {
-                                        buildingAngle = ai.race == Races.ELVES ? 180f : 180f; // Elves OK Human NO
+                                        buildingAngle = ai.race == Races.ELVES ? 180f : 180f;
                                         choosenAngle = true;
                                     }
                                     else
                                     {
-                                        buildingAngle = ai.race == Races.ELVES ? 270f : 270f; // Elves OK Human NO
+                                        buildingAngle = ai.race == Races.ELVES ? 270f : 270f;
                                         choosenAngle = true;
                                     }
 
@@ -478,12 +503,12 @@ namespace Assets.Scripts.AI
                                     GameObject horWall = i == 0 ? walls[1] : walls[0];
                                     if (horWall.transform.position.x > pos.x)
                                     {
-                                        buildingAngle =  0f; 
+                                        buildingAngle =  0f;
                                         choosenAngle = true;
                                     }
                                     else
                                     {
-                                        buildingAngle =  90f; 
+                                        buildingAngle =  90f;
                                         choosenAngle = true;
                                     }
 
@@ -497,12 +522,12 @@ namespace Assets.Scripts.AI
                                     GameObject horWall = i == 0 ? walls[1] : walls[0];
                                     if (horWall.transform.position.z < pos.z)
                                     {
-                                        buildingAngle = 180f; 
+                                        buildingAngle = 180f;
                                         choosenAngle = true;
                                     }
                                     else
                                     {
-                                        buildingAngle = 270f; 
+                                        buildingAngle = 270f;
                                         choosenAngle = true;
                                     }
 
@@ -510,13 +535,12 @@ namespace Assets.Scripts.AI
                             }
                         }
                     }
-                       
+
                 }
             }
 
             return choosenAngle;
         }
-
         void fixPositions()
         {
             GameObject stronghold;
@@ -525,7 +549,69 @@ namespace Assets.Scripts.AI
 
             stronghold = GameObject.Find(sName);
             stronghold.transform.position = constructionGrid.discretizeMapCoords(stronghold.transform.position);
-            
+
+        }
+
+        /// <summary>
+        /// This this method in order to maintain the base, when someone destroys our buildings
+        /// </summary>
+        /// <param name="obj"></param>
+        public void onDestroy(System.Object obj)
+        {
+            GameObject gob = (GameObject)obj;
+            Vector3 position = gob.transform.position;
+            float yRot = gob.transform.rotation.eulerAngles.y;
+            BuildingTypes type = gob.GetComponent<IGameEntity>().getType<BuildingTypes>();
+            //Add back the building to the queue in order to reconstruct it as soon as it is possible
+            buildingPrefs.Add(type);
+            constructionGrid.liberatePosition(constructionGrid.discretizeMapCoords(position));
+
+            //We need to inform the architect that new positions are avaliable
+            StructureType buildingType = StructureType.RESOURCE_BUILDING;
+
+            switch (type)
+            {
+                case BuildingTypes.FARM:
+                    buildingType = StructureType.RESOURCE_BUILDING;
+                    break;
+                case BuildingTypes.MINE:
+                    buildingType = StructureType.RESOURCE_BUILDING;
+                    break;
+                case BuildingTypes.SAWMILL:
+                    buildingType = StructureType.RESOURCE_BUILDING;
+                    break;
+                case BuildingTypes.ARCHERY:
+                    buildingType = StructureType.MILITARY_BUILDING;
+                    break;
+                case BuildingTypes.BARRACK:
+                    buildingType = StructureType.MILITARY_BUILDING;
+                    break;
+                case BuildingTypes.STABLE:
+                    buildingType = StructureType.MILITARY_BUILDING;
+                    break;
+                case BuildingTypes.WALL:
+                    if(Mathf.Round(yRot) == 90f)
+                    {
+                        buildingType = ai.race == Races.MEN ? StructureType.HORIZONTALL_WALL : StructureType.VERTICALL_WALL;
+                    }
+                    else
+                    {
+                        buildingType = ai.race == Races.MEN ? StructureType.VERTICALL_WALL : StructureType.HORIZONTALL_WALL;
+                    }
+                    break;
+                case BuildingTypes.WALLCORNER:
+                    buildingType = StructureType.CORNER_WALL;
+                    break;
+                case BuildingTypes.WATCHTOWER:
+                    buildingType = StructureType.TOWER;
+                    break;
+                default:
+                    Debug.Log("AIArchitect: Unknown type maibe there are new buildings?");
+                    break;
+            }
+
+            avaliablePositions[buildingType].Add(position);
+
         }
     }
 }

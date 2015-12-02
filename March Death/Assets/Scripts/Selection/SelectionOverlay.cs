@@ -3,7 +3,7 @@ using System.Collections;
 
 public static class SelectionOverlay{
 
-    private static int Height = 120, Width = 100;
+    private static int Height = 10, Width = 100;
     private static int HealthHeight = 10;
 
     public static Vector3 offset_small = new Vector3(-20f, +22f, +20f);
@@ -13,10 +13,7 @@ public static class SelectionOverlay{
     private static Color BorderColour = Color.white;
     private static Color HealthColour = Color.green;
 
-    public static Vector3 getOffset(Collider c) {
-        if (c.bounds.size.x > 30) return offset_big;
-        else return offset_small;
-    }
+
 
     /// <summary>
     /// Calculates the box surrounding the collider
@@ -44,7 +41,7 @@ public static class SelectionOverlay{
 
         
         box.yMax = Screen.height - Mathf.Min(lowerTopLeft.y, lowerTopRight.y, lowerBottomLeft.y, lowerBottomRight.y, upperTopLeft.y, upperTopRight.y, upperBottomRight.y, upperBottomLeft.y);
-        box.yMin = Screen.height - box.yMax - Height;
+        box.yMin = box.yMax + Height;
         box.xMin = Mathf.Min(lowerTopLeft.x, lowerTopRight.x, lowerBottomLeft.x, lowerBottomRight.x, upperTopLeft.x, upperTopRight.x, upperBottomRight.x, upperBottomLeft.x);
         box.xMax = Mathf.Max(lowerTopLeft.x, lowerTopRight.x, lowerBottomLeft.x, lowerBottomRight.x, upperTopLeft.x, upperTopRight.x, upperBottomRight.x, upperBottomLeft.x);
 
@@ -60,20 +57,7 @@ public static class SelectionOverlay{
         {
             for (int j = 0; j < Height; j++)
             {
-                if (!ownUnit && ((((i == 0  || i == 1 || i == Width - 1 || i == Width - 2) && (j > Height - HealthHeight )) 
-                    || (j == Height - 1 || j == Height - 2 || j == Height - HealthHeight || j == Height - HealthHeight - 1))))
-                {
-                	texToReturn.SetPixel(i, j, BorderColour);
-                }
-
-                else if (j > Height - HealthHeight)
-                {
-                    texToReturn.SetPixel(i, j, HealthColour);
-                }
-                else
-                {
-                    texToReturn.SetPixel(i, j, Color.clear);
-                }
+                texToReturn.SetPixel(i, j, HealthColour);
             }
         }
 
@@ -81,17 +65,20 @@ public static class SelectionOverlay{
         return texToReturn;
     }
 
-	public static GameObject getPlane(GameObject gameObject, Texture2D tex)
+	public static GameObject getPlane(GameObject gameObject, Texture2D tex, bool building)
     {
+
         GameObject plane = new GameObject("Plane");
-        Camera cam = GameObject.Find("Camera/Main Camera").GetComponent<Camera>();
-        plane.transform.localEulerAngles = angle;
+
         MeshFilter meshFilter = (MeshFilter)plane.AddComponent(typeof(MeshFilter));
         Collider coll = gameObject.GetComponent<Collider>();
+
+        plane.transform.localEulerAngles = angle;
         meshFilter.mesh = getQuad();
 
-        plane.transform.position = gameObject.transform.position + getOffset(coll);
-        plane.transform.localScale = new Vector3(coll.bounds.size.x, 0f, coll.bounds.size.x);
+        plane.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + (coll.bounds.size.y * 0.5f), gameObject.transform.position.z) ;
+        
+        plane.transform.localScale = new Vector3(coll.bounds.size.x* .75f , 0f, coll.bounds.size.x * (building ? .02f : .08f));
 
         MeshRenderer renderer = plane.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
         renderer.material.shader = Shader.Find("Particles/Additive");
@@ -102,7 +89,12 @@ public static class SelectionOverlay{
 
         return plane;
     }
-    
+
+    public static Vector3 Angle()
+    {
+        return angle;
+    }
+
     public static Mesh getQuad()
     {
         Mesh mesh = new Mesh();

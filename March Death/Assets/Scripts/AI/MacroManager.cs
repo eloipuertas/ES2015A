@@ -1,6 +1,7 @@
 ﻿using Storage;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -12,17 +13,27 @@ namespace Assets.Scripts.AI
 {
     public class MacroManager
     {
-        
+
         /// <summary>
         /// This list contains what buildings the macro plans to build next
         /// </summary>
-        List<UnitTypes> UnitPref;
+        Dictionary<UnitTypes, int> UnitPref;
         AIController ai;
-        AIArchitect architect;
+        public AIArchitect architect;
+        static Dictionary<UnitTypes, BuildingTypes> unitToBuildMap = new Dictionary<UnitTypes, BuildingTypes>()
+        {
+            {UnitTypes.HEAVY,BuildingTypes.BARRACK},
+            {UnitTypes.LIGHT,BuildingTypes.BARRACK},
+            {UnitTypes.THROWN,BuildingTypes.ARCHERY}
+        };
         public MacroManager(AIController ai)
         {
             this.ai = ai;
-            UnitPref = new List<UnitTypes>() {UnitTypes.CIVIL};
+
+            UnitPref = new Dictionary<UnitTypes, int>();
+            UnitPref.Add(UnitTypes.HEAVY, 5);
+            UnitPref.Add(UnitTypes.LIGHT, 0);
+            UnitPref.Add(UnitTypes.THROWN, 0);
             architect = new AIArchitect(ai);
         }
         /// <summary>
@@ -33,6 +44,19 @@ namespace Assets.Scripts.AI
             foreach (Resource r in ai.OwnResources)
                 if (r.harvestUnits == 10) //TODO ask for the actual max
                     architect.buildingPrefs.Add(r.type);
+            List<UnitTypes> keys = new List<UnitTypes>(UnitPref.Keys);
+            foreach (var key in keys)
+            {
+                int val = UnitPref[key] += 5;
+                if (val < 0) //avoid overflows
+                {
+                    UnitPref[key] = 0;
+                }
+                else if (val > 100)
+                {
+                    architect.buildingPrefs.Insert(0, unitToBuildMap[key]);
+                }
+            }
         }
         /// <summar>
         /// Called fast enough, acomplishes what the macroHigh asks for
@@ -43,10 +67,19 @@ namespace Assets.Scripts.AI
             {
                 architect.constructNextBuilding();
             }
-            foreach(Resource r in ai.OwnResources)
+            foreach (Resource r in ai.OwnResources)
             {
                 if (r.harvestUnits < 10)
                     r.newCivilian();
+            }
+            UnitTypes bUnit = (UnitPref.Aggregate((a, b) => a.Value > b.Value ? a : b)).Key;
+            BuildingTypes needed = unitToBuildMap[bUnit];
+            foreach (Barrack b in ai.OwnBarracks)
+            {
+                if (b.type == needed)
+                {
+                    UnitPref[bUnit] += (b.addUnitQueue(bUnit)) ? -1 : 0;
+                }
             }
         }
         /// <summary>
@@ -54,7 +87,7 @@ namespace Assets.Scripts.AI
         /// </summary>
         public int canTakeArms()
         {
-            return ai.Workers.Count; 
+            return ai.Workers.Count;
         }
         /// <summary>
         /// The micro is forcibly taking num civils from the macro
@@ -64,10 +97,28 @@ namespace Assets.Scripts.AI
         {
             if (ai.Workers.Count > 0)
             {
+                List<Unit> lu = new List<Unit>();
+
                 int min = Math.Min(num, ai.Workers.Count);
-                List<Unit> lu = ai.Workers.GetRange(0, min);
-                ai.Workers.RemoveRange(0, min);
-                ai.addToArmy(lu);
+                int edL = 0;
+                while (lu.Count < min && edL < ai.OwnResources.Count)
+                {
+                    Resource building = ai.OwnResources[edL];
+                    if (building.harvestUnits > 0)
+                    {
+                        Unit u = building.recruitExplorer();
+                        if (u != null)
+                        {
+                            lu.Add(u);
+                            ai.Workers.Remove(u);
+                        }
+                    }
+                    else
+                    {
+                        edL++;
+                    }
+                    ai.addToArmy(lu);
+                }
             }
         }
     }

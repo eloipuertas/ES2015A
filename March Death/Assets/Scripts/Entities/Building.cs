@@ -39,6 +39,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     public T DESTROYED { get; set; }
     public T CREATE_UNIT { get; set; }
     public T BUILDING_FINISHED { get; set; }
+    public T HEALTH_UPDATED { get; set; }
 
     private float _totalBuildTime = 0;
     private float _creationTimer = 0;
@@ -57,6 +58,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     /// </summary>
     protected override void onReceiveDamage()
     {
+		base.onReceiveDamage ();
         fire(DAMAGED);
     }
 
@@ -111,6 +113,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         DESTROYED = (T)Enum.Parse(typeof(T), "DESTROYED", true);
         CREATE_UNIT = (T)Enum.Parse(typeof(T), "CREATE_UNIT", true);
         BUILDING_FINISHED = (T) Enum.Parse(typeof(T), "BUILDING_FINISHED", true);
+        HEALTH_UPDATED = (T)Enum.Parse(typeof(T), "HEALTH_UPDATED", true); 
 
         // Call GameEntity start
         base.Awake();
@@ -129,14 +132,13 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         _deploymentPoint = new Vector3(transform.position.x + 10, transform.position.y, transform.position.z + 10);
         activateFOWEntity();
 
-        if (DefaultStatus == EntityStatus.BUILDING_PHASE_1)
+        /*if (DefaultStatus == EntityStatus.BUILDING_PHASE_1)
         {
             _woundsReceived = info.buildingAttributes.wounds;
             _woundsBuildControl = info.buildingAttributes.wounds;
-        }
+        }*/
 
         //return (info.buildingAttributes.wounds - _woundsReceived) * 100f / info.buildingAttributes.wounds;
-
         // Set the status
         setStatus(DefaultStatus);
     }
@@ -162,7 +164,8 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
                 // We are substracting wounds instead of a new value because the building might be under attack while is being built.
                 _woundsReceived -= diffWounds;
                 _woundsBuildControl = woundsBuilt;
-                fire(DAMAGED);
+                fire(HEALTH_UPDATED);
+                Debug.Log("entra health");
             }
 
 			// TODO: What if we have more than 3 phases... maybe we should add the number of phases in the JSON, instead of harcoding it...
@@ -213,7 +216,6 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         GameObject gob = Info.get.createUnit(race, type, unitPosition, transform.rotation, -1);
 
         Unit new_unit = gob.GetComponent<Unit>();
-        new_unit.role = Unit.Roles.WANDERING;
 
         BasePlayer.getOwner(this).addEntity(new_unit);
         fire(CREATE_UNIT, new_unit);

@@ -125,6 +125,20 @@ namespace Utils
                 return new Vector3(0,0,0);
         }
 
+
+        /// <summary>
+        /// Returns the object of a unit, please be sure that there is a unit there
+        /// </summary>
+        /// <returns></returns>
+        public GameObject Unit()
+        {
+            Ray _ray = Camera.main.ScreenPointToRay(MousePosition());
+            if (Physics.Raycast(_ray, out _hit, Mathf.Infinity, _layersMasks[Layers.UNIT]))
+                return _hit.collider.gameObject;
+            else
+                return null;
+        }
+
         //Private stuff
         
         private Vector3 MousePosition() {

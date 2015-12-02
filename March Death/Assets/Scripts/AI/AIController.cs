@@ -9,7 +9,7 @@ using Utils;
 /// <summary>
 /// Class tasked with deciding what the enemy will do.
 /// </summary>
-namespace Assets.Scripts.AI 
+namespace Assets.Scripts.AI
 {
     public class AIController : BasePlayer
     {
@@ -26,7 +26,7 @@ namespace Assets.Scripts.AI
 
         List<AIModule> modules;
         float[] timers;
-        //TODO: change this when decided about what do we really need to keep about buildings 
+        //TODO: change this when decided about what do we really need to keep about buildings
         public List<Resource> OwnResources { get; set; }
         public List<Barrack> OwnBarracks { get; set; }
         public List<IGameEntity> EnemyBuildings { get; set; }
@@ -40,7 +40,6 @@ namespace Assets.Scripts.AI
         public Vector3 rootBasePosition;
         public List<Unit> Army { get; set; }
         public List<Unit> Workers { get; set; }
-        public AISenses senses;
 
         // HACK To signal MicroManager that the game has ended when the AI hero is killed
         public bool FinishPlaying { get { return missionStatus.isGameOver(); } }
@@ -66,12 +65,6 @@ namespace Assets.Scripts.AI
             rootBasePosition = new Vector3(pos.X, 80, pos.Y);
             buildPosition = rootBasePosition;
             Macro = new MacroManager(this);
-
-            //We need to implement som kind of senses for te AI so here they are 
-            GameObject sensesContainer = new GameObject("AI Senses");
-            sensesContainer.AddComponent<AISenses>();
-            senses = sensesContainer.GetComponent<AISenses>();
-
             Micro = new MicroManager(this);
             modules.Add(new AIModule(Macro.MacroHigh, 30));
             modules.Add(new AIModule(Macro.MacroLow, 5));
@@ -100,7 +93,7 @@ namespace Assets.Scripts.AI
             missionStatus = new MissionStatus(playerId);
 
         }
-        
+
         void Update()
         {
             if (!missionStatus.isGameOver())
@@ -201,10 +194,11 @@ namespace Assets.Scripts.AI
 
         }
 
-        public void CreateBuilding(BuildingTypes btype, Vector3 position, Quaternion rotation)
+        public void CreateBuilding(BuildingTypes btype, Vector3 position, Quaternion rotation, AIArchitect architect)
         {
             GameObject g = Info.get.createBuilding(_selfRace, btype, position, rotation);
             IGameEntity entity = g.GetComponent<IGameEntity>();
+            entity.registerFatalWounds(architect.onDestroy);
             OnBuildingCreated(entity);
             if(!AIArchitect.TESTING) checkout(entity);
         }
@@ -225,16 +219,14 @@ namespace Assets.Scripts.AI
         {
             if (u.info.isCivil)
             {
-                //Workers.Add(u);
-                //The line above is correct, but we still don't have enemy units so let's just put everything into the army and wipe the floor with the player
-                addToArmy(u);
+                Workers.Add(u);
             }
             else
             {
                 addToArmy(u);
             }
         }
-        
+
         public override void removeEntity(IGameEntity entity) {
             if (entity.info.isBuilding)
             {
@@ -250,7 +242,7 @@ namespace Assets.Scripts.AI
             else
             {
                 Unit u = (Unit)entity;
-                Micro.OnUnitDead(u);
+
                 if (entity.info.isArmy)
                 {
                     if (Army.Contains(u))
@@ -278,7 +270,7 @@ namespace Assets.Scripts.AI
             buildPosition = entity.getTransform().position + new Vector3(0,0,30);
             OnBuildingCreated(entity);
         }
-        
+
         public void addToArmy(List<Unit> units)
         {
             foreach (Unit u in units)
@@ -302,5 +294,5 @@ namespace Assets.Scripts.AI
         /// </summary>
         public int period;
     }
-    
+
 }

@@ -53,7 +53,8 @@ namespace SceneLoader
         private void LoadHUD()
         {
             gameInfo.SetPlayerRace(_playerRace);
-            gameInfo.LoadHUD();
+            // NOTE: This would load a 2nd HUD
+            //gameInfo.LoadHUD();
         }
 
 
@@ -68,9 +69,7 @@ namespace SceneLoader
             }
 
             
-            LoadHUD();
-
-            
+            LoadHUD();            
         }
 
         public void LoadExtraUnits()

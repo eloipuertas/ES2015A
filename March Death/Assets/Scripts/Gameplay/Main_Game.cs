@@ -12,24 +12,39 @@ public class Main_Game : MonoBehaviour
     public Managers.BuildingsManager BuildingsMgr { get { return bm; } }
 
     // Use this for initialization
-    void Start ()
+    void Start()
     {
-        if (GameObject.Find ("GameInformationObject"))
-            info = (GameInformation)GameObject.Find ("GameInformationObject").GetComponent ("GameInformation");
+        if (GameObject.Find("GameInformationObject"))
+            info = (GameInformation)GameObject.Find("GameInformationObject").GetComponent("GameInformation");
         bm = new Managers.BuildingsManager();
         sounds = GameObject.Find("GameController").GetComponent<Managers.SoundsManager>();
-        if (info) info.LoadHUD ();
+        if (info) info.LoadHUD();
+        //if (info) info.LoadActionButtons();
         StartGame();
         bm.Player = user;
         UserInput inputs = gameObject.AddComponent<UserInput>();
         inputs.TerrainLayerMask = new LayerMask();
         inputs.TerrainLayerMask = 520;// HACK LayerMask.NameToLayer("Terrain"); didn't work
-        bm.Inputs = inputs; 
+        bm.Inputs = inputs;
+        LoadInitialScreen();
     }
 
     public GameInformation GetGameInformationObject()
     {
         return info;
+    }
+
+    void LoadInitialScreen()
+    {
+        switch (info.GetPlayerRace())
+        {
+            case Races.ELVES:
+                Instantiate(Resources.Load("WelcomeScreen-Elf")).name = "Welcome-Screen";
+                break;
+            case Races.MEN:
+                Instantiate(Resources.Load("WelcomeScreen-Human")).name = "Welcome-Screen";
+                break;
+        }
     }
 
     public void StartGame()
@@ -40,13 +55,20 @@ public class Main_Game : MonoBehaviour
                 LoadCampaign();
                 break;
             case GameInformation.GameMode.SKIRMISH:
+                LoadSkirmish();
                 break;
         }
 
         BasePlayer.Setup();
     }
 
-    private void LoadCampaign ()
+    private void LoadSkirmish()
+    {
+        // TODO Replace with appropriate functionality
+        LoadCampaign();
+    }
+
+    private void LoadCampaign()
     {
         int id = 1;
         foreach (Battle.PlayerInformation player in info.GetBattle().GetPlayerInformationList())
@@ -69,6 +91,7 @@ public class Main_Game : MonoBehaviour
 
     public void ClearGame()
     {
+        Debug.LogError("Terminando el juego!");
         GameObject obj;
         obj = GameObject.Find("GameInformationObject").gameObject;
         Destroy(obj);

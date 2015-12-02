@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using Storage;
+using UnityEngine.Assertions;
 
 
 public class Resource : Building<Resource.Actions>
 {
-    public enum Actions { CREATED, DAMAGED, DESTROYED, BUILDING_FINISHED, COLLECTION, CREATE_UNIT, DEL_STATS };
+    public enum Actions { CREATED, DAMAGED, DESTROYED, BUILDING_FINISHED, COLLECTION, CREATE_UNIT, DEL_STATS, HEALTH_UPDATED };
 
     /// <summary>
     /// civilian creation waste some time. When units are being created status
@@ -79,6 +80,7 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     List<Unit> workersList = new List<Unit>();
 
+   
     /// <summary>
     /// HUD, get current civilian units working here
     /// </summary>
@@ -314,22 +316,17 @@ public class Resource : Building<Resource.Actions>
     public void newCivilian()
     {
         // If there's no workers, the next unit to be created will be a worker...
-        if (harvestUnits < 1)
+        if (harvestUnits < info.resourceAttributes.maxUnits)
         {
-            // TODO get inside meeting point and calculate position
-            //unitPosition = this.GetComponent(meetingPointInside).transform.position;
 
-            // Units distributed in rows of 5 elements
-
-            _xDisplacement = harvestUnits % 5;
-            _yDisplacement = harvestUnits / 5;
-            _unitPosition.Set(_center.x + _xDisplacement, _center.y, _center.z + _yDisplacement);
+            _unitPosition.Set(_center.x , _center.y, _center.z );
 
             // Method createUnit from Info returns GameObject Instance;
             GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
 
             Unit civil = gob.GetComponent<Unit>();
-            civil.role = Unit.Roles.PRODUCING;
+            civil.vanish();
+            civil.setStatus(EntityStatus.WORKING);
             BasePlayer.getOwner(this).addEntity(civil);
             fire(Actions.CREATE_UNIT, civil);
 
@@ -342,6 +339,7 @@ public class Resource : Building<Resource.Actions>
         }
         else
         {
+            // building capacity is full new civilians will be explorers
             base.addUnitQueue(UnitTypes.CIVIL);
         }
 
@@ -353,23 +351,35 @@ public class Resource : Building<Resource.Actions>
     /// Recruit a Explorer from building. you need to do this to take away worker
     ///  from building. production decrease when you remove workers
     /// </summary>
-    private void recruitExplorer(Unit worker)
+    public Unit recruitExplorer()
     {
+       
         if (harvestUnits > 0)
         {
+            Unit worker;
+            worker = workersList.PopAt(0);
             _collectionRate -= worker.info.attributes.capacity;
             harvestUnits--;
+            _xDisplacement = totalUnits % 5;
+            _yDisplacement = totalUnits / 5;
+            _unitPosition.Set(_center.x + 10 + _xDisplacement, _center.y, _center.z + 10 +  _yDisplacement);
 
-            worker.role = Unit.Roles.WANDERING;
-            workersList.Remove(worker);
+            worker.bringBack();
+            worker.transform.position = _unitPosition;
+            worker.setStatus(EntityStatus.IDLE);
+
+            if (harvestUnits == 0)
+            {
+                setStatus(EntityStatus.IDLE);
+            }
+            return worker;
         }
-
-        // No workers
-        if (harvestUnits == 0)
+        else
         {
-            setStatus(EntityStatus.IDLE);
-        }
-        // TODO: Some alert message if you try to remove unit when no unit at building
+            Debug.Log("Can't recruite explorer because no workers");
+            return null;
+        }      
+        // TODO: Some alert message or sound for player if try to remove unit when no unit at building
     }
 
     /// <summary>
@@ -382,99 +392,47 @@ public class Resource : Building<Resource.Actions>
         {
             _collectionRate -= explorer.info.attributes.capacity;
             harvestUnits++;
+            
+            explorer.setStatus(EntityStatus.WORKING);
 
-            explorer.role = Unit.Roles.PRODUCING;
             workersList.Add(explorer);
+            if (harvestUnits == 1)
+            {
+                setStatus(EntityStatus.WORKING);
+            }
         }
-        if (harvestUnits == 1)
+        else
         {
-            setStatus(EntityStatus.WORKING);
-        }
-        Debug.Log(" You are trying to recruit worker but building capacity is full");
+            Debug.Log(" You are trying to recruit worker but building capacity is full");
+        }     
+        
     }
 
     /// <summary>
-    /// when collider interact with other gameobject method checks if
-    /// gameobject is a civilian unit. Civilians units are recruited as workers
-    /// while limit of workers are not reached.
+    /// If civilian unit points to building and is close enough (inside trapRange)
+    /// Unit is vanished and teleported to building. Civilian units at building
+    /// are recruited as workers.
     /// </summary>
-    /// <param name="other">collider gameobject interacting with our own collider</param>
-    void OnTriggerEnter(Collider other)
+    /// <param name="entity"></param>
+    public void trapUnit(IGameEntity entity)
     {
+        // Unit must be civil and player owned
+        Assert.IsTrue(entity.info.isCivil);
+        Assert.IsTrue(entity.info.race == info.race);
 
         // space enough to hold new civil
-
         if (harvestUnits < info.resourceAttributes.maxUnits)
         {
-            IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
-
-            if (entity.info.isUnit)
-            {
-                if (entity.info.isCivil)
-                {
-                    recruitWorker((Unit)entity);
-                }
-            }
+            Unit unit = (Unit)entity;
+            unit.vanish();
+            unit.transform.position = this.transform.position;
+            recruitWorker((Unit)unit);
         }
-    }
-
-    /// <summary>
-    /// If unit inside building is attacked and killed we must recalculate
-    /// collection rate and current harvestUnits. No harvestUnits means no
-    ///  production or collection so IDLE status.
-    /// </summary>
-    /// <param name="other"></param>
-    void OnTriggerStay(Collider other)
-    {
-
-        IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
-        if ((entity.info.isUnit) && (entity.info.isCivil))
+        else
         {
-            if (entity.status == EntityStatus.DEAD)
-            {
-                _collectionRate -= entity.info.attributes.capacity;
-                harvestUnits--;
-                if (harvestUnits == 0)
-                {
-                    setStatus(EntityStatus.IDLE);
-                }
-            }
+            //do nothing
         }
     }
-
-    /// <summary>
-    /// when collider interaction with other gameobject ends method checks if
-    /// gameobject is civilian unit. Civilians units are recruited as explorers
-    /// and fired as workers.
-    /// </summary>
-    /// <param name="other">collider gameobject interacting with our own collider</param>
-    void OnTriggerExit(Collider other)
-
-    {
-        // get entity
-        IGameEntity entity = other.gameObject.GetComponent<IGameEntity>();
-
-        if (harvestUnits < info.resourceAttributes.maxUnits)
-        {
-            if (entity.info.isUnit)
-            {
-                if (entity.info.isCivil)
-                {
-                    recruitExplorer((Unit)entity);
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// Workers can be attacked inside buildings???. waiting for design decission
-    /// </summary>
-    /// <param name="unit"></param>
-    private void onUnitDestroy(Unit unit)
-    {
-
-    }
-
 
     /// <summary>
     /// When building is destroyed civilian workers turns into explorers
@@ -485,12 +443,6 @@ public class Resource : Building<Resource.Actions>
         {
             statistics.getNegative();
             fire(Actions.DEL_STATS, statistics);
-        }
-
-        foreach (Unit unit in workersList)
-        {
-            unit.role = Unit.Roles.WANDERING;
-            harvestUnits--;
         }
 
         base.OnDestroy();
@@ -608,5 +560,19 @@ public class Resource : Building<Resource.Actions>
     {
         base.onBuilt();
         newCivilian();
+    }
+}
+
+/// <summary>
+/// Class to pop element from list. Weird thing , sure. 
+/// </summary>
+/// 
+static class ListExtension
+{
+    public static T PopAt<T>(this List<T> list, int index)
+    {
+        T r = list[index];
+        list.RemoveAt(index);
+        return r;
     }
 }

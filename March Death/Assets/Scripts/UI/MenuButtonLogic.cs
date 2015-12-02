@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class MenuButtonLogic : MonoBehaviour {
 
-	static bool bPaused = false;
+	public static bool bPaused = false;
 
     static string path;
 

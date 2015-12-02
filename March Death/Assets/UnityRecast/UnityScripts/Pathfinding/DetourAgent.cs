@@ -1,8 +1,11 @@
-﻿using System;
+﻿#define NON_AGGRESSIVE_CHECKING
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Pathfinding
 {
@@ -79,15 +82,24 @@ namespace Pathfinding
             }
         }
 
+        public int ID { get { return idx; } }
+
         public void AddToCrowd()
         {
-            idx = DetourCrowd.Instance.AddAgent(this, ap);
+            if (idx == -1)
+            {
+                idx = DetourCrowd.Instance.AddAgent(this, ap);
+                targetPoint = transform.position;
+            }
         }
 
         public void RemoveFromCrowd()
         {
-            DetourCrowd.Instance.RemoveAgent(idx);
-            idx = -1;
+            if (idx != -1)
+            {
+                DetourCrowd.Instance.RemoveAgent(this);
+                idx = -1;
+            }
         }
 
         public void UpdateParams()
@@ -116,7 +128,6 @@ namespace Pathfinding
         {
             UpdateParams();
             AddToCrowd();
-            targetPoint = transform.position;
         }
 
         public void OnDisable()
@@ -126,12 +137,30 @@ namespace Pathfinding
 
         public void MoveTo(Vector3 target)
         {
+#if NON_AGGRESSIVE_CHECKING
+            if (idx == -1)
+            {
+                return;
+            }
+#else
+            Assert.IsTrue(idx != -1);
+#endif
+
             targetPoint = target;
             DetourCrowd.Instance.MoveTarget(idx, target);
         }
 
         public void ResetPath()
         {
+#if NON_AGGRESSIVE_CHECKING
+            if (idx == -1)
+            {
+                return;
+            }
+#else
+            Assert.IsTrue(idx != -1);
+#endif
+
             DetourCrowd.Instance.ResetPath(idx);
         }
     }

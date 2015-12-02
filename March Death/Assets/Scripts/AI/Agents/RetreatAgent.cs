@@ -38,20 +38,20 @@ namespace Assets.Scripts.AI.Agents
 
         }
 
-        public override void controlUnits(SquadAI squad)
+        public override void controlUnits(Squad squad)
         {
             // Mirar on estan els enemics
-			enemySquadBoundingBox = squad.enemySquad.boudningBox;
+			enemySquadBoundingBox = squad.EnemySquad.BoundingBox.Bounds;
             
             // Mirar on estic jo
-            ownSquadBoundingBox = squad.boudningBox;
+            ownSquadBoundingBox = squad.BoundingBox.Bounds;
 
             // Intentar Veure on hauria d'anar una unitat per estar protegida
             recalcSafePoint();
 
             if (ai.EnemyUnits.Count > 0)
             {
-                foreach (Unit u in squad.units)
+                foreach (Unit u in squad.Units)
                 {
                     if (u.status != EntityStatus.DEAD)
                     {
@@ -64,24 +64,24 @@ namespace Assets.Scripts.AI.Agents
                     }
                 }
                 assistAgent.addConfidence(CONFIDENCE_ASSIST_HELP_NEEDED);
-                assistAgent.requestHelp(new KeyValuePair<SquadAI, int>(squad, CONFIDENCE_ASSIST_HELP_NEEDED));
+                assistAgent.requestHelp(new KeyValuePair<Squad, int>(squad, CONFIDENCE_ASSIST_HELP_NEEDED));
             }
         }
 
 
-        public override int getConfidence(SquadAI squad)
+        public override int getConfidence(Squad squad)
         {
             if (ai.EnemyUnits.Count == 0)
                 return 0;
-            
+
             minDistanceBetweenHeroAndNearestEnemy = 0;
 
             //Get the squad bounding box
-            ownSquadBoundingBox = squad.boudningBox;
+            ownSquadBoundingBox = squad.BoundingBox.Bounds;
 
-            foreach (Unit enemyUnit in squad.enemySquad.units)
+            foreach (Unit enemyUnit in squad.EnemySquad.Units)
             {
-                foreach (Unit ownUnit in squad.units)
+                foreach (Unit ownUnit in squad.Units)
                 {
                     float distance = Vector3.Distance(enemyUnit.transform.position, ownUnit.transform.position);
                     //HACK: Change this magic number before intefore integration.

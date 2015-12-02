@@ -15,7 +15,9 @@
         "updateInterval": 10,
         "sightRange": 50,
         "creationQueueCapacity": 5,
-        "creationTime": 15
+        "creationTime": 15,
+		"trapRange": 5
+		
     },
 
     "resources": {
@@ -34,6 +36,10 @@
             "targetType": "UNIT",
             "targetRace": "MEN",
             "targetUnit": "CIVIL"
+        },
+        {
+            "ability": "Recruit Explorer",
+			"name": "Recruit Explorer"
         },
         {
             "name": "Sell",

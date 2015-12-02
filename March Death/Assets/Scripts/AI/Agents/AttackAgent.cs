@@ -35,22 +35,25 @@ namespace Assets.Scripts.AI.Agents
             assistAgent = assist;
         }
 
-        public override void controlUnits(SquadAI squad)
+        public override void controlUnits(Squad squad)
         {
             Vector3 Squadpos = Vector3.zero;
-            if (squad.units.Count > 0)
+            if (squad.Units.Count > 0)
             {
                 //We assume our squad is mostly together 
-                Squadpos = squad.boudningBox.center;
+                Squadpos = squad.BoundingBox.Bounds.center;
             }
-            if (ai.EnemyUnits.Count > 0)
+
+            if (squad.EnemySquad.Units.Count > 0)
             {
-                foreach(Unit u in squad.units)
+                //Debug.Log(squad.Units[0] + " " + squad.EnemySquad.Units[0]);
+
+                foreach (Unit u in squad.Units)
                 {
                     //Select target
                     Unit bTar = null;
                     float bVal = float.MinValue;
-                    foreach (Unit e in squad.enemySquad.units)
+                    foreach (Unit e in squad.EnemySquad.Units)
                     {
                         float val = -Vector3.Distance(u.transform.position, e.transform.position);
                         if (u.type == Storage.UnitTypes.HERO)
@@ -63,7 +66,7 @@ namespace Assets.Scripts.AI.Agents
                             bTar = e;
                         }
                     }
-                    if (bTar!=null && u.status != EntityStatus.DEAD && ((Unit)u.getTarget() != bTar))
+                    if (bTar!=null && bTar.status!=EntityStatus.DEAD && u.status != EntityStatus.DEAD && ((Unit)u.getTarget() != bTar))
                     {
                         u.attackTarget(bTar);
                     }
@@ -82,13 +85,13 @@ namespace Assets.Scripts.AI.Agents
 		/// </summary>
 		/// <returns>The confidence.</returns>
 		/// <param name="squad">Squad.</param>
-        public override int getConfidence(SquadAI squad)
+        public override int getConfidence(Squad squad)
         {
-            if (ai.EnemyUnits.Count == 0)
+            if (squad.EnemySquad.Units.Count == 0)
                 return 0;
 
             //Get the ratio of how better we are comparing us with the enemy army
-            supremaciIndex = squad.getData<AttackData>().Value / squad.enemySquad.getData<AttackData>().Value;
+            supremaciIndex = squad.Attack / squad.EnemySquad.Attack;
 
             //If is an infinity number we return 0
             supremaciIndex = supremaciIndex == Mathf.Infinity ? 0 : supremaciIndex;
@@ -99,7 +102,7 @@ namespace Assets.Scripts.AI.Agents
                 conf = Mathf.RoundToInt(Mathf.Min(supremaciIndex, CONFIDENCE_OWN_SQUAD_SUPREMACI_MAX_MULTITPLIER) * CONFIDENCE_OWN_SQUAD_SUPREMACY);
 
                 //We need to check if the enemy squad has hero inside
-                foreach (Unit u in squad.enemySquad.units)
+                foreach (Unit u in squad.EnemySquad.Units)
                 {
                     if(u.type == Storage.UnitTypes.HERO)
                     {
@@ -113,24 +116,6 @@ namespace Assets.Scripts.AI.Agents
 
             return 0;
 
-        }
-    }
-
-    class AttackData : AgentData
-    {
-        public float Value { get; set; }
-        public bool hasChanged { get; set; }
-        public AttackData()
-        {
-            hasChanged = true;
-        }
-        public override void OnUnitJoined(Unit u)
-        {
-            hasChanged = true;
-        }
-        public override void OnUnitLeft(Unit u)
-        {
-            hasChanged = true;
         }
     }
 }

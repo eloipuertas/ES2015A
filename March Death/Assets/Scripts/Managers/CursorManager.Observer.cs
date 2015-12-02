@@ -70,7 +70,7 @@ namespace Managers
             /// Mainly here we check if the selection is not a building and then
             /// if the pointed entity is an enemy or not, if it is we show a sword if not, we show the pointer cursor
 
-            if (BasePlayer.player.selection.IsBuilding())
+            if (BasePlayer.player.selection.IsBuilding)
                 _currentCursor = cursor.POINTER;
             else if(ItsEnemy())
                 _currentCursor = cursor.SWORD;
