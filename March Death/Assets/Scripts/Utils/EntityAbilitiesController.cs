@@ -23,7 +23,7 @@ public class EntityAbilitiesController : MonoBehaviour
     private static int Button_Columns = 4;
     private static Boolean showText = false;
 
-    public static List<Ability> abilities_on_show;
+    public static List<Ability> abilities_on_show = new List<Ability>();
 
     // Use this for initialization
     void Start()
@@ -42,8 +42,6 @@ public class EntityAbilitiesController : MonoBehaviour
         {
             registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
         });
-
-        abilities_on_show = new List<Ability>();
     }
 
     public void onActorSelected(System.Object obj)

@@ -283,6 +283,15 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         // TODO: Should this be automatically handled with events?
         BasePlayer.getOwner(this).removeEntity(this);
 
+        // Stop detour agent
+        doIfUnit(unit =>
+        {
+            if (!unit.isImmobile)
+            {
+                GetComponent<Pathfinding.DetourAgent>().enabled = false;
+            }
+        });
+
         // Play dead and/or destroy
         Destroy(this.gameObject, immediately ? 0.0f : 5.0f);
     }
@@ -428,7 +437,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         {
             if (unit.status == EntityStatus.IDLE)
             {
-                unit.attackTarget(from);
+                unit.attackTarget(from, true);
             }
         });
     }
