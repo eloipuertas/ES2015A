@@ -42,8 +42,6 @@ namespace Assets.Scripts.AI
         Dictionary<StructureType, List<Vector3>> avaliablePositions;
         ConstructionGrid constructionGrid;
 
-        Vector3 basePosition;
-
         public List<BuildingTypes> buildingPrefs;
 
         int buildingsPlaced;
@@ -63,17 +61,7 @@ namespace Assets.Scripts.AI
             ai = aiController;
             baseCriticPoints = new List<Vector3>();
 
-            //HACK: Probably would be cool to find a way to get this dinamically
-            if (ai.race == Storage.Races.ELVES)
-            {
-                basePosition = new Vector3(283.7f, 80.00262f, 562.5f);
-            }
-            else
-            {
-                basePosition = new Vector3(801.4f, 80.00262f, 753.6f);
-            }
-
-            constructionGrid.reservePositionForStronghold(basePosition);
+            constructionGrid.reservePositionForStronghold(ai.rootBasePosition);
 
             planifyBuildingsAccordingToDifficulty();
 
@@ -217,7 +205,7 @@ namespace Assets.Scripts.AI
             Vector3 processingPos = Vector3.zero;
             Vector2 processingOffset = Vector2.zero;
 
-            processingPos.y = basePosition.y;
+            processingPos.y = ai.rootBasePosition.y;
 
             for(int i = 0; i < mapData.height; i++)
             {
@@ -225,8 +213,8 @@ namespace Assets.Scripts.AI
                 {
                     Color pixel = pixels[j + i * mapData.width];
                     processingOffset = new Vector2(i, j) - center;
-                    processingPos.x = basePosition.x + constructionGrid.getDimensions().x * processingOffset.x;
-                    processingPos.z = basePosition.z + constructionGrid.getDimensions().y * processingOffset.y;
+                    processingPos.x = ai.rootBasePosition.x + constructionGrid.getDimensions().x * processingOffset.x;
+                    processingPos.z = ai.rootBasePosition.z + constructionGrid.getDimensions().y * processingOffset.y;
                     processingPos = constructionGrid.discretizeMapCoords(processingPos);
 
                     //In order to be more flexible we need to check if we can construct
@@ -338,12 +326,11 @@ namespace Assets.Scripts.AI
                     {
                         buildingType = StructureType.HORIZONTALL_WALL;
                         if (ai.race == Races.MEN)
-                            buildingAngle = 90f;
+                            buildingAngle = 0f;
                     }
                     else
                     {
                         buildingType = StructureType.VERTICALL_WALL;
-                        if (ai.race == Races.ELVES)
                             buildingAngle = 90f;
                     }
                     break;
@@ -417,7 +404,6 @@ namespace Assets.Scripts.AI
                     //If the corner hasn't 2 walls or has 3 or more i need to skip it
                     if (!getCornerRotation(position))
                     {
-                        buildingPrefs.RemoveAt(0);
                         return;
                     }
                 }
@@ -429,9 +415,8 @@ namespace Assets.Scripts.AI
 
         bool getCornerRotation(Vector3 pos)
         {
-            List<IBuilding> buildings = ai.race == Races.ELVES ? Helpers.getBuildingsOfRaceNearPosition(pos, 20, ai.race) : Helpers.getBuildingsOfRaceNearPosition(pos, 22, ai.race);
+            List<IBuilding> buildings = Helpers.getBuildingsOfRaceNearPosition(pos, 10, ai.race);
 
-            Debug.Log(buildings.Count);
             List <GameObject> walls  = new List<GameObject>();
             foreach(IBuilding wall in buildings)
             {
