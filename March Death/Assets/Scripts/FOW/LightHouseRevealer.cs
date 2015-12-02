@@ -24,6 +24,7 @@ class LightHouseRevealer : MonoBehaviour
     private GameObject _light;
     private FOWEntity _fow;
     private GameObject _target;
+    private Unit _attacker;
     private Vector3 _lastPosition;
     private Vector3 _lastTargetPosition;
     private float _offset = 1f;
@@ -33,10 +34,10 @@ class LightHouseRevealer : MonoBehaviour
 
     void Start()
     {
-
         //moves the revealer to the orbitating position
         transform.position = transform.parent.position;
         _race = transform.parent.GetComponent<Barrack>().getRace();
+        _attacker = transform.parent.GetComponent<Unit>();
         _center = transform.parent.position;
         _fow = GetComponent<FOWEntity>();
         _fow.Activate(_race);
@@ -140,6 +141,7 @@ class LightHouseRevealer : MonoBehaviour
             {
                 _target = obj;
                 _lastTargetPosition = _target.transform.position;
+                _attacker.attackTarget(entity);
             }
 
         }
@@ -159,6 +161,7 @@ class LightHouseRevealer : MonoBehaviour
             {
                 _target = null;
                 _orbitating = true;
+                _attacker.stopAttack();
                 RestartLastPosition();
             }
 
