@@ -119,6 +119,9 @@ namespace Storage
                 case "Create Archery":
                     keyBinding = KeyCode.A;
                     break;
+                case "Create Artillery":
+                    keyBinding = KeyCode.R;
+                    break;
                 case "Create Stable":
                     keyBinding = KeyCode.C;
                     break;
@@ -127,6 +130,9 @@ namespace Storage
                     break;
                 case "Create Wall":
                     keyBinding = KeyCode.W;
+                    break;
+                case "Create WallGate":
+                    keyBinding = KeyCode.G;
                     break;
                 case "Create Cavalry":
                     keyBinding = KeyCode.C;
@@ -149,8 +155,14 @@ namespace Storage
                 case "Create Civil":
                     keyBinding = KeyCode.C;
                     break;
+                case "Create Gryphon":
+                    keyBinding = KeyCode.Y;
+                    break;
                 case "Sell":
                     keyBinding = KeyCode.S;
+                    break;
+                case "Recruit Explorer":
+                    keyBinding = KeyCode.E;
                     break;
                 default:
                     keyBinding =  KeyCode.RightShift;

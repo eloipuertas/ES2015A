@@ -54,10 +54,6 @@ public class HUDPopulationInfo : MonoBehaviour
         {
             Toggle();
         }
-        if (Input.GetKeyUp(KeyCode.C))
-        {
-            ToggleVision();
-        }
 
     }
 
