@@ -35,13 +35,6 @@ namespace Assets.Scripts.AI.Agents
 
         public override void controlUnits(Squad squad)
         {
-            Vector3 Squadpos = Vector3.zero;
-            if (squad.Units.Count > 0)
-            {
-                //We assume our squad is mostly together 
-                Squadpos = squad.BoundingBox.Bounds.center;
-            }
-
             if (squad.EnemySquad.Units.Count > 0)
             {
                 //Debug.Log(squad.Units[0] + " " + squad.EnemySquad.Units[0]);

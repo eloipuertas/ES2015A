@@ -22,7 +22,6 @@ namespace Assets.Scripts.AI.Agents
         Vector3 safeArea;
         float minDistanceBetweenHeroAndNearestEnemy;
 
-        private int confidence;
 
         bool isHeroInDanger;
 
@@ -78,7 +77,7 @@ namespace Assets.Scripts.AI.Agents
 
             //Get the squad bounding box
             ownSquadBoundingBox = squad.BoundingBox.Bounds;
-
+            int confidence = 0;
             foreach (Unit enemyUnit in squad.EnemySquad.Units)
             {
                 foreach (Unit ownUnit in squad.Units)
