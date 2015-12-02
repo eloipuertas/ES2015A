@@ -428,7 +428,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         {
             if (unit.status == EntityStatus.IDLE)
             {
-                unit.attackTarget(from);
+                unit.attackTarget(from, true);
             }
         });
     }
