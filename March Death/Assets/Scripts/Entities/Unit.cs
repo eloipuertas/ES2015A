@@ -743,10 +743,6 @@ public class Unit : GameEntity<Unit.Actions>
                         {
                             destination = _closestPointToTarget + ((Unit)_target).Agent.Velocity.normalized * (float)Math.Sqrt(SQR_UPDATE_DISTANCE);
                         }
-
-                        // Save move point
-                        _movePoint = destination;
-                        _detourAgent.MoveTo(destination);
                     }
 
                     // If we are already close enough, stop and attack
@@ -756,6 +752,12 @@ public class Unit : GameEntity<Unit.Actions>
                         setStatus(EntityStatus.ATTACKING);
                         _followingTarget = false;
                         return;
+                    }
+                    else
+                    {
+                        // Save move point
+                        _movePoint = destination;
+                        _detourAgent.MoveTo(destination);
                     }
                 }
 
