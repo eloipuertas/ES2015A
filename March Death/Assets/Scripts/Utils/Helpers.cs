@@ -127,7 +127,14 @@ public static class Helpers
         {
             GameObject obj = foundGameObjects[i];
             Unit objUnit = obj.GetComponent<Unit>();
-            if (objUnit != null && objUnit.race != race && objUnit.status != EntityStatus.DEAD && obj.GetComponent<FOWEntity>().IsRevealed)
+            FOWEntity fowEntity = obj.GetComponent<FOWEntity>();
+
+            if (objUnit == null || fowEntity == null)
+            {
+                continue;
+            }
+
+            if (objUnit.race != race && objUnit.status != EntityStatus.DEAD && fowEntity.IsRevealed)
             {
                 unitsOfRace.Add(objUnit);
             }
