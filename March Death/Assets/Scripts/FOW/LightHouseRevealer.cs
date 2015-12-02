@@ -36,16 +36,15 @@ class LightHouseRevealer : MonoBehaviour
 
         //moves the revealer to the orbitating position
         transform.position = transform.parent.position;
-        transform.Translate(new Vector3(RevealerOrbitatingRadius, 0f, 0f));
-        _basePosition = transform.position;
-
         _race = transform.parent.GetComponent<Barrack>().getRace();
         _center = transform.parent.position;
         _fow = GetComponent<FOWEntity>();
         _fow.Activate(_race);
         _revealerSphereRadius = _fow.Range * .5f;
         _light = transform.parent.FindChild("Light").gameObject;
+        _light.SetActive(false);
         _lastPosition = new Vector3(9999f, 9999f, 9999f);
+        transform.parent.GetComponent<Barrack>().register(Barrack.Actions.BUILDING_FINISHED, OnBuildingFinished);
         _orbitating = true;
     }
 
@@ -95,7 +94,18 @@ class LightHouseRevealer : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Enables the lighthouse system only when the building is finished
+    /// </summary>
+    /// <param name="obj"></param>
+    public void OnBuildingFinished(object obj)
+    {
+        transform.Translate(new Vector3(RevealerOrbitatingRadius, 0f, 0f));
+        _basePosition = transform.position;
+        _light.SetActive(true);
+        _orbitating = true;
 
+    }
     /// <summary>
     /// Toggles the orbitating direction
     /// </summary>
@@ -121,6 +131,7 @@ class LightHouseRevealer : MonoBehaviour
     /// <param name="col"></param>
     void OnTriggerEnter(Collider col)
     {
+        if (_target) return;
         GameObject obj = col.gameObject;
         IGameEntity entity = obj.GetComponent<IGameEntity>();
         if (entity != null)
