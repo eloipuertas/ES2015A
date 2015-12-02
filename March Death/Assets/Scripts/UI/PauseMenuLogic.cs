@@ -11,7 +11,9 @@ public class PauseMenuLogic : MonoBehaviour
 	void Start ()
 	{
         mg = GameObject.FindWithTag("GameController").GetComponent<Main_Game>();
-		GameObject.Find ("Resume").GetComponent<Button> ().onClick.AddListener (() => {
+        
+        // TODO: NullRefence here!
+        GameObject.Find ("Resume").GetComponent<Button> ().onClick.AddListener (() => {
 			QuitPauseMenu (); });
 		GameObject.Find ("Exit").GetComponent<Button> ().onClick.AddListener (() => {
 			QuitToMainMenu (); });
