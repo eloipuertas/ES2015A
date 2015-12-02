@@ -313,7 +313,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     /// <param name="unit"></param>
     /// <returns>Returns true if target is in range, false otherwise</returns>
-    public bool attackTarget<A>(GameEntity<A> entity, bool selfDefense = false) where A : struct, IConvertible
+    public bool attackTarget<A>(GameEntity<A> entity, bool selfDefense) where A : struct, IConvertible
     {
         // Note: Cast is redundant but avoids warning
         if (_target != (IGameEntity)entity)
