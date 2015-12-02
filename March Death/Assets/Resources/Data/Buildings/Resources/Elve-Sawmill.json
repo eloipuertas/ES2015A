@@ -36,10 +36,17 @@
             "targetRace": "ELVES",
             "targetUnit": "CIVIL"
         },
+
         {
             "ability": "Recruit Explorer",
-			"name": "Recruit Explorer"
+			"name": "Recruit Explorer",
+			
+			"tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "UNIT",
+            "targetRace": "ELVES",
+            "targetUnit": "CIVIL"
         },
+		
         {
             "name": "Sell",
             "tooltipFlags": "HIDE"

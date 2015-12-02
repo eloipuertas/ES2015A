@@ -103,8 +103,8 @@ public class EntityAbilitiesController : MonoBehaviour
                     Debug.Log("* " + abilityObj);
                     abilityObj.enable();
                 });
-                image.sprite = CreateSprite(ability, image.rectTransform.sizeDelta);
-                buttonComponent.targetGraphic = image;
+                //image.sprite = CreateSprite(ability, image.rectTransform.sizeDelta);
+                //buttonComponent.targetGraphic = image;
                 buttonComponent.onClick.AddListener(() => actionMethod());
                 image.enabled = true;
                 eventTrigger.enabled = true;

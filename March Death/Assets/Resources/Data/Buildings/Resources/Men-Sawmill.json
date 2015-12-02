@@ -39,7 +39,12 @@
         },
         {
             "ability": "Recruit Explorer",
-			"name": "Recruit Explorer"
+			"name": "Recruit Explorer",
+			
+			"tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "UNIT",
+            "targetRace": "MEN",
+            "targetUnit": "CIVIL"
         },
         {
             "name": "Sell",

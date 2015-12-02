@@ -24,6 +24,16 @@
 
     "abilities":
     [
+		{
+            "ability": "Create",
+            "name":"Create Siege",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "UNIT",
+            "targetRace": "MEN",
+            "targetUnit": "MACHINE"
+        },
+		
         {
             "name": "Sell",
             "tooltipFlags": "HIDE"
