@@ -62,13 +62,13 @@ public class Main_Game : MonoBehaviour
         BasePlayer.Setup();
     }
 
-    private void LoadSkirmish()
+    private void LoadCampaign()
     {
         // TODO Replace with appropriate functionality
-        LoadCampaign();
+        LoadSkirmish();
     }
 
-    private void LoadCampaign()
+    private void LoadSkirmish()
     {
         int id = 1;
         foreach (Battle.PlayerInformation player in info.GetBattle().GetPlayerInformationList())
