@@ -57,7 +57,9 @@ namespace Assets.Scripts.AI.Agents
                             bTar = e;
                         }
                     }
-                    if (bTar!=null && bTar.status!=EntityStatus.DEAD && u.status != EntityStatus.DEAD && ((Unit)u.getTarget() != bTar))
+                    IGameEntity target = u.getTarget();
+                    if (bTar!=null && bTar.status!=EntityStatus.DEAD && u.status != EntityStatus.DEAD &&
+                       (target==null || (!u.getTarget().info.isUnit || (Unit)u.getTarget() != bTar)))
                     {
                         u.attackTarget(bTar);
                     }

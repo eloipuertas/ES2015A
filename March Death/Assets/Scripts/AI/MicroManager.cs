@@ -54,8 +54,7 @@ namespace Assets.Scripts.AI
                 {
                     agent.PreUpdate();
                 }
-
-
+                
                 for(int i =0;i<squads.Count;i++)
                 {
                     // Update squad
@@ -139,7 +138,6 @@ namespace Assets.Scripts.AI
         /// <param name="u"></param>
         public void assignUnit(Unit u)
         {
-            //TODO: placeholder until we know how to split the squads
             if (u.type == Storage.UnitTypes.HERO)
             {
                 squads[0].AddUnit(u);
@@ -147,13 +145,13 @@ namespace Assets.Scripts.AI
             else if(u.type == Storage.UnitTypes.CIVIL)
             {
                 Squad s = new Squad(ai.race);
-                squads.Add(s);
                 s.AddUnit(u);
+                squads.Add(s);
             }
             else
             {
                 Squad s = squads[squads.Count-1];
-                if (s.Units.Count > 0)
+                if (s.Units.Count > 4)
                 {
                     s = new Squad(ai.race);
                     squads.Add(s);
