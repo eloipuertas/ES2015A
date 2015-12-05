@@ -138,7 +138,6 @@ namespace Assets.Scripts.AI
             {
                 if (!EnemyBuildings.Contains(g))
                 {
-                    Debug.Log(g.info.name);
                     g.registerFatalWounds(OnEnemyDied);
                     EnemyBuildings.Add(g);
                 }
