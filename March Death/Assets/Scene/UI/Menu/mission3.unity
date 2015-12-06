@@ -231,6 +231,76 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
+--- !u!1 &1369836417
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 176304, guid: 3ae3901878f29ca4d92291d94e0c9fee, type: 2}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 1369836418}
+  - 222: {fileID: 1369836420}
+  - 114: {fileID: 1369836419}
+  m_Layer: 5
+  m_Name: Image
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1369836418
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 22435396, guid: 3ae3901878f29ca4d92291d94e0c9fee,
+    type: 2}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1369836417}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1911435617}
+  m_RootOrder: 14
+  m_AnchorMin: {x: .5, y: .5}
+  m_AnchorMax: {x: .5, y: .5}
+  m_AnchoredPosition: {x: -159.000031, y: -137.599976}
+  m_SizeDelta: {x: 126, y: 126}
+  m_Pivot: {x: .5, y: .5}
+--- !u!114 &1369836419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11431118, guid: 3ae3901878f29ca4d92291d94e0c9fee,
+    type: 2}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1369836417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: .397000015}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Sprite: {fileID: 21300000, guid: 206069bd29f70874d9d0e2248c176af6, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+--- !u!222 &1369836420
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 22248432, guid: 3ae3901878f29ca4d92291d94e0c9fee,
+    type: 2}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1369836417}
 --- !u!1001 &1911435616
 Prefab:
   m_ObjectHideFlags: 0
@@ -314,25 +384,11 @@ Prefab:
       propertyPath: m_Name
       value: Canvas
       objectReference: {fileID: 0}
-    - target: {fileID: 11410014, guid: 1ce6f33ff70c39b499eef33ff853d866, type: 2}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: 66626bd5767277d4d9528f43c680a2f3,
-        type: 3}
-    - target: {fileID: 11474228, guid: 1ce6f33ff70c39b499eef33ff853d866, type: 2}
-      propertyPath: m_Text
-      value: thyhtyhtyhyth
-      objectReference: {fileID: 0}
-    - target: {fileID: 11478684, guid: 1ce6f33ff70c39b499eef33ff853d866, type: 2}
-      propertyPath: m_Text
-      value: 'MISSION 3 - The Mountain
-
-'
-      objectReference: {fileID: 0}
-    - target: {fileID: 11455192, guid: 1ce6f33ff70c39b499eef33ff853d866, type: 2}
-      propertyPath: m_Text
-      value: "\r\nSurvive to the mountain"
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 1ce6f33ff70c39b499eef33ff853d866, type: 2}
   m_IsPrefabParent: 0
+--- !u!224 &1911435617 stripped
+RectTransform:
+  m_PrefabParentObject: {fileID: 22419900, guid: 1ce6f33ff70c39b499eef33ff853d866,
+    type: 2}
+  m_PrefabInternal: {fileID: 1911435616}
