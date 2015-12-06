@@ -81,7 +81,7 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     List<Unit> workersList = new List<Unit>();
 
-   
+
     /// <summary>
     /// HUD, get current civilian units working here
     /// </summary>
@@ -281,8 +281,10 @@ public class Resource : Building<Resource.Actions>
 
         if (amount > 0.0)
         {
-            Goods goods = new Goods();
-            goods.amount = amount;
+            CollectableGood collectable = new CollectableGood();
+            collectable.entity = this;
+            collectable.goods = new Goods();
+            collectable.goods.amount = amount;
 
             // TODO:
             // BUG: Null reference when we try to add material amount to player.
@@ -290,19 +292,19 @@ public class Resource : Building<Resource.Actions>
             if (type.Equals(BuildingTypes.FARM))
             {
                 BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.FOOD, amount);
-                goods.type = Goods.GoodsType.FOOD;
+                collectable.goods.type = Goods.GoodsType.FOOD;
             }
             else if (type.Equals(BuildingTypes.MINE))
             {
                 BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.METAL, amount);
-                goods.type = Goods.GoodsType.METAL;
+                collectable.goods.type = Goods.GoodsType.METAL;
             }
             else
             {
                 BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.WOOD, amount);
-                goods.type = Goods.GoodsType.WOOD;
+                collectable.goods.type = Goods.GoodsType.WOOD;
             }
-            fire(Actions.COLLECTION, goods);
+            fire(Actions.COLLECTION, collectable);
         }
     }
 
@@ -354,17 +356,17 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     public Unit recruitExplorer()
     {
-        
+
         if (harvestUnits > 0)
         {
             Unit worker;
             worker = workersList.PopAt(0);
             _collectionRate -= worker.info.attributes.capacity;
             harvestUnits--;
-            
+
             worker.transform.position = getMeetingPoint();
             worker.bringBack();
-            
+
             worker.setStatus(EntityStatus.IDLE);
 
             if (harvestUnits == 0)
@@ -377,7 +379,7 @@ public class Resource : Building<Resource.Actions>
         {
             Debug.Log("Can't recruite explorer because no workers");
             return null;
-        }      
+        }
         // TODO: Some alert message or sound for player if try to remove unit when no unit at building
     }
 
@@ -391,7 +393,7 @@ public class Resource : Building<Resource.Actions>
         {
             _collectionRate += explorer.info.attributes.capacity;
             harvestUnits++;
-            
+
             explorer.setStatus(EntityStatus.WORKING);
 
             workersList.Add(explorer);
@@ -403,8 +405,8 @@ public class Resource : Building<Resource.Actions>
         else
         {
             Debug.Log(" You are trying to recruit worker but building capacity is full");
-        }     
-        
+        }
+
     }
 
     /// <summary>
@@ -564,9 +566,9 @@ public class Resource : Building<Resource.Actions>
 }
 
 /// <summary>
-/// Class to pop element from list. Weird thing , sure. 
+/// Class to pop element from list. Weird thing , sure.
 /// </summary>
-/// 
+///
 static class ListExtension
 {
     public static T PopAt<T>(this List<T> list, int index)
