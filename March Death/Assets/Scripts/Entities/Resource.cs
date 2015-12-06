@@ -309,24 +309,17 @@ public class Resource : Building<Resource.Actions>
     }
 
     /// <summary>
-    /// Method create civilian unit.
-    /// If capacity limit of building is not reached unit is positioned inside
-    /// building limits otherwise unit is positioned outside,
-    /// just at desired meeting Point.
-    /// civilian sex is randomly selected(last parameter of createUnit method).
+    /// Method overrides base to check if civilian unit will be a worker or a explorer.
+    /// If this unit must be a worker it is vanished and placed at center of building.
     /// </summary>
-    /// <returns>civilian GameObject</returns>
-    public void newCivilian()
+    /// <param name="type"></param>
+    protected override void createUnit(UnitTypes type)
     {
-        // If there's no workers, the next unit to be created will be a worker...
+        
         if (harvestUnits < info.resourceAttributes.maxUnits)
         {
-
-            _unitPosition.Set(_center.x , _center.y, _center.z );
-
-            // Method createUnit from Info returns GameObject Instance;
-            GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
-
+            _unitPosition.Set(_center.x, _center.y, _center.z);
+            GameObject gob = Info.get.createUnit(race, type, _unitPosition, _unitRotation, -1);
             Unit civil = gob.GetComponent<Unit>();
             civil.vanish();
             civil.setStatus(EntityStatus.WORKING);
@@ -341,12 +334,22 @@ public class Resource : Building<Resource.Actions>
             _collectionRate += Info.get.of(race, UnitTypes.CIVIL).attributes.capacity;
         }
         else
-        {
-            // building capacity is full new civilians will be explorers
-            base.addUnitQueue(UnitTypes.CIVIL);
+        {           
+            base.createUnit(type);
         }
-
         _createStatus = createCivilStatus.IDLE;
+    }
+    /// <summary>
+    /// Method create civilian unit.
+    /// If capacity limit of building is not reached unit is positioned inside
+    /// building limits otherwise unit is positioned outside,
+    /// just at desired meeting Point.
+    /// civilian sex is randomly selected(last parameter of createUnit method).
+    /// </summary>
+    /// <returns>civilian GameObject</returns>
+    public void newCivilian()
+    {
+        base.addUnitQueue(UnitTypes.CIVIL);
     }
 
 
@@ -522,7 +525,8 @@ public class Resource : Building<Resource.Actions>
     override public void Update()
     {
         base.Update();
-
+        
+        
         switch (status)
         {
 

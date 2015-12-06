@@ -69,6 +69,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// If in battle, this is the target and last attack time
     /// </summary>
     private IGameEntity _target = null;
+    private bool _selfDefense = false;
     public float _distanceToTarget = 0;
     private Vector3 _attackPoint;
     private Vector3 _closestPointToTarget;
@@ -312,7 +313,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     /// <param name="unit"></param>
     /// <returns>Returns true if target is in range, false otherwise</returns>
-    public bool attackTarget<A>(GameEntity<A> entity) where A : struct, IConvertible
+    public bool attackTarget<A>(GameEntity<A> entity, bool selfDefense) where A : struct, IConvertible
     {
         // Note: Cast is redundant but avoids warning
         if (_target != (IGameEntity)entity)
@@ -330,6 +331,7 @@ public class Unit : GameEntity<Unit.Actions>
             }
 
             _target = entity;
+            _selfDefense = selfDefense;
 
             // Show target health
             selectable = _target.getGameObject().GetComponent<Selectable>();
@@ -352,19 +354,19 @@ public class Unit : GameEntity<Unit.Actions>
         return _target;
     }
 
-    public bool attackTarget(IGameEntity entity)
+    public bool attackTarget(IGameEntity entity, bool selfDefense = false)
     {
         if (entity.info.isUnit)
         {
-            return attackTarget((Unit)entity);
+            return attackTarget((Unit)entity, selfDefense);
         }
         else if (entity.info.isBarrack)
         {
-            return attackTarget((Barrack)entity);
+            return attackTarget((Barrack)entity, selfDefense);
         }
         else if (entity.info.isResource)
         {
-            return attackTarget((Resource)entity);
+            return attackTarget((Resource)entity, selfDefense);
         }
 
         throw new ArgumentException("Unkown entity type to attack");
@@ -648,22 +650,34 @@ public class Unit : GameEntity<Unit.Actions>
                     // Check if we are still in range
                     if (_distanceToTarget > currentAttackRange())
                     {
-                        _followingTarget = true;
-                        setStatus(EntityStatus.MOVING);
-
+                        if (!_selfDefense)
+                        {
+                            _followingTarget = true;
+                            setStatus(EntityStatus.MOVING);
+                        }
+                        else
+                        {
+                            setStatus(EntityStatus.IDLE);
+                        }
+                    }
                     // Check if we already have to attack
-                    } else if (! _projectileThrown && (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate))) {
-                            if (canDoRangedAttack())  {
-                                _projectile = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                                _projectile.AddComponent<Rigidbody>();
-                                _projectile.transform.position = new Vector3(transform.position.x, transform.position.y + GetComponent<Collider>().bounds.size.y, transform.position.z);
-                                _projectileEndPoint = new Vector3(_target.getTransform().position.x, _target.getTransform().position.y + _target.getGameObject().GetComponent<Collider>().bounds.size.y, _target.getTransform().position.z);
-                                _projectileThrown = true;
-                            } else {
-                                _target.receiveAttack(this, canDoRangedAttack());
-                            }
+                    else if (! _projectileThrown &&
+                        (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate)))
+                    {
+                        if (canDoRangedAttack())
+                        {
+                            _projectile = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                            _projectile.AddComponent<Rigidbody>();
+                            _projectile.transform.position = new Vector3(transform.position.x, transform.position.y + GetComponent<Collider>().bounds.size.y, transform.position.z);
+                            _projectileEndPoint = new Vector3(_target.getTransform().position.x, _target.getTransform().position.y + _target.getGameObject().GetComponent<Collider>().bounds.size.y, _target.getTransform().position.z);
+                            _projectileThrown = true;
+                        }
+                        else
+                        {
+                            _target.receiveAttack(this, canDoRangedAttack());
+                        }
 
-                            _lastAttack = Time.time;
+                        _lastAttack = Time.time;
                     }
                 }
                 break;

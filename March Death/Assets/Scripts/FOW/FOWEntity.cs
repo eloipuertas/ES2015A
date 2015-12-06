@@ -83,6 +83,10 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
             {
                 r.enabled = visible;
             }
+            foreach (Light l in GetComponentsInChildren<Light>())
+            {
+                l.enabled = visible;
+            }
         }
     }
     /// <summary>

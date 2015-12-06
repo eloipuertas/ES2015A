@@ -9,10 +9,9 @@ public partial class UserInput : MonoBehaviour
 {
     public enum action { NONE, LEFT_CLICK, RIGHT_CLICK, DRAG }
     private action currentAction;
-
-    private Player player;
-    private SelectionManager sManager { get { return player.selection; } }
-    private BuildingsManager bManager { get { return player.buildings; } }
+    
+    private SelectionManager sManager { get { return BasePlayer.player.selection; } }
+    private BuildingsManager bManager { get { return BasePlayer.player.buildings; } }
     private CursorManager cursor;
 
     //Should be better to create a constants class or structure
@@ -63,7 +62,6 @@ public partial class UserInput : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        player = GetComponent<Player>();
         selectionTexture = (Texture2D)Resources.Load("SelectionTexture");
 
         cursorAttack = (Texture2D)Resources.Load("cursor_attack");
@@ -138,8 +136,7 @@ public partial class UserInput : MonoBehaviour
 
     private void LeftClick()
     {
-
-        switch (player.currently)
+        switch (BasePlayer.player.currently)
         {
             case Player.status.IDLE:
                 Select();
@@ -159,11 +156,11 @@ public partial class UserInput : MonoBehaviour
 
     private void RightClick()
     {
-        if (player.isCurrently(Player.status.IDLE))
+        if (BasePlayer.player.isCurrently(Player.status.IDLE))
         {
             //Do nothing
         }
-        else if ( player.isCurrently(Player.status.SELECTED_UNITS) )
+        else if (BasePlayer.player.isCurrently(Player.status.SELECTED_UNITS) )
         {
             GameObject hitObject = FindHitObject();
             if (!hitObject) // out of bounds click
@@ -180,7 +177,7 @@ public partial class UserInput : MonoBehaviour
                 //if entity == null it means it's a nonactor, like a tree
                 if(entity != null)
                 {
-                    if ((entity.info.race != player.race)
+                    if ((entity.info.race != BasePlayer.player.race)
                     && entity.status != EntityStatus.DEAD
                     && entity.status != EntityStatus.DESTROYED)
                     {
@@ -211,10 +208,10 @@ public partial class UserInput : MonoBehaviour
                 }
             }
         }
-        else if (player.isCurrently(Player.status.PLACING_BUILDING))
+        else if (BasePlayer.player.isCurrently(Player.status.PLACING_BUILDING))
         {
             bManager.cancelPlacing();
-            player.setCurrently(Player.status.SELECTED_UNITS);
+            BasePlayer.player.setCurrently(Player.status.SELECTED_UNITS);
         }
     }
 
@@ -224,7 +221,7 @@ public partial class UserInput : MonoBehaviour
     /// </summary>
     private void Drag()
     {
-        switch (player.currently)
+        switch (BasePlayer.player.currently)
         {
             case Player.status.IDLE:
             case Player.status.SELECTED_UNITS:
@@ -249,7 +246,7 @@ public partial class UserInput : MonoBehaviour
             {
                 Deselect();
                 sManager.Select(selectedObject);
-                player.setCurrently(Player.status.SELECTED_UNITS);
+                BasePlayer.player.setCurrently(Player.status.SELECTED_UNITS);
             }
             else
             {
@@ -269,19 +266,19 @@ public partial class UserInput : MonoBehaviour
                 {
                     Deselect();
                     sManager.Select(selectedObject);
-                    player.setCurrently(Player.status.SELECTED_UNITS);
+                    BasePlayer.player.setCurrently(Player.status.SELECTED_UNITS);
                 }
                 else
                 {
                     Deselect();
-                    player.setCurrently(Player.status.IDLE);
+                    BasePlayer.player.setCurrently(Player.status.IDLE);
                 }
 
             }
             else
             {
                 Deselect();
-                player.setCurrently(Player.status.IDLE);
+                BasePlayer.player.setCurrently(Player.status.IDLE);
             }
         }
         else Deselect();
@@ -291,7 +288,7 @@ public partial class UserInput : MonoBehaviour
     {
         //Deselect all
         sManager.DeselectCurrent();
-        player.setCurrently(Player.status.IDLE);
+        BasePlayer.player.setCurrently(Player.status.IDLE);
     }
 
     private void PlaceBuilding()
@@ -302,11 +299,11 @@ public partial class UserInput : MonoBehaviour
         {
             if (bManager.placeBuilding())
             {
-                player.setCurrently(Player.status.SELECTED_UNITS);
+                BasePlayer.player.setCurrently(Player.status.SELECTED_UNITS);
             }
             else
             {
-                player.setCurrently(Player.status.PLACING_BUILDING);
+                BasePlayer.player.setCurrently(Player.status.PLACING_BUILDING);
             }
         }
     }
@@ -389,7 +386,7 @@ public partial class UserInput : MonoBehaviour
             }
 
             // Check if it is an unit and race
-            if (entity.info.isBuilding || entity.info.race != player.race)
+            if (entity.info.isBuilding || entity.info.race != BasePlayer.player.race)
             {
                 continue;
             }
@@ -404,7 +401,7 @@ public partial class UserInput : MonoBehaviour
         sManager.DragUpdate(newInArea);
 
         Player.status currentAction = (sManager.SelectedSquad != null && sManager.SelectedSquad.Units.Count > 0) ? Player.status.SELECTED_UNITS : Player.status.IDLE;
-        player.setCurrently(currentAction);
+        BasePlayer.player.setCurrently(currentAction);
     }
 
     //math formula to know if a given point is inside an area
