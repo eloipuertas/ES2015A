@@ -110,7 +110,7 @@ WindZone:
   m_Enabled: 1
   m_Mode: 1
   m_Radius: 282.200012
-  m_WindMain: 20
+  m_WindMain: 1
   m_WindTurbulence: 1
   m_WindPulseMagnitude: 1
   m_WindPulseFrequency: .200000003
@@ -406,6 +406,14 @@ Prefab:
     - target: {fileID: 13776694, guid: 2032da35c217510429adfab41c609d88, type: 2}
       propertyPath: m_AABB.m_Extent.x
       value: 3.00500396e-05
+      objectReference: {fileID: 0}
+    - target: {fileID: 13776694, guid: 2032da35c217510429adfab41c609d88, type: 2}
+      propertyPath: m_AABB.m_Extent.y
+      value: .0170720406
+      objectReference: {fileID: 0}
+    - target: {fileID: 13776694, guid: 2032da35c217510429adfab41c609d88, type: 2}
+      propertyPath: m_AABB.m_Extent.z
+      value: .0163537487
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 2032da35c217510429adfab41c609d88, type: 2}
