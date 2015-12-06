@@ -55,10 +55,8 @@ public class HUDPopulationInfo : MonoBehaviour
     {
         onShow ^= true;
 
-        if (onShow)
-        {
-            cUnits.enabled = true;
-        }
+        cUnits.enabled = onShow;
+
     }
 
     void OnGUI()
@@ -69,7 +67,7 @@ public class HUDPopulationInfo : MonoBehaviour
             {
                 if (_timer > REPAINT_TIME)
                 {
-                    paintUnitsInCanvas();
+                    if(onShow) paintUnitsInCanvas();
 
                     _timer = 0f;
                 }
