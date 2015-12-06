@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class HUDPopulationInfo : MonoBehaviour
 {
     public static bool  onShow; // to show if info is shown
-    public static bool UnitsMarked; // units (true) or buildings (false) are displayed.
 
     private float REPAINT_TIME = 0.3f;
     private float _timer = 0.3f;
@@ -16,12 +15,8 @@ public class HUDPopulationInfo : MonoBehaviour
     private GameObject windowInfo;
     private GameObject container;
     private GameObject canvasUnits;
-    private GameObject canvasBuildings;
     private static Canvas cUnits;
-    private static Canvas cBuildings;
-    private List<Text> building;
-    private List<Text> unit;
-    private List<Text> building_val;
+    private List<Image> unit;
     private List<Text> unit_val;
 
     private Font ArialFont; // Font to use with the population info panel
@@ -33,7 +28,6 @@ public class HUDPopulationInfo : MonoBehaviour
 	void Start ()
     {
         onShow = false;
-        UnitsMarked = true;
 
         Setup();   // initialize arrays and list containing keys and values
 
@@ -41,33 +35,16 @@ public class HUDPopulationInfo : MonoBehaviour
 
         InitCanvas();         // Setup for the canvas
         SetupUnitCanvas();
-        SetupBuildingCanvas();
 
-        cBuildings.enabled = false;
         cUnits.enabled = false;
     }
 	
 	// Update is called once per frame
-	void Update () {
-
-        if (Input.GetKeyUp(KeyCode.U))
-        {
-            Toggle();
-        }
-
-    }
-
-    /// <summary>
-    /// Toggles the current info between units and building
-    /// if thy are being shown.
-    /// </summary>
-    public static void Toggle()
+	void Update ()
     {
-        if (onShow)
+        foreach (Sprite s in Resources.LoadAll<Sprite>("PopInfoIcons"))
         {
-            UnitsMarked ^= true;
-            cUnits.enabled ^= true;
-            cBuildings.enabled ^= true;
+            Debug.Log(s.name);
         }
     }
 
@@ -81,13 +58,6 @@ public class HUDPopulationInfo : MonoBehaviour
         if (onShow)
         {
             cUnits.enabled = true;
-            cBuildings.enabled = false;
-            UnitsMarked = true;
-        }
-        else
-        {
-            if (UnitsMarked) cUnits.enabled = false;
-            else cBuildings.enabled = false;
         }
     }
 
@@ -99,8 +69,7 @@ public class HUDPopulationInfo : MonoBehaviour
             {
                 if (_timer > REPAINT_TIME)
                 {
-                    if (UnitsMarked) paintUnitsInCanvas();
-                    else paintBuildingsInCanvas();
+                    paintUnitsInCanvas();
 
                     _timer = 0f;
                 }
@@ -113,20 +82,16 @@ public class HUDPopulationInfo : MonoBehaviour
 
     private void Setup()
     {
-        uKeys = PopulationInfo.get.GetUnitKeys();
-        bKeys = PopulationInfo.get.GetBuildingKeys();
+        uKeys = PopulationInfo.get.GetGeneralKeys();
 
-        unit = new List<Text>();
-        building = new List<Text>();
+        unit = new List<Image>();
         unit_val = new List<Text>();
-        building_val = new List<Text>();
     }
 
 
     private void EnableDisableCanvas()
     {
-        if (!UnitsMarked) cBuildings.enabled = onShow;
-        else cUnits.enabled = onShow;
+        cUnits.enabled = onShow;
     }
 
     private void initializeContainer()
@@ -155,12 +120,6 @@ public class HUDPopulationInfo : MonoBehaviour
         cUnits.GetComponent<RectTransform>().SetParent(windowInfo.GetComponent<RectTransform>(), false);
         cUnits.GetComponent<RectTransform>().sizeDelta = windowInfo.GetComponent<RectTransform>().sizeDelta;
 
-        canvasBuildings = new GameObject("canvasBuildings");
-        canvasBuildings.layer = 5; // UI LAYER
-        cBuildings = canvasBuildings.AddComponent<Canvas>();
-        cBuildings.GetComponent<RectTransform>().SetParent(windowInfo.GetComponent<RectTransform>(), false);
-        cBuildings.GetComponent<RectTransform>().sizeDelta = windowInfo.GetComponent<RectTransform>().sizeDelta;
-
         ArialFont = (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf");
     }
 
@@ -174,11 +133,12 @@ public class HUDPopulationInfo : MonoBehaviour
         {
             GameObject newText = new GameObject(uKeys[i]);
             newText.layer = 5; // UI LAYER
-            newText.AddComponent<Text>();
+            newText.AddComponent<Image>();
             newText.transform.Translate( 0, maxY/2 - i*step - 25, 0); // raul_hack
+            newText.GetComponent<RectTransform>().sizeDelta = new Vector2(16,16);
             newText.GetComponent<RectTransform>().SetParent(cUnits.GetComponent<RectTransform>(), false);
-            unit.Add(newText.GetComponent<Text>());
-            unit[i] = SetupText(unit[i] , uKeys[i], 8);
+            unit.Add(newText.GetComponent<Image>());
+            unit[i] = SetupImage(unit[i] , uKeys[i]);
         }
 
         List<string> l = PopulationInfo.get.GetUnitValues();
@@ -191,7 +151,7 @@ public class HUDPopulationInfo : MonoBehaviour
             newText.transform.Translate(0, maxY / 2 - i * step - 45, 0); // raul_hack
             newText.GetComponent<RectTransform>().SetParent(cUnits.GetComponent<RectTransform>(), false);
             unit_val.Add(newText.GetComponent<Text>());
-            unit_val[i] = SetupText(unit_val[i], l[i].ToString(), 15);
+            unit_val[i] = SetupText(unit_val[i], l[i].ToString(), 13);
         }
 
     }
@@ -201,55 +161,11 @@ public class HUDPopulationInfo : MonoBehaviour
     /// </summary>
     private void paintUnitsInCanvas()
     {
-        List<string> l = PopulationInfo.get.GetUnitValues();
+        List<string> l = PopulationInfo.get.GetGeneralValues();
 
         for (int i = 0; i < uKeys.Count; i++)
         {
             unit_val[i].text = l[i].ToString();
-        }
-    }
-
-
-    private void SetupBuildingCanvas()
-    {
-        int maxY = (int)cBuildings.GetComponent<RectTransform>().sizeDelta.y;
-        int step = maxY / bKeys.Count - 4; // raul_hack
-
-        for (int i = 0; i < bKeys.Count; i++)
-        {
-            GameObject newText = new GameObject(bKeys[i]);
-            newText.layer = 5; // UI LAYER
-            newText.AddComponent<Text>();
-            newText.transform.Translate(0, maxY / 2 - i * (step+2) - 25, 0); // raul_hack
-            newText.GetComponent<RectTransform>().SetParent(cBuildings.GetComponent<RectTransform>(), false);
-            building.Add(newText.GetComponent<Text>());
-            building[i] = SetupText(building[i], bKeys[i], 6);
-        }
-
-        List<string> l = PopulationInfo.get.GetBuildingValues();
-
-        for (int i = 0; i < bKeys.Count; i++)
-        {
-            GameObject newText = new GameObject(bKeys[i]);
-            newText.layer = 5; // UI LAYER
-            newText.AddComponent<Text>();
-            newText.transform.Translate(0, maxY / 2 - i * (step+2) - 35, 0); // raul_hack
-            newText.GetComponent<RectTransform>().SetParent(cBuildings.GetComponent<RectTransform>(), false);
-            building_val.Add(newText.GetComponent<Text>());
-            building_val[i] = SetupText(building_val[i], l[i].ToString(), 12);
-        }
-    }
-
-    /// <summary>
-    /// Update values of buildings
-    /// </summary>
-    private void paintBuildingsInCanvas()
-    {
-        List<string> l = PopulationInfo.get.GetBuildingValues();
-
-        for (int i = 0; i < l.Count; i++)
-        {
-            building_val[i].text = l[i].ToString();
         }
     }
 
@@ -263,6 +179,22 @@ public class HUDPopulationInfo : MonoBehaviour
         t.alignment = TextAnchor.MiddleCenter;
 
         return t;
+    }
+
+    private Image SetupImage(Image img, string text)
+    {
+        img.color = new Color(1f,1f,1f,0f);
+
+        Sprite sprite = Resources.Load<Sprite>("PopInfoIcons/"+text);
+
+        if (sprite == null) {
+            Debug.LogError("Null sprite!");
+        }
+
+        img.sprite = sprite;
+        img.color = new Color(1f, 1f, 1f, 1f);
+
+        return img;
     }
 
 }

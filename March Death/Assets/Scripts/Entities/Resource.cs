@@ -9,7 +9,7 @@ using UnityEngine.Assertions;
 public class Resource : Building<Resource.Actions>
 {
 
-    public enum Actions { CREATED, DAMAGED, DESTROYED, BUILDING_FINISHED, COLLECTION, CREATE_UNIT, DEL_STATS, HEALTH_UPDATED, ADDED_QUEUE };
+    public enum Actions { CREATED, DAMAGED, DESTROYED, BUILDING_FINISHED, COLLECTION, CREATE_UNIT, DEL_STATS, HEALTH_UPDATED, ADDED_QUEUE, NEW_HARVEST, NEW_EXPLORER };
 
     /// <summary>
     /// civilian creation waste some time. When units are being created status
@@ -23,6 +23,8 @@ public class Resource : Building<Resource.Actions>
     public Resource() { }
 
     private IGameEntity _entity;
+
+    private ResourcesEvents _events;
 
     private createCivilStatus _createStatus;
 
@@ -333,6 +335,7 @@ public class Resource : Building<Resource.Actions>
 
             totalUnits++;
             harvestUnits++;
+            fire(Actions.NEW_HARVEST);
             workersList.Add(civil);
             setStatus(EntityStatus.WORKING);
 
@@ -361,7 +364,8 @@ public class Resource : Building<Resource.Actions>
             worker = workersList.PopAt(0);
             _collectionRate -= worker.info.attributes.capacity;
             harvestUnits--;
-            
+            fire(Actions.NEW_EXPLORER);
+
             worker.transform.position = getMeetingPoint();
             worker.bringBack();
             
@@ -506,6 +510,9 @@ public class Resource : Building<Resource.Actions>
         // Setup base
         base.Start();
         this.GetComponent<Rigidbody>().isKinematic = false;
+        
+        if (_entity.info.race.Equals(BasePlayer.player.race)) 
+            ResourcesEvents.get.registerToEvents(_entity);
 
         SetupStatistics();
 
