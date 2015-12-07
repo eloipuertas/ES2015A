@@ -24,6 +24,16 @@
 
     "abilities":
     [
+		{
+            "ability": "Create",
+            "name":"Create Cavalry",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "UNIT",
+            "targetRace": "MEN",
+            "targetUnit": "CAVALRY"
+        },
+		
         {
             "name": "Sell",
             "tooltipFlags": "HIDE"
