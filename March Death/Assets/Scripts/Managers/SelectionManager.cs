@@ -101,15 +101,13 @@ namespace Managers
                 foreach (Unit unit in _selectedSquad.Units)
                 {
                     // Is it already in another troop?
-                    foreach (var entry in _troops)
+                    if (unit.Troop != null)
                     {
-                        if (entry.Value.Units.Contains(unit))
-                        {
-                            entry.Value.RemoveUnit(unit);
-                        }
+                        unit.Troop.RemoveUnit(unit);
                     }
 
                     unit.Squad = _selectedSquad;
+                    unit.Troop = _selectedSquad;
                 }
 
                 _troops.Add(key, _selectedSquad);
@@ -210,22 +208,9 @@ namespace Managers
                     // Deselect entity
                     unit.GetComponent<Selectable>().DeselectEntity();
 
-                    // Unless this unit is part of a squad saved as a troop, null it out
-                    bool inTroop = false;
-                    foreach (var entry in _troops)
-                    {
-                        if (entry.Value.Units.Contains(unit))
-                        {
-                            // Restore squad
-                            unit.Squad = entry.Value;
-                            inTroop = true;
-                        }
-                    }
-
-                    if (!inTroop)
-                    {
-                        unit.Squad = null;
-                    }
+                    // Restore the Squad as the Troop it is in
+                    // In case it is not in a troop, it will automatically null it out
+                    unit.Squad = unit.Troop;
                 }
 
                 // Deselect current squad
@@ -246,8 +231,6 @@ namespace Managers
 
             bool deselectBuilding = ((!force && !_isSquad) || force) &&
                 _selectedBuilding != null;
-
-            Debug.Log(deselectSquad + " " + deselectBuilding);
 
             if (deselectSquad)
             {
@@ -284,7 +267,6 @@ namespace Managers
 
         public void DragStart()
         {
-            Debug.Log("DragStart");
             DeselectCurrent(true);
         }
 

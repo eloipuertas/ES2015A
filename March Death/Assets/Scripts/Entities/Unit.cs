@@ -150,6 +150,9 @@ public class Unit : GameEntity<Unit.Actions>
         }
     }
 
+    /// Saved Squad the unit belongs to
+    public Squad Troop { get; set; }
+
     /// <summary>
     /// Max. euclidean distance to the target
     /// </summary>
@@ -457,8 +460,6 @@ public class Unit : GameEntity<Unit.Actions>
             GetComponent<Rigidbody>().isKinematic = true;
         }
         //Disable Selectable
-        // TODO: can't disable square border and lifebar
-
         if (GetComponent<Selectable>())
         {
             GetComponent<Selectable>().enabled = false;
@@ -474,10 +475,9 @@ public class Unit : GameEntity<Unit.Actions>
         {
             GetComponent<Collider>().enabled = false;
         }
-        // Disable DetourAgent. Must remove form crowd first
+        // Disable DetourAgent
         if (GetComponent<DetourAgent>())
         {
-            GetComponent<DetourAgent>().RemoveFromCrowd();
             GetComponent<DetourAgent>().enabled = false;
         }
         // Disable render
@@ -486,16 +486,14 @@ public class Unit : GameEntity<Unit.Actions>
         {
             r.enabled = false;
         }
-
-
     }
+
     /// <summary>
     /// Units vanished with vanish method needs to uses BringBack method in
     /// order to enable components.
     /// </summary>
     public void bringBack()
     {
-
         if (GetComponent<FOWEntity>())
         {
             GetComponent<FOWEntity>().enabled = true;
@@ -543,6 +541,7 @@ public class Unit : GameEntity<Unit.Actions>
     {
         _info = Info.get.of(race, type);
         _auto = this;
+        Troop = null;
 
         // Call GameEntity awake
         base.Awake();

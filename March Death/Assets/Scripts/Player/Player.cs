@@ -23,7 +23,7 @@ public class Player : BasePlayer
 
     //the list of player units in the scene
     public ArrayList currentUnits = new ArrayList ();
-    
+
     private EventsNotifier events;
 
     private bool isGameOverScreenDisplayed = false;
@@ -43,13 +43,13 @@ public class Player : BasePlayer
 
     // Use this for initialization
     public override void Start()
-    {   
+    {
         base.Start();
         _selection = GetComponent<Managers.SelectionManager>();
         //request the race of the player
         _selfRace = info.GetPlayerRace();
         _selection.SetRace(race);
-        
+
         cam = GameObject.FindWithTag("MainCamera").GetComponent<CameraController>();
         events = GetComponent<EventsNotifier>();
 
@@ -155,11 +155,11 @@ public class Player : BasePlayer
         Debug.Log(_activeEntities.Count + " entities");
     }
 
-	public void FillPlayerUnits(GameObject unit) 
+	public void FillPlayerUnits(GameObject unit)
 	{
 		currentUnits.Add (unit);
 	}
-    
+
     /// <summary>
     /// Returns the count of the current associated entities
     /// </summary>
@@ -220,7 +220,7 @@ public class Player : BasePlayer
         displayResourceInfo(WorldResources.Type.GOLD, minGoldTolerance);
         events.DisplayUnitCreated(obj);
     }
-    
+
     private void signalMissionUpdate(System.Object obj)
     {
         IGameEntity entity = ((GameObject) obj).GetComponent<IGameEntity>();
@@ -267,7 +267,7 @@ public class Player : BasePlayer
                 barrack.register(Barrack.Actions.CREATE_UNIT, OnUnitCreated);
                 barrack.register(Barrack.Actions.BUILDING_FINISHED, events.DisplayBuildingCreated);
             }
-            else 
+            else
             {
                 Resource resourcesBuilding = (Resource) entity;
                 resourcesBuilding.register(Resource.Actions.DAMAGED, events.DisplayUnderAttack);
