@@ -168,24 +168,12 @@ namespace Assets.Scripts.AI
                     resources.getAmount(WorldResources.Type.METAL) >= i.resources.metal);
         }
 
-        /// <summary>
-        /// Used to pay something
-        /// </summary>
-        /// <param name="entity"></param>
-        public void checkout(IGameEntity entity)
-        {
-            resources.SubstractAmount(WorldResources.Type.FOOD, entity.info.resources.food);
-            resources.SubstractAmount(WorldResources.Type.WOOD, entity.info.resources.wood);
-            resources.SubstractAmount(WorldResources.Type.METAL, entity.info.resources.metal);
-        }
-
         public void CreateBuilding(BuildingTypes btype, Vector3 position, Quaternion rotation, AIArchitect architect)
         {
             GameObject g = Info.get.createBuilding(_selfRace, btype, position, rotation);
             IGameEntity entity = g.GetComponent<IGameEntity>();
             entity.registerFatalWounds(architect.onDestroy);
             OnBuildingCreated(entity);
-            if(!AIArchitect.TESTING) checkout(entity);
         }
 
         void OnBuildingCreated(IGameEntity entity)

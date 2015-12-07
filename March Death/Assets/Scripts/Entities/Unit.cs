@@ -564,15 +564,20 @@ public class Unit : GameEntity<Unit.Actions>
 
         activateFOWEntity();
 
-        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
+        // Statistics available for both AI and Player
         GameObject gameController = GameObject.Find("GameController");
         ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
+        register(Actions.EAT, res_pl.onFoodConsumption);
 
-        if (Player.getOwner(this).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
+        // Statistics only available to player
+        if (Player.getOwner(this) == BasePlayer.player)
         {
-            register(Actions.EAT, res_pl.onFoodConsumption);
             register(Actions.STAT_OUT, res_pl.onStatisticsUpdate);
             register(Actions.CREATED, res_pl.onStatisticsUpdate);
+
+            float foodConsumption = info.unitAttributes.foodConsumption * RESOURCES_UPDATE_INTERVAL;
+            statistics = new Statistics(WorldResources.Type.FOOD, RESOURCES_UPDATE_INTERVAL, foodConsumption);
+            fire(Actions.CREATED, statistics);
         }
 
         // Set detour params (can't be done until Start is done)
@@ -582,9 +587,6 @@ public class Unit : GameEntity<Unit.Actions>
             _detourAgent.MaxAcceleration = info.unitAttributes.movementRate * 20;
             _detourAgent.UpdateParams();
         }
-
-        statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -5);
-        fire(Actions.CREATED, statistics);
     }
 
     /// <summary>
@@ -622,13 +624,14 @@ public class Unit : GameEntity<Unit.Actions>
             // Update this unit resources
             BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.GOLD, goldProduced);
             BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.GOLD, goldConsumed);
-            BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.FOOD, foodConsumed);
 
-            Goods goods = new Goods(); // Generate the goods the units eat
-            goods.amount = 5;
-            goods.type = Goods.GoodsType.FOOD;
+            CollectableGood collectable = new CollectableGood();
+            collectable.entity = this;
+            collectable.goods = new Goods(); // Generate the goods the units eat
+            collectable.goods.amount = foodConsumed;
+            collectable.goods.type = Goods.GoodsType.FOOD;
 
-            fire(Actions.EAT, goods);
+            fire(Actions.EAT, collectable);
         }
 
         // Status dependant functionality

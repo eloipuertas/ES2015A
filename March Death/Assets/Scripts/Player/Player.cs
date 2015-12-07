@@ -37,6 +37,10 @@ public class Player : BasePlayer
 
     private bool foodDepleted;
 
+    GameObject gameOverDialog;
+    float timeToShow;
+    const float WAIT_FOR_FINISH = 3.5f;
+
     // Use this for initialization
     public override void Start()
     {   
@@ -71,6 +75,8 @@ public class Player : BasePlayer
         };
         Utils.Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.DISCOVERED, OnEntityFound, selector);
 
+        timeToShow = WAIT_FOR_FINISH;
+
     }
 
     // Update is called once per frame
@@ -80,7 +86,6 @@ public class Player : BasePlayer
         {
             if (!isGameOverScreenDisplayed)
             {
-                GameObject gameOverDialog = null;
                 if (missionStatus.hasWon(playerId))
                 {
                     switch (_selfRace)
@@ -105,10 +110,22 @@ public class Player : BasePlayer
                             break;
                     }
                 }
-                Instantiate(gameOverDialog);
+                gameOverDialog = Instantiate(gameOverDialog);
+                gameOverDialog.SetActive(false);
                 isGameOverScreenDisplayed = true;
             }
+            ShowGameOverDialog();
             _currently = status.TERMINATED;
+        }
+    }
+
+    private void ShowGameOverDialog()
+    {
+        timeToShow -= Time.deltaTime;
+        if (timeToShow <= 0)
+        {
+            gameOverDialog.SetActive(true);
+            Time.timeScale = 0;
         }
     }
 
@@ -116,7 +133,7 @@ public class Player : BasePlayer
     {
         _currently = status.TERMINATED;
         Utils.Subscriber<FOWEntity.Actions, FOWEntity>.get.unregisterFromAll(FOWEntity.Actions.DISCOVERED, OnEntityFound);
-
+        if (isGameOverScreenDisplayed) Time.timeScale = 1;
         base.OnDestroy();
     }
 

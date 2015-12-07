@@ -81,7 +81,7 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     List<Unit> workersList = new List<Unit>();
 
-   
+
     /// <summary>
     /// HUD, get current civilian units working here
     /// </summary>
@@ -281,8 +281,10 @@ public class Resource : Building<Resource.Actions>
 
         if (amount > 0.0)
         {
-            Goods goods = new Goods();
-            goods.amount = amount;
+            CollectableGood collectable = new CollectableGood();
+            collectable.entity = this;
+            collectable.goods = new Goods();
+            collectable.goods.amount = amount;
 
             // TODO:
             // BUG: Null reference when we try to add material amount to player.
@@ -290,41 +292,34 @@ public class Resource : Building<Resource.Actions>
             if (type.Equals(BuildingTypes.FARM))
             {
                 BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.FOOD, amount);
-                goods.type = Goods.GoodsType.FOOD;
+                collectable.goods.type = Goods.GoodsType.FOOD;
             }
             else if (type.Equals(BuildingTypes.MINE))
             {
                 BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.METAL, amount);
-                goods.type = Goods.GoodsType.METAL;
+                collectable.goods.type = Goods.GoodsType.METAL;
             }
             else
             {
                 BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.WOOD, amount);
-                goods.type = Goods.GoodsType.WOOD;
+                collectable.goods.type = Goods.GoodsType.WOOD;
             }
-            fire(Actions.COLLECTION, goods);
+            fire(Actions.COLLECTION, collectable);
         }
     }
 
     /// <summary>
-    /// Method create civilian unit.
-    /// If capacity limit of building is not reached unit is positioned inside
-    /// building limits otherwise unit is positioned outside,
-    /// just at desired meeting Point.
-    /// civilian sex is randomly selected(last parameter of createUnit method).
+    /// Method overrides base to check if civilian unit will be a worker or a explorer.
+    /// If this unit must be a worker it is vanished and placed at center of building.
     /// </summary>
-    /// <returns>civilian GameObject</returns>
-    public void newCivilian()
+    /// <param name="type"></param>
+    protected override void createUnit(UnitTypes type)
     {
-        // If there's no workers, the next unit to be created will be a worker...
+        
         if (harvestUnits < info.resourceAttributes.maxUnits)
         {
-
-            _unitPosition.Set(_center.x , _center.y, _center.z );
-
-            // Method createUnit from Info returns GameObject Instance;
-            GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
-
+            _unitPosition.Set(_center.x, _center.y, _center.z);
+            GameObject gob = Info.get.createUnit(race, type, _unitPosition, _unitRotation, -1);
             Unit civil = gob.GetComponent<Unit>();
             civil.vanish();
             civil.setStatus(EntityStatus.WORKING);
@@ -339,12 +334,22 @@ public class Resource : Building<Resource.Actions>
             _collectionRate += Info.get.of(race, UnitTypes.CIVIL).attributes.capacity;
         }
         else
-        {
-            // building capacity is full new civilians will be explorers
-            base.addUnitQueue(UnitTypes.CIVIL);
+        {           
+            base.createUnit(type);
         }
-
         _createStatus = createCivilStatus.IDLE;
+    }
+    /// <summary>
+    /// Method create civilian unit.
+    /// If capacity limit of building is not reached unit is positioned inside
+    /// building limits otherwise unit is positioned outside,
+    /// just at desired meeting Point.
+    /// civilian sex is randomly selected(last parameter of createUnit method).
+    /// </summary>
+    /// <returns>civilian GameObject</returns>
+    public void newCivilian()
+    {
+        base.addUnitQueue(UnitTypes.CIVIL);
     }
 
 
@@ -354,17 +359,17 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     public Unit recruitExplorer()
     {
-        
+
         if (harvestUnits > 0)
         {
             Unit worker;
             worker = workersList.PopAt(0);
             _collectionRate -= worker.info.attributes.capacity;
             harvestUnits--;
-            
+
             worker.transform.position = getMeetingPoint();
             worker.bringBack();
-            
+
             worker.setStatus(EntityStatus.IDLE);
 
             if (harvestUnits == 0)
@@ -377,7 +382,7 @@ public class Resource : Building<Resource.Actions>
         {
             Debug.Log("Can't recruite explorer because no workers");
             return null;
-        }      
+        }
         // TODO: Some alert message or sound for player if try to remove unit when no unit at building
     }
 
@@ -391,7 +396,7 @@ public class Resource : Building<Resource.Actions>
         {
             _collectionRate += explorer.info.attributes.capacity;
             harvestUnits++;
-            
+
             explorer.setStatus(EntityStatus.WORKING);
 
             workersList.Add(explorer);
@@ -403,8 +408,8 @@ public class Resource : Building<Resource.Actions>
         else
         {
             Debug.Log(" You are trying to recruit worker but building capacity is full");
-        }     
-        
+        }
+
     }
 
     /// <summary>
@@ -520,7 +525,8 @@ public class Resource : Building<Resource.Actions>
     override public void Update()
     {
         base.Update();
-
+        
+        
         switch (status)
         {
 
@@ -564,9 +570,9 @@ public class Resource : Building<Resource.Actions>
 }
 
 /// <summary>
-/// Class to pop element from list. Weird thing , sure. 
+/// Class to pop element from list. Weird thing , sure.
 /// </summary>
-/// 
+///
 static class ListExtension
 {
     public static T PopAt<T>(this List<T> list, int index)
