@@ -31,16 +31,14 @@ public class EntityAbilitiesController : MonoBehaviour
 #if UNITY_5_2
         Physics.queriesHitTriggers = true;
 #endif
-        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
-
         //Register to selectable actions
         Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.SELECTED, onActorSelected, new ActorSelector()
         {
-            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
+            registerCondition = (checkRace) => BasePlayer.isOfPlayer(checkRace.GetComponent<IGameEntity>())
         });
         Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.DESELECTED, onActorDeselected, new ActorSelector()
         {
-            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
+            registerCondition = (checkRace) => BasePlayer.isOfPlayer(checkRace.GetComponent<IGameEntity>())
         });
     }
 
@@ -115,7 +113,7 @@ public class EntityAbilitiesController : MonoBehaviour
     {
 		GameObject gameObject = (GameObject) obj;
         GameObject actionPanel = GameObject.Find("HUD/actions");
-        
+
         if (!actionPanel) return;
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
         var rectTransform = actionPanel.GetComponent<RectTransform>();

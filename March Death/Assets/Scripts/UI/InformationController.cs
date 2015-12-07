@@ -32,18 +32,15 @@ public partial class InformationController : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-		GameObject gameInformationObject = GameObject.Find("GameInformationObject");
-		playerRace = gameInformationObject.GetComponent<GameInformation>().GetPlayerRace();
-
         //Register to selectable actions
         Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.SELECTED, onUnitSelected, new ActorSelector()
         {
-            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
+            registerCondition = (checkRace) => BasePlayer.isOfPlayer(checkRace.GetComponent<IGameEntity>())
         });
 
         Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.DESELECTED, onUnitDeselected, new ActorSelector()
         {
-            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
+            registerCondition = (checkRace) => BasePlayer.isOfPlayer(checkRace.GetComponent<IGameEntity>())
         });
 
 
@@ -360,8 +357,8 @@ public partial class InformationController : MonoBehaviour
                     path = IMAGES_PATH + separator + entity.getRace() + "_" + entity.info.name + "_woman";
                 }
             });
-        } 
-         
+        }
+
         Texture2D texture = (Texture2D)Resources.Load(path);
         if (texture)
         {

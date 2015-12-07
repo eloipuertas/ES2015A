@@ -69,15 +69,6 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     public abstract void removeEntity(IGameEntity entity);
     public abstract void addEntity(IGameEntity newEntity);
 
-    public static BasePlayer getOwner(IGameEntity entity)
-    {
-        if (entity.info.race == info.GetPlayerRace())
-        {
-            return player;
-        }
-
-        return ia;
-    }
 
     public static BasePlayer getOwner(Storage.Races race)
     {
@@ -87,6 +78,16 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
         }
 
         return ia;
+    }
+
+    public static BasePlayer getOwner(IGameEntity entity)
+    {
+        return getOwner(entity.info.race);
+    }
+
+    public static bool isOfPlayer(IGameEntity entity)
+    {
+        return getOwner(entity) == player;
     }
 
     void Update () {}
@@ -124,7 +125,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
                 entity.DefaultStatus = building.status;
                 entity.setStatus(building.status);
             }
-            
+
             AddBuilding(entity);
         }
     }

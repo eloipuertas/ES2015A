@@ -94,8 +94,7 @@ public class ResourcesPlacer : MonoBehaviour
         BasePlayer.getOwner(entity).resources.SubstractAmount(WorldResources.Type.WOOD, entity.info.resources.wood);
         BasePlayer.getOwner(entity).resources.SubstractAmount(WorldResources.Type.METAL, entity.info.resources.metal);
 
-        // TODO: Simplify, BasePlayer.isFromPlayer(entity)
-        if (BasePlayer.getOwner(entity) == BasePlayer.player)
+        if (BasePlayer.isOfPlayer(entity))
         {
             updateAmounts();
         }
@@ -221,8 +220,7 @@ public class ResourcesPlacer : MonoBehaviour
 
         BasePlayer.getOwner(collectable.entity).resources.SubstractAmount(t[0], goods.amount); // t[0] is FOOD
 
-        // TODO: Simplify, BasePlayer.isFromPlayer(entity)
-        if (BasePlayer.getOwner(collectable.entity) == BasePlayer.player)
+        if (BasePlayer.isOfPlayer(collectable.entity))
         {
             updateAmounts();
         }
@@ -248,8 +246,7 @@ public class ResourcesPlacer : MonoBehaviour
                 break;
         }
 
-        // TODO: Simplify, BasePlayer.isFromPlayer(entity)
-        if (BasePlayer.getOwner(collectable.entity) == BasePlayer.player)
+        if (BasePlayer.isOfPlayer(collectable.entity))
         {
             updateAmounts();
         }

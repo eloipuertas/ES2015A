@@ -471,7 +471,7 @@ public class Resource : Building<Resource.Actions>
         GameObject gameController = GameObject.Find("GameController");
         ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
 
-        if (Player.getOwner(_entity).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
+        if (Player.isOfPlayer(_entity))
         {
             register(Actions.COLLECTION, res_pl.onCollection);
             register(Actions.CREATED, res_pl.onStatisticsUpdate);
