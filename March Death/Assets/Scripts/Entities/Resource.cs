@@ -315,7 +315,7 @@ public class Resource : Building<Resource.Actions>
     /// <param name="type"></param>
     protected override void createUnit(UnitTypes type)
     {
-        
+
         if (harvestUnits < info.resourceAttributes.maxUnits)
         {
             _unitPosition.Set(_center.x, _center.y, _center.z);
@@ -334,7 +334,7 @@ public class Resource : Building<Resource.Actions>
             _collectionRate += Info.get.of(race, UnitTypes.CIVIL).attributes.capacity;
         }
         else
-        {           
+        {
             base.createUnit(type);
         }
         _createStatus = createCivilStatus.IDLE;
@@ -444,11 +444,8 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     public override void OnDestroy()
     {
-        if (_info.isResource)
-        {
-            statistics.getNegative();
-            fire(Actions.DEL_STATS, statistics);
-        }
+        statistics.getNegative();
+        fire(Actions.DEL_STATS, statistics);
 
         base.OnDestroy();
     }
@@ -481,7 +478,7 @@ public class Resource : Building<Resource.Actions>
             register(Actions.DEL_STATS, res_pl.onStatisticsUpdate);
         }
 
-        statistics = _info.isResource ? new Statistics(ResourceFromBuilding(type), (int)info.resourceAttributes.updateInterval, 10) : null; // hardcoded, To modify, by now the collection rate is always 10, but theres no workers yet
+        statistics = new Statistics(ResourceFromBuilding(type), (int)info.resourceAttributes.updateInterval, 10); // hardcoded, To modify, by now the collection rate is always 10, but theres no workers yet
     }
 
     /// <summary>
@@ -513,7 +510,6 @@ public class Resource : Building<Resource.Actions>
         this.GetComponent<Rigidbody>().isKinematic = false;
 
         SetupStatistics();
-
     }
 
 
@@ -525,11 +521,10 @@ public class Resource : Building<Resource.Actions>
     override public void Update()
     {
         base.Update();
-        
-        
+
+
         switch (status)
         {
-
             case EntityStatus.IDLE:
 
                 if (!hasDefaultUnit)
@@ -539,24 +534,28 @@ public class Resource : Building<Resource.Actions>
                 break;
 
             case EntityStatus.WORKING:
-
                 if (Time.time > _nextUpdate)
                 {
-                    if (_info.isResource)
-                    {
-                        _nextUpdate = Time.time + info.resourceAttributes.updateInterval;
-                        collect();
-                        produce();
-
-                        if (once)
-                        {
-                            fire(Actions.CREATED, statistics); once = false;
-                        }
-                    }
+                    _nextUpdate = Time.time + info.resourceAttributes.updateInterval;
+                    collect();
+                    produce();
                 }
                 break;
         }
+    }
 
+    public override void setStatus(EntityStatus newStatus)
+    {
+        if (status == EntityStatus.IDLE && newStatus == EntityStatus.WORKING)
+        {
+            if (once)
+            {
+                fire(Actions.CREATED, statistics);
+                once = false;
+            }
+        }
+
+        base.setStatus(newStatus);
     }
 
     /// <summary>

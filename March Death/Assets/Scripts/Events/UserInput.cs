@@ -9,7 +9,7 @@ public partial class UserInput : MonoBehaviour
 {
     public enum action { NONE, LEFT_CLICK, RIGHT_CLICK, DRAG }
     private action currentAction;
-    
+
     private SelectionManager sManager { get { return BasePlayer.player.selection; } }
     private BuildingsManager bManager { get { return BasePlayer.player.buildings; } }
     private CursorManager cursor;
@@ -183,19 +183,13 @@ public partial class UserInput : MonoBehaviour
                     {
 
                         sManager.AttackTo(entity);
-                        
+
                     }
                     else if (entity.info.isResource
                             && (entity.status == EntityStatus.IDLE
                             || entity.status == EntityStatus.WORKING))
-
                     {
-                        
-                        if((entity.info.isResource)
-                            && (entity.status == EntityStatus.IDLE || entity.status == EntityStatus.WORKING))
-                            {
-                                sManager.Enter(entity);
-                            }                   
+                        sManager.Enter(entity);
                     }
                     else // HACK!! go there to by the point in the terrain
                     {
