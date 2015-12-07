@@ -43,7 +43,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     public T DESTROYED { get; set; }
     public T CREATE_UNIT { get; set; }
     public T BUILDING_FINISHED { get; set; }
-    public T HEALTH_UPDATED { get; set; }
+    //public T HEALTH_UPDATED { get; set; }
     public T ADDED_QUEUE { get; set; }
     
     private float _totalBuildTime = 0;

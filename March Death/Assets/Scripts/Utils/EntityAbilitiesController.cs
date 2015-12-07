@@ -50,6 +50,8 @@ public class EntityAbilitiesController : MonoBehaviour
 
         destroyButtons();
         showActions(gameObject);
+        //hideActionButtons(gameObject);
+        //showActionButtons(gameObject);
 
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 
@@ -67,6 +69,9 @@ public class EntityAbilitiesController : MonoBehaviour
         destroyButtons();
 
         GameObject gameObject = (GameObject) obj;
+
+        //hideActionButtons(gameObject);
+
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 
         entity.doIfResource(resource => {
@@ -101,8 +106,8 @@ public class EntityAbilitiesController : MonoBehaviour
                     Debug.Log("* " + abilityObj);
                     abilityObj.enable();
                 });
-                //image.sprite = CreateSprite(ability, image.rectTransform.sizeDelta);
-                //buttonComponent.targetGraphic = image;
+                image.sprite = CreateSprite(ability, image.rectTransform.sizeDelta);
+                buttonComponent.targetGraphic = image;
                 buttonComponent.onClick.AddListener(() => actionMethod());
                 image.enabled = true;
                 eventTrigger.enabled = true;

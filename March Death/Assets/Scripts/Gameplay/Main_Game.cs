@@ -19,7 +19,6 @@ public class Main_Game : MonoBehaviour
         bm = new Managers.BuildingsManager();
         sounds = GameObject.Find("GameController").GetComponent<Managers.SoundsManager>();
         if (info) info.LoadHUD();
-        //if (info) info.LoadActionButtons();
         StartGame();
         bm.Player = user;
         UserInput inputs = gameObject.AddComponent<UserInput>();
