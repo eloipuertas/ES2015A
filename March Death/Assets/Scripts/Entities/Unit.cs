@@ -704,7 +704,10 @@ public class Unit : GameEntity<Unit.Actions>
 
                 // Should I prevent friendly fire?
                 foreach (IGameEntity inRadiusObject in objectsInRadius.ToArray()) {
-                    inRadiusObject.receiveAttack(this, canDoRangedAttack());
+                    if (inRadiusObject.status != EntityStatus.DEAD)
+                    {
+                        inRadiusObject.receiveAttack(this, canDoRangedAttack());
+                    }
                 }
 
                 _projectileThrown = false;
