@@ -211,13 +211,19 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     protected override void onFatalWounds()
     {
-        statistics.getNegative();
-        fire(Actions.STAT_OUT, statistics);
+        if (BasePlayer.isOfPlayer(this))
+        {
+            statistics.getNegative();
+            fire(Actions.STAT_OUT, statistics);
+        }
 
         fire(Actions.DIED);
 
-        statistics.growth_speed *= -1;
-        fire(Actions.STAT_OUT, statistics);
+        if (BasePlayer.isOfPlayer(this))
+        {
+            statistics.growth_speed *= -1;
+            fire(Actions.STAT_OUT, statistics);
+        }
     }
 
     /// <summary>
