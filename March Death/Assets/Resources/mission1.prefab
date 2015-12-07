@@ -68,23 +68,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!1 &128600
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
-  m_Component:
-  - 224: {fileID: 22449064}
-  - 222: {fileID: 22243926}
-  - 114: {fileID: 11465246}
-  m_Layer: 5
-  m_Name: objective 1
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
 --- !u!1 &133154
 GameObject:
   m_ObjectHideFlags: 0
@@ -119,18 +102,18 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!1 &138786
+--- !u!1 &143104
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 4
   m_Component:
-  - 224: {fileID: 22437958}
-  - 222: {fileID: 22298682}
-  - 114: {fileID: 11473230}
+  - 224: {fileID: 22482102}
+  - 222: {fileID: 22264380}
+  - 114: {fileID: 11465630}
   m_Layer: 5
-  m_Name: objetivos2
+  m_Name: Objectives
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -202,6 +185,23 @@ GameObject:
   - 114: {fileID: 11483604}
   m_Layer: 5
   m_Name: Text (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &171054
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 22485916}
+  - 222: {fileID: 22206752}
+  - 114: {fileID: 11487664}
+  m_Layer: 5
+  m_Name: objective 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -671,14 +671,12 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 10
     m_MaxSize: 40
-    m_Alignment: 0
+    m_Alignment: 1
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'MISSION 1 - beach landing
-
-'
+  m_Text: "MISSION 1 \nBeach landing\n"
 --- !u!114 &11435648
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -705,9 +703,9 @@ MonoBehaviour:
     m_ColorMultiplier: 1
     m_FadeDuration: .100000001
   m_SpriteState:
-    m_HighlightedSprite: {fileID: 21300000, guid: 1e8a22533f23f984bb50bc22603d831f,
+    m_HighlightedSprite: {fileID: 21300000, guid: 27835bc6ee460b94eb9a7b152b30084a,
       type: 3}
-    m_PressedSprite: {fileID: 21300000, guid: 1e8a22533f23f984bb50bc22603d831f, type: 3}
+    m_PressedSprite: {fileID: 21300000, guid: 27835bc6ee460b94eb9a7b152b30084a, type: 3}
     m_DisabledSprite: {fileID: 0}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
@@ -759,12 +757,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb1cab7f0bc16e64a89c6c4d3f15fa13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &11465246
+--- !u!114 &11465630
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 128600}
+  m_GameObject: {fileID: 143104}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
@@ -780,17 +778,17 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
-    m_FontStyle: 0
+    m_FontSize: 16
+    m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 10
     m_MaxSize: 40
-    m_Alignment: 0
+    m_Alignment: 1
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\r\nFind the enemy village"
+  m_Text: Objectives
 --- !u!114 &11467070
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -865,38 +863,6 @@ MonoBehaviour:
       m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
         Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   delegates: []
---- !u!114 &11473230
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 138786}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: .196078435, g: .196078435, b: .196078435, a: 1}
-  m_RaycastTarget: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
-    m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
-    m_Alignment: 0
-    m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
-    m_LineSpacing: 1
-  m_Text: Destroy enemy's stronghold
 --- !u!114 &11480092
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1033,6 +999,38 @@ MonoBehaviour:
   m_Text: We sailed into enemy territory to invade his stronghold, but a fierce storm
     has diverted us from the goal and made us wrecked in this beach. Willing to go
     our way we spotted a village near enemy. The war begins today.
+--- !u!114 &11487664
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 171054}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: .196078435, g: .196078435, b: .196078435, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: "- Find the enemy village\n- \rDestroy enemy's stronghold"
 --- !u!114 &11489782
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1081,6 +1079,12 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 128366}
+--- !u!222 &22206752
+CanvasRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 171054}
 --- !u!222 &22208646
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -1099,18 +1103,18 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 177268}
---- !u!222 &22243926
-CanvasRenderer:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 128600}
 --- !u!222 &22260102
 CanvasRenderer:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 150964}
+--- !u!222 &22264380
+CanvasRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 143104}
 --- !u!222 &22269954
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -1135,12 +1139,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 192882}
---- !u!222 &22298682
-CanvasRenderer:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 138786}
 --- !u!223 &22350600
 Canvas:
   m_ObjectHideFlags: 1
@@ -1175,23 +1173,6 @@ RectTransform:
   m_AnchoredPosition: {x: 85.0000076, y: 50.3000031}
   m_SizeDelta: {x: 130, y: 40}
   m_Pivot: {x: .5, y: .5}
---- !u!224 &22437958
-RectTransform:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 138786}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 22462322}
-  m_RootOrder: 9
-  m_AnchorMin: {x: .5, y: .5}
-  m_AnchorMax: {x: .5, y: .5}
-  m_AnchoredPosition: {x: -163.800003, y: -138.499985}
-  m_SizeDelta: {x: 160, y: 30}
-  m_Pivot: {x: .5, y: .5}
 --- !u!224 &22445390
 RectTransform:
   m_ObjectHideFlags: 1
@@ -1204,27 +1185,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 22462322}
   m_RootOrder: 3
-  m_AnchorMin: {x: .5, y: .5}
-  m_AnchorMax: {x: .5, y: .5}
-  m_AnchoredPosition: {x: 13.6000004, y: 174.699997}
-  m_SizeDelta: {x: 311.899994, y: 31.3999996}
-  m_Pivot: {x: .5, y: .5}
---- !u!224 &22449064
-RectTransform:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 128600}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 22462322}
-  m_RootOrder: 8
-  m_AnchorMin: {x: .5, y: .5}
-  m_AnchorMax: {x: .5, y: .5}
-  m_AnchoredPosition: {x: -125, y: -119.900002}
-  m_SizeDelta: {x: 237.600006, y: 79.8000031}
+  m_AnchorMin: {x: .5, y: 1}
+  m_AnchorMax: {x: .5, y: 1}
+  m_AnchoredPosition: {x: 9.05989964e-06, y: -88}
+  m_SizeDelta: {x: 218, y: 83}
   m_Pivot: {x: .5, y: .5}
 --- !u!224 &22451390
 RectTransform:
@@ -1261,12 +1225,12 @@ RectTransform:
   - {fileID: 423286}
   - {fileID: 490936}
   - {fileID: 22483556}
-  - {fileID: 22449064}
-  - {fileID: 22437958}
   - {fileID: 22480822}
   - {fileID: 22481300}
   - {fileID: 22472734}
   - {fileID: 22498630}
+  - {fileID: 22482102}
+  - {fileID: 22485916}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
@@ -1302,10 +1266,10 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 22462322}
-  m_RootOrder: 12
+  m_RootOrder: 10
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
-  m_AnchoredPosition: {x: -226.600006, y: 170.649963}
+  m_AnchoredPosition: {x: -225, y: 170.649963}
   m_SizeDelta: {x: 60.3999939, y: 118.699997}
   m_Pivot: {x: .5, y: .5}
 --- !u!224 &22480822
@@ -1319,10 +1283,10 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 22462322}
-  m_RootOrder: 10
+  m_RootOrder: 8
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
-  m_AnchoredPosition: {x: 220.599976, y: 170.649963}
+  m_AnchoredPosition: {x: 225, y: 170.649963}
   m_SizeDelta: {x: 60.3999939, y: 118.699997}
   m_Pivot: {x: .5, y: .5}
 --- !u!224 &22481300
@@ -1336,11 +1300,28 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 22462322}
-  m_RootOrder: 11
+  m_RootOrder: 9
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
-  m_AnchoredPosition: {x: -226.600006, y: 170.649963}
+  m_AnchoredPosition: {x: -225, y: 170.649963}
   m_SizeDelta: {x: 60.3999939, y: 118.699997}
+  m_Pivot: {x: .5, y: .5}
+--- !u!224 &22482102
+RectTransform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 143104}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 22462322}
+  m_RootOrder: 12
+  m_AnchorMin: {x: .5, y: .5}
+  m_AnchorMax: {x: .5, y: .5}
+  m_AnchoredPosition: {x: -150.800049, y: -116.500015}
+  m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: .5, y: .5}
 --- !u!224 &22483556
 RectTransform:
@@ -1359,6 +1340,23 @@ RectTransform:
   m_AnchoredPosition: {x: 136.100006, y: -22.6000004}
   m_SizeDelta: {x: 232.199997, y: 216.5}
   m_Pivot: {x: .5, y: .5}
+--- !u!224 &22485916
+RectTransform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 171054}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 22462322}
+  m_RootOrder: 13
+  m_AnchorMin: {x: .5, y: .5}
+  m_AnchorMax: {x: .5, y: .5}
+  m_AnchoredPosition: {x: -124.000031, y: -160.000031}
+  m_SizeDelta: {x: 238, y: 57}
+  m_Pivot: {x: .5, y: .5}
 --- !u!224 &22498630
 RectTransform:
   m_ObjectHideFlags: 1
@@ -1370,10 +1368,10 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 22462322}
-  m_RootOrder: 13
+  m_RootOrder: 11
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
-  m_AnchoredPosition: {x: 220.599976, y: 170.649963}
+  m_AnchoredPosition: {x: 225, y: 170.649963}
   m_SizeDelta: {x: 60.3999939, y: 118.699997}
   m_Pivot: {x: .5, y: .5}
 --- !u!1001 &100100000
