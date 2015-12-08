@@ -39,9 +39,16 @@ class Sell : Ability
         IGameEntity entity = _gameObject.GetComponent<IGameEntity>();
         EntityResources resources = entity.info.buildingAttributes.sellValue;
 
-        BasePlayer.getOwner(entity).resources.AddAmount(WorldResources.Type.WOOD, resources.wood);
-        BasePlayer.getOwner(entity).resources.AddAmount(WorldResources.Type.METAL, resources.metal);
-        BasePlayer.getOwner(entity).resources.AddAmount(WorldResources.Type.FOOD, resources.food);
+        if (resources != null)
+        {
+            BasePlayer.getOwner(entity).resources.AddAmount(WorldResources.Type.WOOD, resources.wood);
+            BasePlayer.getOwner(entity).resources.AddAmount(WorldResources.Type.METAL, resources.metal);
+            BasePlayer.getOwner(entity).resources.AddAmount(WorldResources.Type.FOOD, resources.food);
+        }
+        else
+        {
+            Debug.LogWarning(entity + " Have no sellValue on JSON");
+        }
 
         // Destroy it (onDestroy will handle grid freeing)
         _gameObject.GetComponent<IGameEntity>().Destroy(true);
