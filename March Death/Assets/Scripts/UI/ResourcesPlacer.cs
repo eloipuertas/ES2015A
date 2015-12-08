@@ -19,6 +19,11 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
     private Text pop;
     private Player _player;
 
+    private Sprite up;
+    private Sprite down;
+
+    private List<Image> arrows;
+
     Dictionary<WorldResources.Type, int> resources;
     Dictionary<WorldResources.Type, Dictionary<IGameEntity, GrowthStatsPacket>> statistics;
 
@@ -27,6 +32,7 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
     {
         res_amounts = new List<Text>();
         res_stats = new List<Text>();
+        arrows = new List<Image>();
 
         Setup();
 
@@ -158,6 +164,12 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
         return sum/maxTime;
     }
 
+    private void SetArrow(ref Image image , float amount)
+    {
+        image.sprite = ( amount >= 0f ) ? up : down;
+        image.color = (amount >= 0f) ? Color.green : Color.red;
+    }
+
 
 
     // Updating Texts
@@ -185,8 +197,9 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
 
             if (res_stats[i] != null)
             {
-                res_stats[i].text = "" + Math.Round(amount, 2);
-                res_stats[i].color = amount >= 0 ? Color.gray : Color.red;
+                res_stats[i].text = "" + Math.Abs(Math.Round(amount, 2));
+                res_stats[i].color = amount >= 0 ? Color.green : Color.red;
+                // SetArrow(ref arrows[i] , amount);
             }
         }
 
@@ -202,12 +215,14 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
         _player = GameObject.Find("GameController").GetComponent<Player>();
 
         for (int i = 0; i < txt_names.Length; i++)
-        {
+        {   // UNCOMMENT WHEN ARROWS ARE PLACED IN HUD  ( RAUL_TODO )
             GameObject obj;
             Text text;
+            //Image image;
 
             string _text = "HUD/resources/text_" + txt_names[i];
             string _stats = "HUD/resources/text_" + txt_names[i] + "_hour";
+            //string _arrow = "HUD/resources/arrow_" + txt_names[i];
 
             obj = GameObject.Find(_text);
             if (!obj) throw new Exception("Object " + _text + " not found!");
@@ -219,12 +234,22 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
 
 
             obj = GameObject.Find(_stats);
-            if (!obj) throw new Exception("Object " + _text + " not found!");
+            if (!obj) throw new Exception("Object " + _stats + " not found!");
 
             text = obj.GetComponent<Text>();
-            if (!text) throw new Exception("Component " + _text + " not found!");
+            if (!text) throw new Exception("Component " + _stats + " not found!");
 
             res_stats.Add(text);
+
+            /*
+            obj = GameObject.Find(_arrow);
+            if (!obj) throw new Exception("Object " + _arrow + " not found!");
+
+            image = obj.GetComponent<Image>();
+            if (!text) throw new Exception("Component " + _arrow + " not found!");
+
+            arrows.Add(image);
+            */
         }
 
         GameObject go = GameObject.Find("HUD/resources/text_population");
@@ -232,6 +257,12 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
 
 
         pop = go.GetComponent<Text>();
+
+        up = Resources.Load<Sprite>("Statistics_icons/up");
+        if (up == null) throw new NullReferenceException("Up icon not found!");
+
+        down = Resources.Load<Sprite>("Statistics_icons/down");
+        if (down == null) throw new NullReferenceException("Down icon not found!");
 
         foreach (Text t in res_amounts)
         {
