@@ -252,8 +252,13 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     /// </summary>
     public float getcreationUnitPercentage()
     {
-        return (_creationTimer * 100f) / _infoUnitToCreate.unitAttributes.creationTime;
-
+       
+        if (_infoUnitToCreate!= null )
+        {
+            return (_creationTimer * 100f) / _infoUnitToCreate.unitAttributes.creationTime;
+        }
+        return 0F;
+       
     }
 
     /// <summary>
