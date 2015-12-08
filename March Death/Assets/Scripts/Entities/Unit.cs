@@ -310,7 +310,7 @@ public class Unit : GameEntity<Unit.Actions>
         setStatus(EntityStatus.MOVING);
         fire(Actions.MOVEMENT_START);
         updateDistanceToTarget();
-        Debug.Log("Unit: GoToBuilding()");
+        
 
         return true;
     }
