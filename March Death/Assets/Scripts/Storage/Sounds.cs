@@ -6,7 +6,7 @@ namespace Storage
     sealed class Sounds : Singleton<Sounds>
     {
 
-        public enum SoundType { CREATION, SELECTION, ACTION, ATTACK, DEAD, TRAP, FULLHOUSE, RECRUITEXPLORER }
+        public enum SoundType { CREATION, SELECTION, ACTION, ATTACK, DEAD, TRAP, FULLHOUSE }
         public enum SoundSource { BUILDING, UNIT}
 
         private Dictionary<Tuple<BuildingTypes, SoundType>, AudioClip> buildings = new Dictionary<Tuple<BuildingTypes, SoundType>, AudioClip>();
