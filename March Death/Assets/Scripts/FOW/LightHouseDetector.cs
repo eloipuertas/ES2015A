@@ -129,6 +129,7 @@ class LightHouseDetector : MonoBehaviour
                 _revealer.StopFocusing();
             }
         }
+        Debug.Log("Remaining targets: " + _targets.Count);
     }
 
 
@@ -152,6 +153,18 @@ class LightHouseDetector : MonoBehaviour
         unit.unregister(Unit.Actions.DIED, OnUnitDied);
     }
 
+    void OnDestroy()
+    {
+        if (_targets.Any())
+        {
+            foreach (IGameEntity entity in _targets)
+            {
+                Unit unit = (Unit)entity;
+                unit.unregister(Unit.Actions.DIED, OnUnitDied);
+            }
+        }
+
+    }
 
     #region INFO
 
@@ -168,10 +181,13 @@ class LightHouseDetector : MonoBehaviour
         {
             foreach (IGameEntity entity in _targets)
             {
-                if(entity.getGameObject() == _currentTarget)
-                    Debug.DrawLine(transform.position, entity.getGameObject().transform.position, Color.red);
-                else
-                    Debug.DrawLine(transform.position, entity.getGameObject().transform.position, Color.yellow);
+                if (entity.status != EntityStatus.DEAD)
+                {
+                    if (entity.getGameObject() == _currentTarget)
+                        Debug.DrawLine(transform.position, entity.getGameObject().transform.position, Color.red);
+                    else
+                        Debug.DrawLine(transform.position, entity.getGameObject().transform.position, Color.yellow);
+                }
             }
         }
 

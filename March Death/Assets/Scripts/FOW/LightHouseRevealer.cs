@@ -56,7 +56,7 @@ class LightHouseRevealer : MonoBehaviour
             transform.RotateAround(_referencePosition, rotateDirection, _revealerAngleStep);
         }
 
-        else if (status == Status.FOCUSED)
+        else if (status == Status.FOCUSED && _target != null)
         {
 
             if (EnoughDifference(transform.position, _target.transform.position))
@@ -64,7 +64,14 @@ class LightHouseRevealer : MonoBehaviour
                 transform.position = GetPosition(_target.transform.position);
                 transform.position = Vector3.MoveTowards(transform.position, _target.transform.position, _focusingStep);
 
-            }    
+            }
+        }
+        else if (status != Status.STOP)
+        {
+            Debug.Log("Trying to acces to a null target");
+            ReturnOrbitatingDistance();
+            SetStatus(Status.IDLE);
+            _target = null;
         }
 
         _light.transform.LookAt(transform);
