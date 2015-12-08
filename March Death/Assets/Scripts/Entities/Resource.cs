@@ -9,7 +9,7 @@ using UnityEngine.Assertions;
 public class Resource : Building<Resource.Actions>
 {
 
-    public enum Actions { CREATED, DAMAGED, DESTROYED, BUILDING_FINISHED, COLLECTION, CREATE_UNIT, DEL_STATS, HEALTH_UPDATED, ADDED_QUEUE, NEW_HARVEST, NEW_EXPLORER };
+    public enum Actions { CREATED, DAMAGED, DESTROYED, BUILDING_FINISHED, COLLECTION, CREATE_UNIT, EXTERMINATED, HEALTH_UPDATED, ADDED_QUEUE, NEW_HARVEST, NEW_EXPLORER };
 
     /// <summary>
     /// civilian creation waste some time. When units are being created status
@@ -239,7 +239,7 @@ public class Resource : Building<Resource.Actions>
             _collectedAmount = _collectionRate;
             _stored -= _collectedAmount;
         }
-        sendResource(_collectedAmount);
+        sendResource( _collectedAmount );
         return;
     }
 
@@ -284,7 +284,7 @@ public class Resource : Building<Resource.Actions>
         if (amount > 0.0)
         {
             Goods goods = new Goods();
-            goods.amount = amount;
+            goods.amount = Mathf.Min( amount, HUD_productionRate );
 
             // TODO:
             // BUG: Null reference when we try to add material amount to player.
@@ -304,7 +304,11 @@ public class Resource : Building<Resource.Actions>
                 BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.WOOD, amount);
                 goods.type = Goods.GoodsType.WOOD;
             }
-            fire(Actions.COLLECTION, goods);
+
+            if (BasePlayer.player.race.Equals(_entity.info.race))
+            {
+                fire(Actions.COLLECTION, goods);
+            }
         }
     }
 
@@ -335,7 +339,7 @@ public class Resource : Building<Resource.Actions>
 
             totalUnits++;
             harvestUnits++;
-            fire(Actions.NEW_HARVEST);
+            fire(Actions.NEW_HARVEST, _entity);
             workersList.Add(civil);
             setStatus(EntityStatus.WORKING);
 
@@ -364,7 +368,7 @@ public class Resource : Building<Resource.Actions>
             worker = workersList.PopAt(0);
             _collectionRate -= worker.info.attributes.capacity;
             harvestUnits--;
-            fire(Actions.NEW_EXPLORER);
+            fire(Actions.NEW_EXPLORER, _entity);
 
             worker.transform.position = getMeetingPoint();
             worker.bringBack();
@@ -443,45 +447,13 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     public override void OnDestroy()
     {
-        if (_info.isResource)
-        {
-            statistics.getNegative();
-            fire(Actions.DEL_STATS, statistics);
-        }
+        if (BasePlayer.player.race.Equals(_entity.info.race))
+            fire(Actions.EXTERMINATED, _entity);
 
+        ResourcesEvents.get.unregisterResourceToEvents(_entity);
         base.OnDestroy();
     }
 
-    private WorldResources.Type ResourceFromBuilding(BuildingTypes type)
-    {
-        switch (type)
-        {
-            case BuildingTypes.FARM:
-                return WorldResources.Type.FOOD;
-            case BuildingTypes.MINE:
-                return WorldResources.Type.METAL;
-            case BuildingTypes.SAWMILL:
-                return WorldResources.Type.WOOD;
-            default:
-                throw new Exception("That resource type does not exist!");
-        }
-    }
-
-    private void SetupStatistics()
-    {
-        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
-        GameObject gameController = GameObject.Find("GameController");
-        ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
-
-        if (Player.getOwner(_entity).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
-        {
-            register(Actions.COLLECTION, res_pl.onCollection);
-            register(Actions.CREATED, res_pl.onStatisticsUpdate);
-            register(Actions.DEL_STATS, res_pl.onStatisticsUpdate);
-        }
-
-        statistics = _info.isResource ? new Statistics(ResourceFromBuilding(type), (int)info.resourceAttributes.updateInterval, 10) : null; // hardcoded, To modify, by now the collection rate is always 10, but theres no workers yet
-    }
 
     /// <summary>
     /// Object initialization
@@ -510,11 +482,12 @@ public class Resource : Building<Resource.Actions>
         // Setup base
         base.Start();
         this.GetComponent<Rigidbody>().isKinematic = false;
-        
-        if (_entity.info.race.Equals(BasePlayer.player.race)) 
-            ResourcesEvents.get.registerToEvents(_entity);
 
-        SetupStatistics();
+        if (_entity.info.race.Equals(BasePlayer.player.race))
+        {
+            ResourcesEvents.get.registerResourceToEvents(_entity);
+            fire(Actions.CREATED, _entity);
+        }
 
     }
 
@@ -548,11 +521,6 @@ public class Resource : Building<Resource.Actions>
                         _nextUpdate = Time.time + info.resourceAttributes.updateInterval;
                         collect();
                         produce();
-
-                        if (once)
-                        {
-                            fire(Actions.CREATED, statistics); once = false;
-                        }
                     }
                 }
                 break;
