@@ -46,10 +46,10 @@ public class EntityAbilitiesController : MonoBehaviour
     {
 		GameObject gameObject = (GameObject) obj;
 
-        destroyButtons();
-        showActions(gameObject);
-        //hideActionButtons(gameObject);
-        //showActionButtons(gameObject);
+        //destroyButtons();
+        //showActions(gameObject);
+        hideActionButtons(gameObject);
+        showActionButtons(gameObject);
 
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 
@@ -64,11 +64,11 @@ public class EntityAbilitiesController : MonoBehaviour
 
     public void onActorDeselected(System.Object obj)
     {
-        destroyButtons();
+        //destroyButtons();
 
         GameObject gameObject = (GameObject) obj;
 
-        //hideActionButtons(gameObject);
+        hideActionButtons(gameObject);
 
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 
@@ -84,6 +84,8 @@ public class EntityAbilitiesController : MonoBehaviour
     private void showActionButtons(GameObject objeto)
     {
         IGameEntity entity = objeto.GetComponent<IGameEntity>();
+        GameObject actionPanel = GameObject.Find("HUD/actions");
+        actionPanel.GetComponent<Image>().enabled = true;
         var abilities = entity.info.abilities;
         var nabilities = abilities.Count;
         for (int i = 0; i < nabilities; i++)
@@ -170,6 +172,8 @@ public class EntityAbilitiesController : MonoBehaviour
             buttonComponent.interactable = false;
 
         }
+        GameObject actionPanel = GameObject.Find("HUD/actions");
+        actionPanel.GetComponent<Image>().enabled = false;
     }
 
 
