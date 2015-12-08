@@ -53,8 +53,10 @@ public class Player : BasePlayer
         InstantiateBuildings(me.GetBuildings());
         InstantiateUnits(me.GetUnits());
         SetInitialResources(me.GetResources().Wood, me.GetResources().Food, me.GetResources().Metal, me.GetResources().Gold);
-        gameObject.AddComponent<ResourcesPlacer>();
+        // gameObject.AddComponent<ResourcesPlacer>();
+        
         missionStatus = new MissionStatus(playerId);
+        ResourcesPlacer r = ResourcesPlacer.get; // initialization
 
         // TODO Set this values dynamically
         minFoodTolerance = 100;

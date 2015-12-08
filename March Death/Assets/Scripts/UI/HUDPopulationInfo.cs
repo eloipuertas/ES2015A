@@ -42,10 +42,7 @@ public class HUDPopulationInfo : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        foreach (Sprite s in Resources.LoadAll<Sprite>("PopInfoIcons"))
-        {
-            Debug.Log(s.name);
-        }
+
     }
 
     /// <summary>

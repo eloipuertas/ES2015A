@@ -13,7 +13,7 @@ using Pathfinding;
 /// </summary>
 public class Unit : GameEntity<Unit.Actions>
 {
-    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EAT, DIED, STAT_OUT, TARGET_TERMINATED, HEALTH_UPDATED };
+    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EXTERMINATED, EAT, DIED, STAT_OUT, TARGET_TERMINATED, HEALTH_UPDATED };
     public enum Gender { MALE, FEMALE }
 
     private EntityStatus _defaultStatus = EntityStatus.IDLE;
@@ -28,6 +28,8 @@ public class Unit : GameEntity<Unit.Actions>
             _defaultStatus = value;
         }
     }
+
+    private IGameEntity _entity;
 
     public Unit() { }
 
@@ -208,13 +210,12 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     protected override void onFatalWounds()
     {
-        statistics.getNegative();
-        fire(Actions.STAT_OUT, statistics);
+        if(BasePlayer.player.race.Equals(_entity.info.race))
+            fire(Actions.EXTERMINATED, _entity);
+
+        ResourcesEvents.get.unregisterUnitToEvents(_entity);
 
         fire(Actions.DIED);
-
-        statistics.growth_speed *= -1;
-        fire(Actions.STAT_OUT, statistics);
     }
 
     /// <summary>
@@ -566,13 +567,13 @@ public class Unit : GameEntity<Unit.Actions>
 
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
         GameObject gameController = GameObject.Find("GameController");
-        ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
+
+        _entity = this.GetComponent<IGameEntity>();
+        //ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
 
         if (Player.getOwner(this).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
         {
-            register(Actions.EAT, res_pl.onFoodConsumption);
-            register(Actions.STAT_OUT, res_pl.onStatisticsUpdate);
-            register(Actions.CREATED, res_pl.onStatisticsUpdate);
+            ResourcesEvents.get.registerUnitToEvents(_entity);
         }
 
         // Set detour params (can't be done until Start is done)
@@ -583,8 +584,8 @@ public class Unit : GameEntity<Unit.Actions>
             _detourAgent.UpdateParams();
         }
 
-        statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -5);
-        fire(Actions.CREATED, statistics);
+        if(BasePlayer.player.race.Equals(_info.race))
+            fire(Actions.CREATED, _entity);
     }
 
     /// <summary>
