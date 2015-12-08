@@ -219,8 +219,10 @@ GameObject:
   m_Component:
   - 4: {fileID: 430986}
   - 108: {fileID: 10834786}
-  m_Layer: 0
-  m_Name: Light
+  - 114: {fileID: 11421388}
+  - 135: {fileID: 13536384}
+  m_Layer: 2
+  m_Name: LightHouse-Detector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1897,7 +1899,6 @@ GameObject:
   - 4: {fileID: 411996}
   - 114: {fileID: 11449172}
   - 114: {fileID: 11435750}
-  - 135: {fileID: 13508944}
   m_Layer: 0
   m_Name: LightHouse-Revealer
   m_TagString: Untagged
@@ -4373,8 +4374,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 185688}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 214.657257, y: -44.0058022, z: 389.876587}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_LocalPosition: {x: 212.185272, y: -43.9973755, z: 412.646912}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 475374}
   - {fileID: 478072}
@@ -4990,6 +4991,17 @@ MonoBehaviour:
   Position: {x: 0, y: 0, z: 0}
   Size: {x: 13, y: 20, z: 13}
   CheckEverySeconds: 1
+--- !u!114 &11421388
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 107116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd035228533ff044a9afaf6673dedf89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11427206
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -5027,6 +5039,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: 0
+  status: 0
 --- !u!114 &11449172
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -5039,7 +5052,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsActor: 1
-  Range: 50
+  Range: 30
 --- !u!114 &11498060
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -5055,17 +5068,17 @@ MonoBehaviour:
   type: 8
   gender: 0
   _distanceToTarget: 0
---- !u!135 &13508944
+--- !u!135 &13536384
 SphereCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 170224}
+  m_GameObject: {fileID: 107116}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 30
+  m_Radius: .5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!137 &13759736
 SkinnedMeshRenderer:
@@ -5099,7 +5112,7 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -.000771015882, y: .0013229847, z: 1.09672546e-05}
+    m_Center: {x: -.00077098608, y: .00132346153, z: 1.09672546e-05}
     m_Extent: {x: .0109024905, y: .0113815013, z: 2.18123075e-09}
   m_DirtyAABB: 0
 --- !u!137 &13787910
@@ -7650,6 +7663,26 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: race
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Range
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_LocalScale.z
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
