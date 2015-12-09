@@ -104,6 +104,23 @@ namespace Managers
 
         }
 
+        /// <summary>
+        /// function to trigger a sound when building trap explorer recruited as worker
+        /// </summary>
+        /// <param name="bType"></param>
+        public void onExplorerTrapped()
+        {
+            _buildingsAudioPool.Play(Sounds.get.RandomClip(Sounds.SoundSource.BUILDING, Sounds.SoundType.TRAP));
+        }
+
+        /// <summary>
+        /// function to trigger a sound when building could not trap a explorer because is full.
+        /// </summary>
+        /// <param name="bType"></param>
+        public void onFullHouse()
+        {
+            _buildingsAudioPool.Play(Sounds.get.RandomClip(Sounds.SoundSource.BUILDING, Sounds.SoundType.FULLHOUSE));
+        }
 
 
         void OnDestroy()

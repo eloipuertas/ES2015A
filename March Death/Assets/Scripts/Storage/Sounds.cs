@@ -6,7 +6,7 @@ namespace Storage
     sealed class Sounds : Singleton<Sounds>
     {
 
-        public enum SoundType { CREATION, SELECTION, ACTION, ATTACK, DEAD }
+        public enum SoundType { CREATION, SELECTION, ACTION, ATTACK, DEAD, TRAP, FULLHOUSE }
         public enum SoundSource { BUILDING, UNIT}
 
         private Dictionary<Tuple<BuildingTypes, SoundType>, AudioClip> buildings = new Dictionary<Tuple<BuildingTypes, SoundType>, AudioClip>();
@@ -23,6 +23,8 @@ namespace Storage
             parseCommonSoundFiles("Sounds/common/units/action", sounds, SoundSource.UNIT, SoundType.ACTION);
             parseCommonSoundFiles("Sounds/common/units/death", sounds, SoundSource.UNIT, SoundType.DEAD);
             parseCommonSoundFiles("Sounds/common/buildings/destroyed", sounds, SoundSource.BUILDING, SoundType.DEAD);
+            parseCommonSoundFiles("Sounds/common/buildings/trap", sounds, SoundSource.BUILDING, SoundType.TRAP);
+            parseCommonSoundFiles("Sounds/common/buildings/fullHouse", sounds, SoundSource.BUILDING, SoundType.FULLHOUSE);
 
         }
 

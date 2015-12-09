@@ -62,7 +62,7 @@ public class GameInformation : MonoBehaviour
         }
 
         currentHud.AddComponent<HUDPopulationInfo>(); // Adds the text to show population stats.  
-        //LoadActionButtons();
+        LoadActionButtons();
     }
 
     private void LoadElfHUD()
@@ -136,6 +136,7 @@ public class GameInformation : MonoBehaviour
             eventTrigger.enabled = false;
             //buttonObject.GetComponent<Renderer>().enabled= false;
         }
+        actionPanel.GetComponent<Image>().enabled = false;
     }
 
 

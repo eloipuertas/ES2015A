@@ -17,6 +17,11 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     public enum createCivilStatus { IDLE, RUN, DISABLED };
 
+    /// <summary>
+    ///  Sounds manager
+    /// </summary>
+    Managers.SoundsManager sounds;
+
     public Statistics statistics;
 
     // Constructor
@@ -430,12 +435,13 @@ public class Resource : Building<Resource.Actions>
         {
             Unit unit = (Unit)entity;
             unit.vanish();
+            sounds.onExplorerTrapped();
             unit.transform.position = this.transform.position;
             recruitWorker((Unit)unit);
         }
         else
         {
-            //do nothing
+            sounds.onFullHouse();
         }
     }
 
@@ -498,7 +504,8 @@ public class Resource : Building<Resource.Actions>
         hasDefaultUnit = false;
         civilInfo = Info.get.of(this.race, UnitTypes.CIVIL);
         _entity = this.GetComponent<IGameEntity>();
-
+        sounds = GameObject.Find("GameController").GetComponent<Managers.SoundsManager>();
+        
         // Call Building start
         base.Awake();
     }
