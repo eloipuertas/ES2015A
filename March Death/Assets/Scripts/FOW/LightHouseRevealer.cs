@@ -182,12 +182,13 @@ class LightHouseRevealer : MonoBehaviour
 
     #region INFO
 
+#if  UNITY_EDITOR
     private void OnDrawGizmos()
     {
         UnityEditor.Handles.color = Color.yellow;
         UnityEditor.Handles.DrawWireDisc(transform.parent.position, Vector3.down, _revealerOrbitatingRadius);
     }
-
+#endif
     private void DrawInfo()
     {
         if (_target)

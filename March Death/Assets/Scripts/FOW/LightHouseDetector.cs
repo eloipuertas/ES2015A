@@ -168,12 +168,14 @@ class LightHouseDetector : MonoBehaviour
 
     #region INFO
 
+#if UNITY_EDITOR 
     private void OnDrawGizmos()
     {
         UnityEditor.Handles.color = Color.red;
         UnityEditor.Handles.DrawWireDisc(transform.parent.position, Vector3.down, _radius);
     }
 
+#endif
 
     private void DrawInfo()
     {
