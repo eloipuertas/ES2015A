@@ -82,6 +82,11 @@ public partial class InformationController : MonoBehaviour
 
         //Inicializate window extended info
         windowInfo = GameObject.Find("HUD/windowInfo");
+		rectTransform = GameObject.Find("HUD/windowInfo").GetComponent<RectTransform>();
+		panelSize = rectTransform.sizeDelta;
+		globalScaleXY = new Vector2(rectTransform.lossyScale.x, rectTransform.lossyScale.y);
+		Vector2 scaledSize = Vector2.Scale(panelSize, globalScaleXY);
+		rectTransform.sizeDelta = new Vector2(panelSize.x, scaledSize.y * 1f);
         ArialFont = (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf");
         currentTitles = new List<GameObject>();
         currentValues = new List<GameObject>();
