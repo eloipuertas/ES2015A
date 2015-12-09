@@ -25,7 +25,7 @@ class LightHouseDetector : MonoBehaviour
 
     public void Update()
     {
-        DrawInfo();
+        //DrawInfo(); <- buggy
     }
 
     /// <summary>
