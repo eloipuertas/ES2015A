@@ -6,41 +6,208 @@ using System.Collections.Generic;
 using Utils;
 using System;
 
-public class ResourcesPlacer : MonoBehaviour
+public class ResourcesPlacer : Singleton<ResourcesPlacer>
 {
     // attributes
-    private const float UPDATE_STATS = 1.5f;
-    private float _timer = 1.5f;
-
     private readonly string[] txt_names = { "meat", "wood", "metal" };
-    private WorldResources.Type[] t = { WorldResources.Type.FOOD, WorldResources.Type.WOOD, WorldResources.Type.METAL };
-    private List<Text> res_amounts;
-    private List<Text> res_stats;
+
+    private List<Text> res_amounts, res_stats;
+
+    /// <summary>
+    /// Population text where number of units are displayed
+    /// </summary>
     private Text pop;
-    private Player player;
+    private Player _player;
 
-    private float[] _statistics = { 0f, 0f, 0f };
+    Dictionary<WorldResources.Type, int> resources;
+    Dictionary<WorldResources.Type, Dictionary<IGameEntity, GrowthStatsPacket>> statistics;
 
 
-
-    void Start()
+    private ResourcesPlacer()
     {
         res_amounts = new List<Text>();
         res_stats = new List<Text>();
 
-        player = GameObject.Find("GameController").GetComponent<Player>();
+        Setup();
 
-        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
+        initializeResources();
+        initializeStatistics();
+
+        updateAmounts();
+        updateStatistics();
+        updatePopulation();
+    }
+
+
+    // Resources 
+
+    private void initializeResources()
+    {
+        resources = new Dictionary<WorldResources.Type, int>()
+        {
+            { WorldResources.Type.FOOD ,  (int) _player.resources.getAmount(WorldResources.Type.FOOD) } ,
+            { WorldResources.Type.WOOD ,  (int) _player.resources.getAmount(WorldResources.Type.WOOD) } ,
+            { WorldResources.Type.METAL , (int) _player.resources.getAmount(WorldResources.Type.METAL) }
+        };
+    }
+
+    /// <summary>
+    /// Collect an amount (amount) from a type (type).  
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="amount"></param>
+    public void Collect ( WorldResources.Type type , float amount  )
+    {
+        resources[type] += (int) amount;
+        updateAmounts();
+    }
+
+    /// <summary>
+    /// Units consume a certain amount froma a certain WorldResources.Type
+    /// </summary>
+    /// <param name="type"> </param>
+    /// <param name="amount"> </param>
+    public void Consume ( WorldResources.Type type, float amount )
+    {
+        resources[type] -= (int)((resources[type] - amount < 0) ? 0 : amount);
+        updateAmounts();
+    }
+
+    /// <summary>
+    /// Method to remove resources from the top HUD when you buy an ability.
+    /// </summary>
+    /// <param name="amounts">A dictionary where type represents the WorldResources.Type and the 
+    /// float represents the amount of WorldResources.Type whe will extract.</param>
+    public void Buy (Dictionary<WorldResources.Type, float> amounts)
+    {
+        foreach (KeyValuePair<WorldResources.Type, float> tuple in amounts)
+            resources[tuple.Key] -= (int)((resources[tuple.Key] - tuple.Value < 0) ? 0 : tuple.Value);
+
+        updateAmounts();
+    }
+
+
+    // Statistics 
+
+    private void initializeStatistics()
+    {
+        statistics = new Dictionary<WorldResources.Type, Dictionary<IGameEntity, GrowthStatsPacket>>()
+        {
+            { WorldResources.Type.FOOD  , new Dictionary<IGameEntity, GrowthStatsPacket>() { } } ,
+            { WorldResources.Type.WOOD  , new Dictionary<IGameEntity, GrowthStatsPacket>() { } } ,
+            { WorldResources.Type.METAL , new Dictionary<IGameEntity, GrowthStatsPacket>() { } }
+        };
+    }
+
+    /// <summary>
+    /// Method to call when a unit or a resource is created or when a resource building 
+    /// adds or removes a worker. 
+    /// </summary>
+    /// <param name="entity">Entity where their inner stats have changed.</param>
+    /// <param name="packet">Package that represents an entity.</param>
+    public void StatisticsChanged(IGameEntity entity, GrowthStatsPacket packet)
+    {
+        
+        if (statistics[packet.type].ContainsKey(entity))
+        {
+            statistics[packet.type][entity] = packet;
+        }
+        else
+        {
+            statistics[packet.type].Add(entity, packet);
+        }
+
+        updateStatistics();
+    }
+
+    /// <summary>
+    /// Removes entity from the main dictionary.
+    /// </summary>
+    /// <param name="type">Type of resource this entity creates/destroys.</param>
+    /// <param name="entity">Entity to Destroy.</param>
+    public void RemoveEntity(WorldResources.Type type, IGameEntity entity)
+    {
+        statistics[type].Remove(entity);
+        updateStatistics();
+    }
+
+
+
+
+    // Others
+
+    /// <summary>
+    /// Returns the stat from a given dictionary.
+    /// </summary>
+    /// <param name="dict"></param>
+    /// <returns></returns>
+    private float sumDict(Dictionary<IGameEntity,GrowthStatsPacket> dict)
+    {
+        float sum = 0;
+        float maxTime = 1;
+
+        foreach (KeyValuePair<IGameEntity, GrowthStatsPacket> tuple in dict)
+        {
+            if (maxTime < tuple.Value.updateTime) maxTime = tuple.Value.updateTime;
+        }
+        foreach (KeyValuePair<IGameEntity, GrowthStatsPacket> tuple in dict)
+        {
+            sum += (maxTime/tuple.Value.updateTime) * tuple.Value.amount;
+        }
+
+        return sum/maxTime;
+    }
+
+
+
+    // Updating Texts
+
+    public void updateAmounts()
+    {
+        for (int i = 0; i < txt_names.Length; i++)
+        {
+            res_amounts[i].text = "" + resources[(WorldResources.Type)i];
+        }
+    }
+    
+    public void updatePopulation()
+    {
+        pop.text = PopulationInfo.get.number_of_units.ToString();
+    }
+    
+    public void updateStatistics()
+    {
+        float amount;
 
         for (int i = 0; i < txt_names.Length; i++)
         {
+            amount = sumDict(statistics[(WorldResources.Type)i]);
 
+            if (res_stats[i] != null)
+            {
+                res_stats[i].text = "" + Math.Round(amount, 2);
+                res_stats[i].color = amount >= 0 ? Color.gray : Color.red;
+            }
+        }
+
+    }
+
+    // Setup GameObjects
+
+    /// <summary>
+    /// Just initializations.
+    /// </summary>
+    private void Setup()
+    {
+        _player = GameObject.Find("GameController").GetComponent<Player>();
+
+        for (int i = 0; i < txt_names.Length; i++)
+        {
             GameObject obj;
             Text text;
 
             string _text = "HUD/resources/text_" + txt_names[i];
             string _stats = "HUD/resources/text_" + txt_names[i] + "_hour";
-
 
             obj = GameObject.Find(_text);
             if (!obj) throw new Exception("Object " + _text + " not found!");
@@ -63,190 +230,14 @@ public class ResourcesPlacer : MonoBehaviour
         GameObject go = GameObject.Find("HUD/resources/text_population");
         if (!go) throw new Exception("Object text_population not found!");
 
+
         pop = go.GetComponent<Text>();
 
-        setupText();
-        updateAmounts();
-
-        Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.CREATED, onUnitCreated, new ActorSelector()
-        {
-            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
-        });
-
-    }
-
-    void Update()
-    {
-        if (_timer >= UPDATE_STATS)
-        {
-            updateStatistics();
-            updatePopulation();
-            _timer = 0f;
-        }
-        else _timer += Time.deltaTime;
-
-    }
-
-    void OnDestroy()
-    {
-        Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.CREATED, onUnitCreated);
-    }
-
-    // PUBLIC METHODS
-
-    /// <summary>
-    /// Substracts the costs for the unit from the players deposit.
-    /// </summary>
-    /// <param name="entity"></param>
-    public void updateUnitCreated(IGameEntity entity)
-    {
-        player.resources.SubstractAmount(WorldResources.Type.FOOD, entity.info.resources.food);
-        player.resources.SubstractAmount(WorldResources.Type.WOOD, entity.info.resources.wood);
-        player.resources.SubstractAmount(WorldResources.Type.METAL, entity.info.resources.metal);
-
-        updateAmounts();
-    }
-
-    public void updateAmounts()
-    {
-        for (int i = 0; i < txt_names.Length; i++)
-        {
-            res_amounts[i].text = "" + player.resources.getAmount(t[i]);
-        }
-    }
-
-    public void updatePopulation()
-    {
-        pop.text = PopulationInfo.get.number_of_units.ToString();
-    }
-
-    public void updateStatistics()
-    {
-        for (int i = 0; i < txt_names.Length; i++)
-        {
-            res_stats[i].text = "" + System.Math.Round(_statistics[i], 2) + "/s";
-            res_stats[i].color = _statistics[i] >= 0 ? Color.gray : Color.red;
-        }
-    }
-
-    public void insufficientFundsColor(IGameEntity entity)
-    {
-        if (entity.info.resources.food > player.resources.getAmount(WorldResources.Type.FOOD))
-            res_amounts[0].color = Color.red;
-        if (entity.info.resources.wood > player.resources.getAmount(WorldResources.Type.WOOD))
-            res_amounts[1].color = Color.red;
-        if (entity.info.resources.metal > player.resources.getAmount(WorldResources.Type.METAL))
-            res_amounts[2].color = Color.red;
-    }
-
-    public void clearColor()
-    {
-        foreach (Text t in res_amounts)
-            t.color = Color.white;
-    }
-
-    // PRIVATE METHODS
-
-    /// <summary>
-    /// Checks if the game object is a hero or a stronghold. (Improve)
-    /// </summary>
-    /// <param name="ige"></param>
-    /// <returns></returns>
-    private bool isStarter(IGameEntity ige)
-    {
-        if (ige.info.isBuilding)
-        {
-            if (!(ige.info.isBarrack || ige.info.isResource)) return true;
-            return false;
-        }
-        else
-        {
-            if (ige.info.isCivil) return false;
-            return true;
-        }
-    }
-
-    private void setupText()
-    {
         foreach (Text t in res_amounts)
         {
             t.color = Color.white;
             t.fontStyle = FontStyle.BoldAndItalic;
         }
-    }
-
-
-    // EVENTS
-
-    void onUnitCreated(System.Object obj)
-    {
-
-        GameObject go = (GameObject)obj;
-
-
-        if (go)
-        {
-            IGameEntity i_game = go.GetComponent<IGameEntity>();
-
-            if (!isStarter(i_game))
-                updateUnitCreated(go.GetComponent<IGameEntity>());
-        }
-    }
-
-
-    public void onStatisticsUpdate(System.Object obj)
-    {
-        Statistics st = (Statistics)obj;
-
-        switch (st._type)
-        {
-            case WorldResources.Type.FOOD:
-                _statistics[0] += st.growth_speed;
-                break;
-            case WorldResources.Type.WOOD:
-                _statistics[1] += st.growth_speed;
-                break;
-            case WorldResources.Type.METAL:
-                _statistics[2] += st.growth_speed;
-                break;
-            default:
-                break;
-        }
-
-    }
-
-    public void onFoodConsumption(System.Object obj)
-    {
-        Goods goods = (Goods)obj;
-
-        if (player != null && goods != null)
-        {
-            player.resources.SubstractAmount(t[0], goods.amount); // t[0] is FOOD
-        }
-
-        updateAmounts();
-    }
-
-    public void onCollection(System.Object obj)
-    {
-        Goods goods = (Goods)obj;
-
-        switch (goods.type)
-        {
-            case Goods.GoodsType.FOOD:
-                player.resources.AddAmount(t[0], goods.amount);
-                break;
-            case Goods.GoodsType.WOOD:
-                player.resources.AddAmount(t[1], goods.amount);
-                break;
-            case Goods.GoodsType.METAL:
-                player.resources.AddAmount(t[2], goods.amount);
-                break;
-            default:
-                break;
-        }
-
-        updateAmounts();
     }
 
 }
