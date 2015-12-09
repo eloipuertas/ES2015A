@@ -56,6 +56,8 @@ public partial class InformationController : MonoBehaviour
 		RectTransform rectTransform = GameObject.Find("Information").transform.FindChild ("background").GetComponent<RectTransform>();
 		Vector2 panelSize = rectTransform.sizeDelta;
 		Vector2 center = rectTransform.position;
+		Vector2 globalScaleXY = new Vector2(rectTransform.lossyScale.x, rectTransform.lossyScale.y);
+		panelSize = Vector2.Scale(panelSize, globalScaleXY);
 		multiselectionButtonSize = new Vector2(panelSize.x / multiselectionColumns, panelSize.y / multiselectionRows);
 		multiselectionInitialPoint = new Vector2(center.x - panelSize.x / 2, center.y + panelSize.y / 2);
 
@@ -63,21 +65,22 @@ public partial class InformationController : MonoBehaviour
 		rectTransform = GameObject.Find("Information").transform.FindChild ("SquadButtons").GetComponent<RectTransform>();
 		panelSize = rectTransform.sizeDelta;
 		center = rectTransform.position;
+		globalScaleXY = new Vector2(rectTransform.lossyScale.x, rectTransform.lossyScale.y);
+		panelSize = Vector2.Scale(panelSize, globalScaleXY);
         squadsButtonSize = new Vector2(panelSize.x / squadsColumns, panelSize.y / squadsRows);
         squadsInitialPoint = new Vector2(center.x - panelSize.x / 2, center.y + panelSize.y / 2);
         MAX_SQUADS_BUTTONS = squadsColumns * squadsRows;
 
         //Inicializate parameters for unit creation buttons
-        RectTransform parentTransform = GameObject.Find("Information").GetComponent<RectTransform>();
-        Vector2 globalScaleXY = new Vector2(parentTransform.lossyScale.x, parentTransform.lossyScale.y);
-        RectTransform newrectTransform = GameObject.Find("Information").transform.FindChild("UnitCreationPanel").GetComponent<RectTransform>();
-        var newpanelSize = newrectTransform.sizeDelta;
-        var newcenter = newrectTransform.position;
-        scaledUnitCreationPanel = Vector2.Scale(newpanelSize, globalScaleXY);
-        creationQueueButtonSize = new Vector2(scaledUnitCreationPanel.x / 5, scaledUnitCreationPanel.y);
-        creationQueueInitialPoint = new Vector2(newcenter.x - scaledUnitCreationPanel.x, newcenter.y + scaledUnitCreationPanel.y);
+		rectTransform = GameObject.Find("Information").transform.FindChild("UnitCreationPanel").GetComponent<RectTransform>();
+		panelSize = rectTransform.sizeDelta;
+		center = rectTransform.position;
+		globalScaleXY = new Vector2(rectTransform.lossyScale.x, rectTransform.lossyScale.y);
+		unitCreationPanel = Vector2.Scale(panelSize, globalScaleXY);
+		creationQueueButtonSize = new Vector2(unitCreationPanel.x / 5, unitCreationPanel.y);
+		creationQueueInitialPoint = new Vector2(center.x - unitCreationPanel.x, center.y + unitCreationPanel.y);
 
-        //Inicializate windows extended info
+        //Inicializate window extended info
         windowInfo = GameObject.Find("HUD/windowInfo");
         ArialFont = (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf");
         currentTitles = new List<GameObject>();
