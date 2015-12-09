@@ -456,6 +456,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &119492
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 467396}
+  - 33: {fileID: 3396432}
+  - 23: {fileID: 2319292}
+  m_Layer: 0
+  m_Name: Plano subdividido (3)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &120608
 GameObject:
   m_ObjectHideFlags: 1
@@ -3662,8 +3679,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 186436}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 749.682495, y: 79.0026245, z: 940.035461}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 738.008972, y: 79.0026245, z: 922.328674}
+  m_LocalScale: {x: 1.27499998, y: 1.27499998, z: 1.27499998}
   m_Children:
   - {fileID: 424202}
   - {fileID: 498922}
@@ -3681,6 +3698,7 @@ Transform:
   - {fileID: 436670}
   - {fileID: 406826}
   - {fileID: 455034}
+  - {fileID: 467396}
   m_Father: {fileID: 0}
   m_RootOrder: 0
 --- !u!4 &463160
@@ -3800,6 +3818,18 @@ Transform:
   - {fileID: 492102}
   m_Father: {fileID: 404602}
   m_RootOrder: 0
+--- !u!4 &467396
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 119492}
+  m_LocalRotation: {x: -.707106829, y: 0, z: 0, w: .707106709}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 72.6600113, y: 72.6600113, z: 72.6600113}
+  m_Children: []
+  m_Father: {fileID: 463130}
+  m_RootOrder: 16
 --- !u!4 &467466
 Transform:
   m_ObjectHideFlags: 1
@@ -4595,6 +4625,32 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
+--- !u!23 &2319292
+MeshRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 119492}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_Materials:
+  - {fileID: 2100000, guid: 07dedaa9fede46b46897be3fdc223fca, type: 2}
+  m_SubsetIndices: 
+  m_StaticBatchRoot: {fileID: 0}
+  m_UseLightProbes: 1
+  m_ReflectionProbeUsage: 1
+  m_ProbeAnchor: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: .5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
 --- !u!23 &2325914
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -4861,6 +4917,13 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 125534}
   m_Mesh: {fileID: 4300008, guid: cd734f0764aab2f429c6c0b9bb1a7124, type: 3}
+--- !u!33 &3396432
+MeshFilter:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 119492}
+  m_Mesh: {fileID: 4300000, guid: dd49625046361da43ac450e7182a2797, type: 3}
 --- !u!54 &5417802
 Rigidbody:
   m_ObjectHideFlags: 1
@@ -4994,8 +5057,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -.000770926476, y: .00132274628, z: 1.14440918e-05}
-    m_Extent: {x: .0109025147, y: .0113812936, z: 2.18121077e-09}
+    m_Center: {x: -.000771045685, y: .00132322311, z: 1.04904175e-05}
+    m_Extent: {x: .0109024877, y: .0113812387, z: 2.18120233e-09}
   m_DirtyAABB: 0
 --- !u!137 &13767904
 SkinnedMeshRenderer:
@@ -7548,6 +7611,18 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: race
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_LocalScale.x
+      value: 1.27499998
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_LocalScale.y
+      value: 1.27499998
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_LocalScale.z
+      value: 1.27499998
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
