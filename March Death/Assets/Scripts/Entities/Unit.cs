@@ -672,10 +672,11 @@ public class Unit : GameEntity<Unit.Actions>
                         // TODO: Ranged attack should also be inside a while
                         if (canDoRangedAttack())
                         {
-                            _projectile = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                            _projectile.AddComponent<Rigidbody>();
-                            _projectile.transform.position = new Vector3(transform.position.x, transform.position.y + GetComponent<Collider>().bounds.size.y, transform.position.z);
-                            _projectileEndPoint = new Vector3(_target.getTransform().position.x, _target.getTransform().position.y + _target.getGameObject().GetComponent<Collider>().bounds.size.y, _target.getTransform().position.z);
+                            //_projectile = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                            //_projectile.AddComponent<Rigidbody>();
+							Vector3 projectile_position = new Vector3(transform.position.x, transform.position.y + GetComponent<Collider>().bounds.size.y, transform.position.z);
+							_projectile = Info.get.createGenericPrefab("Projectile/Projectile.prefab", projectile_position, transform.rotation);
+							_projectileEndPoint = new Vector3(_target.getTransform().position.x, _target.getTransform().position.y + _target.getGameObject().GetComponent<Collider>().bounds.size.y, _target.getTransform().position.z);
                             _projectileThrown = true;
 
                             _lastAttack = Time.time;
