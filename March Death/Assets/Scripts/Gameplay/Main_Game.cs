@@ -19,7 +19,6 @@ public class Main_Game : MonoBehaviour
         bm = new Managers.BuildingsManager();
         sounds = GameObject.Find("GameController").GetComponent<Managers.SoundsManager>();
         if (info) info.LoadHUD();
-        //if (info) info.LoadActionButtons();
         StartGame();
         bm.Player = user;
         UserInput inputs = gameObject.AddComponent<UserInput>();
@@ -62,13 +61,13 @@ public class Main_Game : MonoBehaviour
         BasePlayer.Setup();
     }
 
-    private void LoadSkirmish()
+    private void LoadCampaign()
     {
         // TODO Replace with appropriate functionality
-        LoadCampaign();
+        LoadSkirmish();
     }
 
-    private void LoadCampaign()
+    private void LoadSkirmish()
     {
         int id = 1;
         foreach (Battle.PlayerInformation player in info.GetBattle().GetPlayerInformationList())

@@ -222,8 +222,12 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         {
             // Try to get class with this name
             string abilityName = ability.ability.Replace(" ", "");
-            Ability newAbility = null;
+            if (abilityName.Length == 0)
+            {
+                abilityName = ability.name.Replace(" ", "");
+            }
 
+            Ability newAbility = null;
             try
             {
                 var constructor = Type.GetType(abilityName).

@@ -17,6 +17,11 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     public enum createCivilStatus { IDLE, RUN, DISABLED };
 
+    /// <summary>
+    ///  Sounds manager
+    /// </summary>
+    Managers.SoundsManager sounds;
+
     public Statistics statistics;
 
     // Constructor
@@ -81,7 +86,7 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     List<Unit> workersList = new List<Unit>();
 
-   
+
     /// <summary>
     /// HUD, get current civilian units working here
     /// </summary>
@@ -281,8 +286,10 @@ public class Resource : Building<Resource.Actions>
 
         if (amount > 0.0)
         {
-            Goods goods = new Goods();
-            goods.amount = amount;
+            CollectableGood collectable = new CollectableGood();
+            collectable.entity = this;
+            collectable.goods = new Goods();
+            collectable.goods.amount = amount;
 
             // TODO:
             // BUG: Null reference when we try to add material amount to player.
@@ -290,41 +297,34 @@ public class Resource : Building<Resource.Actions>
             if (type.Equals(BuildingTypes.FARM))
             {
                 BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.FOOD, amount);
-                goods.type = Goods.GoodsType.FOOD;
+                collectable.goods.type = Goods.GoodsType.FOOD;
             }
             else if (type.Equals(BuildingTypes.MINE))
             {
                 BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.METAL, amount);
-                goods.type = Goods.GoodsType.METAL;
+                collectable.goods.type = Goods.GoodsType.METAL;
             }
             else
             {
                 BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.WOOD, amount);
-                goods.type = Goods.GoodsType.WOOD;
+                collectable.goods.type = Goods.GoodsType.WOOD;
             }
-            fire(Actions.COLLECTION, goods);
+            fire(Actions.COLLECTION, collectable);
         }
     }
 
     /// <summary>
-    /// Method create civilian unit.
-    /// If capacity limit of building is not reached unit is positioned inside
-    /// building limits otherwise unit is positioned outside,
-    /// just at desired meeting Point.
-    /// civilian sex is randomly selected(last parameter of createUnit method).
+    /// Method overrides base to check if civilian unit will be a worker or a explorer.
+    /// If this unit must be a worker it is vanished and placed at center of building.
     /// </summary>
-    /// <returns>civilian GameObject</returns>
-    public void newCivilian()
+    /// <param name="type"></param>
+    protected override void createUnit(UnitTypes type)
     {
-        // If there's no workers, the next unit to be created will be a worker...
+
         if (harvestUnits < info.resourceAttributes.maxUnits)
         {
-
-            _unitPosition.Set(_center.x , _center.y, _center.z );
-
-            // Method createUnit from Info returns GameObject Instance;
-            GameObject gob = Info.get.createUnit(race, UnitTypes.CIVIL, _unitPosition, _unitRotation, -1);
-
+            _unitPosition.Set(_center.x, _center.y, _center.z);
+            GameObject gob = Info.get.createUnit(race, type, _unitPosition, _unitRotation, -1);
             Unit civil = gob.GetComponent<Unit>();
             civil.vanish();
             civil.setStatus(EntityStatus.WORKING);
@@ -340,11 +340,21 @@ public class Resource : Building<Resource.Actions>
         }
         else
         {
-            // building capacity is full new civilians will be explorers
-            base.addUnitQueue(UnitTypes.CIVIL);
+            base.createUnit(type);
         }
-
         _createStatus = createCivilStatus.IDLE;
+    }
+    /// <summary>
+    /// Method create civilian unit.
+    /// If capacity limit of building is not reached unit is positioned inside
+    /// building limits otherwise unit is positioned outside,
+    /// just at desired meeting Point.
+    /// civilian sex is randomly selected(last parameter of createUnit method).
+    /// </summary>
+    /// <returns>civilian GameObject</returns>
+    public void newCivilian()
+    {
+        base.addUnitQueue(UnitTypes.CIVIL);
     }
 
 
@@ -354,17 +364,17 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     public Unit recruitExplorer()
     {
-        
+
         if (harvestUnits > 0)
         {
             Unit worker;
             worker = workersList.PopAt(0);
             _collectionRate -= worker.info.attributes.capacity;
             harvestUnits--;
-            
+
             worker.transform.position = getMeetingPoint();
             worker.bringBack();
-            
+
             worker.setStatus(EntityStatus.IDLE);
 
             if (harvestUnits == 0)
@@ -377,7 +387,7 @@ public class Resource : Building<Resource.Actions>
         {
             Debug.Log("Can't recruite explorer because no workers");
             return null;
-        }      
+        }
         // TODO: Some alert message or sound for player if try to remove unit when no unit at building
     }
 
@@ -391,7 +401,7 @@ public class Resource : Building<Resource.Actions>
         {
             _collectionRate += explorer.info.attributes.capacity;
             harvestUnits++;
-            
+
             explorer.setStatus(EntityStatus.WORKING);
 
             workersList.Add(explorer);
@@ -403,8 +413,8 @@ public class Resource : Building<Resource.Actions>
         else
         {
             Debug.Log(" You are trying to recruit worker but building capacity is full");
-        }     
-        
+        }
+
     }
 
     /// <summary>
@@ -425,12 +435,13 @@ public class Resource : Building<Resource.Actions>
         {
             Unit unit = (Unit)entity;
             unit.vanish();
+            sounds.onExplorerTrapped();
             unit.transform.position = this.transform.position;
             recruitWorker((Unit)unit);
         }
         else
         {
-            //do nothing
+            sounds.onFullHouse();
         }
     }
 
@@ -439,11 +450,8 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     public override void OnDestroy()
     {
-        if (_info.isResource)
-        {
-            statistics.getNegative();
-            fire(Actions.DEL_STATS, statistics);
-        }
+        statistics.getNegative();
+        fire(Actions.DEL_STATS, statistics);
 
         base.OnDestroy();
     }
@@ -469,14 +477,14 @@ public class Resource : Building<Resource.Actions>
         GameObject gameController = GameObject.Find("GameController");
         ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
 
-        if (Player.getOwner(_entity).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
+        if (Player.isOfPlayer(_entity))
         {
             register(Actions.COLLECTION, res_pl.onCollection);
             register(Actions.CREATED, res_pl.onStatisticsUpdate);
             register(Actions.DEL_STATS, res_pl.onStatisticsUpdate);
         }
 
-        statistics = _info.isResource ? new Statistics(ResourceFromBuilding(type), (int)info.resourceAttributes.updateInterval, 10) : null; // hardcoded, To modify, by now the collection rate is always 10, but theres no workers yet
+        statistics = new Statistics(ResourceFromBuilding(type), (int)info.resourceAttributes.updateInterval, 10); // hardcoded, To modify, by now the collection rate is always 10, but theres no workers yet
     }
 
     /// <summary>
@@ -496,7 +504,8 @@ public class Resource : Building<Resource.Actions>
         hasDefaultUnit = false;
         civilInfo = Info.get.of(this.race, UnitTypes.CIVIL);
         _entity = this.GetComponent<IGameEntity>();
-
+        sounds = GameObject.Find("GameController").GetComponent<Managers.SoundsManager>();
+        
         // Call Building start
         base.Awake();
     }
@@ -508,7 +517,6 @@ public class Resource : Building<Resource.Actions>
         this.GetComponent<Rigidbody>().isKinematic = false;
 
         SetupStatistics();
-
     }
 
 
@@ -521,9 +529,9 @@ public class Resource : Building<Resource.Actions>
     {
         base.Update();
 
+
         switch (status)
         {
-
             case EntityStatus.IDLE:
 
                 if (!hasDefaultUnit)
@@ -533,24 +541,28 @@ public class Resource : Building<Resource.Actions>
                 break;
 
             case EntityStatus.WORKING:
-
                 if (Time.time > _nextUpdate)
                 {
-                    if (_info.isResource)
-                    {
-                        _nextUpdate = Time.time + info.resourceAttributes.updateInterval;
-                        collect();
-                        produce();
-
-                        if (once)
-                        {
-                            fire(Actions.CREATED, statistics); once = false;
-                        }
-                    }
+                    _nextUpdate = Time.time + info.resourceAttributes.updateInterval;
+                    collect();
+                    produce();
                 }
                 break;
         }
+    }
 
+    public override void setStatus(EntityStatus newStatus)
+    {
+        if (status == EntityStatus.IDLE && newStatus == EntityStatus.WORKING)
+        {
+            if (once)
+            {
+                fire(Actions.CREATED, statistics);
+                once = false;
+            }
+        }
+
+        base.setStatus(newStatus);
     }
 
     /// <summary>
@@ -564,9 +576,9 @@ public class Resource : Building<Resource.Actions>
 }
 
 /// <summary>
-/// Class to pop element from list. Weird thing , sure. 
+/// Class to pop element from list. Weird thing , sure.
 /// </summary>
-/// 
+///
 static class ListExtension
 {
     public static T PopAt<T>(this List<T> list, int index)

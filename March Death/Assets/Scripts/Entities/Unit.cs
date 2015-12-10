@@ -150,6 +150,9 @@ public class Unit : GameEntity<Unit.Actions>
         }
     }
 
+    /// Saved Squad the unit belongs to
+    public Squad Troop { get; set; }
+
     /// <summary>
     /// Max. euclidean distance to the target
     /// </summary>
@@ -208,13 +211,19 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     protected override void onFatalWounds()
     {
-        statistics.getNegative();
-        fire(Actions.STAT_OUT, statistics);
+        if (BasePlayer.isOfPlayer(this))
+        {
+            statistics.getNegative();
+            fire(Actions.STAT_OUT, statistics);
+        }
 
         fire(Actions.DIED);
 
-        statistics.growth_speed *= -1;
-        fire(Actions.STAT_OUT, statistics);
+        if (BasePlayer.isOfPlayer(this))
+        {
+            statistics.growth_speed *= -1;
+            fire(Actions.STAT_OUT, statistics);
+        }
     }
 
     /// <summary>
@@ -301,7 +310,7 @@ public class Unit : GameEntity<Unit.Actions>
         setStatus(EntityStatus.MOVING);
         fire(Actions.MOVEMENT_START);
         updateDistanceToTarget();
-        Debug.Log("Unit: GoToBuilding()");
+
 
         return true;
     }
@@ -332,6 +341,7 @@ public class Unit : GameEntity<Unit.Actions>
 
             _target = entity;
             _selfDefense = selfDefense;
+            _lastAttack = Time.time - (1f / info.unitAttributes.attackRate);
 
             // Show target health
             selectable = _target.getGameObject().GetComponent<Selectable>();
@@ -457,8 +467,6 @@ public class Unit : GameEntity<Unit.Actions>
             GetComponent<Rigidbody>().isKinematic = true;
         }
         //Disable Selectable
-        // TODO: can't disable square border and lifebar
-
         if (GetComponent<Selectable>())
         {
             GetComponent<Selectable>().enabled = false;
@@ -474,10 +482,9 @@ public class Unit : GameEntity<Unit.Actions>
         {
             GetComponent<Collider>().enabled = false;
         }
-        // Disable DetourAgent. Must remove form crowd first
+        // Disable DetourAgent
         if (GetComponent<DetourAgent>())
         {
-            GetComponent<DetourAgent>().RemoveFromCrowd();
             GetComponent<DetourAgent>().enabled = false;
         }
         // Disable render
@@ -486,16 +493,14 @@ public class Unit : GameEntity<Unit.Actions>
         {
             r.enabled = false;
         }
-
-
     }
+
     /// <summary>
     /// Units vanished with vanish method needs to uses BringBack method in
     /// order to enable components.
     /// </summary>
     public void bringBack()
     {
-
         if (GetComponent<FOWEntity>())
         {
             GetComponent<FOWEntity>().enabled = true;
@@ -543,6 +548,7 @@ public class Unit : GameEntity<Unit.Actions>
     {
         _info = Info.get.of(race, type);
         _auto = this;
+        Troop = null;
 
         // Call GameEntity awake
         base.Awake();
@@ -564,15 +570,20 @@ public class Unit : GameEntity<Unit.Actions>
 
         activateFOWEntity();
 
-        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
+        // Statistics available for both AI and Player
         GameObject gameController = GameObject.Find("GameController");
         ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
+        register(Actions.EAT, res_pl.onFoodConsumption);
 
-        if (Player.getOwner(this).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
+        // Statistics only available to player
+        if (Player.getOwner(this) == BasePlayer.player)
         {
-            register(Actions.EAT, res_pl.onFoodConsumption);
             register(Actions.STAT_OUT, res_pl.onStatisticsUpdate);
             register(Actions.CREATED, res_pl.onStatisticsUpdate);
+
+            float foodConsumption = info.unitAttributes.foodConsumption * RESOURCES_UPDATE_INTERVAL;
+            statistics = new Statistics(WorldResources.Type.FOOD, RESOURCES_UPDATE_INTERVAL, foodConsumption);
+            fire(Actions.CREATED, statistics);
         }
 
         // Set detour params (can't be done until Start is done)
@@ -582,9 +593,6 @@ public class Unit : GameEntity<Unit.Actions>
             _detourAgent.MaxAcceleration = info.unitAttributes.movementRate * 20;
             _detourAgent.UpdateParams();
         }
-
-        statistics = new Statistics(WorldResources.Type.FOOD, (int)RESOURCES_UPDATE_INTERVAL, -5);
-        fire(Actions.CREATED, statistics);
     }
 
     /// <summary>
@@ -622,13 +630,14 @@ public class Unit : GameEntity<Unit.Actions>
             // Update this unit resources
             BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.GOLD, goldProduced);
             BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.GOLD, goldConsumed);
-            BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.FOOD, foodConsumed);
 
-            Goods goods = new Goods(); // Generate the goods the units eat
-            goods.amount = 5;
-            goods.type = Goods.GoodsType.FOOD;
+            CollectableGood collectable = new CollectableGood();
+            collectable.entity = this;
+            collectable.goods = new Goods(); // Generate the goods the units eat
+            collectable.goods.amount = foodConsumed;
+            collectable.goods.type = Goods.GoodsType.FOOD;
 
-            fire(Actions.EAT, goods);
+            fire(Actions.EAT, collectable);
         }
 
         // Status dependant functionality
@@ -658,9 +667,9 @@ public class Unit : GameEntity<Unit.Actions>
                         }
                     }
                     // Check if we already have to attack
-                    else if (! _projectileThrown &&
-                        (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate)))
+                    else if (!_projectileThrown && (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate)))
                     {
+                        // TODO: Ranged attack should also be inside a while
                         if (canDoRangedAttack())
                         {
                             _projectile = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -668,13 +677,23 @@ public class Unit : GameEntity<Unit.Actions>
                             _projectile.transform.position = new Vector3(transform.position.x, transform.position.y + GetComponent<Collider>().bounds.size.y, transform.position.z);
                             _projectileEndPoint = new Vector3(_target.getTransform().position.x, _target.getTransform().position.y + _target.getGameObject().GetComponent<Collider>().bounds.size.y, _target.getTransform().position.z);
                             _projectileThrown = true;
+
+                            _lastAttack = Time.time;
                         }
                         else
                         {
-                            _target.receiveAttack(this, canDoRangedAttack());
-                        }
+                            while (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate))
+                            {
+                                // Target might be null if inside the while the target unit is killed
+                                if (_target != null)
+                                {
+                                    _target.receiveAttack(this, canDoRangedAttack());
+                                }
 
-                        _lastAttack = Time.time;
+                                // TODO: Precalculate
+                                _lastAttack += (1f / info.unitAttributes.attackRate);
+                            }
+                        }
                     }
                 }
                 break;
@@ -696,7 +715,10 @@ public class Unit : GameEntity<Unit.Actions>
 
                 // Should I prevent friendly fire?
                 foreach (IGameEntity inRadiusObject in objectsInRadius.ToArray()) {
-                    inRadiusObject.receiveAttack(this, canDoRangedAttack());
+                    if (inRadiusObject.status != EntityStatus.DEAD)
+                    {
+                        inRadiusObject.receiveAttack(this, canDoRangedAttack());
+                    }
                 }
 
                 _projectileThrown = false;
@@ -752,7 +774,7 @@ public class Unit : GameEntity<Unit.Actions>
                     // Check distance to target to know if we are close enough.
                     // When capture distance is reached resource building capture
                     // method is triggered.
-
+                    /*
                     if (_target.info.race == this.race)
                     {
                         if (_distanceToTarget <= _target.info.resourceAttributes.trapRange)
@@ -767,7 +789,7 @@ public class Unit : GameEntity<Unit.Actions>
                         }
 
                     }
-
+                    */
                     // Update destination only if target has moved
                     Vector3 destination = _closestPointToTarget;
 
@@ -796,6 +818,7 @@ public class Unit : GameEntity<Unit.Actions>
                         _detourAgent.ResetPath();
                         setStatus(EntityStatus.ATTACKING);
                         _followingTarget = false;
+                        _lastAttack = Time.time - (1f / info.unitAttributes.attackRate);
                         return;
                     }
                     else if(!isImmobile)

@@ -9,9 +9,9 @@
         "capacity": 10,
         "timeToBuild": 30,
         "repairSpeed": 0.2,
-        "storeSize": 100,
+        "storeSize": 150,
         "maxUnits":  10,
-        "productionRate": 20,
+        "productionRate": 100,
         "updateInterval": 10,
         "sightRange": 50,
         "creationQueueCapacity": 5,
@@ -36,10 +36,17 @@
             "targetRace": "ELVES",
             "targetUnit": "CIVIL"
         },
+		
         {
             "ability": "Recruit Explorer",
-            "name": "Recruit Explorer"
+            "name": "Recruit Explorer",
+			
+			"tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "UNIT",
+            "targetRace": "ELVES",
+            "targetUnit": "CIVIL"
         },
+		
         {
             "name": "Sell",
             "tooltipFlags": "HIDE"

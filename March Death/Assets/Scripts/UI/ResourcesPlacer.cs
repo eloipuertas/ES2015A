@@ -17,19 +17,13 @@ public class ResourcesPlacer : MonoBehaviour
     private List<Text> res_amounts;
     private List<Text> res_stats;
     private Text pop;
-    private Player player;
 
     private float[] _statistics = { 0f, 0f, 0f };
-
-
 
     void Start()
     {
         res_amounts = new List<Text>();
         res_stats = new List<Text>();
-
-        player = GameObject.Find("GameController").GetComponent<Player>();
-
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
 
         for (int i = 0; i < txt_names.Length; i++)
@@ -50,7 +44,6 @@ public class ResourcesPlacer : MonoBehaviour
 
             res_amounts.Add(text);
 
-
             obj = GameObject.Find(_stats);
             if (!obj) throw new Exception("Object " + _text + " not found!");
 
@@ -68,11 +61,8 @@ public class ResourcesPlacer : MonoBehaviour
         setupText();
         updateAmounts();
 
-        Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.CREATED, onUnitCreated, new ActorSelector()
-        {
-            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
-        });
-
+        // Regiter for all unit created events
+        Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.CREATED, onUnitCreated);
     }
 
     void Update()
@@ -100,18 +90,21 @@ public class ResourcesPlacer : MonoBehaviour
     /// <param name="entity"></param>
     public void updateUnitCreated(IGameEntity entity)
     {
-        player.resources.SubstractAmount(WorldResources.Type.FOOD, entity.info.resources.food);
-        player.resources.SubstractAmount(WorldResources.Type.WOOD, entity.info.resources.wood);
-        player.resources.SubstractAmount(WorldResources.Type.METAL, entity.info.resources.metal);
+        BasePlayer.getOwner(entity).resources.SubstractAmount(WorldResources.Type.FOOD, entity.info.resources.food);
+        BasePlayer.getOwner(entity).resources.SubstractAmount(WorldResources.Type.WOOD, entity.info.resources.wood);
+        BasePlayer.getOwner(entity).resources.SubstractAmount(WorldResources.Type.METAL, entity.info.resources.metal);
 
-        updateAmounts();
+        if (BasePlayer.isOfPlayer(entity))
+        {
+            updateAmounts();
+        }
     }
 
     public void updateAmounts()
     {
         for (int i = 0; i < txt_names.Length; i++)
         {
-            res_amounts[i].text = "" + player.resources.getAmount(t[i]);
+            res_amounts[i].text = "" + BasePlayer.player.resources.getAmount(t[i]);
         }
     }
 
@@ -131,11 +124,11 @@ public class ResourcesPlacer : MonoBehaviour
 
     public void insufficientFundsColor(IGameEntity entity)
     {
-        if (entity.info.resources.food > player.resources.getAmount(WorldResources.Type.FOOD))
+        if (entity.info.resources.food > BasePlayer.player.resources.getAmount(WorldResources.Type.FOOD))
             res_amounts[0].color = Color.red;
-        if (entity.info.resources.wood > player.resources.getAmount(WorldResources.Type.WOOD))
+        if (entity.info.resources.wood > BasePlayer.player.resources.getAmount(WorldResources.Type.WOOD))
             res_amounts[1].color = Color.red;
-        if (entity.info.resources.metal > player.resources.getAmount(WorldResources.Type.METAL))
+        if (entity.info.resources.metal > BasePlayer.player.resources.getAmount(WorldResources.Type.METAL))
             res_amounts[2].color = Color.red;
     }
 
@@ -156,13 +149,18 @@ public class ResourcesPlacer : MonoBehaviour
     {
         if (ige.info.isBuilding)
         {
-            if (!(ige.info.isBarrack || ige.info.isResource)) return true;
+            // TODO: If more Stronghold(s) can ever be done, this will not work
+            if (ige.info.isBarrack)
+            {
+                return ((Barrack)ige).type == BuildingTypes.STRONGHOLD;
+            }
+
             return false;
         }
         else
         {
-            if (ige.info.isCivil) return false;
-            return true;
+            // TODO: If more Hero(s) can ever be done, this will not work
+            return ((Unit)ige).type != UnitTypes.HERO;
         }
     }
 
@@ -180,16 +178,16 @@ public class ResourcesPlacer : MonoBehaviour
 
     void onUnitCreated(System.Object obj)
     {
-
         GameObject go = (GameObject)obj;
-
 
         if (go)
         {
             IGameEntity i_game = go.GetComponent<IGameEntity>();
 
             if (!isStarter(i_game))
-                updateUnitCreated(go.GetComponent<IGameEntity>());
+            {
+                updateUnitCreated(i_game);
+            }
         }
     }
 
@@ -217,36 +215,46 @@ public class ResourcesPlacer : MonoBehaviour
 
     public void onFoodConsumption(System.Object obj)
     {
-        Goods goods = (Goods)obj;
+        CollectableGood collectable = (CollectableGood)obj;
+        Goods goods = collectable.goods;
 
-        if (player != null && goods != null)
+        BasePlayer.getOwner(collectable.entity).resources.SubstractAmount(t[0], goods.amount); // t[0] is FOOD
+
+        if (BasePlayer.isOfPlayer(collectable.entity))
         {
-            player.resources.SubstractAmount(t[0], goods.amount); // t[0] is FOOD
+            updateAmounts();
         }
-
-        updateAmounts();
     }
 
     public void onCollection(System.Object obj)
     {
-        Goods goods = (Goods)obj;
+        CollectableGood collectable = (CollectableGood)obj;
+        Goods goods = collectable.goods;
 
         switch (goods.type)
         {
             case Goods.GoodsType.FOOD:
-                player.resources.AddAmount(t[0], goods.amount);
+                BasePlayer.getOwner(collectable.entity).resources.AddAmount(t[0], goods.amount);
                 break;
             case Goods.GoodsType.WOOD:
-                player.resources.AddAmount(t[1], goods.amount);
+                BasePlayer.getOwner(collectable.entity).resources.AddAmount(t[1], goods.amount);
                 break;
             case Goods.GoodsType.METAL:
-                player.resources.AddAmount(t[2], goods.amount);
+                BasePlayer.getOwner(collectable.entity).resources.AddAmount(t[2], goods.amount);
                 break;
             default:
                 break;
         }
 
-        updateAmounts();
+        if (BasePlayer.isOfPlayer(collectable.entity))
+        {
+            updateAmounts();
+        }
     }
+}
 
+public class CollectableGood
+{
+    public IGameEntity entity;
+    public Goods goods;
 }

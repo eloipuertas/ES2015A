@@ -37,7 +37,7 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
     public bool IsOwnedByPlayer { get; set; }
     private bool activated;
     private bool notFullyOpaque;
-    
+
     public override void Start()
     {
         base.Start();
@@ -83,6 +83,10 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
             {
                 r.enabled = visible;
             }
+            foreach (Light l in GetComponentsInChildren<Light>())
+            {
+                l.enabled = visible;
+            }
         }
     }
     /// <summary>
@@ -92,8 +96,7 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
     /// </summary>
     public void Activate()
     {
-        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
-        Activate(this.gameObject.GetComponent<IGameEntity>().getRace() == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace());
+        Activate(BasePlayer.isOfPlayer(this.gameObject.GetComponent<IGameEntity>()));
     }
     /// <summary>
     /// Enables the FOWEntity to start working as so.
@@ -109,7 +112,7 @@ public class FOWEntity : SubscribableActor<FOWEntity.Actions, FOWEntity>
     /// </summary>
     public void Activate(bool owner)
     {
-        if (!calcSize()) 
+        if (!calcSize())
         {
             //If we didn't find any collider we are going to say the object is 1x1.
             size = Vector2.one;

@@ -31,16 +31,14 @@ public class EntityAbilitiesController : MonoBehaviour
 #if UNITY_5_2
         Physics.queriesHitTriggers = true;
 #endif
-        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
-
         //Register to selectable actions
         Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.SELECTED, onActorSelected, new ActorSelector()
         {
-            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
+            registerCondition = (checkRace) => BasePlayer.isOfPlayer(checkRace.GetComponent<IGameEntity>())
         });
         Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.DESELECTED, onActorDeselected, new ActorSelector()
         {
-            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
+            registerCondition = (checkRace) => BasePlayer.isOfPlayer(checkRace.GetComponent<IGameEntity>())
         });
     }
 
@@ -48,8 +46,10 @@ public class EntityAbilitiesController : MonoBehaviour
     {
 		GameObject gameObject = (GameObject) obj;
 
-        destroyButtons();
-        showActions(gameObject);
+        //destroyButtons();
+        //showActions(gameObject);
+        hideActionButtons(gameObject);
+        showActionButtons(gameObject);
 
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 
@@ -64,9 +64,12 @@ public class EntityAbilitiesController : MonoBehaviour
 
     public void onActorDeselected(System.Object obj)
     {
-        destroyButtons();
+        //destroyButtons();
 
         GameObject gameObject = (GameObject) obj;
+
+        hideActionButtons(gameObject);
+
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 
         entity.doIfResource(resource => {
@@ -81,6 +84,8 @@ public class EntityAbilitiesController : MonoBehaviour
     private void showActionButtons(GameObject objeto)
     {
         IGameEntity entity = objeto.GetComponent<IGameEntity>();
+        GameObject actionPanel = GameObject.Find("HUD/actions");
+        actionPanel.GetComponent<Image>().enabled = true;
         var abilities = entity.info.abilities;
         var nabilities = abilities.Count;
         for (int i = 0; i < nabilities; i++)
@@ -115,7 +120,7 @@ public class EntityAbilitiesController : MonoBehaviour
     {
 		GameObject gameObject = (GameObject) obj;
         GameObject actionPanel = GameObject.Find("HUD/actions");
-        
+
         if (!actionPanel) return;
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
         var rectTransform = actionPanel.GetComponent<RectTransform>();
@@ -167,6 +172,8 @@ public class EntityAbilitiesController : MonoBehaviour
             buttonComponent.interactable = false;
 
         }
+        GameObject actionPanel = GameObject.Find("HUD/actions");
+        actionPanel.GetComponent<Image>().enabled = false;
     }
 
 

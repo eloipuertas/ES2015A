@@ -23,7 +23,7 @@ public class Player : BasePlayer
 
     //the list of player units in the scene
     public ArrayList currentUnits = new ArrayList ();
-    
+
     private EventsNotifier events;
 
     private bool isGameOverScreenDisplayed = false;
@@ -37,15 +37,19 @@ public class Player : BasePlayer
 
     private bool foodDepleted;
 
+    GameObject gameOverDialog;
+    float timeToShow;
+    const float WAIT_FOR_FINISH = 3.5f;
+
     // Use this for initialization
     public override void Start()
-    {   
+    {
         base.Start();
         _selection = GetComponent<Managers.SelectionManager>();
         //request the race of the player
         _selfRace = info.GetPlayerRace();
         _selection.SetRace(race);
-        
+
         cam = GameObject.FindWithTag("MainCamera").GetComponent<CameraController>();
         events = GetComponent<EventsNotifier>();
 
@@ -71,6 +75,8 @@ public class Player : BasePlayer
         };
         Utils.Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.DISCOVERED, OnEntityFound, selector);
 
+        timeToShow = WAIT_FOR_FINISH;
+
     }
 
     // Update is called once per frame
@@ -80,7 +86,6 @@ public class Player : BasePlayer
         {
             if (!isGameOverScreenDisplayed)
             {
-                GameObject gameOverDialog = null;
                 if (missionStatus.hasWon(playerId))
                 {
                     switch (_selfRace)
@@ -105,10 +110,22 @@ public class Player : BasePlayer
                             break;
                     }
                 }
-                Instantiate(gameOverDialog);
+                gameOverDialog = Instantiate(gameOverDialog);
+                gameOverDialog.SetActive(false);
                 isGameOverScreenDisplayed = true;
             }
+            ShowGameOverDialog();
             _currently = status.TERMINATED;
+        }
+    }
+
+    private void ShowGameOverDialog()
+    {
+        timeToShow -= Time.deltaTime;
+        if (timeToShow <= 0)
+        {
+            gameOverDialog.SetActive(true);
+            Time.timeScale = 0;
         }
     }
 
@@ -116,7 +133,7 @@ public class Player : BasePlayer
     {
         _currently = status.TERMINATED;
         Utils.Subscriber<FOWEntity.Actions, FOWEntity>.get.unregisterFromAll(FOWEntity.Actions.DISCOVERED, OnEntityFound);
-
+        if (isGameOverScreenDisplayed) Time.timeScale = 1;
         base.OnDestroy();
     }
 
@@ -138,11 +155,11 @@ public class Player : BasePlayer
         Debug.Log(_activeEntities.Count + " entities");
     }
 
-	public void FillPlayerUnits(GameObject unit) 
+	public void FillPlayerUnits(GameObject unit)
 	{
 		currentUnits.Add (unit);
 	}
-    
+
     /// <summary>
     /// Returns the count of the current associated entities
     /// </summary>
@@ -203,7 +220,7 @@ public class Player : BasePlayer
         displayResourceInfo(WorldResources.Type.GOLD, minGoldTolerance);
         events.DisplayUnitCreated(obj);
     }
-    
+
     private void signalMissionUpdate(System.Object obj)
     {
         IGameEntity entity = ((GameObject) obj).GetComponent<IGameEntity>();
@@ -250,7 +267,7 @@ public class Player : BasePlayer
                 barrack.register(Barrack.Actions.CREATE_UNIT, OnUnitCreated);
                 barrack.register(Barrack.Actions.BUILDING_FINISHED, events.DisplayBuildingCreated);
             }
-            else 
+            else
             {
                 Resource resourcesBuilding = (Resource) entity;
                 resourcesBuilding.register(Resource.Actions.DAMAGED, events.DisplayUnderAttack);

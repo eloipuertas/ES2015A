@@ -13,7 +13,7 @@ namespace Storage
     /// Should something be added, append it as the last element, otherwise
     /// previously assigned gameobjects might get wrong types
     /// </remarks>
-    public enum BuildingTypes { STRONGHOLD, FARM, MINE, SAWMILL, ARCHERY, BARRACK, STABLE, WALL, WALLCORNER, WALLGATE, WATCHTOWER, WORKSHOP, ARTILLERY, GRYPHON, ENT , SPECIAL};
+    public enum BuildingTypes { STRONGHOLD, FARM, MINE, SAWMILL, ARCHERY, BARRACK, STABLE, WALL, WALLCORNER, WALLGATE, WATCHTOWER, WORKSHOP, ARTILLERY, GRYPHON, ENT, SPECIAL};
 
     public class BuildingInfo : EntityInfo
     {

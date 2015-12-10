@@ -5,8 +5,8 @@ using Utils;
 public class Statistics
 {
     public WorldResources.Type _type { get; private set; }
-    public int _time { private get; set; }
-    public int _amount { private get; set; }
+    public float _time { private get; set; }
+    public float _amount { private get; set; }
 
     private float _growth_speed;
     public float growth_speed {
@@ -31,7 +31,7 @@ public class Statistics
     /// <param name="type">Type of the Resources.</param>
     /// <param name="time">Time of refresh.</param>
     /// <param name="amount">Amount of resource for each refresh cycle,</param>
-    public Statistics(WorldResources.Type type, int time, int amount)
+    public Statistics(WorldResources.Type type, float time, float amount)
     {
         _time = time;
         _amount = amount;
@@ -45,9 +45,9 @@ public class Statistics
 
     public static Statistics operator +(Statistics self, Statistics other)
     {
-        int lcm = LCM(self._time, other._time);
+        float lcm = LCM(self._time, other._time);
 
-        self._amount = (int)(((float)((lcm/(float)self._time) * self._amount)) + ((float)((lcm / (float)other._time) * other._amount)));
+        self._amount = (((float)((lcm/self._time) * self._amount)) + ((lcm / (float)other._time) * other._amount));
         self._time = lcm;
 
         return self;
@@ -55,19 +55,18 @@ public class Statistics
 
     public static Statistics operator -(Statistics self, Statistics other)
     {
-        int lcm = LCM(self._time, other._time);
+        float lcm = LCM(self._time, other._time);
 
-        self._amount = (int)(((float)((lcm / (float)self._time) * self._amount)) - ((float)((lcm / (float)other._time) * other._amount)));
+        self._amount = ((((lcm / (float)self._time) * self._amount)) - ((lcm / (float)other._time) * other._amount));
         self._time = lcm;
 
         return self;
     }
 
     // Assistant methods
-
-    private static int LCM(int a, int b)
+    private static float LCM(float a, float b)
     {
-        int num1, num2;
+        float num1, num2;
 
         if (a > b)
         {
@@ -88,5 +87,4 @@ public class Statistics
 
         return num2;
     }
-
 }

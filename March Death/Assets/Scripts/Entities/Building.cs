@@ -43,7 +43,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     public T DESTROYED { get; set; }
     public T CREATE_UNIT { get; set; }
     public T BUILDING_FINISHED { get; set; }
-    public T HEALTH_UPDATED { get; set; }
+    //public T HEALTH_UPDATED { get; set; }
     public T ADDED_QUEUE { get; set; }
     
     private float _totalBuildTime = 0;
@@ -218,33 +218,18 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     public Vector3 getMeetingPoint()
     {
         Vector3 position = new Vector3();
-
         position = ConstructionGrid.instance.getFreePositionAbleToConstructNearPoint(_center);
-
-        //Debug.Log("POS: " + position);
         return position;
 
     }
 
-    
-    protected void createUnit(UnitTypes type)
-    {
-        
-        
-        //Debug.Log("Meeting_Point: " + (getMeetingPoint() - _center));
-        
-        
+    protected virtual void createUnit(UnitTypes type)
+    {       
         GameObject gob = Info.get.createUnit(race, type, getMeetingPoint(), transform.rotation, -1);
         Unit new_unit = gob.GetComponent<Unit>(); 
         BasePlayer.getOwner(this).addEntity(new_unit);
         fire(CREATE_UNIT, new_unit);
-        _totalUnits++;
-        //Debug.Log("Meeting:" + getMeetingPoint());
-        //Debug.Log("Deploy: " + getDeploymentPoint());
-
-        gob.GetComponent<Unit>().moveTo(getMeetingPoint());
-        
-
+        _totalUnits++;   
     }
 
     public bool addUnitQueue(UnitTypes type)
@@ -267,8 +252,13 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     /// </summary>
     public float getcreationUnitPercentage()
     {
-        return (_creationTimer * 100f) / _infoUnitToCreate.unitAttributes.creationTime;
-
+       
+        if (_infoUnitToCreate!= null )
+        {
+            return (_creationTimer * 100f) / _infoUnitToCreate.unitAttributes.creationTime;
+        }
+        return 0F;
+       
     }
 
     /// <summary>
