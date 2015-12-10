@@ -666,9 +666,9 @@ public class Unit : GameEntity<Unit.Actions>
                         }
                     }
                     // Check if we already have to attack
-                    else if (! _projectileThrown &&
-                        (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate)))
+                    else if (!_projectileThrown && (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate)))
                     {
+                        // TODO: Ranged attack should also be inside a while
                         if (canDoRangedAttack())
                         {
                             _projectile = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -676,13 +676,23 @@ public class Unit : GameEntity<Unit.Actions>
                             _projectile.transform.position = new Vector3(transform.position.x, transform.position.y + GetComponent<Collider>().bounds.size.y, transform.position.z);
                             _projectileEndPoint = new Vector3(_target.getTransform().position.x, _target.getTransform().position.y + _target.getGameObject().GetComponent<Collider>().bounds.size.y, _target.getTransform().position.z);
                             _projectileThrown = true;
+
+                            _lastAttack = Time.time;
                         }
                         else
                         {
-                            _target.receiveAttack(this, canDoRangedAttack());
-                        }
+                            while (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate))
+                            {
+                                // Target might be null if inside the while the target unit is killed
+                                if (_target != null)
+                                {
+                                    _target.receiveAttack(this, canDoRangedAttack());
+                                }
 
-                        _lastAttack = Time.time;
+                                // TODO: Precalculate
+                                _lastAttack += (1f / info.unitAttributes.attackRate);
+                            }
+                        }
                     }
                 }
                 break;
@@ -763,7 +773,7 @@ public class Unit : GameEntity<Unit.Actions>
                     // Check distance to target to know if we are close enough.
                     // When capture distance is reached resource building capture
                     // method is triggered.
-
+                    /*
                     if (_target.info.race == this.race)
                     {
                         if (_distanceToTarget <= _target.info.resourceAttributes.trapRange)
@@ -778,7 +788,7 @@ public class Unit : GameEntity<Unit.Actions>
                         }
 
                     }
-
+                    */
                     // Update destination only if target has moved
                     Vector3 destination = _closestPointToTarget;
 
