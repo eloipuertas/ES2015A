@@ -1,8 +1,9 @@
 
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Linq;
 using System;
+using Pathfinding;
 
 public class ConstructionGrid : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public class ConstructionGrid : MonoBehaviour
     private ArrayList reservedPositions = new ArrayList();
     private const float DIFERENCE_OF_HEIGHTS_TOLERANCE = 1.5f;
     const int MAX_RECURSION_DEPTH = 10;
+    Terrain terrain;
+    TerrainData data;
+    TreeInstance[] trees;
 
     void Awake()
     {
@@ -127,6 +131,7 @@ public class ConstructionGrid : MonoBehaviour
     /// <returns></returns>
     public bool isNewPositionAbleForConstrucction(Vector3 discretizedPosition, bool checkFlat = true)
     {
+
         //If this position is contained on the array return false
         if (reservedPositions.Contains(new Vector2(discretizedPosition.x, discretizedPosition.z)))
         {
@@ -134,7 +139,28 @@ public class ConstructionGrid : MonoBehaviour
         }
 
         //next check if the zone is flat enought for construction
-        if (checkFlat) return isFlatEnoughtForConstruction(discretizedPosition);
+        if (checkFlat)
+        {
+            terrain = Terrain.activeTerrain;
+            data = terrain.terrainData;
+            trees = data.treeInstances;
+
+            if (trees.Length > 0)
+            {
+                float width = (float)data.heightmapWidth;
+                float height = (float)data.heightmapHeight;
+                foreach (TreeInstance Location in trees)
+                {
+                    Vector3 position = discretizeMapCoords(Vector3.Scale(Location.position, data.size) + terrain.transform.position);
+                    if (position.x == discretizedPosition.x && position.z == discretizedPosition.z)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return isFlatEnoughtForConstruction(discretizedPosition);
+        }
         else return true;
     }
 
