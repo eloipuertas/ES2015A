@@ -36,7 +36,10 @@ namespace Pathfinding
         public static extern void resetPath(IntPtr crowd, int idx);
 
         [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void updateTick(IntPtr tileCache, IntPtr nav, IntPtr crowd, float dt, float[] positions, float[] velocities, byte[] states, byte[] targetStates, ref int nagents);
+        public static extern void updateTick(IntPtr tileCache, IntPtr nav, IntPtr crowd, float dt, float[] positions, float[] velocities, byte[] states, byte[] targetStates, bool[] partial, ref int nagents);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool isPointValid(IntPtr crowd, float[] targetPoint);
 
         [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool randomPoint(IntPtr crowd, float[] targetPoint);
@@ -68,6 +71,7 @@ namespace Pathfinding
         private float[] velocities = null;
         private byte[] targetStates = null;
         private byte[] states = null;
+        private bool[] partial = null;
         private int numUpdated = 0;
         #endregion
 
@@ -114,6 +118,7 @@ namespace Pathfinding
             velocities = new float[MaxAgents * 3];
             targetStates = new byte[MaxAgents];
             states = new byte[MaxAgents];
+            partial = new bool[MaxAgents];
             
             Instance = this;
 
@@ -243,6 +248,11 @@ namespace Pathfinding
             resetPath(_crowd.Handle, idx);
         }
 
+        public bool IsPointValid(Vector3 point)
+        {
+            return isPointValid(_crowd.Handle, point.ToFloat());
+        }
+
         public bool RandomValidPoint(ref Vector3 dest)
         {
             Assert.IsTrue(_crowd.Handle.ToInt64() != 0);
@@ -275,13 +285,14 @@ namespace Pathfinding
             Assert.IsTrue(_tileCache.TileCacheHandle.Handle.ToInt64() != 0);
             Assert.IsTrue(_tileCache.NavMeshHandle.Handle.ToInt64() != 0);
 
-            updateTick(_tileCache.TileCacheHandle.Handle, _tileCache.NavMeshHandle.Handle, _crowd.Handle, Time.deltaTime, positions, velocities, states, targetStates, ref numUpdated);
+            updateTick(_tileCache.TileCacheHandle.Handle, _tileCache.NavMeshHandle.Handle, _crowd.Handle, Time.deltaTime, positions, velocities, states, targetStates, partial, ref numUpdated);
 
             foreach (DetourAgent agent in agents)
             {
                 agent.Velocity = velocities.ToVector3(agent.ID * 3);
                 agent.State = (DetourAgent.CrowdAgentState)states[agent.ID];
                 agent.TargetState = (DetourAgent.MoveRequestState)targetStates[agent.ID];
+                agent.IsPathPartial = partial[agent.ID];
 
                 Vector3 newPosition = positions.ToVector3(agent.ID * 3);
                 agent.transform.position = newPosition;
