@@ -164,11 +164,6 @@ public class ConstructionGrid : MonoBehaviour
         else return true;
     }
 
-    Vector2 XZ(this Vector3 v)
-    {
-        return new Vector2(v.x, v.z);
-    }
-
     /// <summary>
     /// Reserves a 3 x 3 matrix on the grid for strongholds
     /// </summary>
