@@ -310,7 +310,7 @@ public class Unit : GameEntity<Unit.Actions>
         setStatus(EntityStatus.MOVING);
         fire(Actions.MOVEMENT_START);
         updateDistanceToTarget();
-        
+
 
         return true;
     }
@@ -341,6 +341,7 @@ public class Unit : GameEntity<Unit.Actions>
 
             _target = entity;
             _selfDefense = selfDefense;
+            _lastAttack = Time.time - (1f / info.unitAttributes.attackRate);
 
             // Show target health
             selectable = _target.getGameObject().GetComponent<Selectable>();
@@ -817,6 +818,7 @@ public class Unit : GameEntity<Unit.Actions>
                         _detourAgent.ResetPath();
                         setStatus(EntityStatus.ATTACKING);
                         _followingTarget = false;
+                        _lastAttack = Time.time - (1f / info.unitAttributes.attackRate);
                         return;
                     }
                     else if(!isImmobile)
