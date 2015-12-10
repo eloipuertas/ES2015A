@@ -56,11 +56,12 @@ DLL_EXPORT int addAgent(dtCrowd* crowd, float* p, dtCrowdAgentParams* ap);
 DLL_EXPORT dtCrowdAgent* getAgent(dtCrowd* crowd, int idx);
 DLL_EXPORT void updateAgent(dtCrowd* crowd, int idx, dtCrowdAgentParams* ap);
 DLL_EXPORT void removeAgent(dtCrowd* crowd, int idx);
-DLL_EXPORT void setMoveTarget(dtNavMeshQuery* navquery, dtCrowd* crowd, int idx, float* p, bool adjust);
+DLL_EXPORT void setMoveTarget(dtNavMeshQuery* navquery, dtCrowd* crowd, int idx, float* p, bool adjust, int filterIndex);
 DLL_EXPORT void resetPath(dtCrowd* crowd, int idx);
 DLL_EXPORT void updateTick(dtTileCache* tileCache, dtNavMesh* nav, dtCrowd* crowd, float dt, float* positions, float* velocity, unsigned char* state, unsigned char* targetState, bool* partial, int& nagents);
 DLL_EXPORT bool isPointValid(dtCrowd* crowd, float* targetPoint);
 DLL_EXPORT bool randomPoint(dtCrowd* crowd, float* targetPoint);
 DLL_EXPORT bool randomPointInCircle(dtCrowd* crowd, float* initialPoint, float maxRadius, float* targetPoint);
+DLL_EXPORT bool setAreaFlags(dtCrowd* crowd, dtNavMesh* navMesh, float* center, float* verts, int nverts, unsigned short int flags);
 
 #endif

@@ -609,10 +609,10 @@ static void calcVel(float* vel, const float* pos, const float* tgt, const float 
 	dtVscale(vel, vel, speed);
 }
 
-void setMoveTarget(dtNavMeshQuery* navquery, dtCrowd* crowd, int idx, float* p, bool adjust)
+void setMoveTarget(dtNavMeshQuery* navquery, dtCrowd* crowd, int idx, float* p, bool adjust, int filterIndex)
 {
 	// Find nearest point on navmesh and set move request to that location.
-	const dtQueryFilter* filter = crowd->getFilter(0);
+	const dtQueryFilter* filter = crowd->getFilter(filterIndex);
 	const float* ext = crowd->getQueryExtents();
 
 	if (adjust)
@@ -741,4 +741,36 @@ bool randomPointInCircle(dtCrowd* crowd, float* initialPoint, float maxRadius, f
 	}
 
 	return dtStatusSucceed(status);
+}
+
+bool setAreaFlags(dtCrowd* crowd, dtNavMesh* navMesh, float* center, float* verts, int nverts, unsigned short int flags)
+{
+	const dtNavMeshQuery* navQuery = crowd->getNavMeshQuery();
+	const dtQueryFilter* filter = crowd->getFilter(0);
+	const float* ext = crowd->getQueryExtents();
+	dtPolyRef nearestRef;
+	float nearestPoint[3];
+
+	dtStatus status = navQuery->findNearestPoly(center, ext, filter, &nearestRef, nearestPoint);
+	if (dtStatusFailed(status))
+	{
+		return false;
+	}
+
+	static const int MAX_POLYS = 256;
+	dtPolyRef polys[MAX_POLYS];
+	dtPolyRef parent[MAX_POLYS];
+	int npolys;
+
+	navQuery->findPolysAroundShape(nearestRef, verts, nverts, filter, polys, parent, 0, &npolys, MAX_POLYS);
+
+	for (int i = 0; i < npolys; ++i)
+	{
+		if (navQuery->isValidPolyRef(polys[i], filter))
+		{
+			navMesh->setPolyFlags(polys[i], flags);
+		}
+	}
+
+	return true;
 }

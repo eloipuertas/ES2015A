@@ -30,7 +30,7 @@ namespace Pathfinding
         public static extern void removeAgent(IntPtr crowd, int idx);
 
         [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void setMoveTarget(IntPtr navquery, IntPtr crowd, int idx, float[] p, bool adjust);
+        public static extern void setMoveTarget(IntPtr navquery, IntPtr crowd, int idx, float[] p, bool adjust, int filterIndex);
 
         [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
         public static extern void resetPath(IntPtr crowd, int idx);
@@ -233,12 +233,12 @@ namespace Pathfinding
             agents.Remove(agent);
         }
 
-        public void MoveTarget(int idx, Vector3 target)
+        public void MoveTarget(DetourAgent agent, Vector3 target)
         {
             Assert.IsTrue(_crowd.Handle.ToInt64() != 0);
             Assert.IsTrue(_tileCache.NavQueryHandle.Handle.ToInt64() != 0);
 
-            setMoveTarget(_tileCache.NavQueryHandle.Handle, _crowd.Handle, idx, target.ToFloat(), false);
+            setMoveTarget(_tileCache.NavQueryHandle.Handle, _crowd.Handle, agent.ID, target.ToFloat(), false, agent.FilterIndex);
         }
 
         public void ResetPath(int idx)

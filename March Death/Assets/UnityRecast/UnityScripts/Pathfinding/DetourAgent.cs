@@ -47,6 +47,7 @@ namespace Pathfinding
         };
 
         private CrowdAgentParams ap = new CrowdAgentParams();
+        public int FilterIndex = 0;
         public float Radius = 0.8f;
         public float Height = 2.0f;
         public float MaxSpeed = 2.0f;
@@ -157,7 +158,7 @@ namespace Pathfinding
 #endif
 
             targetPoint = target;
-            DetourCrowd.Instance.MoveTarget(idx, target);
+            DetourCrowd.Instance.MoveTarget(this, target);
         }
 
         public void ResetPath()
