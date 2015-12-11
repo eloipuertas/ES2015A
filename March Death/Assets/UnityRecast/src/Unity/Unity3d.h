@@ -62,6 +62,7 @@ DLL_EXPORT void updateTick(dtTileCache* tileCache, dtNavMesh* nav, dtCrowd* crow
 DLL_EXPORT bool isPointValid(dtCrowd* crowd, float* targetPoint);
 DLL_EXPORT bool randomPoint(dtCrowd* crowd, float* targetPoint);
 DLL_EXPORT bool randomPointInCircle(dtCrowd* crowd, float* initialPoint, float maxRadius, float* targetPoint);
-DLL_EXPORT bool setAreaFlags(dtCrowd* crowd, dtNavMesh* navMesh, float* center, float* verts, int nverts, unsigned short int flags);
+DLL_EXPORT unsigned int addAreaFlags(dtTileCache* tileCache, dtCrowd* crowd, float* center, float* verts, int nverts, float height, unsigned short int flags);
+DLL_EXPORT void removeAreaFlags(dtTileCache* tileCache, dtObstacleRef ref);
 
 #endif

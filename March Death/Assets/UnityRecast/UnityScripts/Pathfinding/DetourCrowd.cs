@@ -46,9 +46,6 @@ namespace Pathfinding
 
         [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool randomPointInCircle(IntPtr crowd, float[] initialPoint, float maxRadius, float[] targetPoint);
-
-        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool setAreaFlags(IntPtr crowd, IntPtr navMesh, float[] center, float[] verts, int nverts, ushort flags);
         #endregion
 
         #region Unity Attributes
@@ -284,21 +281,6 @@ namespace Pathfinding
             }
 
             return false;
-        }
-
-        public bool SetAreaFlags(DetourFlag flag)
-        {
-            Vector3[] flagVertices = flag.Vertices();
-
-            float[] vertices =
-            {
-                flagVertices[0].x, flagVertices[0].y - 3.0f, flagVertices[0].z,
-                flagVertices[1].x, flagVertices[1].y - 3.0f, flagVertices[1].z,
-                flagVertices[2].x, flagVertices[2].y - 3.0f, flagVertices[2].z,
-                flagVertices[3].x, flagVertices[3].y - 3.0f, flagVertices[3].z,
-            };
-
-            return setAreaFlags(_crowd.Handle, TileCache.NavMeshHandle.Handle, flag.Center.ToFloat(), vertices, 4, flag.Flags);
         }
 
         public void Update()

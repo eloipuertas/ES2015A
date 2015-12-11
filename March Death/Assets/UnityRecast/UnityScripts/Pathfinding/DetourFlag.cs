@@ -14,8 +14,10 @@ namespace Pathfinding
         public Vector3 Size = new Vector3(1, 1, 1);
         public float CheckEverySeconds = 1.0f;
 
-        private Vector3 _center = new Vector3();
+        private Vector3 _center;
         public Vector3 Center { get { return _center; } }
+
+        public uint ID { get; set; }
 
         public ushort Flags
         {
@@ -62,7 +64,8 @@ namespace Pathfinding
         {
             if (alreadyAdded)
             {
-                DetourCrowd.Instance.SetAreaFlags(this);
+                DetourCrowd.Instance.TileCache.RemoveAreaFlag(this);
+                DetourCrowd.Instance.TileCache.AddAreaFlags(this);
             }
         }
 
@@ -86,9 +89,7 @@ namespace Pathfinding
             Bottom_4.x -= size.x / 2;
             Bottom_4.z -= size.z / 2;
 
-            _center.x = Bottom_1.x + size.x / 2;
-            _center.y = Bottom_1.y;
-            _center.z = Bottom_1.z - size.z / 2;
+            _center = transform.position + Position;
         }
 
         private void checkFlagStatus()
@@ -105,12 +106,12 @@ namespace Pathfinding
 
                     if (alreadyAdded)
                     {
-                        DetourCrowd.Instance.SetAreaFlags(this);
+                        DetourCrowd.Instance.TileCache.RemoveAreaFlag(this);
                     }
 
                     CalcVertices();
 
-                    DetourCrowd.Instance.SetAreaFlags(this);
+                    DetourCrowd.Instance.TileCache.AddAreaFlags(this);
                     alreadyAdded = true;
                 }
             }

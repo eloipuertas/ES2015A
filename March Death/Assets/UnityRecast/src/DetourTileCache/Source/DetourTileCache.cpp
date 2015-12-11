@@ -3,6 +3,7 @@
 #include "DetourNavMeshBuilder.h"
 #include "DetourNavMesh.h"
 #include "DetourCommon.h"
+#include "DetourCrowd.h"
 #include "DetourMath.h"
 #include "DetourAlloc.h"
 #include "DetourAssert.h"
@@ -73,7 +74,10 @@ dtTileCache::dtTileCache() :
 	m_tmproc(0),
 	m_obstacles(0),
 	m_nextFreeObstacle(0),
+	m_flags(0),
+	m_nextFreeFlag(0),
 	m_nreqs(0),
+	m_flags_nreqs(0),
 	m_nupdate(0)
 {
 	memset(&m_params, 0, sizeof(m_params));
@@ -91,11 +95,14 @@ dtTileCache::~dtTileCache()
 	}
 	dtFree(m_obstacles);
 	m_obstacles = 0;
+	dtFree(m_flags);
+	m_flags = 0;
 	dtFree(m_posLookup);
 	m_posLookup = 0;
 	dtFree(m_tiles);
 	m_tiles = 0;
 	m_nreqs = 0;
+	m_flags_nreqs = 0;
 	m_nupdate = 0;
 }
 
@@ -123,6 +130,7 @@ dtStatus dtTileCache::init(const dtTileCacheParams* params,
 	m_tcomp = tcomp;
 	m_tmproc = tmproc;
 	m_nreqs = 0;
+	m_flags_nreqs = 0;
 	memcpy(&m_params, params, sizeof(m_params));
 	
 	// Alloc space for obstacles.
@@ -137,7 +145,20 @@ dtStatus dtTileCache::init(const dtTileCacheParams* params,
 		m_obstacles[i].next = m_nextFreeObstacle;
 		m_nextFreeObstacle = &m_obstacles[i];
 	}
-	
+
+	// Alloc space for flags.
+	m_flags = (dtTileCacheFlag*)dtAlloc(sizeof(dtTileCacheFlag)*m_params.maxObstacles, DT_ALLOC_PERM);
+	if (!m_flags)
+		return DT_FAILURE | DT_OUT_OF_MEMORY;
+	memset(m_flags, 0, sizeof(dtTileCacheFlag)*m_params.maxObstacles);
+	m_nextFreeFlag = 0;
+	for (int i = m_params.maxObstacles - 1; i >= 0; --i)
+	{
+		m_flags[i].salt = 1;
+		m_flags[i].next = m_nextFreeFlag;
+		m_nextFreeFlag = &m_flags[i];
+	}
+
 	// Init tiles
 	m_tileLutSize = dtNextPow2(m_params.maxTiles/4);
 	if (!m_tileLutSize) m_tileLutSize = 1;
@@ -232,6 +253,27 @@ const dtTileCacheObstacle* dtTileCache::getObstacleByRef(dtObstacleRef ref)
 	if ((int)idx >= m_params.maxObstacles)
 		return 0;
 	const dtTileCacheObstacle* ob = &m_obstacles[idx];
+	unsigned int salt = decodeObstacleIdSalt(ref);
+	if (ob->salt != salt)
+		return 0;
+	return ob;
+}
+
+dtObstacleRef dtTileCache::getFlagRef(const dtTileCacheFlag* ob) const
+{
+	if (!ob) return 0;
+	const unsigned int idx = (unsigned int)(ob - m_flags);
+	return encodeObstacleId(ob->salt, idx);
+}
+
+const dtTileCacheFlag* dtTileCache::getFlagByRef(dtObstacleRef ref)
+{
+	if (!ref)
+		return 0;
+	unsigned int idx = decodeObstacleIdObstacle(ref);
+	if ((int)idx >= m_params.maxObstacles)
+		return 0;
+	const dtTileCacheFlag* ob = &m_flags[idx];
 	unsigned int salt = decodeObstacleIdSalt(ref);
 	if (ob->salt != salt)
 		return 0;
@@ -438,6 +480,62 @@ dtStatus dtTileCache::removeObstacle(const dtObstacleRef ref)
 	return DT_SUCCESS;
 }
 
+dtStatus dtTileCache::addFlag(const float* pos, const float* convexHullVertices, int numConvexHullVertices, const float height, unsigned short flags, dtCrowd* crowd, dtObstacleRef* result)
+{
+	if (m_flags_nreqs >= MAX_REQUESTS)
+		return DT_FAILURE | DT_BUFFER_TOO_SMALL;
+
+	dtTileCacheFlag* ob = 0;
+	if (m_nextFreeFlag)
+	{
+		ob = m_nextFreeFlag;
+		m_nextFreeFlag = ob->next;
+		ob->next = 0;
+	}
+	if (!ob)
+		return DT_FAILURE | DT_OUT_OF_MEMORY;
+
+	unsigned short salt = ob->salt;
+	memset(ob, 0, sizeof(dtTileCacheFlag));
+	ob->crowd = crowd;
+	ob->flags = flags;
+	ob->salt = salt;
+	ob->state = DT_OBSTACLE_PROCESSING;
+	dtVcopy(ob->pos, pos);
+	ob->radius = 0.f;   // 0 means obstacle is a polygon instead of cylinder
+	ob->height = height;
+	ob->nverts = numConvexHullVertices;
+	for (int i = 0; i < ob->nverts; i++)
+	{
+		dtVcopy(&ob->verts[i * 3], &convexHullVertices[i * 3]);
+	}
+
+	ObstacleRequest* req = &m_flags_reqs[m_flags_nreqs++];
+	memset(req, 0, sizeof(ObstacleRequest));
+	req->action = REQUEST_ADD;
+	req->ref = getFlagRef(ob);
+
+	if (result)
+		*result = req->ref;
+
+	return DT_SUCCESS;
+}
+
+dtStatus dtTileCache::removeFlag(const dtObstacleRef ref)
+{
+	if (!ref)
+		return DT_SUCCESS;
+	if (m_flags_nreqs >= MAX_REQUESTS)
+		return DT_FAILURE | DT_BUFFER_TOO_SMALL;
+
+	ObstacleRequest* req = &m_flags_reqs[m_flags_nreqs++];
+	memset(req, 0, sizeof(ObstacleRequest));
+	req->action = REQUEST_REMOVE;
+	req->ref = ref;
+
+	return DT_SUCCESS;
+}
+
 dtStatus dtTileCache::queryTiles(const float* bmin, const float* bmax,
 								 dtCompressedTileRef* results, int* resultCount, const int maxResults) const 
 {
@@ -534,12 +632,79 @@ dtStatus dtTileCache::update(const float /*dt*/, dtNavMesh* navmesh)
 				}
 			}
 		}
+
+		if (m_nupdate > 0)
+		{
+			m_updateType = UPDATE_OBSTACLES;
+		}
 		
 		m_nreqs = 0;
 	}
+
+	if (m_nupdate == 0)
+	{
+		// Process requests.
+		for (int i = 0; i < m_flags_nreqs; ++i)
+		{
+			ObstacleRequest* req = &m_flags_reqs[i];
+
+			unsigned int idx = decodeObstacleIdObstacle(req->ref);
+			if ((int)idx >= m_params.maxObstacles)
+				continue;
+			dtTileCacheFlag* ob = &m_flags[idx];
+			unsigned int salt = decodeObstacleIdSalt(req->ref);
+			if (ob->salt != salt)
+				continue;
+
+			if (req->action == REQUEST_ADD)
+			{
+				// Find touched tiles.
+				float bmin[3], bmax[3];
+				getObstacleBounds(ob, bmin, bmax);
+
+				int ntouched = 0;
+				queryTiles(bmin, bmax, ob->touched, &ntouched, DT_MAX_TOUCHED_TILES);
+				ob->ntouched = (unsigned char)ntouched;
+				// Add tiles to update list.
+				ob->npending = 0;
+				for (int j = 0; j < ob->ntouched; ++j)
+				{
+					if (m_nupdate < MAX_UPDATE)
+					{
+						if (!contains(m_update, m_nupdate, ob->touched[j]))
+							m_update[m_nupdate++] = ob->touched[j];
+						ob->pending[ob->npending++] = ob->touched[j];
+					}
+				}
+			}
+			else if (req->action == REQUEST_REMOVE)
+			{
+				// Prepare to remove obstacle.
+				ob->state = DT_OBSTACLE_REMOVING;
+				// Add tiles to update list.
+				ob->npending = 0;
+				for (int j = 0; j < ob->ntouched; ++j)
+				{
+					if (m_nupdate < MAX_UPDATE)
+					{
+						if (!contains(m_update, m_nupdate, ob->touched[j]))
+							m_update[m_nupdate++] = ob->touched[j];
+						ob->pending[ob->npending++] = ob->touched[j];
+					}
+				}
+			}
+		}
+
+		if (m_nupdate > 0)
+		{
+			m_updateType = UPDATE_FLAGS;
+		}
+
+		m_flags_nreqs = 0;
+	}
 	
 	// Process updates
-	if (m_nupdate)
+	if (m_nupdate && m_updateType == UPDATE_OBSTACLES)
 	{
 		// Build mesh
 		const dtCompressedTileRef ref = m_update[0];
@@ -590,7 +755,58 @@ dtStatus dtTileCache::update(const float /*dt*/, dtNavMesh* navmesh)
 		if (dtStatusFailed(status))
 			return status;
 	}
-	
+	else if (m_nupdate && m_updateType == UPDATE_FLAGS)
+	{
+		// Build mesh
+		const dtCompressedTileRef ref = m_update[0];
+		dtStatus status = buildNavMeshTile(ref, navmesh);
+		m_nupdate--;
+		if (m_nupdate > 0)
+			memmove(m_update, m_update + 1, m_nupdate*sizeof(dtCompressedTileRef));
+
+		// Update obstacle states.
+		for (int i = 0; i < m_params.maxObstacles; ++i)
+		{
+			dtTileCacheFlag* ob = &m_flags[i];
+			if (ob->state == DT_OBSTACLE_PROCESSING || ob->state == DT_OBSTACLE_REMOVING)
+			{
+				// Remove handled tile from pending list.
+				for (int j = 0; j < (int)ob->npending; j++)
+				{
+					if (ob->pending[j] == ref)
+					{
+						ob->pending[j] = ob->pending[(int)ob->npending - 1];
+						ob->npending--;
+						break;
+					}
+				}
+
+				// If all pending tiles processed, change state.
+				if (ob->npending == 0)
+				{
+					if (ob->state == DT_OBSTACLE_PROCESSING)
+					{
+						ob->state = DT_OBSTACLE_PROCESSED;
+					}
+					else if (ob->state == DT_OBSTACLE_REMOVING)
+					{
+						ob->state = DT_OBSTACLE_EMPTY;
+						// Update salt, salt should never be zero.
+						ob->salt = (ob->salt + 1) & ((1 << 16) - 1);
+						if (ob->salt == 0)
+							ob->salt++;
+						// Return obstacle to free list.
+						ob->next = m_nextFreeFlag;
+						m_nextFreeFlag = ob;
+					}
+				}
+			}
+		}
+
+		if (dtStatusFailed(status))
+			return status;
+	}
+
 	return DT_SUCCESS;
 }
 
@@ -658,6 +874,27 @@ dtStatus dtTileCache::buildNavMeshTile(const dtCompressedTileRef ref, dtNavMesh*
 					ob->verts, ob->nverts, 0);
 			}
 #endif
+		}
+	}
+
+	// Rasterize flags.
+	for (int i = 0; i < m_params.maxObstacles; ++i)
+	{
+		const dtTileCacheFlag* ob = &m_flags[i];
+		if (ob->state == DT_OBSTACLE_EMPTY || ob->state == DT_OBSTACLE_REMOVING)
+			continue;
+		if (contains(ob->touched, ob->ntouched, ref))
+		{
+			if (ob->radius != 0)
+			{
+				dtMarkCylinderArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
+					ob->pos, ob->radius, ob->height, 0);
+			}
+			else
+			{
+				dtMarkPolyArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
+					ob->verts, ob->nverts, 0);
+			}
 		}
 	}
 	
@@ -730,6 +967,43 @@ dtStatus dtTileCache::buildNavMeshTile(const dtCompressedTileRef ref, dtNavMesh*
 			return status;
 		}
 	}
+
+	// Mark areas
+	for (int i = 0; i < m_params.maxObstacles; ++i)
+	{
+		const dtTileCacheFlag* ob = &m_flags[i];
+		if (ob->state == DT_OBSTACLE_EMPTY || ob->state == DT_OBSTACLE_REMOVING)
+			continue;
+
+		dtCrowd* crowd = ob->crowd;
+
+		const dtNavMeshQuery* navQuery = crowd->getNavMeshQuery();
+		const dtQueryFilter* filter = crowd->getFilter(0);
+		const float* ext = crowd->getQueryExtents();
+		dtPolyRef nearestRef;
+		float nearestPoint[3];
+
+		dtStatus status = navQuery->findNearestPoly(ob->pos, ext, filter, &nearestRef, nearestPoint);
+		if (dtStatusFailed(status))
+		{
+			return status;
+		}
+
+		static const int MAX_POLYS = 256;
+		dtPolyRef polys[MAX_POLYS];
+		dtPolyRef parent[MAX_POLYS];
+		int npolys;
+
+		navQuery->findPolysAroundShape(nearestRef, ob->verts, ob->nverts, filter, polys, parent, 0, &npolys, MAX_POLYS);
+
+		for (int i = 0; i < npolys; ++i)
+		{
+			if (navQuery->isValidPolyRef(polys[i], filter))
+			{
+				navmesh->setPolyFlags(polys[i], ob->flags);
+			}
+		}
+	}
 	
 	return DT_SUCCESS;
 }
@@ -745,7 +1019,8 @@ void dtTileCache::calcTightTileBounds(const dtTileCacheLayerHeader* header, floa
 	bmax[2] = header->bmin[2] + (header->maxy+1)*cs;
 }
 
-void dtTileCache::getObstacleBounds(const struct dtTileCacheObstacle* ob, float* bmin, float* bmax) const
+template <typename T>
+void dtTileCache::getObstacleBounds(const T* ob, float* bmin, float* bmax) const
 {
 	if (ob->nverts == 0)
 	{
@@ -786,3 +1061,6 @@ void dtTileCache::getObstacleBounds(const struct dtTileCacheObstacle* ob, float*
 		}
 	}
 }
+
+//template <> void dtTileCache::getObstacleBounds<dtTileCacheObstacle>(const struct dtTileCacheObstacle* ob, float* bmin, float* bmax) const;
+//template <> void dtTileCache::getObstacleBounds<dtTileCacheFlag>(const struct dtTileCacheFlag* ob, float* bmin, float* bmax) const;
