@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Utils;
@@ -98,8 +99,9 @@ namespace Pathfinding
             _crowd = new HandleRef(this, h);
             
             ushort k = 0;
-            _recastConfig.Filters.Reverse();
-            foreach (var filter in _recastConfig.Filters)
+            var filters = _recastConfig.Filters.ToList();
+            filters.Reverse();
+            foreach (var filter in filters)
             {
                 ushort include = 0;
                 ushort exclude = 0;
