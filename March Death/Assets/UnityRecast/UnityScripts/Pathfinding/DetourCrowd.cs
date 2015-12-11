@@ -46,6 +46,9 @@ namespace Pathfinding
 
         [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool randomPointInCircle(IntPtr crowd, float[] initialPoint, float maxRadius, float[] targetPoint);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool setAreaFlags(IntPtr crowd, IntPtr navMesh, float[] center, float[] verts, int nverts, ushort flags);
         #endregion
 
         #region Unity Attributes
@@ -83,30 +86,34 @@ namespace Pathfinding
         private HandleRef _crowd;
         private TileCache _tileCache;
 
+        // RecastConfig
+        private RecastConfig _recastConfig;
+        public RecastConfig RecastConfig { get { return _recastConfig; } }
+
         private List<DetourAgent> agents = new List<DetourAgent>();
         
         public void OnEnable()
         {
-            RecastConfig recastConfig = GameObject.FindObjectOfType<RecastConfig>();
-            _tileCache = new TileCache(navmeshData, recastConfig);
+            _recastConfig = GameObject.FindObjectOfType<RecastConfig>();
+            _tileCache = new TileCache(navmeshData, _recastConfig);
 
             IntPtr h = createCrowd(MaxAgents, AgentMaxRadius, _tileCache.NavMeshHandle.Handle);
             _crowd = new HandleRef(this, h);
             
             ushort k = 0;
-            foreach (var filter in recastConfig.Filters)
+            foreach (var filter in _recastConfig.Filters)
             {
                 ushort include = 0;
                 ushort exclude = 0;
 
                 foreach (var incl in filter.Include)
                 {
-                    include |= recastConfig.Areas[incl.Name];
+                    include |= _recastConfig.Areas[incl.Name];
                 }
 
                 foreach (var excl in filter.Exclude)
                 {
-                    exclude |= recastConfig.Areas[excl.Name];
+                    exclude |= _recastConfig.Areas[excl.Name];
                 }
 
                 setFilter(_crowd.Handle, k, include, exclude);
@@ -277,6 +284,21 @@ namespace Pathfinding
             }
 
             return false;
+        }
+
+        public bool SetAreaFlags(DetourFlag flag)
+        {
+            Vector3[] flagVertices = flag.Vertices();
+
+            float[] vertices =
+            {
+                flagVertices[0].x, flagVertices[0].y - 3.0f, flagVertices[0].z,
+                flagVertices[1].x, flagVertices[1].y - 3.0f, flagVertices[1].z,
+                flagVertices[2].x, flagVertices[2].y - 3.0f, flagVertices[2].z,
+                flagVertices[3].x, flagVertices[3].y - 3.0f, flagVertices[3].z,
+            };
+
+            return setAreaFlags(_crowd.Handle, TileCache.NavMeshHandle.Handle, flag.Center.ToFloat(), vertices, 4, flag.Flags);
         }
 
         public void Update()

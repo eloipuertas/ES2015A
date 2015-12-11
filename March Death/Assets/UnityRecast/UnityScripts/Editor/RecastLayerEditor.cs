@@ -71,10 +71,10 @@ public class RecastLayerEditor : Editor
         filtersList = new ReorderableList(serializedObject,
                 serializedObject.FindProperty("Filters"),
                 false, true, true, true);
-        
+
         filtersList.drawHeaderCallback = (Rect rect) => {
             EditorGUI.LabelField(rect, "Filters");
-        };        
+        };
         filtersList.drawElementCallback += (rect, index, active, focused) =>
         {
             rect.y += 2;
