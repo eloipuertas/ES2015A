@@ -679,6 +679,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &121228
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 439080}
+  - 33: {fileID: 3383194}
+  - 23: {fileID: 2320988}
+  m_Layer: 0
+  m_Name: Plano subdividido (4)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &121346
 GameObject:
   m_ObjectHideFlags: 0
@@ -4242,6 +4259,18 @@ Transform:
   - {fileID: 460956}
   m_Father: {fileID: 488446}
   m_RootOrder: 0
+--- !u!4 &439080
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 121228}
+  m_LocalRotation: {x: -.707106829, y: 0, z: 0, w: .707106709}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 88, y: 87.9999695, z: 87.9999619}
+  m_Children: []
+  m_Father: {fileID: 447162}
+  m_RootOrder: 17
 --- !u!4 &439544
 Transform:
   m_ObjectHideFlags: 1
@@ -4376,7 +4405,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 167314}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 722.817139, y: 79.0026245, z: 914.676514}
+  m_LocalPosition: {x: 366.205505, y: 79.0026245, z: 746.208557}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 454178}
@@ -4396,6 +4425,7 @@ Transform:
   - {fileID: 485888}
   - {fileID: 484942}
   - {fileID: 498704}
+  - {fileID: 439080}
   m_Father: {fileID: 0}
   m_RootOrder: 0
 --- !u!4 &449014
@@ -5721,6 +5751,32 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
+--- !u!23 &2320988
+MeshRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 121228}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_Materials:
+  - {fileID: 2100000, guid: 2e3b5f2b9b7c293418023055f4135bda, type: 2}
+  m_SubsetIndices: 
+  m_StaticBatchRoot: {fileID: 0}
+  m_UseLightProbes: 1
+  m_ReflectionProbeUsage: 1
+  m_ProbeAnchor: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: .5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
 --- !u!23 &2328154
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -5988,6 +6044,13 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 159854}
   m_Mesh: {fileID: 4300018, guid: 987fb5b5b0864574da171ed986d2b282, type: 3}
+--- !u!33 &3383194
+MeshFilter:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 121228}
+  m_Mesh: {fileID: 4300000, guid: 4ed8ba4282c26164bb0f77f7b177ae38, type: 3}
 --- !u!33 &3392230
 MeshFilter:
   m_ObjectHideFlags: 1
@@ -6113,8 +6176,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -.00048828125, y: 0, z: 0}
-    m_Extent: {x: 5.0000062, y: 0, z: 5.00009632}
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 5.0000062, y: 0, z: 4.99996328}
   m_DirtyAABB: 0
 --- !u!137 &13731738
 SkinnedMeshRenderer:
@@ -6150,7 +6213,7 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -.000244140625, y: 0, z: 0}
+    m_Center: {x: .000122070312, y: 0, z: 0}
     m_Extent: {x: 5.00000858, y: 0, z: 5.00009823}
   m_DirtyAABB: 0
 --- !u!137 &13741896
@@ -6187,8 +6250,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: .00048828125, y: 0, z: 0}
-    m_Extent: {x: 5.0000062, y: 0, z: 5.00009632}
+    m_Center: {x: 0, y: 0, z: -.000122070312}
+    m_Extent: {x: 5.0000062, y: 0, z: 4.99996328}
   m_DirtyAABB: 0
 --- !u!137 &13762264
 SkinnedMeshRenderer:
@@ -6433,7 +6496,7 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: .000244140625, y: 0, z: 0}
+    m_Center: {x: -.000122070312, y: 0, z: 0}
     m_Extent: {x: 5.00000668, y: 0, z: 5.0000968}
   m_DirtyAABB: 0
 --- !u!183 &18339284

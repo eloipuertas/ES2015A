@@ -2974,6 +2974,33 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: fc4effbd435c1d14fb2d1dbcfae26fe3, type: 2}
   m_IsPrefabParent: 0
+--- !u!1 &1487997071
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 870780628}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1487997072}
+  m_Layer: 0
+  m_Name: Missing Prefab
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1487997072
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 870780628}
+  m_GameObject: {fileID: 1487997071}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
 --- !u!1 &1500646305
 GameObject:
   m_ObjectHideFlags: 0
@@ -3554,6 +3581,7 @@ GameObject:
   - 92: {fileID: 1844893521}
   - 124: {fileID: 1844893520}
   - 81: {fileID: 1844893519}
+  - 114: {fileID: 1844893524}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -3715,6 +3743,29 @@ GameObject:
   m_Layer: 0
   m_Name: Cube (26)
   m_TagString: Campaign_building_military
+--- !u!114 &1844893524
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1844893518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f35f03dbba897747a4f7740d051ed4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mode: 0
+--- !u!1 &1950986009
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 786582754}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1950986010}
+  m_Layer: 0
+  m_Name: Missing Prefab
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3920,3 +3971,16 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 20
+--- !u!4 &1950986010
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 786582754}
+  m_GameObject: {fileID: 1950986009}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+

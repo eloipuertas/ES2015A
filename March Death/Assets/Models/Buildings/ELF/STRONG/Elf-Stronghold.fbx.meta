@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 87cc20ac1c2bea84eb008345f8252120
-timeCreated: 1447430085
+guid: 013276a65a39dd041bd89e38a1f9e59b
+timeCreated: 1449687994
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
@@ -9,21 +9,21 @@ ModelImporter:
     100002: Bandera_Mastil
     100004: Camera
     100006: Camera.001
-    100008: Edificio
-    100010: Edificio_Base
-    100012: Edificio_BaseTejado
-    100014: Edificio_Soporte
-    100016: Edificio_Tejado
-    100018: Lamp
-    100020: Lamp.001
-    100022: Muro_Delante
-    100024: Muro_Derecha
-    100026: Muro_Detras
-    100028: Muro_Izquierda
-    100030: Puerta
-    100032: Punto
-    100034: Sol
-    100036: Sol.001
+    100008: Camera.002
+    100010: Edificio
+    100012: Edificio_Base
+    100014: Edificio_BaseTejado
+    100016: Edificio_Soporte
+    100018: Edificio_Tejado
+    100020: //RootNode
+    100022: Lamp
+    100024: Lamp.001
+    100026: Lamp.002
+    100028: Muro_Delante
+    100030: Muro_Derecha
+    100032: Muro_Detras
+    100034: Muro_Izquierda
+    100036: Puerta
     100038: Suelo
     100040: Torre1_Almena
     100042: Torre1_Base
@@ -38,31 +38,25 @@ ModelImporter:
     100060: Torre4_Base
     100062: Torre4_Tejado
     100064: Tunel
-    100066: //RootNode
-    100068: Camera.002
-    100070: Lamp.002
-    100072: Torre4_Base.001
-    100074: Torre4_Base.002
-    100076: Torre4_Base.003
     400000: Bandera
     400002: Bandera_Mastil
     400004: Camera
     400006: Camera.001
-    400008: Edificio
-    400010: Edificio_Base
-    400012: Edificio_BaseTejado
-    400014: Edificio_Soporte
-    400016: Edificio_Tejado
-    400018: Lamp
-    400020: Lamp.001
-    400022: Muro_Delante
-    400024: Muro_Derecha
-    400026: Muro_Detras
-    400028: Muro_Izquierda
-    400030: Puerta
-    400032: Punto
-    400034: Sol
-    400036: Sol.001
+    400008: Camera.002
+    400010: Edificio
+    400012: Edificio_Base
+    400014: Edificio_BaseTejado
+    400016: Edificio_Soporte
+    400018: Edificio_Tejado
+    400020: //RootNode
+    400022: Lamp
+    400024: Lamp.001
+    400026: Lamp.002
+    400028: Muro_Delante
+    400030: Muro_Derecha
+    400032: Muro_Detras
+    400034: Muro_Izquierda
+    400036: Puerta
     400038: Suelo
     400040: Torre1_Almena
     400042: Torre1_Base
@@ -77,12 +71,6 @@ ModelImporter:
     400060: Torre4_Base
     400062: Torre4_Tejado
     400064: Tunel
-    400066: //RootNode
-    400068: Camera.002
-    400070: Lamp.002
-    400072: Torre4_Base.001
-    400074: Torre4_Base.002
-    400076: Torre4_Base.003
     2300000: Bandera
     2300002: Bandera_Mastil
     2300004: Edificio
@@ -109,9 +97,6 @@ ModelImporter:
     2300046: Torre4_Base
     2300048: Torre4_Tejado
     2300050: Tunel
-    2300052: Torre4_Base.001
-    2300054: Torre4_Base.002
-    2300056: Torre4_Base.003
     3300000: Bandera
     3300002: Bandera_Mastil
     3300004: Edificio
@@ -138,38 +123,32 @@ ModelImporter:
     3300046: Torre4_Base
     3300048: Torre4_Tejado
     3300050: Tunel
-    3300052: Torre4_Base.001
-    3300054: Torre4_Base.002
-    3300056: Torre4_Base.003
     4300000: Edificio_BaseTejado
     4300002: Puerta
     4300004: Edificio_Soporte
     4300006: Edificio_Tejado
     4300008: Torre3_Almena
-    4300010: Torre3_Tejado
-    4300012: Torre4_Almena
-    4300014: Torre4_Base
-    4300016: Torre4_Tejado
-    4300018: Torre1_Almena
-    4300020: Torre1_Tejado
-    4300022: Torre2_Almena
-    4300024: Torre2_Tejado
-    4300026: Tunel
-    4300028: Edificio_Base
-    4300030: Edificio
-    4300032: Suelo
-    4300034: Muro_Delante
-    4300036: Torre1_Base
-    4300038: Torre2_Base
-    4300040: Muro_Detras
+    4300010: Torre4_Almena
+    4300012: Torre4_Base
+    4300014: Torre4_Tejado
+    4300016: Torre1_Almena
+    4300018: Torre2_Almena
+    4300020: Torre2_Tejado
+    4300022: Tunel
+    4300024: Edificio_Base
+    4300026: Edificio
+    4300028: Suelo
+    4300030: Muro_Delante
+    4300032: Muro_Detras
+    4300034: Muro_Derecha
+    4300036: Bandera_Mastil
+    4300038: Bandera
+    4300040: Muro_Izquierda
     4300042: Torre3_Base
-    4300044: Muro_Derecha
-    4300046: Bandera_Mastil
-    4300048: Bandera
-    4300050: Muro_Izquierda
-    4300052: Torre4_Base.003
-    4300054: Torre4_Base.002
-    4300056: Torre4_Base.001
+    4300044: Torre1_Base
+    4300046: Torre2_Base
+    4300048: Torre1_Tejado
+    4300050: Torre3_Tejado
   materials:
     importMaterials: 1
     materialName: 0
@@ -193,7 +172,7 @@ ModelImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 1.5
+    globalScale: 1
     meshCompression: 0
     addColliders: 0
     importBlendShapes: 1

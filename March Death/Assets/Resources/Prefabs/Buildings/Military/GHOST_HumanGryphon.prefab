@@ -1,41 +1,41 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &125572
+--- !u!1 &148388
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 410758}
-  - 33: {fileID: 3340080}
-  - 23: {fileID: 2394208}
-  - 114: {fileID: 11479990}
+  - 4: {fileID: 420702}
+  - 33: {fileID: 3372016}
+  - 23: {fileID: 2328504}
+  - 114: {fileID: 11467038}
   m_Layer: 0
-  m_Name: GHOST_gryphon
+  m_Name: GHOST_HumanGryphon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &410758
+--- !u!4 &420702
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 125572}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 516.085449, y: 79.0026169, z: 821.210022}
-  m_LocalScale: {x: 942.898621, y: 1131.47839, z: 5.6573925}
+  m_GameObject: {fileID: 148388}
+  m_LocalRotation: {x: -.0616068505, y: -.666155219, z: -.0684459805, w: .740106046}
+  m_LocalPosition: {x: 470.175262, y: 79.0026245, z: 785.948181}
+  m_LocalScale: {x: 131.118118, y: 156.860764, z: 132.077255}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
---- !u!23 &2394208
+--- !u!23 &2328504
 MeshRenderer:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 125572}
+  m_GameObject: {fileID: 148388}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -48,25 +48,27 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_MinimumChartSize: 4
   m_AutoUVMaxDistance: .5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!33 &3340080
+--- !u!33 &3372016
 MeshFilter:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 125572}
-  m_Mesh: {fileID: 4300000, guid: 5e4efe7d0a7f75f4394303b145f2cfc2, type: 3}
---- !u!114 &11479990
+  m_GameObject: {fileID: 148388}
+  m_Mesh: {fileID: 4300000, guid: 54094c5585b142248ac653f14552bd63, type: 3}
+--- !u!114 &11467038
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 125572}
+  m_GameObject: {fileID: 148388}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc4dbd7bbbda4e14baa3f054762b3ca9, type: 3}
@@ -80,24 +82,8 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 0}
-      propertyPath: m_LocalScale.x
-      value: 942.898621
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: m_LocalScale.y
-      value: 1131.47839
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: m_LocalScale.z
-      value: 5.6573925
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: type
-      value: 13
-      objectReference: {fileID: 0}
+    m_Modifications: []
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 125572}
+  m_RootGameObject: {fileID: 148388}
   m_IsPrefabParent: 1
