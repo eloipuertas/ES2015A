@@ -2365,6 +2365,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b09a9a421fcedee4ea755b7daade40c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  FilterIndex: 1
   Radius: 1.5
   Height: 2
   MaxSpeed: 2
@@ -2423,7 +2424,11 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: FilterIndex
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 176104}

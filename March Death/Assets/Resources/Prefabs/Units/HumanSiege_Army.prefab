@@ -10307,6 +10307,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b09a9a421fcedee4ea755b7daade40c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  FilterIndex: 1
   Radius: 1.5
   Height: 2
   MaxSpeed: 2
@@ -10653,6 +10654,10 @@ Prefab:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 81ae1df7daeb14a0497991c58c44b120, type: 2}
+    - target: {fileID: 0}
+      propertyPath: FilterIndex
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 135352}
