@@ -171,6 +171,10 @@ namespace Managers
             {
                 position.y -= yOffset - 0.1f;
                 obj = Storage.Info.get.createBuilding(race, type, position, rotation);
+                if(type == Storage.BuildingTypes.STRONGHOLD)
+                {
+                    grid.reservePositionForStronghold(position);
+                }
                 grid.reservePosition(position);
             }
             return obj;
@@ -207,6 +211,10 @@ namespace Managers
 
                 GameObject finalBuilding = CreateFinalBuilding(_newBuilding.race, _newBuilding.type);
                 //TODO : (hermetico) restar recursos necesarios para crear el building
+                if (_newBuilding.type == Storage.BuildingTypes.STRONGHOLD)
+                {
+                    grid.reservePositionForStronghold(_newBuilding.building.gameObject.transform.position);
+                }
                 grid.reservePosition(newDestination);
                 newDestination.y -= yoffset - 0.1f;
                 finalBuilding.transform.position = newDestination;

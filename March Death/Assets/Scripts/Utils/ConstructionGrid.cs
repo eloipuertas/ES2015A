@@ -165,47 +165,6 @@ public class ConstructionGrid : MonoBehaviour
     }
 
     /// <summary>
-    /// Reserves a 3 x 3 matrix on the grid for strongholds
-    /// </summary>
-    /// <param name="sp"></param>
-    public void reservePositionForStronghold(Vector3 sp, bool centerToo = false)
-    {
-        Vector3 topLeft, top, topRight,
-                left, right,
-                bottomLeft, bottom, bottomRight;
-
-        topLeft = new Vector3(sp.x - dimensions.x, sp.y, sp.z - dimensions.y);
-        top = new Vector3(sp.x, sp.y, sp.z - dimensions.y);
-        topRight = new Vector3(sp.x + dimensions.x, sp.y, sp.z - dimensions.y);
-
-        left = new Vector3(sp.x - dimensions.x, sp.y, sp.z);
-        right = new Vector3(sp.x + dimensions.x, sp.y, sp.z);
-
-        bottomLeft = new Vector3(sp.x - dimensions.x, sp.y, sp.z + dimensions.y);
-        bottom = new Vector3(sp.x, sp.y, sp.z + dimensions.y);
-        bottomRight = new Vector3(sp.x + dimensions.x, sp.y, sp.z + dimensions.y);
-
-        reservePosition(discretizeMapCoords(topLeft));
-        reservePosition(discretizeMapCoords(top));
-        reservePosition(discretizeMapCoords(topRight));
-
-        reservePosition(discretizeMapCoords(left));
-
-        if (centerToo)
-        {
-            reservePosition(discretizeMapCoords(sp));
-        }
-
-        reservePosition(discretizeMapCoords(right));
-
-        reservePosition(discretizeMapCoords(bottomLeft));
-        reservePosition(discretizeMapCoords(bottom));
-        reservePosition(discretizeMapCoords(bottomRight));
-
-    }
-
-
-    /// <summary>
     /// Gets a free position near somewhere
     /// </summary>
     /// <param name="position"></param>
@@ -275,4 +234,46 @@ public class ConstructionGrid : MonoBehaviour
     {
         return dimensions;
     }
+
+
+    /// <summary>
+    /// Reserves a 3 x 3 matrix on the grid for strongholds
+    /// </summary>
+    /// <param name="sp"></param>
+    public void reservePositionForStronghold(Vector3 sp, bool centerToo = false)
+    {
+        Vector3 topLeft, top, topRight,
+                left, right,
+                bottomLeft, bottom, bottomRight;
+
+        topLeft = new Vector3(sp.x - dimensions.x, sp.y, sp.z - dimensions.y);
+        top = new Vector3(sp.x, sp.y, sp.z - dimensions.y);
+        topRight = new Vector3(sp.x + dimensions.x, sp.y, sp.z - dimensions.y);
+
+        left = new Vector3(sp.x - dimensions.x, sp.y, sp.z);
+        right = new Vector3(sp.x + dimensions.x, sp.y, sp.z);
+
+        bottomLeft = new Vector3(sp.x - dimensions.x, sp.y, sp.z + dimensions.y);
+        bottom = new Vector3(sp.x, sp.y, sp.z + dimensions.y);
+        bottomRight = new Vector3(sp.x + dimensions.x, sp.y, sp.z + dimensions.y);
+
+        reservePosition(discretizeMapCoords(topLeft));
+        reservePosition(discretizeMapCoords(top));
+        reservePosition(discretizeMapCoords(topRight));
+
+        reservePosition(discretizeMapCoords(left));
+
+        if (centerToo)
+        {
+            reservePosition(discretizeMapCoords(sp));
+        }
+
+        reservePosition(discretizeMapCoords(right));
+
+        reservePosition(discretizeMapCoords(bottomLeft));
+        reservePosition(discretizeMapCoords(bottom));
+        reservePosition(discretizeMapCoords(bottomRight));
+
+    }
+
 }
