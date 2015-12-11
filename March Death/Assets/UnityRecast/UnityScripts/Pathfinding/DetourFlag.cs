@@ -66,6 +66,15 @@ namespace Pathfinding
             {
                 DetourCrowd.Instance.TileCache.RemoveAreaFlag(this);
                 DetourCrowd.Instance.TileCache.AddAreaFlags(this);
+                alreadyAdded = false;
+            }
+        }
+
+        public void OnEnable()
+        {
+            if (!alreadyAdded)
+            {
+                DetourCrowd.Instance.TileCache.AddAreaFlags(this);
             }
         }
 

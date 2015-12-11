@@ -577,6 +577,17 @@ dtStatus dtTileCache::queryTiles(const float* bmin, const float* bmax,
 	return DT_SUCCESS;
 }
 
+void reverseVector(float* verts, const int nverts)
+{
+	float temp[3];
+	for (int i = 0; i < nverts / 2; i++)
+	{
+		dtVcopy(temp, &verts[i * 3]);
+		dtVcopy(&verts[i * 3], &verts[(nverts - i - 1) * 3]);
+		dtVcopy(&verts[(nverts - i - 1) * 3], temp);
+	}
+}
+
 dtStatus dtTileCache::update(const float /*dt*/, dtNavMesh* navmesh)
 {
 	if (m_nupdate == 0)
@@ -787,6 +798,34 @@ dtStatus dtTileCache::update(const float /*dt*/, dtNavMesh* navmesh)
 					if (ob->state == DT_OBSTACLE_PROCESSING)
 					{
 						ob->state = DT_OBSTACLE_PROCESSED;
+
+						// Mark areas
+						dtCrowd* crowd = ob->crowd;
+						const dtNavMeshQuery* navQuery = crowd->getNavMeshQuery();
+
+						dtQueryFilter filter;
+
+						const float* ext = crowd->getQueryExtents();
+						dtPolyRef nearestRef;
+						float nearestPoint[3];
+
+						float *queryPoly = new float[ob->nverts * 3];
+						for (int i = 0; i < ob->nverts * 3; ++i)
+							queryPoly[i] = ob->verts[i];
+
+						reverseVector(queryPoly, ob->nverts);
+
+						float center[3];
+						dtVcopy(center, ob->pos);
+						reverseVector(center, 1);
+
+						status = navQuery->findNearestPoly(center, ext, &filter, &nearestRef, nearestPoint);
+						if (dtStatusFailed(status))
+						{
+							return status;
+						}
+
+						status = navmesh->setPolyFlags(nearestRef, ob->flags);
 					}
 					else if (ob->state == DT_OBSTACLE_REMOVING)
 					{
@@ -888,12 +927,12 @@ dtStatus dtTileCache::buildNavMeshTile(const dtCompressedTileRef ref, dtNavMesh*
 			if (ob->radius != 0)
 			{
 				dtMarkCylinderArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
-					ob->pos, ob->radius, ob->height, 0);
+					ob->pos, ob->radius, ob->height, DT_TILECACHE_WALKABLE_AREA);
 			}
 			else
 			{
 				dtMarkPolyArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
-					ob->verts, ob->nverts, 0);
+					ob->verts, ob->nverts, DT_TILECACHE_WALKABLE_AREA);
 			}
 		}
 	}
@@ -965,43 +1004,6 @@ dtStatus dtTileCache::buildNavMeshTile(const dtCompressedTileRef ref, dtNavMesh*
 		{
 			dtFree(navData);
 			return status;
-		}
-	}
-
-	// Mark areas
-	for (int i = 0; i < m_params.maxObstacles; ++i)
-	{
-		const dtTileCacheFlag* ob = &m_flags[i];
-		if (ob->state == DT_OBSTACLE_EMPTY || ob->state == DT_OBSTACLE_REMOVING)
-			continue;
-
-		dtCrowd* crowd = ob->crowd;
-
-		const dtNavMeshQuery* navQuery = crowd->getNavMeshQuery();
-		const dtQueryFilter* filter = crowd->getFilter(0);
-		const float* ext = crowd->getQueryExtents();
-		dtPolyRef nearestRef;
-		float nearestPoint[3];
-
-		dtStatus status = navQuery->findNearestPoly(ob->pos, ext, filter, &nearestRef, nearestPoint);
-		if (dtStatusFailed(status))
-		{
-			return status;
-		}
-
-		static const int MAX_POLYS = 256;
-		dtPolyRef polys[MAX_POLYS];
-		dtPolyRef parent[MAX_POLYS];
-		int npolys;
-
-		navQuery->findPolysAroundShape(nearestRef, ob->verts, ob->nverts, filter, polys, parent, 0, &npolys, MAX_POLYS);
-
-		for (int i = 0; i < npolys; ++i)
-		{
-			if (navQuery->isValidPolyRef(polys[i], filter))
-			{
-				navmesh->setPolyFlags(polys[i], ob->flags);
-			}
 		}
 	}
 	
