@@ -33,6 +33,8 @@ namespace Assets.Scripts.AI.Agents
 		const int CONFIDENCE_EXPLORER_DISABLED = -1;
 		const int CONFIDENCE_HERO_ALREADY_FOUND = 0;
 
+        const float HERO_GO_TO_BASE = 60 * 1f; //The first minute hero can explore after that he will stay at base
+
         bool isEnabled = true;
         int numberSquadsExploring = 0;
         bool heroVisible;
@@ -41,6 +43,8 @@ namespace Assets.Scripts.AI.Agents
         Terrain terrain;
         AssistAgent assistAgent;
         FOWManager fowManager;
+
+        bool destinatedToBase = false;
 
         /// <summary>
         /// Last position when we saw the enemy hero
@@ -115,6 +119,15 @@ namespace Assets.Scripts.AI.Agents
 
             // Update squads exploring
             ++numberSquadsExploring;
+
+            if(squad.Units[0].type == Storage.UnitTypes.HERO && Time.time > HERO_GO_TO_BASE && !destinatedToBase)
+            {
+                squad.Units[0].moveTo(new Vector3(ai.rootBasePosition.x + 30f, ai.rootBasePosition.y, ai.rootBasePosition.z + 10f));
+                this.destinatedToBase = true;
+                return;
+            }
+
+            if (squad.Units[0].type == Storage.UnitTypes.HERO && destinatedToBase) return;
 
             if (fowManager.Enabled)
             {
