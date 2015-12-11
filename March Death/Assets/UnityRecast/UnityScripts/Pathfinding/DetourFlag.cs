@@ -80,25 +80,25 @@ namespace Pathfinding
 
         private void CalcVertices()
         {
-            Vector3 size = transform.rotation * Size;
+            Bottom_1 = new Vector3(Position.x, Position.y, Position.z);
+            Bottom_1.x -= Size.x / 2;
+            Bottom_1.z += Size.z / 2;
+            Bottom_1 = transform.rotation * Bottom_1 + transform.position;
 
-            Bottom_1 = transform.position + Position;
-            Bottom_1.x -= size.x / 2;
-            Bottom_1.z += size.z / 2;
+            Bottom_2 = new Vector3(Position.x, Position.y, Position.z);
+            Bottom_2.x += Size.x / 2;
+            Bottom_2.z += Size.z / 2;
+            Bottom_2 = transform.rotation * Bottom_2 + transform.position;
 
-            Bottom_2 = transform.position + Position;
-            Bottom_2.x += size.x / 2;
-            Bottom_2.z += size.z / 2;
+            Bottom_3 = new Vector3(Position.x, Position.y, Position.z);
+            Bottom_3.x += Size.x / 2;
+            Bottom_3.z -= Size.z / 2;
+            Bottom_3 = transform.rotation * Bottom_3 + transform.position;
 
-            Bottom_3 = transform.position + Position;
-            Bottom_3.x += size.x / 2;
-            Bottom_3.z -= size.z / 2;
-
-            Bottom_4 = transform.position + Position;
-            Bottom_4.x -= size.x / 2;
-            Bottom_4.z -= size.z / 2;
-
-            _center = transform.position + Position;
+            Bottom_4 = new Vector3(Position.x, Position.y, Position.z);
+            Bottom_4.x -= Size.x / 2;
+            Bottom_4.z -= Size.z / 2;
+            Bottom_4 = transform.rotation * Bottom_4 + transform.position;
         }
 
         private void checkFlagStatus()
