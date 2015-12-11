@@ -774,7 +774,7 @@ public class Unit : GameEntity<Unit.Actions>
                     // Check distance to target to know if we are close enough.
                     // When capture distance is reached resource building capture
                     // method is triggered.
-                    /*
+                    
                     if (_target.info.race == this.race)
                     {
                         if (_distanceToTarget <= _target.info.resourceAttributes.trapRange)
@@ -789,7 +789,7 @@ public class Unit : GameEntity<Unit.Actions>
                         }
 
                     }
-                    */
+                    
                     // Update destination only if target has moved
                     Vector3 destination = _closestPointToTarget;
 
