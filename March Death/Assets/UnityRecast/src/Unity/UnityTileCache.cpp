@@ -745,7 +745,6 @@ bool randomPointInCircle(dtCrowd* crowd, float* initialPoint, float maxRadius, f
 
 unsigned int addAreaFlags(dtTileCache* tileCache, dtCrowd* crowd, float* center, float* verts, int nverts, float height, unsigned short int flags)
 {
-	ctx->log(RC_LOG_ERROR, "Adding with flags %X", flags);
 	dtObstacleRef ref;
 	tileCache->addFlag(center, verts, nverts, height, flags, crowd, &ref);
 
