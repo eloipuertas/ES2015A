@@ -98,6 +98,7 @@ namespace Pathfinding
             _crowd = new HandleRef(this, h);
             
             ushort k = 0;
+            _recastConfig.Filters.Reverse();
             foreach (var filter in _recastConfig.Filters)
             {
                 ushort include = 0;
@@ -112,7 +113,7 @@ namespace Pathfinding
                 {
                     exclude |= _recastConfig.Areas[excl.Name];
                 }
-
+                
                 setFilter(_crowd.Handle, k, include, exclude);
                 ++k;
             }
