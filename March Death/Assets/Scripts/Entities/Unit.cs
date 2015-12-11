@@ -73,10 +73,7 @@ public class Unit : GameEntity<Unit.Actions>
     public float _distanceToTarget = 0;
     private Vector3 _attackPoint;
     private Vector3 _closestPointToTarget;
-
-    private Vector3 _projectileEndPoint;
-    private bool _projectileThrown = false;
-    private GameObject _projectile;
+    
     //private Helpers _Helpers;
 
     /// <summary>
@@ -667,18 +664,18 @@ public class Unit : GameEntity<Unit.Actions>
                         }
                     }
                     // Check if we already have to attack
-                    else if (!_projectileThrown && (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate)))
+                    else if (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate))
                     {
                         // TODO: Ranged attack should also be inside a while
                         if (canDoRangedAttack())
                         {
-                            //_projectile = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                            //_projectile.AddComponent<Rigidbody>();
 							Vector3 projectile_position = new Vector3(transform.position.x, transform.position.y + GetComponent<Collider>().bounds.size.y, transform.position.z);
-							_projectile = Info.get.createGenericPrefab("Projectile/Projectile.prefab", projectile_position, transform.rotation);
-							_projectileEndPoint = new Vector3(_target.getTransform().position.x, _target.getTransform().position.y + _target.getGameObject().GetComponent<Collider>().bounds.size.y, _target.getTransform().position.z);
-                            _projectileThrown = true;
+							GameObject projectile = Info.get.createGenericPrefab("Prefabs/Projectile/Projectile", projectile_position, transform.rotation);
 
+                            Projectile testing = projectile.GetComponent<Projectile>();
+                            Vector3 projectileEndPoint = new Vector3(_target.getTransform().position.x, _target.getTransform().position.y + _target.getGameObject().GetComponent<Collider>().bounds.size.y, _target.getTransform().position.z);
+                            testing.setProps(projectileEndPoint, this, info.unitAttributes.projectileSpeed, info.unitAttributes.projectileRadius);
+                            
                             _lastAttack = Time.time;
                         }
                         else
@@ -698,34 +695,6 @@ public class Unit : GameEntity<Unit.Actions>
                     }
                 }
                 break;
-        }
-
-        if (_projectileThrown) {
-            //Find a new position proportionally closer to the end, based on the projectileSpeed
-            Vector3 newPostion = Vector3.MoveTowards(_projectile.transform.position, _projectileEndPoint, info.unitAttributes.projectileSpeed * Time.deltaTime);
-
-            //Move the object to the new position.
-            _projectile.transform.position = newPostion;
-
-            //Recalculate the remaining distance after moving.
-            float sqrRemainingDistance = (_projectile.transform.position - _projectileEndPoint).sqrMagnitude;
-
-            // If we reach the target...
-            if (sqrRemainingDistance <= float.Epsilon) {
-                List<IGameEntity> objectsInRadius = Helpers.getEntitiesNearPosition(_projectileEndPoint, info.unitAttributes.projectileRadius);
-
-                // Should I prevent friendly fire?
-                foreach (IGameEntity inRadiusObject in objectsInRadius.ToArray()) {
-                    if (inRadiusObject.status != EntityStatus.DEAD)
-                    {
-                        inRadiusObject.receiveAttack(this, canDoRangedAttack());
-                    }
-                }
-
-                _projectileThrown = false;
-                GameObject.Destroy(_projectile);
-            }
-
         }
 
 #if UNITY_EDITOR
