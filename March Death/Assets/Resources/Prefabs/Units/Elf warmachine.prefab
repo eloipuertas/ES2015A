@@ -4019,7 +4019,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 123282}
-  m_LocalRotation: {x: .716264665, y: -.336269408, z: -.355378628, w: -.497587949}
+  m_LocalRotation: {x: .716264725, y: -.336269438, z: -.355378658, w: -.497587979}
   m_LocalPosition: {x: -.00111543084, y: .00472757127, z: .000261435081}
   m_LocalScale: {x: 1.00000012, y: 1.00000012, z: 1}
   m_Children:
@@ -4210,7 +4210,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 124812}
-  m_LocalRotation: {x: -.542548716, y: -.614388287, z: -.15407604, w: .551750362}
+  m_LocalRotation: {x: -.542548776, y: -.614388347, z: -.154076055, w: .551750422}
   m_LocalPosition: {x: 8.79168471e-09, y: .00183595775, z: 1.34110445e-09}
   m_LocalScale: {x: 1.00000095, y: 1.00000012, z: .99999994}
   m_Children:
@@ -4359,7 +4359,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!65 &6586870
 BoxCollider:
@@ -4699,6 +4699,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Center.z
       value: -.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Constraints
+      value: 126
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
