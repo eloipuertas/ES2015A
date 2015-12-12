@@ -4,21 +4,22 @@
     "name": "Heavy Soldier",
 
     "attributes": {
-        "weaponAbility": 4,
-        "projectileAbility": 3,
-        "strength": 6,
+        "weaponAbility": 5,
+        "projectileAbility": 0,
+        "strength": 5,
         "resistance": 5,
-        "wounds": 10,
+        "wounds": 25,
 
-        "attackRate": 3,
-        "movementRate": 2,
+        "attackRate": 1.7,
+        "movementRate": 1.8,
         "sightRange": 40,
-        "creationTime": 8
+        "creationTime": 50,
+        "foodConsumption": 0.8
     },
 
     "resources": {
-        "wood": 1,
-        "metal": 5,
-        "food": 1
+        "wood": 30,
+        "metal": 20,
+        "food": 20
     }
 }
