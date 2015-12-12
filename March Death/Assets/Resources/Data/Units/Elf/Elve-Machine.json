@@ -4,21 +4,22 @@
     "name": "War Machine",
 
     "attributes": {
-        "weaponAbility": 5,
-        "projectileAbility": 5,
-        "strength": 7,
-        "resistance": 6,
+        "weaponAbility": 3,
+        "projectileAbility": 8,
+        "strength": 5,
+        "resistance": 5,
         "wounds": 30,
 
         "attackRate": 2,
         "movementRate": 0.6,
         "sightRange": 40,
-        "creationTime": 15
+        "creationTime": 160,
+        "foodConsumption": 0.6
     },
 
     "resources": {
-        "wood": 10,
-        "metal": 6,
-        "food": 1
+        "wood": 120,
+        "metal": 80,
+        "food": 50
     }
 }

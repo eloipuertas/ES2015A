@@ -4,22 +4,23 @@
     "name": "Hero",
 
     "attributes": {
-        "weaponAbility": 7,
-        "projectileAbility": 6,
+        "weaponAbility": 6,
+        "projectileAbility": 0,
         "strength": 9,
-        "resistance": 9,
-        "wounds": 30,
+        "resistance": 7,
+        "wounds": 39,
 
-        "attackRate": 3,
+        "attackRate": 2.5,
         "movementRate": 2.4,
         "sightRange": 50,
-        "creationTime": 30
+        "creationTime": 9999,
+        "foodConsumption":0
     },
 
     "resources": {
-        "wood": 1,
-        "metal": 2,
-        "food": 1
+        "wood": 9999,
+        "metal": 9999,
+        "food": 9999
     },
 
 	"abilities":[

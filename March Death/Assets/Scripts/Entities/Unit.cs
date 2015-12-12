@@ -815,7 +815,11 @@ public class Unit : GameEntity<Unit.Actions>
                     // If we are already close enough, stop and attack
                     if (_distanceToTarget <= currentAttackRange())
                     {
-                        _detourAgent.ResetPath();
+                        if (!isImmobile)
+                        {
+                            _detourAgent.ResetPath();
+                        }
+
                         setStatus(EntityStatus.ATTACKING);
                         _followingTarget = false;
                         _lastAttack = Time.time - (1f / info.unitAttributes.attackRate);
@@ -829,7 +833,11 @@ public class Unit : GameEntity<Unit.Actions>
                     }
                 }
 
-                if (!_detourAgent.IsMoving)
+                if (isImmobile)
+                {
+                    setStatus(EntityStatus.IDLE);
+                }
+                else if (!_detourAgent.IsMoving)
                 {
                     if (!_followingTarget)
                     {

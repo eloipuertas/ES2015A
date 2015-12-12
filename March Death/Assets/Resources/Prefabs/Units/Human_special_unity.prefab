@@ -774,6 +774,7 @@ GameObject:
   - 114: {fileID: 11471218}
   - 114: {fileID: 11442462}
   - 114: {fileID: 11440092}
+  - 95: {fileID: 9504648}
   m_Layer: 10
   m_Name: Human_special_unity
   m_TagString: Untagged
@@ -2343,6 +2344,23 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 4.5, y: 5.5, z: 5}
   m_Center: {x: 0, y: 2.9000001, z: .400000006}
+--- !u!95 &9504648
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 176104}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &11426038
 MonoBehaviour:
   m_ObjectHideFlags: 1

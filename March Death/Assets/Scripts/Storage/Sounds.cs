@@ -72,7 +72,8 @@ namespace Storage
 
             if (!buildings.ContainsKey(key))
             {
-                throw new System.ArgumentException("Sound  for ('" + bType + "', '" + sType + "') not found");
+                Debug.LogError("Sound  for ('" + bType + "', '" + sType + "') not found");
+                return null;
             }
             return buildings[key];
         }

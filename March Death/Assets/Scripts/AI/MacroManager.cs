@@ -42,7 +42,7 @@ namespace Assets.Scripts.AI
         public void MacroHigh()
         {
             foreach (Resource r in ai.OwnResources)
-                if (r.harvestUnits == 10) //TODO ask for the actual max
+                if (r.harvestUnits == r.maxHarvestUnits) 
                     architect.buildingPrefs.Add(r.type);
             List<UnitTypes> keys = new List<UnitTypes>(UnitPref.Keys);
             foreach (var key in keys)
@@ -63,13 +63,13 @@ namespace Assets.Scripts.AI
         /// </summary>
         public void MacroLow()
         {
-            if (architect.buildingPrefs.Count > 0) //TODO and has resources
+            if (architect.buildingPrefs.Count > 0)
             {
                 architect.constructNextBuilding();
             }
             foreach (Resource r in ai.OwnResources)
             {
-                if (r.harvestUnits < 10)
+                if (r.harvestUnits < r.maxHarvestUnits)
                     r.newCivilian();
             }
             UnitTypes bUnit = (UnitPref.Aggregate((a, b) => a.Value > b.Value ? a : b)).Key;

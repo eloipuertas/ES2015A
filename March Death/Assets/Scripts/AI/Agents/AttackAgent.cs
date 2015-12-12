@@ -58,8 +58,8 @@ namespace Assets.Scripts.AI.Agents
                         }
                     }
                     IGameEntity target = u.getTarget();
-                    if (bTar!=null && bTar.status!=EntityStatus.DEAD && u.status != EntityStatus.DEAD &&
-                       (target==null || (!u.getTarget().info.isUnit || (Unit)u.getTarget() != bTar)))
+                    if (bTar.status!=EntityStatus.DEAD && u.status != EntityStatus.DEAD &&
+                       (target==null || (!target.info.isUnit || (Unit)target != bTar)))
                     {
                         u.attackTarget(bTar);
                     }

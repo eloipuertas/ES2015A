@@ -2432,7 +2432,7 @@ AnimationClip:
       serializedVersion: 2
       m_Curve:
       - time: 0
-        value: 0
+        value: 1
         inSlope: Infinity
         outSlope: Infinity
         tangentMode: 21
@@ -2468,34 +2468,6 @@ AnimationClip:
       m_PostInfinity: 2
     attribute: m_Enabled
     path: ListonSierra
-    classID: 23
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - time: 0
-        value: 0
-        inSlope: Infinity
-        outSlope: Infinity
-        tangentMode: 21
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-    attribute: m_Enabled
-    path: RODA/VACAS
-    classID: 23
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - time: 0
-        value: 0
-        inSlope: Infinity
-        outSlope: Infinity
-        tangentMode: 21
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-    attribute: m_Enabled
-    path: RODA
     classID: 23
     script: {fileID: 0}
   - curve:
@@ -2654,25 +2626,6 @@ AnimationClip:
         tangentMode: 31
       m_PreInfinity: 2
       m_PostInfinity: 2
-    attribute: m_Enabled
-    path: Cubo
-    classID: 23
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - time: 0
-        value: 0
-        inSlope: Infinity
-        outSlope: Infinity
-        tangentMode: 31
-      - time: 8
-        value: 0
-        inSlope: Infinity
-        outSlope: Infinity
-        tangentMode: 31
-      m_PreInfinity: 2
-      m_PostInfinity: 2
     attribute: m_IsActive
     path: Plano.001
     classID: 1
@@ -2704,6 +2657,44 @@ AnimationClip:
     attribute: m_IsActive
     path: Humareda
     classID: 1
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 31
+      - time: 8
+        value: 0
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 31
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    attribute: m_Enabled
+    path: RODA/RODA
+    classID: 23
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 31
+      - time: 8
+        value: 0
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 31
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    attribute: m_Enabled
+    path: RODA/RODA/VACAS
+    classID: 137
     script: {fileID: 0}
   m_PPtrCurves: []
   m_SampleRate: 60
@@ -2779,18 +2770,6 @@ AnimationClip:
       classID: 23
       customType: 0
       isPPtrCurve: 0
-    - path: 456572748
-      attribute: 3305885265
-      script: {fileID: 0}
-      classID: 23
-      customType: 0
-      isPPtrCurve: 0
-    - path: 2923964879
-      attribute: 3305885265
-      script: {fileID: 0}
-      classID: 23
-      customType: 0
-      isPPtrCurve: 0
     - path: 1458777322
       attribute: 3305885265
       script: {fileID: 0}
@@ -2845,12 +2824,6 @@ AnimationClip:
       classID: 137
       customType: 0
       isPPtrCurve: 0
-    - path: 1880749976
-      attribute: 3305885265
-      script: {fileID: 0}
-      classID: 23
-      customType: 0
-      isPPtrCurve: 0
     - path: 4250673823
       attribute: 2086281974
       script: {fileID: 0}
@@ -2867,6 +2840,18 @@ AnimationClip:
       attribute: 2086281974
       script: {fileID: 0}
       classID: 1
+      customType: 0
+      isPPtrCurve: 0
+    - path: 4073548730
+      attribute: 3305885265
+      script: {fileID: 0}
+      classID: 23
+      customType: 0
+      isPPtrCurve: 0
+    - path: 3721116106
+      attribute: 3305885265
+      script: {fileID: 0}
+      classID: 137
       customType: 0
       isPPtrCurve: 0
     pptrCurveMapping: []
@@ -3109,7 +3094,7 @@ AnimationClip:
       serializedVersion: 2
       m_Curve:
       - time: 0
-        value: 0
+        value: 1
         inSlope: Infinity
         outSlope: Infinity
         tangentMode: 21
@@ -3145,34 +3130,6 @@ AnimationClip:
       m_PostInfinity: 2
     attribute: m_Enabled
     path: ListonSierra
-    classID: 23
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - time: 0
-        value: 0
-        inSlope: Infinity
-        outSlope: Infinity
-        tangentMode: 21
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-    attribute: m_Enabled
-    path: RODA/VACAS
-    classID: 23
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - time: 0
-        value: 0
-        inSlope: Infinity
-        outSlope: Infinity
-        tangentMode: 21
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-    attribute: m_Enabled
-    path: RODA
     classID: 23
     script: {fileID: 0}
   - curve:
@@ -12489,25 +12446,6 @@ AnimationClip:
         tangentMode: 31
       m_PreInfinity: 2
       m_PostInfinity: 2
-    attribute: m_Enabled
-    path: Cubo
-    classID: 23
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - time: 0
-        value: 0
-        inSlope: Infinity
-        outSlope: Infinity
-        tangentMode: 31
-      - time: 8
-        value: 0
-        inSlope: Infinity
-        outSlope: Infinity
-        tangentMode: 31
-      m_PreInfinity: 2
-      m_PostInfinity: 2
     attribute: m_IsActive
     path: Plano.001
     classID: 1
@@ -12539,6 +12477,44 @@ AnimationClip:
     attribute: m_IsActive
     path: Humareda
     classID: 1
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 31
+      - time: 8
+        value: 0
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 31
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    attribute: m_Enabled
+    path: RODA/RODA
+    classID: 23
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 31
+      - time: 8
+        value: 0
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 31
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    attribute: m_Enabled
+    path: RODA/RODA/VACAS
+    classID: 137
     script: {fileID: 0}
   m_EulerEditorCurves:
   - curve:

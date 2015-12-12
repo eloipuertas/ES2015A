@@ -42,12 +42,9 @@ namespace Managers
 
         public bool IsEnough(WorldResources.Resource other)
         {
-            // HACK: It's a hack
-            return true;
-
             if (_deposits.ContainsKey(other.GetResourceType()))
             {
-                return _deposits[other.GetResourceType()].GetCapacity() >= other.GetAmount();
+                return _deposits[other.GetResourceType()].GetAmount() >= other.GetAmount();
 
             }
             else
