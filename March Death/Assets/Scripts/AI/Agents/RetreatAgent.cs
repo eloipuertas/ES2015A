@@ -82,7 +82,6 @@ namespace Assets.Scripts.AI.Agents
                 foreach (Unit ownUnit in squad.Units)
                 {
                     float distance = Vector3.Distance(enemyUnit.transform.position, ownUnit.transform.position);
-                    //HACK: Change this magic number before intefore integration.
                     if (distance < enemyUnit.currentAttackRange() + 100)
                     {
                         //If our hero is in range and is going to die

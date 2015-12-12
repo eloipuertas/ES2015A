@@ -86,6 +86,11 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     List<Unit> workersList = new List<Unit>();
 
+    /// <summary>
+    /// max harvest units this resource can have
+    /// </summary>
+    public int maxHarvestUnits { get; private set; }
+
 
     /// <summary>
     /// HUD, get current civilian units working here
@@ -321,7 +326,7 @@ public class Resource : Building<Resource.Actions>
     protected override void createUnit(UnitTypes type)
     {
 
-        if (harvestUnits < info.resourceAttributes.maxUnits)
+        if (harvestUnits < maxHarvestUnits)
         {
             _unitPosition.Set(_center.x, _center.y, _center.z);
             GameObject gob = Info.get.createUnit(race, type, _unitPosition, _unitRotation, -1);
@@ -397,7 +402,7 @@ public class Resource : Building<Resource.Actions>
     private void recruitWorker(Unit explorer)
     {
 
-        if (harvestUnits < info.resourceAttributes.maxUnits)
+        if (harvestUnits < maxHarvestUnits)
         {
             _collectionRate += explorer.info.attributes.capacity;
             harvestUnits++;
@@ -431,7 +436,7 @@ public class Resource : Building<Resource.Actions>
         Assert.IsTrue(entity.info.race == info.race);
 
         // space enough to hold new civil
-        if (harvestUnits < info.resourceAttributes.maxUnits)
+        if (harvestUnits < maxHarvestUnits)
         {
             Unit unit = (Unit)entity;
             unit.vanish();
@@ -485,6 +490,7 @@ public class Resource : Building<Resource.Actions>
         }
 
         statistics = new Statistics(ResourceFromBuilding(type), (int)info.resourceAttributes.updateInterval, 10); // hardcoded, To modify, by now the collection rate is always 10, but theres no workers yet
+        maxHarvestUnits = info.resourceAttributes.maxUnits;
     }
 
     /// <summary>
