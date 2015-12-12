@@ -5,20 +5,21 @@
 
     "attributes": {
         "weaponAbility": 6,
-        "projectileAbility": 6,
-        "strength": 4,
+        "projectileAbility": 0,
+        "strength": 5,
         "resistance": 5,
-        "wounds": 20,
+        "wounds": 30,
 
-        "attackRate": 4,
-        "movementRate": 2,
-        "sightRange": 12,
-        "creationTime": 12
+        "attackRate": 1.4,
+        "movementRate": 3.5,
+        "sightRange": 40,
+        "creationTime": 180,
+        "foodConsumption": 2
     },
 
     "resources": {
-        "wood": 1,
-        "metal": 2,
-        "food": 1
+        "wood": 0,
+        "metal": 40,
+        "food": 100
     }
 }
