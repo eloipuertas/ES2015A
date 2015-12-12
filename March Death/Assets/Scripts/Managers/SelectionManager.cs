@@ -94,32 +94,35 @@ namespace Managers
         public bool NewTroop(String key)
         {
             Assert.IsFalse(_troops.ContainsKey(key));
-
-            if (_selectedSquad.Units.Count > 1)
+            if (_selectedSquad != null)
             {
-                // Set unit squad for fast access
-                foreach (Unit unit in _selectedSquad.Units)
+                if (_selectedSquad.Units.Count > 1)
                 {
-                    // Is it already in another troop?
-                    if (unit.Troop != null)
+                    // Set unit squad for fast access
+                    foreach (Unit unit in _selectedSquad.Units)
                     {
-                        unit.Troop.RemoveUnit(unit);
+                        // Is it already in another troop?
+                        if (unit.Troop != null)
+                        {
+                            unit.Troop.RemoveUnit(unit);
+                        }
+
+                        unit.Squad = _selectedSquad;
+                        unit.Troop = _selectedSquad;
                     }
 
-                    unit.Squad = _selectedSquad;
-                    unit.Troop = _selectedSquad;
+                    _troops.Add(key, _selectedSquad);
+
+                    Debug.Log("Created troop: " + key);
+                    return true;
                 }
-
-                _troops.Add(key, _selectedSquad);
-
-                Debug.Log("Created troop: " + key);
-                return true;
+                else
+                {
+                    Debug.Log("Troops should have more than 1 unit");
+                    return false;
+                }
             }
-            else
-            {
-                Debug.Log("Troops should have more than 1 unit");
-                return false;
-            }
+            return false;
         }
 
         /// <summary>
