@@ -20,6 +20,12 @@ public class FOWManager : MonoBehaviour
     /// Also you will be able to see fowEntities in semifog
     /// </summary>
     public bool NotFullyOpaque = false;
+
+    /// <summary>
+    /// Used in menus to disable the fog passing a white texture to the shader
+    /// </summary>
+    public bool IsMenu = false;
+
     /// <summary>
     /// Rate at which the uncovered areas darken up after not being lit anymore.
     /// </summary>
@@ -110,8 +116,8 @@ public class FOWManager : MonoBehaviour
         if (cFrame == frames)
         { 
 #if UNITY_EDITOR
-            //Don't show fog on the editor or if not enabled.
-            if (!Application.isPlaying || !Enabled)
+            //Don't show fog on the editor.
+            if (!Application.isPlaying)
             {
                 Shader.SetGlobalTexture("_FOWTex", UnityEditor.EditorGUIUtility.whiteTexture);
                 if (fowTex != null)
@@ -119,7 +125,15 @@ public class FOWManager : MonoBehaviour
                 fowTex = null;
             }
 #endif
-            if (fowTex)
+            //Pass a white texture if the component is disabled
+            if (!Enabled)
+            {
+                Shader.SetGlobalTexture("_FOWTex", UnityEditor.EditorGUIUtility.whiteTexture);
+                if (fowTex != null)
+                    DestroyImmediate(fowTex);
+                fowTex = null;
+            }
+            else if (fowTex)
             {
                 int fade = Mathf.RoundToInt(Time.deltaTime * fadeRate);
 
