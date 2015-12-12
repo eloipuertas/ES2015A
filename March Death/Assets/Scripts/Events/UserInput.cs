@@ -23,6 +23,9 @@ public partial class UserInput : MonoBehaviour
     //boolean to know if the left mouse button is down
     private bool leftButtonIsDown = false;
 
+    // store last selected object
+    private IGameEntity selectedObject = null;
+
     private Vector2 mouseButtonDownPoint;
     private Vector2 mouseButtonCurrentPoint;
 
@@ -162,14 +165,34 @@ public partial class UserInput : MonoBehaviour
         }
         else if (BasePlayer.player.isCurrently(Player.status.SELECTED_UNITS) )
         {
+           
             GameObject hitObject = FindHitObject();
             if (!hitObject) // out of bounds click
             {
                 Debug.Log("The click is out of bounds?");
             }
-            else if (hitObject.name == "Terrain") // if it is the terrain, let's go there
+            else if (hitObject.name == "Terrain") 
             {
-                sManager.MoveTo(FindHitPoint());
+                // if resource is selected then we are setting the meeting point
+                if (selectedObject != null && selectedObject.info.isBuilding)
+                {
+                    if (selectedObject.info.isResource)
+                    {
+                        Resource r = (Resource)selectedObject;
+                        r.setMeetingPoint(FindTerrainHitPoint());
+                    }
+                    else if (selectedObject.info.isBarrack)
+                    {
+                        Barrack b = (Barrack)selectedObject;
+                        b.setMeetingPoint(FindTerrainHitPoint());
+                    } 
+                }
+                else
+                {
+                    sManager.MoveTo(FindHitPoint());// if it is the terrain,and we are not building let's go there
+                    
+                }
+
             }
             else // let's find what it is, check if is own unit or rival
             {
@@ -227,7 +250,7 @@ public partial class UserInput : MonoBehaviour
     private void Select()
     {
         GameObject hitObject;
-        IGameEntity selectedObject;
+        
 
         //HACK, first checks if there is a unit there
         if (Layer.get.IsUnit())

@@ -154,18 +154,6 @@ public class Resource : Building<Resource.Actions>
     private Quaternion _unitRotation;
 
     /// <summary>
-    /// coordinates where new civilians are positioned before maxUnits limit is
-    ///  reached.
-    /// </summary>
-    private Vector3 meetingPointInsidePosition;
-
-    /// <summary>
-    /// coordinates where new civilians are positioned after maxUnits limit is
-    ///  reached.
-    /// </summary>
-    private Vector3 meetingPointOutsidePosition;
-
-    /// <summary>
     /// when you create a civilian some displacement is needed to avoid units
     /// overlap. this is the x-axis displacement
     /// </summary>
@@ -348,7 +336,7 @@ public class Resource : Building<Resource.Actions>
     /// Method create civilian unit.
     /// If capacity limit of building is not reached unit is positioned inside
     /// building limits otherwise unit is positioned outside,
-    /// just at desired meeting Point.
+    /// just at desired deployment Point.
     /// civilian sex is randomly selected(last parameter of createUnit method).
     /// </summary>
     /// <returns>civilian GameObject</returns>
@@ -372,8 +360,9 @@ public class Resource : Building<Resource.Actions>
             _collectionRate -= worker.info.attributes.capacity;
             harvestUnits--;
 
-            worker.transform.position = getMeetingPoint();
+            worker.transform.position = getDeploymentPoint();
             worker.bringBack();
+            worker.moveTo(getDefaultMeetingPoint());
 
             worker.setStatus(EntityStatus.IDLE);
 
