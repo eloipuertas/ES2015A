@@ -21,10 +21,8 @@ public class FOWManager : MonoBehaviour
     /// </summary>
     public bool NotFullyOpaque = false;
 
-    /// <summary>
-    /// Used in menus to disable the fog passing a white texture to the shader
-    /// </summary>
-    public bool IsMenu = false;
+    Texture2D clearTex;
+    Color32[] wPixels;
 
     /// <summary>
     /// Rate at which the uncovered areas darken up after not being lit anymore.
@@ -84,18 +82,24 @@ public class FOWManager : MonoBehaviour
 
             if (fowTex)
                 DestroyImmediate(fowTex);
+            if (clearTex)
+                DestroyImmediate(clearTex);
             fowTex = new Texture2D(width, height, TextureFormat.RGB24, false);
+            clearTex = new Texture2D(width, height, TextureFormat.RGB24, false);
             pixels = fowTex.GetPixels32();
+            wPixels = clearTex.GetPixels32();
             aiVision = new visible[width * height];
-            //Paint it all black
+
             Color cc = NotFullyOpaque? new Color(0, 255, 0): Color.black;
+            Color white = new Color(255, 255, 255);
             for (int i = 0; i < pixels.Length; i++)
             {
                 pixels[i] = cc;
                 aiVision[i] = visible.unexplored;
+                wPixels[i] = white;
             }
-
             fowTex.SetPixels32(pixels);
+            clearTex.SetPixels32(wPixels);
 
             Shader.SetGlobalTexture("_FOWTex", fowTex);
             Shader.SetGlobalVector("_FOWTex_ST",
@@ -126,33 +130,36 @@ public class FOWManager : MonoBehaviour
             }
 #endif
             //Pass a white texture if the component is disabled
-            if (!Enabled)
+            if(fowTex)
             {
-                Shader.SetGlobalTexture("_FOWTex", UnityEditor.EditorGUIUtility.whiteTexture);
-                if (fowTex != null)
-                    DestroyImmediate(fowTex);
-                fowTex = null;
-            }
-            else if (fowTex)
-            {
-                int fade = Mathf.RoundToInt(Time.deltaTime * fadeRate);
-
-                //Fade all the map
-                for (int i = 0; i < pixels.Length; i++)
+                if (!Enabled)
                 {
-                    if (pixels[i].b > 0)
-                        pixels[i].b = (byte)Mathf.Max(pixels[i].b - fade, 0);
-                    aiVision[i] &= ~visible.visible; //Remove the visible flag
+                    Shader.SetGlobalTexture("_FOWTex", clearTex);
+                    if (fowTex != null)
+                        DestroyImmediate(fowTex);
+                    fowTex = null;
                 }
-                //Reveal the area around the revealer entities
-                foreach (FOWEntity e in entities)
+                else
                 {
-                    if (e.IsActor)
-                        reveal(e);
-                }                   
+                    int fade = Mathf.RoundToInt(Time.deltaTime * fadeRate);
 
-                fowTex.SetPixels32(pixels);
-                fowTex.Apply();
+                    //Fade all the map
+                    for (int i = 0; i < pixels.Length; i++)
+                    {
+                        if (pixels[i].b > 0)
+                            pixels[i].b = (byte)Mathf.Max(pixels[i].b - fade, 0);
+                        aiVision[i] &= ~visible.visible; //Remove the visible flag
+                    }
+                    //Reveal the area around the revealer entities
+                    foreach (FOWEntity e in entities)
+                    {
+                        if (e.IsActor)
+                            reveal(e);
+                    }
+
+                    fowTex.SetPixels32(pixels);
+                    fowTex.Apply();
+                }
             }
             cFrame = 0;
         }
