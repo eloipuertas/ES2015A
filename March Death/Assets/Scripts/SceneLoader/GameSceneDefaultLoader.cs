@@ -94,7 +94,7 @@ namespace SceneLoader
                     else
                         position.x += step;
 
-                    player.addEntity(info.createUnit(_playerRace, _unitType, position, new Quaternion(0, 0, 0, 0)).GetComponent<IGameEntity>());
+                    info.createUnit(_playerRace, _unitType, position, new Quaternion(0, 0, 0, 0));
                 }
             }
         }

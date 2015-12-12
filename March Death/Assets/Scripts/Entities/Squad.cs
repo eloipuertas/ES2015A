@@ -122,7 +122,7 @@ public sealed class Squad : BareObserver<Squad.Actions>
         if (!_units.Contains(unit))
         {
             _units.Add(unit);
-            _auto += unit.register(Unit.Actions.DIED, OnUnitDied);
+            _auto += unit.registerFatalWounds(OnUnitDied);
 
             fire(Actions.UNIT_ADDED, unit);
         }
@@ -144,7 +144,7 @@ public sealed class Squad : BareObserver<Squad.Actions>
     public void RemoveUnit(Unit unit)
     {
         _units.Remove(unit);
-        _auto -= unit.unregister(Unit.Actions.DIED, OnUnitDied);
+        _auto -= unit.unregisterFatalWounds(OnUnitDied);
 
         fire(Actions.UNIT_REMOVED, unit);
     }
