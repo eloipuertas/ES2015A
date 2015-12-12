@@ -302,18 +302,17 @@ namespace Storage
             string prefab = getPrefab(race, type, (int)variant);
             return UnityEngine.Object.Instantiate((GameObject)Resources.Load(prefab, typeof(GameObject)), position, rotation) as GameObject;
         }
-		
-		/// <summary>
-		/// Creates a Building of a given race and type from a prefab in a certain position and rotation
-		/// </summary>
-		/// <param name="race">Race of the Building</param>
-		/// <param name="type">Type of the Building</param>
-		/// <param name="position">Building position</param>
-		/// <param name="rotation">Building rotation</param>
-		/// <returns>The created GameObject</returns>
-		public GameObject createGenericPrefab(string route, Vector3 position, Quaternion rotation)
+
+        /// <summary>
+        /// Creates a Projectile in a certain position and rotation
+        /// </summary>
+        /// <param name="position">Projectile position</param>
+        /// <param name="rotation">Projectile rotation</param>
+        /// <returns>The created GameObject</returns>
+        public GameObject createProjectile(Vector3 position, Quaternion rotation)
 		{
-			return UnityEngine.Object.Instantiate((GameObject)Resources.Load(route, typeof(GameObject)), position, rotation) as GameObject;
-		}
+            string prefab = "Prefabs/Projectile/Projectile";
+            return UnityEngine.Object.Instantiate((GameObject)Resources.Load(prefab, typeof(GameObject)), position, rotation) as GameObject;
+        }
     }
 }

@@ -670,12 +670,11 @@ public class Unit : GameEntity<Unit.Actions>
                         if (canDoRangedAttack())
                         {
 							Vector3 projectile_position = new Vector3(transform.position.x, transform.position.y + GetComponent<Collider>().bounds.size.y, transform.position.z);
-							GameObject projectile = Info.get.createGenericPrefab("Prefabs/Projectile/Projectile", projectile_position, transform.rotation);
-
-                            Projectile testing = projectile.GetComponent<Projectile>();
+							GameObject projectile = Info.get.createProjectile(projectile_position, transform.rotation);
+                            Projectile projectile_cl = projectile.GetComponent<Projectile>();
                             Vector3 projectileEndPoint = new Vector3(_target.getTransform().position.x, _target.getTransform().position.y + _target.getGameObject().GetComponent<Collider>().bounds.size.y, _target.getTransform().position.z);
-                            testing.setProps(projectileEndPoint, this, info.unitAttributes.projectileSpeed, info.unitAttributes.projectileRadius);
-                            
+
+                            projectile_cl.setProps(projectileEndPoint, this, info.unitAttributes.projectileSpeed, info.unitAttributes.projectileRadius);
                             _lastAttack = Time.time;
                         }
                         else
