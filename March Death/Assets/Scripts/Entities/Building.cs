@@ -144,8 +144,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         base.Start();
 
 
-        // Instead of adding 10 to the center of the building, we should check the actual size of the building....
-        _deploymentPoint = new Vector3(transform.position.x + 10, transform.position.y, transform.position.z + 10);
+        _meetingPoint = getDefaultMeetingPoint();
         activateFOWEntity();
 
         if (DefaultStatus == EntityStatus.BUILDING_PHASE_1)
@@ -247,7 +246,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     }
 
     /// <summary>
-    /// Meeting point where new units walk from deployment point
+    /// Default Meeting point where new units walk from deployment point
     /// </summary>
     /// <returns>position of meetingpoint</returns>
     public void setMeetingPoint(Vector3 position)
@@ -256,20 +255,35 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     }
 
     /// <summary>
+    /// Current Meeting point where new units walk from deployment point
+    /// </summary>
+    /// <returns>position of meetingpoint</returns>
+    public Vector3 getMeetingPoint()
+    {
+        return _meetingPoint;
+    }
+
+    /// <summary>
     /// check if meeting point is still available
     /// </summary>
     /// <returns>position of meetingpoint</returns>
-    public void checkMeetingPoint()
+    public Vector3 findMeetingPoint()
     {
-        GameObject[] objects = Helpers.getObjectsNearPosition(getDeploymentPoint(), 1);
+
+        Vector3 position = new Vector3();
+        GameObject[] objects = Helpers.getObjectsNearPosition(getMeetingPoint(), 1);
         foreach (GameObject g in objects)
         {
             if (g.GetComponent<IBuilding>() != null)
             {
-                _meetingPoint = getDeploymentPoint();
+                position = getDefaultMeetingPoint();
+                return position;
             }
         }
+        return getMeetingPoint();
+
     }
+
     protected virtual void createUnit(UnitTypes type)
     {       
         GameObject gob = Info.get.createUnit(race, type, getDeploymentPoint(), transform.rotation, -1);
@@ -277,8 +291,8 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         BasePlayer.getOwner(this).addEntity(new_unit);
         fire(CREATE_UNIT, new_unit);
         _totalUnits++;
-        
-        new_unit.moveTo(getDefaultMeetingPoint());
+    
+        new_unit.moveTo(findMeetingPoint());
 
     }
 
