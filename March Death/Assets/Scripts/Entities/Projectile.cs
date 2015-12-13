@@ -28,6 +28,11 @@ public class Projectile : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (_owner == null) {
+            Destroy(gameObject);
+            return;
+        }
+
         //Find a new position proportionally closer to the end, based on the projectileSpeed
         Vector3 newPostion = Vector3.MoveTowards(gameObject.transform.position, _end_point, _speed * Time.deltaTime);
 
@@ -47,6 +52,11 @@ public class Projectile : MonoBehaviour
 
     void OnTriggerEnter(Collider target)
     {
+        if (_owner == null) {
+            Destroy(gameObject);
+            return;
+        }
+
         if ((target.gameObject.GetInstanceID() != _owner.gameObject.GetInstanceID()) &&
             (target.gameObject.GetComponent<LightHouseRevealer>() == null)) {
             damageRadius();

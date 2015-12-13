@@ -73,6 +73,7 @@ public class Unit : GameEntity<Unit.Actions>
     public float _distanceToTarget = 0;
     private Vector3 _attackPoint;
     private Vector3 _closestPointToTarget;
+    private bool _projectileThrown = false;
     
     //private Helpers _Helpers;
 
@@ -664,26 +665,26 @@ public class Unit : GameEntity<Unit.Actions>
                         }
                     }
                     // Check if we already have to attack
-                    else if (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate))
-                    {
+                    else if (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate)) {
                         // TODO: Ranged attack should also be inside a while
-                        if (canDoRangedAttack())
-                        {
-							Vector3 projectile_position = new Vector3(transform.position.x, transform.position.y + GetComponent<Collider>().bounds.size.y, transform.position.z);
-							GameObject projectile = Info.get.createProjectile(projectile_position, transform.rotation);
-                            Projectile projectile_cl = projectile.GetComponent<Projectile>();
-                            Vector3 projectileEndPoint = new Vector3(_target.getTransform().position.x, _target.getTransform().position.y + _target.getGameObject().GetComponent<Collider>().bounds.size.y, _target.getTransform().position.z);
+                        if (canDoRangedAttack()) {
+                            // This is done to decrease the attackRate.
+                            if (_projectileThrown) {
+                                _projectileThrown = false;
+                            } else {
+                                _projectileThrown = true;
+                                Vector3 projectile_position = new Vector3(transform.position.x, transform.position.y + GetComponent<Collider>().bounds.size.y, transform.position.z);
+                                GameObject projectile = Info.get.createProjectile(projectile_position, transform.rotation);
+                                Projectile projectile_cl = projectile.GetComponent<Projectile>();
+                                Vector3 projectileEndPoint = new Vector3(_target.getTransform().position.x, _target.getTransform().position.y + _target.getGameObject().GetComponent<Collider>().bounds.size.y, _target.getTransform().position.z);
 
-                            projectile_cl.setProps(projectileEndPoint, this, info.unitAttributes.projectileSpeed, info.unitAttributes.projectileRadius);
-                            _lastAttack = Time.time;
-                        }
-                        else
-                        {
-                            while (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate))
-                            {
+                                projectile_cl.setProps(projectileEndPoint, this, info.unitAttributes.projectileSpeed, info.unitAttributes.projectileRadius);
+                                _lastAttack = Time.time;
+                            }
+                        } else {
+                            while (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate)) {
                                 // Target might be null if inside the while the target unit is killed
-                                if (_target != null)
-                                {
+                                if (_target != null) {
                                     _target.receiveAttack(this, canDoRangedAttack());
                                 }
 
