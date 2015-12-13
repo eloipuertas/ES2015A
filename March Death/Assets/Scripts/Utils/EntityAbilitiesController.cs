@@ -47,7 +47,7 @@ public class EntityAbilitiesController : MonoBehaviour
 		GameObject gameObject = (GameObject) obj;
 
         //destroyButtons();
-        showActions(gameObject);
+        //showActions(gameObject);
         hideActionButtons(gameObject);
         showActionButtons(gameObject);
 
