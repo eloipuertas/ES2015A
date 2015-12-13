@@ -972,7 +972,7 @@ ParticleSystemRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 45dc056cf5e21c34194b3c3303da5817, type: 2}
+  - {fileID: 2100000, guid: 6d9a1a1b14b4fe040aa5c31e7305df72, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
@@ -2753,6 +2753,10 @@ Prefab:
       propertyPath: m_AABB.m_Center.z
       value: -4.57763672e-05
       objectReference: {fileID: 0}
+    - target: {fileID: 5417438, guid: 93f4167d8d046e54386e52755b61798d, type: 2}
+      propertyPath: m_Constraints
+      value: 122
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 93f4167d8d046e54386e52755b61798d, type: 2}
   m_IsPrefabParent: 0
@@ -2794,6 +2798,94 @@ Prefab:
     - target: {fileID: 493194, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
       propertyPath: m_RootOrder
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 13794160, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Center.x
+      value: 9.15527344e-05
+      objectReference: {fileID: 0}
+    - target: {fileID: 13794160, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Center.y
+      value: 3.81469727e-06
+      objectReference: {fileID: 0}
+    - target: {fileID: 13794160, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Center.z
+      value: 6.10351562e-05
+      objectReference: {fileID: 0}
+    - target: {fileID: 13794160, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Extent.x
+      value: 7.022264
+      objectReference: {fileID: 0}
+    - target: {fileID: 13794160, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Extent.y
+      value: .0614280999
+      objectReference: {fileID: 0}
+    - target: {fileID: 13794160, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Extent.z
+      value: 6.55749559
+      objectReference: {fileID: 0}
+    - target: {fileID: 13792210, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Center.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 13792210, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Center.z
+      value: 3.05175781e-05
+      objectReference: {fileID: 0}
+    - target: {fileID: 13792210, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Extent.x
+      value: 7.0222435
+      objectReference: {fileID: 0}
+    - target: {fileID: 13792210, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Extent.y
+      value: .056080468
+      objectReference: {fileID: 0}
+    - target: {fileID: 13792210, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Extent.z
+      value: 6.55750418
+      objectReference: {fileID: 0}
+    - target: {fileID: 13714900, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Center.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 13714900, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Center.z
+      value: -.00012588501
+      objectReference: {fileID: 0}
+    - target: {fileID: 13714900, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Extent.x
+      value: 7.02224159
+      objectReference: {fileID: 0}
+    - target: {fileID: 13714900, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Extent.y
+      value: .056080468
+      objectReference: {fileID: 0}
+    - target: {fileID: 13714900, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Extent.z
+      value: 6.55750275
+      objectReference: {fileID: 0}
+    - target: {fileID: 13701014, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Center.x
+      value: -.000144958496
+      objectReference: {fileID: 0}
+    - target: {fileID: 13701014, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Center.y
+      value: 3.81469727e-06
+      objectReference: {fileID: 0}
+    - target: {fileID: 13701014, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Center.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 13701014, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Extent.x
+      value: 7.02227116
+      objectReference: {fileID: 0}
+    - target: {fileID: 13701014, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Extent.y
+      value: .0614283159
+      objectReference: {fileID: 0}
+    - target: {fileID: 13701014, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
+      propertyPath: m_AABB.m_Extent.z
+      value: 6.55753517
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 6502554, guid: d6f4f1dec1b349d438c850f56b88b187, type: 2}
@@ -2890,15 +2982,19 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13797704, guid: 923eb0ba4c3525a4d829c5d344495dcb, type: 2}
       propertyPath: m_AABB.m_Center.y
-      value: .0013229847
+      value: .0013231039
       objectReference: {fileID: 0}
     - target: {fileID: 13797704, guid: 923eb0ba4c3525a4d829c5d344495dcb, type: 2}
       propertyPath: m_AABB.m_Center.z
-      value: 1.10119581e-05
+      value: 1.09672546e-05
       objectReference: {fileID: 0}
     - target: {fileID: 13797704, guid: 923eb0ba4c3525a4d829c5d344495dcb, type: 2}
       propertyPath: m_AABB.m_Center.x
-      value: -.00077098608
+      value: -.000770941377
+      objectReference: {fileID: 0}
+    - target: {fileID: 5426504, guid: 923eb0ba4c3525a4d829c5d344495dcb, type: 2}
+      propertyPath: m_Constraints
+      value: 122
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 923eb0ba4c3525a4d829c5d344495dcb, type: 2}
@@ -3252,7 +3348,7 @@ ParticleSystemRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 45dc056cf5e21c34194b3c3303da5817, type: 2}
+  - {fileID: 2100000, guid: 6d9a1a1b14b4fe040aa5c31e7305df72, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
