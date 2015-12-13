@@ -47,7 +47,7 @@ public class EntityAbilitiesController : MonoBehaviour
 		GameObject gameObject = (GameObject) obj;
 
         //destroyButtons();
-        showActions(gameObject);
+        //showActions(gameObject);
         hideActionButtons(gameObject);
         showActionButtons(gameObject);
 
@@ -98,20 +98,30 @@ public class EntityAbilitiesController : MonoBehaviour
             var eventTrigger = button.GetComponent<EventTrigger>();
             buttonComponent.onClick.RemoveAllListeners();
 
-            if (abilityObj.isUsable)
+            if (abilityObj.isUsable && !abilityObj.isActive)
             {
-                // HACK: When this is fired, the button status should be updated! abilityObj.isActive might have changed...
-                UnityAction actionMethod = new UnityAction(() =>
+                if (BasePlayer.player.resources.IsEnough(WorldResources.Type.FOOD, entity.info.resources.food) &&
+                    BasePlayer.player.resources.IsEnough(WorldResources.Type.METAL, entity.info.resources.metal) &&
+                    BasePlayer.player.resources.IsEnough(WorldResources.Type.WOOD, entity.info.resources.wood))
                 {
-                    Debug.Log("* " + abilityObj);
-                    abilityObj.enable();
-                });
-                image.sprite = CreateSprite(ability, image.rectTransform.sizeDelta);
-                buttonComponent.targetGraphic = image;
-                buttonComponent.onClick.AddListener(() => actionMethod());
-                image.enabled = true;
-                eventTrigger.enabled = true;
-                buttonComponent.interactable = true;
+                    UnityAction actionMethod = new UnityAction(() =>
+                    {
+                        Debug.Log("* " + abilityObj);
+                        abilityObj.enable();
+                    });
+                    image.sprite = CreateSprite(ability, image.rectTransform.sizeDelta);
+                    buttonComponent.targetGraphic = image;
+                    buttonComponent.onClick.AddListener(() => actionMethod());
+                    image.enabled = true;
+                    eventTrigger.enabled = true;
+                    buttonComponent.interactable = true;
+                }
+                //if (entity.info.resources.food < BasePlayer.player.resources.getAmount(WorldResources.Type.FOOD))
+                //{
+                //    Debug.LogError("General food quantity: " + BasePlayer.player.resources.getAmount(WorldResources.Type.FOOD));
+                //}
+                // HACK: When this is fired, the button status should be updated! abilityObj.isActive might have changed...
+                
             }
         }
     }
