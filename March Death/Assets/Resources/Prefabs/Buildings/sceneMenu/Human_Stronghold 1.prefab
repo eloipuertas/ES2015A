@@ -2185,7 +2185,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 187476}
   m_LocalRotation: {x: 0, y: .996225059, z: 0, w: .0868079588}
-  m_LocalPosition: {x: 246.399994, y: 156.600006, z: 464.899994}
+  m_LocalPosition: {x: 246.399994, y: 79.0026245, z: 464.899994}
   m_LocalScale: {x: 1.70000005, y: 1.85000002, z: 1.70000005}
   m_Children:
   - {fileID: 409696}
@@ -5053,11 +5053,11 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0
+  m_AngularDrag: .0500000007
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 122
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!65 &6594116
 BoxCollider:
@@ -5105,8 +5105,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: 3.05175781e-05, y: -7.62939453e-06, z: -.000114440918}
-    m_Extent: {x: 5.00000572, y: .351475328, z: 5.00000095}
+    m_Center: {x: 2.28881836e-05, y: 0, z: -.000114440918}
+    m_Extent: {x: 4.99999952, y: .351475328, z: 5.00000095}
   m_DirtyAABB: 0
 --- !u!183 &18377606
 Cloth:
