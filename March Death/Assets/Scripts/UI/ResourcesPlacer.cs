@@ -209,6 +209,22 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
 
     }
 
+    public bool enoughResources(EntityAbility info)
+    {
+        EntityResources res;
+        
+        if(info.targetType.Equals(EntityType.BUILDING))
+            res = Info.get.of(info.targetRace, info.targetBuilding).resources;
+        else
+            res = Info.get.of(info.targetRace, info.targetUnit).resources;
+
+        if (res.food <= resources[WorldResources.Type.FOOD] && res.wood <= resources[WorldResources.Type.WOOD] && 
+            res.metal <= resources[WorldResources.Type.METAL])
+            return true;
+        else
+            return false;
+    }
+
     // Setup GameObjects
 
     /// <summary>
