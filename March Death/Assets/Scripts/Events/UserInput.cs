@@ -102,8 +102,11 @@ public partial class UserInput : MonoBehaviour
             sManager.DragStart();
         }
 
+        
+        // New approach, checking if the click is over an event system object
+        if(EventSystem.current.IsPointerOverGameObject())
         // FIXME: add HUD colliders
-        if (rectActions.Contains(Input.mousePosition) || rectInformation.Contains(Input.mousePosition) || minimapCamera.pixelRect.Contains(Input.mousePosition) )
+        //if (rectActions.Contains(Input.mousePosition) || rectInformation.Contains(Input.mousePosition) || minimapCamera.pixelRect.Contains(Input.mousePosition) )
         {
             currentAction = action.NONE;
             return;
