@@ -1475,6 +1475,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &164408
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 417730}
+  - 114: {fileID: 11429854}
+  - 135: {fileID: 13513086}
+  m_Layer: 0
+  m_Name: GateObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &164814
 GameObject:
   m_ObjectHideFlags: 1
@@ -1987,6 +2004,7 @@ GameObject:
   - 114: {fileID: 11449282}
   - 114: {fileID: 11489354}
   - 114: {fileID: 11435570}
+  - 114: {fileID: 11442646}
   m_Layer: 11
   m_Name: Elf-Wall_Gate
   m_TagString: Untagged
@@ -2758,6 +2776,18 @@ Transform:
   - {fileID: 434076}
   m_Father: {fileID: 499618}
   m_RootOrder: 0
+--- !u!4 &417730
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 164408}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 463130}
+  m_RootOrder: 16
 --- !u!4 &418262
 Transform:
   m_ObjectHideFlags: 1
@@ -3662,7 +3692,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 186436}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 525.344482, y: 78.8542786, z: 707.959656}
+  m_LocalPosition: {x: 381.22049, y: 78.8542786, z: 879.545654}
   m_LocalScale: {x: 1.27499998, y: 1.27499998, z: 1.27499998}
   m_Children:
   - {fileID: 424202}
@@ -3681,6 +3711,7 @@ Transform:
   - {fileID: 406826}
   - {fileID: 455034}
   - {fileID: 467396}
+  - {fileID: 417730}
   m_Father: {fileID: 0}
   m_RootOrder: 0
 --- !u!4 &463160
@@ -4883,6 +4914,17 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11429854
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 164408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fe8a27976d36b3458cd7711dda070b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11435570
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4896,6 +4938,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   race: 1
   type: 9
+--- !u!114 &11442646
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 186436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea1f16b0a7a42ac4aa742bd54bab8204, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DebugOnEditor: 1
+  Position: {x: 0, y: 0, z: 0}
+  Size: {x: 10, y: 10, z: 8}
+  CheckEverySeconds: 1
+  EnabledFlags:
+  - WALKABLE
+  - DOOR_ELF
+  DisabledFlags:
+  - WALKABLE
 --- !u!114 &11449282
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4938,6 +5000,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider: {fileID: 0}
+--- !u!135 &13513086
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 164408}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: .5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!137 &13722774
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
@@ -4970,7 +5044,7 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -.000771045685, y: .00132369995, z: 1.09672546e-05}
+    m_Center: {x: -.000770926476, y: .00132274628, z: 1.14440918e-05}
     m_Extent: {x: .0109024877, y: .0113812387, z: 2.18120233e-09}
   m_DirtyAABB: 0
 --- !u!137 &13767904
@@ -7512,6 +7586,14 @@ Prefab:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 0}
+      propertyPath: EnabledFlags.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: DisabledFlags.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
       propertyPath: type
       value: 9
       objectReference: {fileID: 0}
@@ -7534,6 +7616,22 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Layer
       value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: EnabledFlags.Array.data[1]
+      value: DOOR_HUMAN
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: DisabledFlags.Array.data[1]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: EnabledFlags.Array.data[2]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: DisabledFlags.Array.data[2]
+      value: DOOR_HUMAN
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

@@ -1369,6 +1369,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &142298
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 435338}
+  - 114: {fileID: 11422216}
+  - 135: {fileID: 13504656}
+  m_Layer: 0
+  m_Name: GateObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &142502
 GameObject:
   m_ObjectHideFlags: 1
@@ -3801,7 +3818,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 106114}
   m_LocalRotation: {x: 0, y: .70710659, z: 0, w: -.707106948}
-  m_LocalPosition: {x: 512.936707, y: 79.6262589, z: 697.268738}
+  m_LocalPosition: {x: 378.557159, y: 79.6262512, z: 903.3349}
   m_LocalScale: {x: 1.19500005, y: 1.27499998, z: 1}
   m_Children:
   - {fileID: 479276}
@@ -3816,6 +3833,7 @@ Transform:
   - {fileID: 407358}
   - {fileID: 451544}
   - {fileID: 430488}
+  - {fileID: 435338}
   m_Father: {fileID: 0}
   m_RootOrder: 0
 --- !u!4 &427458
@@ -4064,6 +4082,18 @@ Transform:
   - {fileID: 432892}
   m_Father: {fileID: 478048}
   m_RootOrder: 0
+--- !u!4 &435338
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 142298}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 427436}
+  m_RootOrder: 12
 --- !u!4 &435900
 Transform:
   m_ObjectHideFlags: 1
@@ -5837,6 +5867,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   race: 0
   type: 9
+--- !u!114 &11422216
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 142298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fe8a27976d36b3458cd7711dda070b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11438484
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -5884,6 +5925,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider: {fileID: 0}
+--- !u!135 &13504656
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 142298}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: .5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!137 &13719220
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
