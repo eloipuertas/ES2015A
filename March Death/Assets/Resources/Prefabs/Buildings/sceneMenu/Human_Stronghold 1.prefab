@@ -1201,11 +1201,6 @@ GameObject:
   - 4: {fileID: 484540}
   - 54: {fileID: 5417438}
   - 65: {fileID: 6594116}
-  - 95: {fileID: 9569030}
-  - 114: {fileID: 11400736}
-  - 114: {fileID: 11469746}
-  - 114: {fileID: 11414480}
-  - 114: {fileID: 11405448}
   m_Layer: 11
   m_Name: Human_Stronghold 1
   m_TagString: Untagged
@@ -5076,76 +5071,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 23.5, y: 12, z: 15.5}
   m_Center: {x: 0, y: 6, z: 0}
---- !u!95 &9569030
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 187476}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &11400736
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 187476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b5e82104f3954c44a992850ac8a8053, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  race: 0
-  type: 0
---- !u!114 &11405448
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 187476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55673783568d5024f8240d70a3d2456f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DebugOnEditor: 1
-  Position: {x: 0, y: 0, z: 0}
-  Size: {x: 50, y: 25, z: 32.5}
-  CheckEverySeconds: 1
---- !u!114 &11414480
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 187476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43c34b4ae45e2c94f90ae970db2ad9f2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _collider: {fileID: 0}
---- !u!114 &11469746
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 187476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: caa19c7f960625f4b83094529589a1c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  IsActor: 1
-  Range: 0
 --- !u!137 &13723340
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
