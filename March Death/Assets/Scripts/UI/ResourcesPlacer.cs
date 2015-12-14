@@ -179,6 +179,8 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
 
     public void updateAmounts()
     {
+        EntityAbilitiesController.ControlButtonsInteractability();
+
         for (int i = 0; i < txt_names.Length; i++)
         {
             res_amounts[i].text = "" + resources[(WorldResources.Type)i];
