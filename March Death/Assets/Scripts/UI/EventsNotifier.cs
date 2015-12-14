@@ -39,6 +39,22 @@ public class EventsNotifier : MonoBehaviour {
     private readonly string ARTILLERY_BUILDING_CREATED = "Artillery building created.";
     private readonly string SPECIAL_UNITS_BUILDING_CREATED = "Special units building created.";
 
+    private readonly string BEGIN_CREATION_BARRACKS = "Begin construction of barracks.";
+    private readonly string BEGIN_CREATION_FARM = "Begin construction of farm.";
+    private readonly string BEGIN_CREATION_MINE = "Begin construction of mine.";
+    private readonly string BEGIN_CREATION_SAWMILL = "Begin construction of sawmill.";
+    private readonly string BEGIN_CREATION_SHOOTING_RANGE = "Begin construction of shooting range.";
+    private readonly string BEGIN_CREATION_STABLE = "Begin construction of stable.";
+    private readonly string BEGIN_CREATION_WATCHTOWER = "Begin construction of watchtower.";
+    private readonly string BEGIN_CREATION_WALL = "Begin construction of wall.";
+    private readonly string BEGIN_CREATION_WALL_CORNER = "Begin construction of wall corner.";
+    private readonly string BEGIN_CREATION_GATE = "Begin construction of gate.";
+    private readonly string BEGIN_CREATION_GRYPHON_NEST = "Begin construction of gryphon nest.";
+    private readonly string BEGIN_CREATION_ENT_FOREST = "Begin construction of ent forest.";
+    private readonly string BEGIN_CREATION_WORKSHOP = "Begin construction of workshop.";
+    private readonly string BEGIN_CREATION_ARTILLERY_BUILDING = "Begin construction of artillery building.";
+    private readonly string BEGIN_CREATION_SPECIAL_UNITS_BUILDING = "Begin construction of special units building.";
+
     // Resource related messages
     private readonly string FOOD_LOW = "Your food supplies are low!";
     private readonly string WOOD_LOW = "Your wood stock is getting low!";
@@ -76,8 +92,8 @@ public class EventsNotifier : MonoBehaviour {
     private readonly string WATCHTOWER_LOST = "You have lost a watchtower.";
     private readonly string WALL_LOST = "Your wall has been wrecked.";
     private readonly string WALL_GATE_LOST = "You have lost a gate.";
-    private readonly string GRYPHON_BUILDING_LOST = "A gryphon's nest was destroyed.";
-    private readonly string ENT_BUILDING_LOST = "An ent's forest has been destroyed.";
+    private readonly string GRYPHON_BUILDING_LOST = "A gryphon nest was destroyed.";
+    private readonly string ENT_BUILDING_LOST = "An ent forest has been destroyed.";
     private readonly string WORKSHOP_LOST = "You have lost a workshop.";
     private readonly string ARTILLERY_BUILDING_LOST = "You have lost an artillery building.";
     private readonly string SPECIAL_UNITS_BUILDING_LOST = "You have lost a special units building.";
@@ -516,8 +532,59 @@ public class EventsNotifier : MonoBehaviour {
                 onSightTimer.Add(entity, Time.time);
             }
         }
+    }
 
-        
-		
+    public void DisplayBuildingUnderConstruction(Storage.BuildingInfo entity)
+    {
+        switch (entity.type)
+        {
+            case Storage.BuildingTypes.STRONGHOLD:
+                break;
+            case Storage.BuildingTypes.ARCHERY:
+                AppendMessage(BEGIN_CREATION_SHOOTING_RANGE);
+                break;
+            case Storage.BuildingTypes.STABLE:
+                AppendMessage(BEGIN_CREATION_STABLE);
+                break;
+            case Storage.BuildingTypes.BARRACK:
+                AppendMessage(BEGIN_CREATION_BARRACKS);
+                break;
+            case Storage.BuildingTypes.FARM:
+                AppendMessage(BEGIN_CREATION_FARM);
+                break;
+            case Storage.BuildingTypes.MINE:
+                AppendMessage(BEGIN_CREATION_MINE);
+                break;
+            case Storage.BuildingTypes.SAWMILL:
+                AppendMessage(BEGIN_CREATION_SAWMILL);
+                break;
+            case Storage.BuildingTypes.WATCHTOWER:
+                AppendMessage(BEGIN_CREATION_WATCHTOWER);
+                break;
+            case Storage.BuildingTypes.WALL:
+                AppendMessage(BEGIN_CREATION_WALL);
+                break;
+            case Storage.BuildingTypes.WALLCORNER:
+                AppendMessage(BEGIN_CREATION_WALL_CORNER);
+                break;
+            case Storage.BuildingTypes.WALLGATE:
+                AppendMessage(BEGIN_CREATION_GATE);
+                break;
+            case Storage.BuildingTypes.ARTILLERY:
+                AppendMessage(BEGIN_CREATION_ARTILLERY_BUILDING);
+                break;
+            case Storage.BuildingTypes.ENT:
+                AppendMessage(BEGIN_CREATION_ENT_FOREST);
+                break;
+            case Storage.BuildingTypes.GRYPHON:
+                AppendMessage(BEGIN_CREATION_GRYPHON_NEST);
+                break;
+            case Storage.BuildingTypes.SPECIAL:
+                AppendMessage(BEGIN_CREATION_SPECIAL_UNITS_BUILDING);
+                break;
+            case Storage.BuildingTypes.WORKSHOP:
+                AppendMessage(BEGIN_CREATION_WORKSHOP);
+                break;
+        }
     }
 }
