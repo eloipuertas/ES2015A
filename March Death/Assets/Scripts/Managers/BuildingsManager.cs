@@ -112,6 +112,7 @@ namespace Managers
                 _newBuilding.placing = true;
                 _newBuilding.continuousConstruction = continuousConstruction;
                 _player.setCurrently(Player.status.PLACING_BUILDING);
+                CheckBuildingDefaultRotation(race, type);
             }
 
         }
@@ -300,6 +301,27 @@ namespace Managers
 
         }
 
+
+
+        /// <summary>
+        /// Some buildings need a different rotation, not the default. In order to be shown properly
+        /// </summary>
+        /// <param name="race"></param>
+        /// <param name="type"></param>
+        private void CheckBuildingDefaultRotation(Storage.Races race, Storage.BuildingTypes type)
+        {
+            if (type == Storage.BuildingTypes.SAWMILL)
+            {
+                Debug.Log("Applying rotation to " + type);
+                ApplyRotation();
+            }
+            else if (race == Storage.Races.MEN && type == Storage.BuildingTypes.ARCHERY)
+            {
+                Debug.Log("Applying rotation to " + race + " " + type);
+                ApplyRotation();
+            }
+
+        }
 
         /// <summary>
         /// Moves the building to the mouse position
