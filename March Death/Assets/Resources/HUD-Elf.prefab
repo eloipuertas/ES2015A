@@ -239,6 +239,24 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &137242
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 22490110}
+  - 222: {fileID: 22269016}
+  - 114: {fileID: 11450080}
+  - 114: {fileID: 11454060}
+  m_Layer: 5
+  m_Name: Information
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &137768
 GameObject:
   m_ObjectHideFlags: 1
@@ -475,6 +493,7 @@ GameObject:
   - 114: {fileID: 11452676}
   m_Layer: 5
   m_Name: ActionButtonsArea
+<<<<<<< Updated upstream
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -493,6 +512,8 @@ GameObject:
   - 114: {fileID: 11443824}
   m_Layer: 5
   m_Name: Information
+=======
+>>>>>>> Stashed changes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1237,7 +1258,11 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+<<<<<<< Updated upstream
   m_Sprite: {fileID: 21300000, guid: e5dddadf6f9c2da4ba6af1c91cc7574b, type: 3}
+=======
+  m_Sprite: {fileID: 21300000, guid: 53729a37a5a7e55428a1e01f547c5dc6, type: 3}
+>>>>>>> Stashed changes
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1426,12 +1451,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c43498a0bbba3644eaa737daa52e07bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+<<<<<<< Updated upstream
 --- !u!114 &11450530
+=======
+--- !u!114 &11450080
+>>>>>>> Stashed changes
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
+<<<<<<< Updated upstream
   m_GameObject: {fileID: 113922}
+=======
+  m_GameObject: {fileID: 137242}
+>>>>>>> Stashed changes
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
@@ -1445,7 +1478,11 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+<<<<<<< Updated upstream
   m_Sprite: {fileID: 21300000, guid: 3832791d92b8d0f4993586488eb5bc20, type: 3}
+=======
+  m_Sprite: {fileID: 21300000, guid: bffd5aa2f9c330b40ab402996b2dd797, type: 3}
+>>>>>>> Stashed changes
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1459,6 +1496,17 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 177250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 115f57c5a09604948af5af757085cade, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &11454060
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 137242}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 115f57c5a09604948af5af757085cade, type: 3}
@@ -2208,12 +2256,20 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 186912}
+<<<<<<< HEAD
 --- !u!222 &22269456
+=======
+--- !u!222 &22269016
+>>>>>>> 4c6e5c7f999a334465be4f80c8a268c93260836b
 CanvasRenderer:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
+<<<<<<< HEAD
   m_GameObject: {fileID: 158824}
+=======
+  m_GameObject: {fileID: 137242}
+>>>>>>> 4c6e5c7f999a334465be4f80c8a268c93260836b
 --- !u!222 &22275454
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -2410,7 +2466,11 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
+<<<<<<< Updated upstream
   m_Father: {fileID: 22472736}
+=======
+  m_Father: {fileID: 22490110}
+>>>>>>> Stashed changes
   m_RootOrder: 6
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
@@ -2427,7 +2487,11 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
+<<<<<<< Updated upstream
   m_Father: {fileID: 22472736}
+=======
+  m_Father: {fileID: 22490110}
+>>>>>>> Stashed changes
   m_RootOrder: 0
   m_AnchorMin: {x: .5, y: 0}
   m_AnchorMax: {x: .5, y: 0}
@@ -2444,7 +2508,11 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
+<<<<<<< Updated upstream
   m_Father: {fileID: 22472736}
+=======
+  m_Father: {fileID: 22490110}
+>>>>>>> Stashed changes
   m_RootOrder: 2
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
@@ -2461,7 +2529,11 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
+<<<<<<< Updated upstream
   m_Father: {fileID: 22472736}
+=======
+  m_Father: {fileID: 22490110}
+>>>>>>> Stashed changes
   m_RootOrder: 5
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
@@ -2512,7 +2584,11 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
+<<<<<<< Updated upstream
   m_Father: {fileID: 22472736}
+=======
+  m_Father: {fileID: 22490110}
+>>>>>>> Stashed changes
   m_RootOrder: 7
   m_AnchorMin: {x: .5, y: 0}
   m_AnchorMax: {x: .5, y: 0}
@@ -2534,7 +2610,11 @@ RectTransform:
   - {fileID: 22452728}
   - {fileID: 22450716}
   - {fileID: 22467158}
+<<<<<<< Updated upstream
   - {fileID: 22472736}
+=======
+  - {fileID: 22490110}
+>>>>>>> Stashed changes
   - {fileID: 22457562}
   - {fileID: 22407232}
   - {fileID: 22493612}
@@ -2626,7 +2706,11 @@ RectTransform:
   - {fileID: 22408040}
   - {fileID: 22492850}
   - {fileID: 22407748}
+<<<<<<< Updated upstream
   m_Father: {fileID: 22472736}
+=======
+  m_Father: {fileID: 22490110}
+>>>>>>> Stashed changes
   m_RootOrder: 1
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
@@ -2726,7 +2810,11 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
+<<<<<<< Updated upstream
   m_Father: {fileID: 22472736}
+=======
+  m_Father: {fileID: 22490110}
+>>>>>>> Stashed changes
   m_RootOrder: 3
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
@@ -2741,13 +2829,21 @@ RectTransform:
   m_GameObject: {fileID: 177250}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
+<<<<<<< Updated upstream
   m_LocalScale: {x: .347150803, y: 1, z: 1}
+=======
+  m_LocalScale: {x: .362521499, y: 1, z: 1}
+>>>>>>> Stashed changes
   m_Children: []
   m_Father: {fileID: 22429962}
   m_RootOrder: 1
   m_AnchorMin: {x: .5, y: 0}
   m_AnchorMax: {x: .5, y: 0}
+<<<<<<< Updated upstream
   m_AnchoredPosition: {x: 263, y: 88}
+=======
+  m_AnchoredPosition: {x: 258.399994, y: 87}
+>>>>>>> Stashed changes
   m_SizeDelta: {x: 790, y: 171}
   m_Pivot: {x: .5, y: .5}
 --- !u!224 &22466434
@@ -2781,7 +2877,11 @@ RectTransform:
   m_RootOrder: 4
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
+<<<<<<< Updated upstream
   m_AnchoredPosition: {x: 79, y: 80}
+=======
+  m_AnchoredPosition: {x: 84.6999969, y: 80}
+>>>>>>> Stashed changes
   m_SizeDelta: {x: 155, y: 150}
   m_Pivot: {x: .5, y: .5}
 --- !u!224 &22472736
@@ -2904,12 +3004,41 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
+<<<<<<< Updated upstream
   m_Father: {fileID: 22472736}
+=======
+  m_Father: {fileID: 22490110}
+>>>>>>> Stashed changes
   m_RootOrder: 4
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
   m_AnchoredPosition: {x: -205, y: -30}
   m_SizeDelta: {x: 50, y: 50}
+  m_Pivot: {x: .5, y: .5}
+--- !u!224 &22490110
+RectTransform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 137242}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: .949828744, y: 1, z: 1}
+  m_Children:
+  - {fileID: 22410646}
+  - {fileID: 22446760}
+  - {fileID: 22414316}
+  - {fileID: 22463604}
+  - {fileID: 22488814}
+  - {fileID: 22418824}
+  - {fileID: 22408354}
+  - {fileID: 22428878}
+  m_Father: {fileID: 22429962}
+  m_RootOrder: 5
+  m_AnchorMin: {x: .5, y: 0}
+  m_AnchorMax: {x: .5, y: 0}
+  m_AnchoredPosition: {x: -10, y: 90}
+  m_SizeDelta: {x: 790, y: 171}
   m_Pivot: {x: .5, y: .5}
 --- !u!224 &22492850
 RectTransform:
@@ -2943,7 +3072,11 @@ RectTransform:
   m_RootOrder: 8
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
+<<<<<<< Updated upstream
   m_AnchoredPosition: {x: 79.1999969, y: 81.8000031}
+=======
+  m_AnchoredPosition: {x: 84.9000015, y: 78.4000015}
+>>>>>>> Stashed changes
   m_SizeDelta: {x: 149.600006, y: 156.899994}
   m_Pivot: {x: .5, y: .5}
 --- !u!224 &22494200
