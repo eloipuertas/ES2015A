@@ -99,6 +99,9 @@ namespace Pathfinding
             Bottom_4.x -= Size.x / 2;
             Bottom_4.z -= Size.z / 2;
             Bottom_4 = transform.rotation * Bottom_4 + transform.position;
+
+            _center = new Vector3(Position.x, Position.y, Position.z);
+            _center = transform.rotation * _center + transform.position;
         }
 
         private void checkFlagStatus()
