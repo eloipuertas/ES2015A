@@ -35,15 +35,40 @@ public class Main_Game : MonoBehaviour
 
     void LoadInitialScreen()
     {
-        switch (info.GetPlayerRace())
+        GameObject welcomeScreen = null;
+        switch (info.getGameMode())
         {
-            case Races.ELVES:
-                Instantiate(Resources.Load("WelcomeScreen-Elf")).name = "Welcome-Screen";
+            case GameInformation.GameMode.SKIRMISH:
+                switch (info.GetPlayerRace())
+                {
+                    case Races.ELVES:
+                        welcomeScreen = (GameObject) Instantiate(Resources.Load("WelcomeScreen-Elf"));
+                        break;
+                    case Races.MEN:
+                        welcomeScreen = (GameObject) Instantiate(Resources.Load("WelcomeScreen-Human"));
+                        break;
+                }
                 break;
-            case Races.MEN:
-                Instantiate(Resources.Load("WelcomeScreen-Human")).name = "Welcome-Screen";
+            case GameInformation.GameMode.CAMPAIGN:
+                if (Application.loadedLevelName.Equals("ES2015A_Q1"))
+                {
+                    welcomeScreen = (GameObject) Instantiate(Resources.Load("mission1"));
+                }
+                else if (Application.loadedLevelName.Equals("ES2015A_Q2"))
+                {
+                    welcomeScreen = (GameObject) Instantiate(Resources.Load("mission2"));
+                }
+                else if (Application.loadedLevelName.Equals("ES2015A_Q3"))
+                {
+                    welcomeScreen = (GameObject) Instantiate(Resources.Load("mission3"));
+                }
+                else if (Application.loadedLevelName.Equals("ES2015A_Q4"))
+                {
+                    welcomeScreen = (GameObject) Instantiate(Resources.Load("mission4"));
+                }
                 break;
         }
+        welcomeScreen.name = "Welcome-Screen";
     }
 
     public void StartGame()

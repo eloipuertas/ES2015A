@@ -13,5 +13,18 @@ public class MissionScreen : MonoBehaviour
         Time.timeScale = 1;
         Destroy(GameObject.Find("Welcome-Screen"));
     }
+
+    public void LoadNextLevel()
+    {
+        Application.LoadLevel(Application.loadedLevel + 1);
+    }
+
+    public void LoadMainMenu()
+    {
+        Time.timeScale = 1;
+        Application.LoadLevel(0);
+    }
+
+    public void RestartMission() {}
 }
 
