@@ -627,6 +627,7 @@ public class Unit : GameEntity<Unit.Actions>
 
             Goods goods = new Goods(); // Generate the goods the units eat
             goods.amount = 5;
+            // goods.amount = this.info.unitAttributes.foodConsumption; // RAUL_UNCOMMENT
             goods.type = Goods.GoodsType.FOOD;
 
             fire(Actions.EAT, goods);

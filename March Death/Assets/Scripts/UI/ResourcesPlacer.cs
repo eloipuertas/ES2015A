@@ -76,7 +76,7 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
     /// <param name="amount"> </param>
     public void Consume ( WorldResources.Type type, float amount )
     {
-        resources[type] -= (int)((resources[type] - amount < 0) ? 0 : amount);
+        resources[type] -= (int)((resources[type] - amount < 0) ? resources[type] : amount);
         updateAmounts();
     }
 

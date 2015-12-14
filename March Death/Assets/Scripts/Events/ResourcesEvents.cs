@@ -173,6 +173,7 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
         if (entity.info.isUnit)
         {
             Unit unit = (Unit)entity;
+            // packet = new GrowthStatsPacket(WorldResources.Type.FOOD, unit.info.unitAttributes.foodConsumption, 1f); // RAUL_UNCOMMENT (CHANGE SIGN¿?)
             packet = new GrowthStatsPacket( WorldResources.Type.FOOD , -5f , 10f );
         }
 

@@ -25,6 +25,7 @@ public class EntityAbilitiesController : MonoBehaviour
 
     public static List<Ability> abilities_on_show = new List<Ability>();
     public static List<Button> buttons_on_show = new List<Button>();
+    public static Dictionary<Ability,bool> affordable_buttons = new Dictionary<Ability, bool>();
 
     // Use this for initialization
     void Start()
@@ -131,6 +132,7 @@ public class EntityAbilitiesController : MonoBehaviour
 
         abilities_on_show.Clear();
         buttons_on_show.Clear();
+        affordable_buttons.Clear();
 
         for (int i = 0; i < nabilities; i++)
         {
@@ -148,16 +150,25 @@ public class EntityAbilitiesController : MonoBehaviour
                 });
                 var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
                 buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Columns) + 1));
-                buttons_on_show.Add(CreateButton(rectTransform, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive));
+
+                bool interactable = ResourcesPlacer.get.enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
+                affordable_buttons[abilityObj] = interactable;
+                Button b = CreateButton(rectTransform, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
+                b.interactable = interactable;
+                buttons_on_show.Add(b);
             }
         }
+
     }
 
     public static void ControlButtonsInteractability()
     {
         for (int i=0; i < buttons_on_show.Count; i++)
         {
-            buttons_on_show[i].interactable = ResourcesPlacer.get.enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
+            Button b = buttons_on_show[i];
+            bool interactable = ResourcesPlacer.get.enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
+            b.interactable = interactable;
+            affordable_buttons[abilities_on_show[i]] = interactable;
         }
     }
 
