@@ -367,7 +367,7 @@ public class Resource : Building<Resource.Actions>
 
             worker.transform.position = getDeploymentPoint();
             worker.bringBack();
-            worker.moveTo(getDefaultMeetingPoint());
+            worker.moveTo(findMeetingPoint());
 
             worker.setStatus(EntityStatus.IDLE);
 

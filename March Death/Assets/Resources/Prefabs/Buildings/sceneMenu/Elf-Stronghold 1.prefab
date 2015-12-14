@@ -324,7 +324,6 @@ GameObject:
   - 4: {fileID: 485254}
   - 54: {fileID: 5426504}
   - 65: {fileID: 6537454}
-  - 95: {fileID: 9590574}
   m_Layer: 11
   m_Name: Elf-Stronghold 1
   m_TagString: Untagged
@@ -702,7 +701,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 107678}
   m_LocalRotation: {x: .519788504, y: .519788444, z: -.479395449, w: -.47939536}
-  m_LocalPosition: {x: 2, y: 19.7299995, z: -1.14999998}
+  m_LocalPosition: {x: 2.04699993, y: 19.6879997, z: -1.12300003}
   m_LocalScale: {x: 72.9765244, y: 106.880836, z: 60.0982819}
   m_Children: []
   m_Father: {fileID: 485254}
@@ -858,7 +857,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 154622}
   m_LocalRotation: {x: 0, y: .843391299, z: 0, w: -.537299871}
-  m_LocalPosition: {x: 258.5, y: 79.1999969, z: 523.5}
+  m_LocalPosition: {x: 575.669617, y: 79.0475464, z: 682.837402}
   m_LocalScale: {x: 2.5999999, y: 2.5999999, z: 2.5999999}
   m_Children:
   - {fileID: 462464}
@@ -1838,23 +1837,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 15, y: 16, z: 10}
   m_Center: {x: 0, y: 8, z: 0}
---- !u!95 &9590574
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 154622}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
 --- !u!137 &13797704
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
@@ -1889,8 +1871,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -.000771034509, y: .0013229847, z: 1.08033419e-05}
-    m_Extent: {x: .0109024998, y: .0113814147, z: .0173971076}
+    m_Center: {x: -.00077098608, y: .0013229847, z: 1.09672546e-05}
+    m_Extent: {x: .0109025296, y: .0113814007, z: .0173970647}
   m_DirtyAABB: 0
 --- !u!183 &18347422
 Cloth:
@@ -1904,8 +1886,8 @@ Cloth:
   m_UseTethers: 1
   m_UseGravity: 1
   m_Damping: 0
-  m_ExternalAcceleration: {x: -50, y: 10, z: 0}
-  m_RandomAcceleration: {x: 10, y: 5, z: 5}
+  m_ExternalAcceleration: {x: 20, y: 10, z: 0}
+  m_RandomAcceleration: {x: 10, y: 10, z: 10}
   m_WorldVelocityScale: .5
   m_WorldAccelerationScale: 1
   m_Friction: .5
@@ -2050,7 +2032,7 @@ Cloth:
   - maxDistance: 3.40282347e+38
     collisionSphereDistance: 3.40282347e+38
   - maxDistance: 0
-    collisionSphereDistance: 3.40282347e+38
+    collisionSphereDistance: 0
   - maxDistance: 3.40282347e+38
     collisionSphereDistance: 3.40282347e+38
   - maxDistance: 3.40282347e+38
@@ -2074,7 +2056,7 @@ Cloth:
   - maxDistance: 3.40282347e+38
     collisionSphereDistance: 3.40282347e+38
   - maxDistance: 0
-    collisionSphereDistance: 3.40282347e+38
+    collisionSphereDistance: 0
   - maxDistance: 3.40282347e+38
     collisionSphereDistance: 3.40282347e+38
   m_CapsuleColliders: []
@@ -2105,6 +2087,30 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_LocalRotation.w
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_ExternalAcceleration.x
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_AABB.m_Center.x
+      value: .000770866929
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_RandomAcceleration.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_RandomAcceleration.y
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_RandomAcceleration.z
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_ExternalAcceleration.y
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
