@@ -16,6 +16,10 @@ public class EventsNotifier : MonoBehaviour {
     private readonly string HEAVY_ARMY_CREATED = "Heavy armor warrior ready.";
     private readonly string CAVALRY_CREATED = "Horseman ready.";
     private readonly string SHOOTER_CREATED = "Shooter ready.";
+    private readonly string GRYPHON_CREATED = "Gryphon ready for battle.";
+    private readonly string ENT_CREATED = "Ent ready for battle.";
+    private readonly string WAR_MACHINE_CREATED = "War machine ready.";
+    private readonly string SIEGE_MACHINE_CREATED = "Siege machine ready.";
 
     // Building creation messages
     private readonly string BARRACK_CREATED = "Barrack created.";
@@ -28,6 +32,12 @@ public class EventsNotifier : MonoBehaviour {
     // TODO Find a better way to display these two messages: creation of wall and wall corner.
     private readonly string WALL_CREATED = "Wall created.";
     private readonly string WALL_CORNER_CREATED = "Wall tower created.";
+    private readonly string WALL_GATE_CREATED = "Gate created.";
+    private readonly string GRYPHON_BUILDING_CREATED = "Gryphon's nest created.";
+    private readonly string ENT_BUILDING_CREATED = "Ent forest created.";
+    private readonly string WORKSHOP_CREATED = "Workshop created.";
+    private readonly string ARTILLERY_BUILDING_CREATED = "Artillery building created.";
+    private readonly string SPECIAL_UNITS_BUILDING_CREATED = "Special units building created.";
 
     // Resource related messages
     private readonly string FOOD_LOW = "Your food supplies are low!";
@@ -50,6 +60,10 @@ public class EventsNotifier : MonoBehaviour {
     private readonly string HEAVY_ARMY_DEAD = "You have lost a heavy armor soldier.";
     private readonly string CAVALRY_DEAD = "You have lost a horseman.";
     private readonly string SHOOTER_DEAD = "You have lost a shooter.";
+    private readonly string GRYPHON_DEAD = "You have lost a gryphon.";
+    private readonly string ENT_DEAD = "You have lost an ent.";
+    private readonly string WAR_MACHINE_DESTROYED = "You have lost a war machine.";
+    private readonly string SIEGE_MACHINE_DESTROYED = "You have lost a siege machine.";
 
     // Messages to indicate the loss of a building
     private readonly string STRONGHOLD_LOST = "You have lost your stronghold.";
@@ -59,8 +73,14 @@ public class EventsNotifier : MonoBehaviour {
     private readonly string SHOOTING_RANGE_LOST = "You have lost a shooting range.";
     private readonly string BARRACK_LOST = "You have lost a barrack.";
     private readonly string STABLE_LOST = "You have lost a stable.";
-    private readonly string WATCHTOWER_LOST = "You have lost a watchtower";
+    private readonly string WATCHTOWER_LOST = "You have lost a watchtower.";
     private readonly string WALL_LOST = "Your wall has been wrecked.";
+    private readonly string WALL_GATE_LOST = "You have lost a gate.";
+    private readonly string GRYPHON_BUILDING_LOST = "A gryphon's nest was destroyed.";
+    private readonly string ENT_BUILDING_LOST = "An ent's forest has been destroyed.";
+    private readonly string WORKSHOP_LOST = "You have lost a workshop.";
+    private readonly string ARTILLERY_BUILDING_LOST = "You have lost an artillery building.";
+    private readonly string SPECIAL_UNITS_BUILDING_LOST = "You have lost a special units building.";
 
     private const float TIME_TO_UPDATE = 5f;
 
@@ -175,13 +195,31 @@ public class EventsNotifier : MonoBehaviour {
             case Storage.BuildingTypes.WALLCORNER:
                 AppendMessage(WALL_CORNER_CREATED);
                 break;
+            case Storage.BuildingTypes.WALLGATE:
+                AppendMessage(WALL_GATE_CREATED);
+                break;
+            case Storage.BuildingTypes.ARTILLERY:
+                AppendMessage(ARTILLERY_BUILDING_CREATED);
+                break;
+            case Storage.BuildingTypes.ENT:
+                AppendMessage(ENT_BUILDING_CREATED);
+                break;
+            case Storage.BuildingTypes.GRYPHON:
+                AppendMessage(GRYPHON_BUILDING_CREATED);
+                break;
+            case Storage.BuildingTypes.SPECIAL:
+                AppendMessage(SPECIAL_UNITS_BUILDING_CREATED);
+                break;
+            case Storage.BuildingTypes.WORKSHOP:
+                AppendMessage(WORKSHOP_CREATED);
+                break;
         }
         sounds.onBuildingCreated(type);
     }
 
-    private void DisplayUnitCreated(Storage.UnitTypes type)
+    private void DisplayUnitCreated(Unit unit)
     {
-        switch (type)
+        switch (unit.type)
         {
             case Storage.UnitTypes.CIVIL:
                 AppendMessage(CIVILIAN_CREATED);
@@ -198,13 +236,35 @@ public class EventsNotifier : MonoBehaviour {
             case Storage.UnitTypes.HEAVY:
                 AppendMessage(HEAVY_ARMY_CREATED);
                 break;
+            case Storage.UnitTypes.MACHINE:
+                switch (unit.race)
+                {
+                    case Storage.Races.ELVES:
+                        AppendMessage(WAR_MACHINE_CREATED);
+                        break;
+                    case Storage.Races.MEN:
+                        AppendMessage(SIEGE_MACHINE_CREATED);
+                        break;
+                }
+                break;
+            case Storage.UnitTypes.SPECIAL:
+                switch (unit.race)
+                {
+                    case Storage.Races.ELVES:
+                        AppendMessage(ENT_CREATED);
+                        break;
+                    case Storage.Races.MEN:
+                        AppendMessage(GRYPHON_CREATED);
+                        break;
+                }
+                break;
         }
         sounds.onUnitCreated();
     }
 
-    private void DisplayUnitDead(Storage.UnitTypes type)
+    private void DisplayUnitDead(Unit unit)
     {
-        switch (type)
+        switch (unit.type)
         {
             case Storage.UnitTypes.CIVIL:
                 AppendMessage(CIVILIAN_DEAD);
@@ -223,6 +283,28 @@ public class EventsNotifier : MonoBehaviour {
                 break;
             case Storage.UnitTypes.HERO:
                 AppendMessage(HERO_DEAD);
+                break;
+            case Storage.UnitTypes.MACHINE:
+                switch (unit.race)
+                {
+                    case Storage.Races.ELVES:
+                        AppendMessage(WAR_MACHINE_DESTROYED);
+                        break;
+                    case Storage.Races.MEN:
+                        AppendMessage(SIEGE_MACHINE_DESTROYED);
+                        break;
+                }
+                break;
+            case Storage.UnitTypes.SPECIAL:
+                switch (unit.race)
+                {
+                    case Storage.Races.ELVES:
+                        AppendMessage(ENT_DEAD);
+                        break;
+                    case Storage.Races.MEN:
+                        AppendMessage(GRYPHON_DEAD);
+                        break;
+                }
                 break;
         }
         sounds.onUnitDead();
@@ -259,6 +341,24 @@ public class EventsNotifier : MonoBehaviour {
             case Storage.BuildingTypes.WALLCORNER:
             case Storage.BuildingTypes.WALL:
                 AppendMessage(WALL_LOST);
+                break;
+            case Storage.BuildingTypes.WALLGATE:
+                AppendMessage(WALL_GATE_LOST);
+                break;
+            case Storage.BuildingTypes.ARTILLERY:
+                AppendMessage(ARTILLERY_BUILDING_LOST);
+                break;
+            case Storage.BuildingTypes.ENT:
+                AppendMessage(ENT_BUILDING_LOST);
+                break;
+            case Storage.BuildingTypes.GRYPHON:
+                AppendMessage(GRYPHON_BUILDING_LOST);
+                break;
+            case Storage.BuildingTypes.SPECIAL:
+                AppendMessage(SPECIAL_UNITS_BUILDING_LOST);
+                break;
+            case Storage.BuildingTypes.WORKSHOP:
+                AppendMessage(WORKSHOP_LOST);
                 break;
         }
         sounds.onBuildingDestroyed();
@@ -383,7 +483,7 @@ public class EventsNotifier : MonoBehaviour {
     {
         Unit entity = (Unit) obj;
 	    PopulationInfo.get.Add(entity);
-        DisplayUnitCreated(entity.type);
+        DisplayUnitCreated(entity);
     }
 
     public void DisplayUnitDead(System.Object obj)
@@ -392,7 +492,7 @@ public class EventsNotifier : MonoBehaviour {
         Unit entity = (Unit) g.GetComponent<IGameEntity>();
         entityTimer.Remove(entity);
 	    PopulationInfo.get.Remove(entity);
-        DisplayUnitDead(entity.type);
+        DisplayUnitDead(entity);
     }
 
     public void DisplayEnemySpotted(GameObject go)
