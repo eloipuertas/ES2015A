@@ -276,8 +276,8 @@ public class GameInformation : MonoBehaviour
         t.unit = UnitTypes.HERO;
         game.AddMission(Battle.MissionType.DESTROY, 1, EntityType.UNIT, t, 0, true, "");
         Battle.PlayerInformation player = new Battle.PlayerInformation(Races.MEN);
-        player.AddBuilding(BuildingTypes.STRONGHOLD, 801.4f, 753.6f, EntityStatus.IDLE);
-        player.AddUnit(UnitTypes.HERO, 801.4f, 785f);
+        player.AddBuilding(BuildingTypes.STRONGHOLD, 777, 779, EntityStatus.IDLE);
+        player.AddUnit(UnitTypes.HERO, 825.6648f, 806.5628f);
         player.SetInitialResources(2000, 2000, 2000, 2000);
         game.AddPlayerInformation(player);
         player = new Battle.PlayerInformation(Races.ELVES);
