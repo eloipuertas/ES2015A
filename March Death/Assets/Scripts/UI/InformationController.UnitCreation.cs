@@ -26,15 +26,17 @@ public partial class InformationController : MonoBehaviour {
 		//Check if array have buttons -> clear array on destroy
 		if (creationQueueButtons.Count > 0) {
 			GameObject buttonCanvas = (GameObject) creationQueueButtons[0];
-			GameObject button = buttonCanvas.transform.Find ("UnitCreationShadow").gameObject;
-			Image image = button.GetComponent<Image> ();
-
-			if (currentResource != null) {
-				float percentage = currentResource.getcreationUnitPercentage();
-				image.fillAmount = 1 - percentage / 100f;
-			} else if (currentBarrack != null) {
-				float percentage = currentBarrack.getcreationUnitPercentage();
-				image.fillAmount = 1 - percentage / 100f;
+			if (buttonCanvas != null) {
+				GameObject button = buttonCanvas.transform.Find ("UnitCreationShadow").gameObject;
+				Image image = button.GetComponent<Image> ();
+				
+				if (currentResource != null) {
+					float percentage = currentResource.getcreationUnitPercentage();
+					image.fillAmount = 1 - percentage / 100f;
+				} else if (currentBarrack != null) {
+					float percentage = currentBarrack.getcreationUnitPercentage();
+					image.fillAmount = 1 - percentage / 100f;
+				}
 			}
 		}
 	}
@@ -88,12 +90,6 @@ public partial class InformationController : MonoBehaviour {
 		{
 			image.color = new Color(1f, 1f, 1f, 1f);
 		}
-		/*
-		Texture2D texture = (Texture2D)Resources.Load ("InformationImages/MEN_civil");
-		if (texture) {
-			image.sprite = Sprite.Create (texture, new Rect (0, 0, texture.width, texture.height), new Vector2 (0.5f, 0.5f));
-		}
-		*/
 
 		Button button = buttonObject.AddComponent<Button>();
 		button.targetGraphic = image;

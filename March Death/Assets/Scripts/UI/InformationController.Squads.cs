@@ -7,6 +7,7 @@ using Utils;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine.Events;
+using Managers;
 
 public partial class InformationController : MonoBehaviour {
 
@@ -16,6 +17,8 @@ public partial class InformationController : MonoBehaviour {
 	Vector2 squadsButtonSize;
 	Vector2 squadsInitialPoint;
 	int MAX_SQUADS_BUTTONS;
+
+	private SelectionManager sManager { get { return BasePlayer.player.selection; } }
 
 	ArrayList squadButtons = new ArrayList();
 
@@ -48,9 +51,8 @@ public partial class InformationController : MonoBehaviour {
 
 		UnityAction createSquadAction = new UnityAction(() =>  
 		{
-			//TODO, here we'll create a new squad with selcted units
 			addNewSquadButton(squadButtons.Count);
-            BasePlayer.player.selection.NewTroop((squadButtons.Count).ToString());
+			sManager.NewTroop((squadButtons.Count).ToString());
 			ReloadSquadGenerationButton();
 		});
 
@@ -67,7 +69,7 @@ public partial class InformationController : MonoBehaviour {
 		string text = "" + (i + 1);
         UnityAction squadAction = new UnityAction(() => 
 		{
-            BasePlayer.player.selection.SelectTroop(text);
+			sManager.SelectTroop(text);
             BasePlayer.player.setCurrently(Player.status.SELECTED_UNITS);
         });
 
