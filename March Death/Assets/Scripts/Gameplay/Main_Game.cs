@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 using Storage;
 
 public class Main_Game : MonoBehaviour
 {
-
     private GameInformation info;
     private Player user;
     Managers.BuildingsManager bm;

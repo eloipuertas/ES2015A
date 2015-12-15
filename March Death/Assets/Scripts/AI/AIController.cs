@@ -11,6 +11,8 @@ namespace Assets.Scripts.AI
 {
     public class AIController : BasePlayer
     {
+        public enum AIMode { CAMPAIGN, BATTLE }
+
         public const bool AI_DEBUG_ENABLED = true;
 
         public MacroManager Macro { get; set; }
@@ -62,13 +64,12 @@ namespace Assets.Scripts.AI
             buildPosition = rootBasePosition;
             Macro = new MacroManager(this);
             Micro = new MicroManager(this);
-            modules.Add(new AIModule(Macro.MacroHigh, 30));
+            modules.Add(new AIModule(Macro.MacroHigh, Macro.architect.constructionGrid.mode == AIMode.BATTLE ? 30 : 1));
             modules.Add(new AIModule(Macro.MacroLow, 5));
             modules.Add(new AIModule(Micro.Micro, 1));
             timers = new float[modules.Count];
             for (int i = 0; i < modules.Count; i++)
                 timers[i] = 0;
-
 
             InstantiateBuildings(me.GetBuildings());
             InstantiateUnits(me.GetUnits());

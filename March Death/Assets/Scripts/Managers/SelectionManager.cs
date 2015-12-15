@@ -27,7 +27,9 @@ namespace Managers
         // Do we have squads or buildings?
         private bool _isSquad = true;
         public bool IsQuad { get { return _isSquad; } }
+
         private IBuilding _selectedBuilding;
+        public IBuilding SelectedBuilding { get { return _selectedBuilding; } }
 
         // Debounce multiselection
         private const float DEBOUCE_EVERY_SECS = 0.1f;
@@ -377,14 +379,15 @@ namespace Managers
         {
             if (_selectedSquad != null && _selectedSquad.Units.Count > 0)
             {
+                _selectedSquad.MoveTo(point, unit => fire(Actions.MOVE, unit));
+                Debug.Log("Moving there");
+
                 GameObject banner = SelectionDestination.CreateBanner(_ownRace);
                 banner.GetComponent<SelectionDestination>().Deploy(_selectedSquad.Selectables, point);
 
-                _selectedSquad.MoveTo(point, unit => fire(Actions.MOVE, unit));
-                Debug.Log("Moving there");
+                
             }
         }
-
 
 
         /// <summary>

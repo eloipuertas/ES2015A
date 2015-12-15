@@ -54,8 +54,15 @@ namespace Assets.Scripts.AI
                 }
                 else if (val > 100)
                 {
-                    architect.buildingPrefs.Insert(0, unitToBuildMap[key]);
+                    if(architect.constructionGrid.mode == AIController.AIMode.BATTLE)
+                    {
+                        architect.buildingPrefs.Insert(0, unitToBuildMap[key]);
+                    }
                 }
+            }
+            if(architect.constructionGrid.mode == AIController.AIMode.CAMPAIGN)
+            {
+                architect.buildForCampaign();
             }
         }
         /// <summar>
@@ -63,7 +70,7 @@ namespace Assets.Scripts.AI
         /// </summary>
         public void MacroLow()
         {
-            if (architect.buildingPrefs.Count > 0)
+            if (architect.constructionGrid.mode == AIController.AIMode.BATTLE && architect.buildingPrefs.Count > 0)
             {
                 architect.constructNextBuilding();
             }

@@ -4,6 +4,7 @@ using Storage;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System;
+using System.IO;
 
 public class GameInformation : MonoBehaviour
 {
@@ -160,7 +161,11 @@ public class GameInformation : MonoBehaviour
 
         var name = data.pointerEnter.name;
         var button = GameObject.Find(name);
-        var buttonTransform = button.GetComponent<Image>().rectTransform;
+		var buttonImage = button.GetComponent<Image>();
+		var buttonTransform = buttonImage.rectTransform;
+		if (buttonImage.name != "Sell" && buttonImage.name != "Recruit Explorer") {
+			buttonImage.sprite = CreateHoverSprite (buttonImage.name, buttonTransform.sizeDelta);     
+		}
         var tooltip = new GameObject("tooltip");
         var canvas = tooltip.AddComponent<Canvas>();
         var tooltipTransform = tooltip.GetComponent<RectTransform>();
@@ -205,9 +210,54 @@ public class GameInformation : MonoBehaviour
 
     private void mouseExit(BaseEventData baseEvent)
     {
+		PointerEventData data = baseEvent as PointerEventData;
         var tooltip = GameObject.Find("tooltip");
+		var name = data.pointerEnter.name;
+        var button = GameObject.Find(name);
+		var buttonImage = button.GetComponent<Image>();
+		var buttonTransform = buttonImage.rectTransform;
+		buttonImage.sprite = CreateSprite (buttonImage.name, buttonTransform.sizeDelta);  
         Destroy(tooltip);
     }
+
+
+	Sprite CreateSprite(String ability, Vector2 size)
+	{
+		Sprite newImg = null;
+		char separator = Path.AltDirectorySeparatorChar;
+		
+		Texture2D image;
+		
+		String file = "ActionButtons" + separator + ability.Replace(" ", "_");
+		image = Resources.Load(file) as Texture2D;
+		if (image)
+		{
+			//newImg = Sprite.Create(image, new Rect(0, 0, image.width, image.height), new Vector2(center.x, center.y));
+			newImg = Sprite.Create(image, new Rect(0, 0, image.width, image.height), new Vector2(0.0f, 0.0f));
+		}
+		
+		return newImg;
+	}
+
+
+	Sprite CreateHoverSprite(String ability, Vector2 size)
+	{
+		Sprite newImg = null;
+		char separator = Path.AltDirectorySeparatorChar;
+		
+		Texture2D image;
+		
+		String file = "ActionButtons" + separator +"Hover"+ separator + ability.Replace(" ", "_")+"_Hover_Enabled";
+		image = Resources.Load(file) as Texture2D;
+		if (image)
+		{
+			//newImg = Sprite.Create(image, new Rect(0, 0, image.width, image.height), new Vector2(center.x, center.y));
+			newImg = Sprite.Create(image, new Rect(0, 0, image.width, image.height), new Vector2(0.0f, 0.0f));
+		}
+		
+		return newImg;
+	}
+
 
     public void SetPlayerRace(int race)
     {

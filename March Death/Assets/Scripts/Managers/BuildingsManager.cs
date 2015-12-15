@@ -292,7 +292,7 @@ namespace Managers
         private Vector3 GetNewDestination()
         {
             // 1. getPoint
-            Vector3 toLocation = _inputs.FindTerrainHitPoint();
+            Vector3 toLocation = _inputs.LastTerrainPos;
             // let the buildings not to fall down
             toLocation.y += yoffset;
             // 2. discretize

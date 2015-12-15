@@ -1004,7 +1004,9 @@ ParticleSystemRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_MinimumChartSize: 4
   m_AutoUVMaxDistance: .5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
@@ -1028,8 +1030,8 @@ ParticleSystem:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 635117692}
-  lengthInSec: .400000006
-  startDelay: .600000024
+  lengthInSec: .200000003
+  startDelay: .400000006
   speed: 1
   randomSeed: 0
   looping: 0
@@ -1072,7 +1074,7 @@ ParticleSystem:
         m_PostInfinity: 2
       minMaxState: 0
     startSpeed:
-      scalar: 24.8999996
+      scalar: 25
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -1199,7 +1201,7 @@ ParticleSystem:
         rgba: 4280558628
       minMaxState: 0
     startSize:
-      scalar: 42.1500015
+      scalar: 45
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -1264,7 +1266,7 @@ ParticleSystem:
         m_PreInfinity: 2
         m_PostInfinity: 2
       minMaxState: 0
-    gravityModifier: -4.05000019
+    gravityModifier: -2
     inheritVelocity: 0
     maxNumParticles: 317
   ShapeModule:
@@ -1285,7 +1287,7 @@ ParticleSystem:
     enabled: 1
     m_Type: 0
     rate:
-      scalar: 60.0299988
+      scalar: 60
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -2733,7 +2735,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 484540, guid: 93f4167d8d046e54386e52755b61798d, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 79.0026169
+      value: 87.5
       objectReference: {fileID: 0}
     - target: {fileID: 484540, guid: 93f4167d8d046e54386e52755b61798d, type: 2}
       propertyPath: m_LocalPosition.z
@@ -2781,11 +2783,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13723340, guid: 93f4167d8d046e54386e52755b61798d, type: 2}
       propertyPath: m_AABB.m_Center.x
-      value: .00313195586
+      value: .00313192606
       objectReference: {fileID: 0}
     - target: {fileID: 13723340, guid: 93f4167d8d046e54386e52755b61798d, type: 2}
       propertyPath: m_AABB.m_Center.y
-      value: 7.3581934e-05
+      value: 7.35521317e-05
       objectReference: {fileID: 0}
     - target: {fileID: 13723340, guid: 93f4167d8d046e54386e52755b61798d, type: 2}
       propertyPath: m_AABB.m_Center.z
@@ -3012,7 +3014,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 485254, guid: 923eb0ba4c3525a4d829c5d344495dcb, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 79.0026169
+      value: 87.5
       objectReference: {fileID: 0}
     - target: {fileID: 485254, guid: 923eb0ba4c3525a4d829c5d344495dcb, type: 2}
       propertyPath: m_LocalPosition.z
@@ -3048,11 +3050,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13797704, guid: 923eb0ba4c3525a4d829c5d344495dcb, type: 2}
       propertyPath: m_AABB.m_Center.z
-      value: 1.10566616e-05
+      value: 1.10864639e-05
       objectReference: {fileID: 0}
     - target: {fileID: 13797704, guid: 923eb0ba4c3525a4d829c5d344495dcb, type: 2}
       propertyPath: m_AABB.m_Center.x
-      value: -.000771019608
+      value: -.000770993531
       objectReference: {fileID: 0}
     - target: {fileID: 5426504, guid: 923eb0ba4c3525a4d829c5d344495dcb, type: 2}
       propertyPath: m_Constraints
@@ -3430,7 +3432,9 @@ ParticleSystemRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_MinimumChartSize: 4
   m_AutoUVMaxDistance: .5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
@@ -3454,8 +3458,8 @@ ParticleSystem:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1978993771}
-  lengthInSec: .400000006
-  startDelay: .600000024
+  lengthInSec: .200000003
+  startDelay: .400000006
   speed: 1
   randomSeed: 0
   looping: 0
@@ -3498,7 +3502,7 @@ ParticleSystem:
         m_PostInfinity: 2
       minMaxState: 0
     startSpeed:
-      scalar: 24.8999996
+      scalar: 25
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -3625,7 +3629,7 @@ ParticleSystem:
         rgba: 4281282351
       minMaxState: 0
     startSize:
-      scalar: 37.1500015
+      scalar: 45
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -3690,7 +3694,7 @@ ParticleSystem:
         m_PreInfinity: 2
         m_PostInfinity: 2
       minMaxState: 0
-    gravityModifier: -4.05000019
+    gravityModifier: -2
     inheritVelocity: 0
     maxNumParticles: 317
   ShapeModule:
@@ -3711,7 +3715,7 @@ ParticleSystem:
     enabled: 1
     m_Type: 0
     rate:
-      scalar: 60.0299988
+      scalar: 60
       maxCurve:
         serializedVersion: 2
         m_Curve:
