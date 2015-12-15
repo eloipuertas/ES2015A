@@ -121,14 +121,15 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
             }
         }
 
-        if (entity.info.isResource)
+        if (entity.info.isBuilding)
         {
             ResourcesPlacer.get.Buy(d);
         }
 
         ResourcesPlacer.get.updatePopulation();
 
-        ResourcesPlacer.get.StatisticsChanged(entity, CreatePackageFromEntity(entity));
+        if (entity.info.isResource || entity.info.isUnit)
+            ResourcesPlacer.get.StatisticsChanged(entity, CreatePackageFromEntity(entity));
     }
 
 
