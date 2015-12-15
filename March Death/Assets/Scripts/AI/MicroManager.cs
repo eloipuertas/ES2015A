@@ -39,8 +39,8 @@ namespace Assets.Scripts.AI
             agents.Add(new RetreatAgent(ai, aA, assistAgent, "Retreat"));
 			agents.Add(assistAgent);
             agents.Add(new StrategyAgent(ai, assistAgent, "Strategy"));
-            squads.Add(new Squad(ai.race)); //Hero
-            squads.Add(new Squad(ai.race));
+            squads.Add(new Squad(ai.race,ai.DifficultyLvl)); //Hero
+            squads.Add(new Squad(ai.race, ai.DifficultyLvl));
         }
         /// <summary>
         /// Called pretty fast, it's just like Update()
@@ -93,22 +93,10 @@ namespace Assets.Scripts.AI
                 }
             }
         }
-        /// <summary>
-        /// Outputs a different error based on the Ai difficulty level, only the easier difficulties should make errors
-        /// </summary>
-        /// <returns></returns>
-        private float getError()
-        {
-            //TODO: improve when we can test it
-            int error = Utils.D6.get.rollOnce();
-            if (error > (ai.DifficultyLvl+3))
-                return 6 / (ai.DifficultyLvl+1);
-            return 0;
-        }
         private void addSquad(List<Unit> units)
         {
             //Squad id 0 is used by temp squads
-            Squad s = new Squad(ai.race);
+            Squad s = new Squad(ai.race,ai.DifficultyLvl);
             s.AddUnits(units);
             squads.Add(s);
         }
@@ -144,7 +132,7 @@ namespace Assets.Scripts.AI
             }
             else if(u.type == Storage.UnitTypes.CIVIL)
             {
-                Squad s = new Squad(ai.race);
+                Squad s = new Squad(ai.race,ai.DifficultyLvl);
                 s.AddUnit(u);
                 squads.Add(s);
             }
@@ -153,7 +141,7 @@ namespace Assets.Scripts.AI
                 Squad s = squads[squads.Count-1];
                 if (s.Units.Count > 4)
                 {
-                    s = new Squad(ai.race);
+                    s = new Squad(ai.race, ai.DifficultyLvl);
                     squads.Add(s);
                 }
                 s.AddUnit(u);
