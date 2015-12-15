@@ -568,7 +568,11 @@ public class Unit : GameEntity<Unit.Actions>
         // Set the status
         setStatus(DefaultStatus);
 
-        activateFOWEntity();
+        // Activate fow unless this is a lighthouse attacker
+        if (type != UnitTypes.LIGHTHOUSE_REVEALER)
+        {
+            activateFOWEntity();
+        }
 
         // Statistics available for both AI and Player
         GameObject gameController = GameObject.Find("GameController");

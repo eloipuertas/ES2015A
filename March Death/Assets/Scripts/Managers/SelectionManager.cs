@@ -27,7 +27,9 @@ namespace Managers
         // Do we have squads or buildings?
         private bool _isSquad = true;
         public bool IsQuad { get { return _isSquad; } }
+
         private IBuilding _selectedBuilding;
+        public IBuilding SelectedBuilding { get { return _selectedBuilding; } }
 
         // Debounce multiselection
         private const float DEBOUCE_EVERY_SECS = 0.1f;
@@ -384,7 +386,6 @@ namespace Managers
                 Debug.Log("Moving there");
             }
         }
-
 
 
         /// <summary>
