@@ -89,6 +89,8 @@ namespace Managers
                     else
                         _currentCursor = cursor.POINTER;
                 }
+                else
+                    _currentCursor = cursor.POINTER;
             }
 
         }
@@ -139,7 +141,7 @@ namespace Managers
         /// </summary>
         /// <param name="_object"></param>
         /// <returns></returns>
-        private bool ItsEnemy(GameObject _object)
+        private bool ItsEnemy(GameObject gameObject)
         {
             _lastHitEntity = gameObject.GetComponent<IGameEntity>();
 
