@@ -320,7 +320,10 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 					if (_woundsReceived == 0) {
 						_autoRecoveryAccom = 0;
 						_autoRecoveryTimer = -1;
-					}
+                        
+                        transform.Find("Humareda").gameObject.SetActive(false);
+                        transform.Find("Foc").gameObject.SetActive(false);
+                    }
 				}
 			}
 		}
@@ -424,6 +427,12 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         bool hitAndWounds = willAttackLand(from, isRanged) && willAttackCauseWounds(from);
         if (hitAndWounds)
         {
+            doIfBuilding(building =>
+            {
+                building.getTransform().Find("Humareda").gameObject.SetActive(true);
+                building.getTransform().Find("Foc").gameObject.SetActive(true);
+            });
+
             _woundsReceived += 1;
             onReceiveDamage();
         }
