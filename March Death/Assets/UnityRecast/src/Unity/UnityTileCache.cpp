@@ -348,16 +348,20 @@ void MeshProcess::process(struct dtNavMeshCreateParams* params,
 {
 	for (int i = 0; i < params->polyCount; ++i)
 	{
+		polyFlags[i] = 0;
+
 		if (polyAreas[i] == DT_TILECACHE_WALKABLE_AREA)
 		{
 			polyFlags[i] = flags[0];
 		}
-
-		for (int j = 1; j < numFlags; ++j)
+		else
 		{
-			if (polyAreas[i] == flags[j])
+			for (int j = 1; j < numFlags; ++j)
 			{
-				polyFlags[i] |= flags[j];
+				if (polyAreas[i] & flags[j])
+				{
+					polyFlags[i] |= flags[j];
+				}
 			}
 		}
 	}
