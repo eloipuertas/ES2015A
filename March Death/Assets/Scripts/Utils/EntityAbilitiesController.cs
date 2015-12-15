@@ -54,12 +54,12 @@ public class EntityAbilitiesController : MonoBehaviour
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 
         entity.doIfResource(resource => {
-            enableKeybinds(gameObject);
+            fixKeybinds(gameObject);
             resource.register(Resource.Actions.BUILDING_FINISHED, showActions);
         });
 
         entity.doIfBarrack(barrack => {
-            enableKeybinds(gameObject);
+            fixKeybinds(gameObject);
             barrack.register(Barrack.Actions.BUILDING_FINISHED, showActions);
         });
     }
@@ -127,8 +127,8 @@ public class EntityAbilitiesController : MonoBehaviour
             }
         }
     }
-    // Hack to get key bindings working. // FERRAN
-    void enableKeybinds(System.Object obj)
+    // Hack to get key bindings working.  
+    void fixKeybinds(System.Object obj)
     {
         GameObject gameObject = (GameObject)obj;
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
@@ -140,7 +140,10 @@ public class EntityAbilitiesController : MonoBehaviour
         {
             String ability = abilities[i].name;
             Ability abilityObj = entity.getAbility(ability);
-            abilities_on_show.Add(abilityObj);
+            if (abilityObj.isUsable)
+            {
+                abilities_on_show.Add(abilityObj);
+            }
 
         }
     }
