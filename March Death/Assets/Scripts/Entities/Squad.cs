@@ -59,6 +59,7 @@ public sealed class Squad : BareObserver<Squad.Actions>
             return ((SmelledEnemies)_data[DataType.SMELLED_ENEMIES]).Value;
         }
     }
+
     public int PatrolPosition
     {
         get
@@ -71,6 +72,17 @@ public sealed class Squad : BareObserver<Squad.Actions>
         }
     }
 
+    public Squad AssistSquad
+    {
+        get
+        {
+            return ((AssistData)_data[DataType.ASSIST_DATA]).AssistSquad;
+        }
+        set
+        {
+            ((AssistData)_data[DataType.ASSIST_DATA]).AssistSquad = value;
+        }
+    }
     private Storage.Races _race;
     public Storage.Races Race
     {
@@ -99,6 +111,7 @@ public sealed class Squad : BareObserver<Squad.Actions>
         _data.Add(DataType.BOUNDING_BOX, new BoundingBox(this));
         _data.Add(DataType.ATTACK_VALUE, new AttackValue(this));
         _data.Add(DataType.PATROL_DATA, new PatrolData(this));
+        _data.Add(DataType.ASSIST_DATA, new AssistData(this));
 
         // Smelled squads can not smell enemies or we would run into endless recursion
         if (smellEnemies)
@@ -120,7 +133,8 @@ public sealed class Squad : BareObserver<Squad.Actions>
         _data.Add(DataType.BOUNDING_BOX, new BoundingBox(this));
         _data.Add(DataType.ATTACK_VALUE, new AttackValue(this,error));
         _data.Add(DataType.PATROL_DATA, new PatrolData(this));
-        
+        _data.Add(DataType.ASSIST_DATA, new AssistData(this));
+
         _maxAttackRange = Storage.Info.get.of(_race, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
         _data.Add(DataType.SMELLED_ENEMIES, new SmelledEnemies(this));
 
@@ -313,7 +327,7 @@ public sealed class SquadUpdater : GameEntity<SquadUpdater.DummyActions>
     }
 }
 
-public enum DataType { BOUNDING_BOX, ATTACK_VALUE, SMELLED_ENEMIES, PATROL_DATA }
+public enum DataType { BOUNDING_BOX, ATTACK_VALUE, SMELLED_ENEMIES, PATROL_DATA, ASSIST_DATA }
 
 public interface ISquadData
 {
@@ -484,6 +498,20 @@ public class PatrolData : SquadData<int>
     public override int Value { get { return PatrolPosition; } }
     public PatrolData(Squad squad) : base(squad) {
         PatrolPosition = 0;
+    }
+    public override void Update(List<Unit> units)
+    {
+        //updated externally
+    }
+}
+
+public class AssistData : SquadData<Squad>
+{
+    public Squad AssistSquad { get; set; }
+    public override Squad Value { get { return AssistSquad; } }
+    public AssistData(Squad squad) : base(squad)
+    {
+        AssistSquad = null;
     }
     public override void Update(List<Unit> units)
     {
