@@ -112,6 +112,7 @@ public class EntityAbilitiesController : MonoBehaviour
                         Debug.Log("* " + abilityObj);
                         abilityObj.enable();
                     });
+					image.name=ability;
                     image.sprite = CreateSprite(ability, image.rectTransform.sizeDelta);
                     buttonComponent.targetGraphic = image;
                     buttonComponent.onClick.AddListener(() => actionMethod());
@@ -195,9 +196,11 @@ public class EntityAbilitiesController : MonoBehaviour
         var nabilities = abilities.Count;
         for (int i = 0; i < nabilities; i++)
         {
-            GameObject button = GameObject.Find("Button " + i);
+            GameObject button = GameObject.Find(abilities[i].name);
+			if(button==null) button= GameObject.Find("Button "+i);
             var buttonComponent = button.GetComponent<Button>();
             var image = buttonComponent.GetComponent<Image>();
+			image.name="Button "+i;
             var eventTrigger = button.GetComponent<EventTrigger>();
             image.enabled = false;
             eventTrigger.enabled = false;
