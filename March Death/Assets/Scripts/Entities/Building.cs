@@ -188,13 +188,14 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
 
             if (_creationTimer >= _infoUnitToCreate.unitAttributes.creationTime)
             {
+				_creationQueue.Dequeue();
                 createUnit(_infoUnitToCreate.type);
                 _creatingUnit = false;
             }
         }
         else if (_creationQueue.Count > 0)
         {
-            _infoUnitToCreate = Info.get.of(info.race, _creationQueue.Dequeue());
+            _infoUnitToCreate = Info.get.of(info.race, _creationQueue.Peek());
             _creationTimer = 0;
             _creatingUnit = true;
         }
