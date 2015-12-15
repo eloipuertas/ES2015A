@@ -55,12 +55,12 @@ public class EntityAbilitiesController : MonoBehaviour
 
         entity.doIfResource(resource => {
             fixKeybinds(gameObject);
-            resource.register(Resource.Actions.BUILDING_FINISHED, showActions);
+            resource.register(Resource.Actions.BUILDING_FINISHED, showActionButtons);
         });
 
         entity.doIfBarrack(barrack => {
             fixKeybinds(gameObject);
-            barrack.register(Barrack.Actions.BUILDING_FINISHED, showActions);
+            barrack.register(Barrack.Actions.BUILDING_FINISHED, showActionButtons);
         });
     }
 
@@ -70,21 +70,22 @@ public class EntityAbilitiesController : MonoBehaviour
 
         GameObject gameObject = (GameObject) obj;
 
-        hideActionButtons(gameObject);
-
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 
         entity.doIfResource(resource => {
-            resource.unregister(Resource.Actions.BUILDING_FINISHED, showActions);
+            resource.unregister(Resource.Actions.BUILDING_FINISHED, showActionButtons);
         });
 
         entity.doIfBarrack(barrack => {
-            barrack.unregister(Barrack.Actions.BUILDING_FINISHED, showActions);
+            barrack.unregister(Barrack.Actions.BUILDING_FINISHED, showActionButtons);
         });
+
+        hideActionButtons(gameObject);
     }
 
-    private void showActionButtons(GameObject objeto)
+    private void showActionButtons(System.Object obj)
     {
+        GameObject objeto = (GameObject)obj;
         IGameEntity entity = objeto.GetComponent<IGameEntity>();
         GameObject actionPanel = GameObject.Find("HUD/actions");
         actionPanel.GetComponent<Image>().enabled = true;
