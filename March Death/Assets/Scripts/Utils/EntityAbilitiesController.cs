@@ -54,10 +54,12 @@ public class EntityAbilitiesController : MonoBehaviour
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 
         entity.doIfResource(resource => {
+            enableKeybinds(gameObject);
             resource.register(Resource.Actions.BUILDING_FINISHED, showActions);
         });
 
         entity.doIfBarrack(barrack => {
+            enableKeybinds(gameObject);
             barrack.register(Barrack.Actions.BUILDING_FINISHED, showActions);
         });
     }
@@ -125,8 +127,24 @@ public class EntityAbilitiesController : MonoBehaviour
             }
         }
     }
+    // Hack to get key bindings working. // FERRAN
+    void enableKeybinds(System.Object obj)
+    {
+        GameObject gameObject = (GameObject)obj;
+        IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+        var abilities = entity.info.abilities;
+        var nabilities = abilities.Count;
 
-	void showActions(System.Object obj)
+        abilities_on_show.Clear();
+        for (int i = 0; i < nabilities; i++)
+        {
+            String ability = abilities[i].name;
+            Ability abilityObj = entity.getAbility(ability);
+            abilities_on_show.Add(abilityObj);
+
+        }
+    }
+    void showActions(System.Object obj)
     {
 		GameObject gameObject = (GameObject) obj;
         GameObject actionPanel = GameObject.Find("HUD/actions");
