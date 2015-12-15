@@ -10,6 +10,18 @@
 #include <string.h>
 #include <new>
 
+
+void reverseVector(float* verts, const int nverts)
+{
+	float temp[3];
+	for (int i = 0; i < nverts / 2; i++)
+	{
+		dtVcopy(temp, &verts[i * 3]);
+		dtVcopy(&verts[i * 3], &verts[(nverts - i - 1) * 3]);
+		dtVcopy(&verts[(nverts - i - 1) * 3], temp);
+	}
+}
+
 dtTileCache* dtAllocTileCache()
 {
 	void* mem = dtAlloc(sizeof(dtTileCache), DT_ALLOC_PERM);
@@ -502,6 +514,7 @@ dtStatus dtTileCache::addFlag(const float* pos, const float* convexHullVertices,
 	ob->salt = salt;
 	ob->state = DT_OBSTACLE_PROCESSING;
 	dtVcopy(ob->pos, pos);
+	reverseVector(ob->pos, 1);
 	ob->radius = 0.f;   // 0 means obstacle is a polygon instead of cylinder
 	ob->height = height;
 	ob->nverts = numConvexHullVertices;
@@ -575,17 +588,6 @@ dtStatus dtTileCache::queryTiles(const float* bmin, const float* bmax,
 	*resultCount = n;
 	
 	return DT_SUCCESS;
-}
-
-void reverseVector(float* verts, const int nverts)
-{
-	float temp[3];
-	for (int i = 0; i < nverts / 2; i++)
-	{
-		dtVcopy(temp, &verts[i * 3]);
-		dtVcopy(&verts[i * 3], &verts[(nverts - i - 1) * 3]);
-		dtVcopy(&verts[(nverts - i - 1) * 3], temp);
-	}
 }
 
 dtStatus dtTileCache::update(const float /*dt*/, dtNavMesh* navmesh)
@@ -798,34 +800,6 @@ dtStatus dtTileCache::update(const float /*dt*/, dtNavMesh* navmesh)
 					if (ob->state == DT_OBSTACLE_PROCESSING)
 					{
 						ob->state = DT_OBSTACLE_PROCESSED;
-
-						// Mark areas
-						dtCrowd* crowd = ob->crowd;
-						const dtNavMeshQuery* navQuery = crowd->getNavMeshQuery();
-
-						dtQueryFilter filter;
-
-						const float* ext = crowd->getQueryExtents();
-						dtPolyRef nearestRef;
-						float nearestPoint[3];
-
-						float *queryPoly = new float[ob->nverts * 3];
-						for (int i = 0; i < ob->nverts * 3; ++i)
-							queryPoly[i] = ob->verts[i];
-
-						reverseVector(queryPoly, ob->nverts);
-
-						float center[3];
-						dtVcopy(center, ob->pos);
-						reverseVector(center, 1);
-
-						status = navQuery->findNearestPoly(center, ext, &filter, &nearestRef, nearestPoint);
-						if (dtStatusFailed(status))
-						{
-							return status;
-						}
-
-						status = navmesh->setPolyFlags(nearestRef, ob->flags);
 					}
 					else if (ob->state == DT_OBSTACLE_REMOVING)
 					{
@@ -920,20 +894,19 @@ dtStatus dtTileCache::buildNavMeshTile(const dtCompressedTileRef ref, dtNavMesh*
 	for (int i = 0; i < m_params.maxObstacles; ++i)
 	{
 		const dtTileCacheFlag* ob = &m_flags[i];
-		if (ob->state == DT_OBSTACLE_EMPTY || ob->state == DT_OBSTACLE_REMOVING)
-			continue;
-		if (contains(ob->touched, ob->ntouched, ref))
+		if (ob->state == DT_OBSTACLE_EMPTY)
 		{
-			if (ob->radius != 0)
-			{
-				dtMarkCylinderArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
-					ob->pos, ob->radius, ob->height, DT_TILECACHE_WALKABLE_AREA);
-			}
-			else
-			{
-				dtMarkPolyArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
-					ob->verts, ob->nverts, DT_TILECACHE_WALKABLE_AREA);
-			}
+			continue;
+		}
+		else if (ob->state == DT_OBSTACLE_REMOVING)
+		{
+			dtMarkPolyArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
+				ob->verts, ob->nverts, DT_TILECACHE_WALKABLE_AREA);
+		}
+		else if (contains(ob->touched, ob->ntouched, ref))
+		{
+			dtMarkPolyArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
+				ob->verts, ob->nverts, ob->flags);
 		}
 	}
 	
