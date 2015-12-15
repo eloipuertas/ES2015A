@@ -4,25 +4,26 @@
     "name": "Thrown",
 
     "attributes": {
-        "weaponAbility": 3,
-        "projectileAbility": 3,
+        "weaponAbility": 1,
+        "projectileAbility": 5,
         "strength": 4,
-        "resistance": 3,
-        "wounds": 10,
+        "resistance": 4,
+        "wounds": 15,
 
-        "attackRate": 2.5,
+        "attackRate": 1.75,
         "movementRate": 2,
         "sightRange": 50,
         "rangedAttackNearest": 10,
         "rangedAttackFurthest": 40,
-        "creationTime": 5,
-		"projectileRadius": 0.2,
-		"projectileSpeed": 30,
+        "creationTime": 45,
+    		"projectileRadius": 0.2,
+    		"projectileSpeed": 30,
+        "foodConsumption": 0.5
     },
 
     "resources": {
-        "wood": 3,
-        "metal": 2,
-        "food": 1
+        "wood": 20,
+        "metal": 10,
+        "food": 30
     }
 }

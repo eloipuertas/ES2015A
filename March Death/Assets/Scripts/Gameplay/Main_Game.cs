@@ -90,7 +90,6 @@ public class Main_Game : MonoBehaviour
 
     public void ClearGame()
     {
-        Debug.LogError("Terminando el juego!");
         GameObject obj;
         obj = GameObject.Find("GameInformationObject").gameObject;
         Destroy(obj);

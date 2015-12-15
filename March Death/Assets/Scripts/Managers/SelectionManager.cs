@@ -27,7 +27,9 @@ namespace Managers
         // Do we have squads or buildings?
         private bool _isSquad = true;
         public bool IsQuad { get { return _isSquad; } }
+
         private IBuilding _selectedBuilding;
+        public IBuilding SelectedBuilding { get { return _selectedBuilding; } }
 
         // Debounce multiselection
         private const float DEBOUCE_EVERY_SECS = 0.1f;
@@ -94,32 +96,35 @@ namespace Managers
         public bool NewTroop(String key)
         {
             Assert.IsFalse(_troops.ContainsKey(key));
-
-            if (_selectedSquad.Units.Count > 1)
+            if (_selectedSquad != null)
             {
-                // Set unit squad for fast access
-                foreach (Unit unit in _selectedSquad.Units)
+                if (_selectedSquad.Units.Count > 1)
                 {
-                    // Is it already in another troop?
-                    if (unit.Troop != null)
+                    // Set unit squad for fast access
+                    foreach (Unit unit in _selectedSquad.Units)
                     {
-                        unit.Troop.RemoveUnit(unit);
+                        // Is it already in another troop?
+                        if (unit.Troop != null)
+                        {
+                            unit.Troop.RemoveUnit(unit);
+                        }
+
+                        unit.Squad = _selectedSquad;
+                        unit.Troop = _selectedSquad;
                     }
 
-                    unit.Squad = _selectedSquad;
-                    unit.Troop = _selectedSquad;
+                    _troops.Add(key, _selectedSquad);
+
+                    Debug.Log("Created troop: " + key);
+                    return true;
                 }
-
-                _troops.Add(key, _selectedSquad);
-
-                Debug.Log("Created troop: " + key);
-                return true;
+                else
+                {
+                    Debug.Log("Troops should have more than 1 unit");
+                    return false;
+                }
             }
-            else
-            {
-                Debug.Log("Troops should have more than 1 unit");
-                return false;
-            }
+            return false;
         }
 
         /// <summary>
@@ -381,7 +386,6 @@ namespace Managers
                 Debug.Log("Moving there");
             }
         }
-
 
 
         /// <summary>

@@ -59,6 +59,7 @@ public sealed class Squad : BareObserver<Squad.Actions>
             return ((SmelledEnemies)_data[DataType.SMELLED_ENEMIES]).Value;
         }
     }
+
     public int PatrolPosition
     {
         get
@@ -71,6 +72,17 @@ public sealed class Squad : BareObserver<Squad.Actions>
         }
     }
 
+    public Squad AssistSquad
+    {
+        get
+        {
+            return ((AssistData)_data[DataType.ASSIST_DATA]).AssistSquad;
+        }
+        set
+        {
+            ((AssistData)_data[DataType.ASSIST_DATA]).AssistSquad = value;
+        }
+    }
     private Storage.Races _race;
     public Storage.Races Race
     {
@@ -99,6 +111,7 @@ public sealed class Squad : BareObserver<Squad.Actions>
         _data.Add(DataType.BOUNDING_BOX, new BoundingBox(this));
         _data.Add(DataType.ATTACK_VALUE, new AttackValue(this));
         _data.Add(DataType.PATROL_DATA, new PatrolData(this));
+        _data.Add(DataType.ASSIST_DATA, new AssistData(this));
 
         // Smelled squads can not smell enemies or we would run into endless recursion
         if (smellEnemies)
@@ -111,7 +124,21 @@ public sealed class Squad : BareObserver<Squad.Actions>
             _maxAttackRange = 1f;
         }
     }
+    //used for AI so smellEnemies is always true
+    public Squad(Storage.Races race, int error)
+    {
+        _auto = new AutoUnregister(this);
+        _race = race;
 
+        _data.Add(DataType.BOUNDING_BOX, new BoundingBox(this));
+        _data.Add(DataType.ATTACK_VALUE, new AttackValue(this,error));
+        _data.Add(DataType.PATROL_DATA, new PatrolData(this));
+        _data.Add(DataType.ASSIST_DATA, new AssistData(this));
+
+        _maxAttackRange = Storage.Info.get.of(_race, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
+        _data.Add(DataType.SMELLED_ENEMIES, new SmelledEnemies(this));
+
+    }
     private void OnUnitDied(System.Object obj)
     {
         RemoveUnit(((GameObject)obj).GetComponent<Unit>());
@@ -122,7 +149,7 @@ public sealed class Squad : BareObserver<Squad.Actions>
         if (!_units.Contains(unit))
         {
             _units.Add(unit);
-            _auto += unit.register(Unit.Actions.DIED, OnUnitDied);
+            _auto += unit.registerFatalWounds(OnUnitDied);
 
             fire(Actions.UNIT_ADDED, unit);
         }
@@ -144,7 +171,7 @@ public sealed class Squad : BareObserver<Squad.Actions>
     public void RemoveUnit(Unit unit)
     {
         _units.Remove(unit);
-        _auto -= unit.unregister(Unit.Actions.DIED, OnUnitDied);
+        _auto -= unit.unregisterFatalWounds(OnUnitDied);
 
         fire(Actions.UNIT_REMOVED, unit);
     }
@@ -300,7 +327,7 @@ public sealed class SquadUpdater : GameEntity<SquadUpdater.DummyActions>
     }
 }
 
-public enum DataType { BOUNDING_BOX, ATTACK_VALUE, SMELLED_ENEMIES, PATROL_DATA }
+public enum DataType { BOUNDING_BOX, ATTACK_VALUE, SMELLED_ENEMIES, PATROL_DATA, ASSIST_DATA }
 
 public interface ISquadData
 {
@@ -386,14 +413,41 @@ public class AttackValue : SquadData<float>
 {
     private float _attack;
     public override float Value { get { return _attack; } }
-
+    private int error;
     public AttackValue(Squad squad) : base(squad)
     {
+        error = 0;
     }
-
-    public static float OfUnit (Unit unit)
+    public AttackValue(Squad squad,int error) : base(squad)
     {
-        return unit.healthPercentage / 100 * (unit.info.unitAttributes.resistance + unit.info.unitAttributes.attackRate * unit.info.unitAttributes.strength);
+        this.error = error;
+    }
+    //If this ever becomes too resource consuming we can precalculate it for each unit.
+    public static float OfUnit (Unit unit,int error)
+    {
+        Storage.UnitAttributes a = unit.info.unitAttributes;
+        return Mathf.Max(200, ((Mathf.Pow(2, a.strength * 1.05f)) +
+               Mathf.Pow(2, Mathf.Max(
+                   (a.projectileAbility),
+                   (a.weaponAbility * 0.8f))) *
+                   (a.attackRange * 0.2f) + a.resistance + a.wounds+(getError(error)))) *
+                   unit.healthPercentage * 0.003f;
+    }
+    /// <summary>
+    /// Outputs a different error based on the Ai difficulty level, only the easier difficulties should make errors
+    /// errors will be around these levels:
+    ///     difficultyLvl, error
+    ///                 1: 1.20
+    ///                 2: 0.35
+    ///                 3: 0 (always 0)
+    /// </summary>
+    /// <returns></returns>
+    private static float getError(int difficultyLvl)
+    {
+        int error = Utils.D6.get.rollOnce();
+        if (error > (difficultyLvl + 3))
+            return 6 / (difficultyLvl + 1);
+        return 0;
     }
 
     public override void Update(List<Unit> units)
@@ -403,9 +457,8 @@ public class AttackValue : SquadData<float>
             _attack = 0;
             foreach (Unit unit in units)
             {
-                _attack += OfUnit(unit);
+                _attack += OfUnit(unit,error);
             }
-
             _needsUpdate = false;
         }
     }
@@ -445,6 +498,20 @@ public class PatrolData : SquadData<int>
     public override int Value { get { return PatrolPosition; } }
     public PatrolData(Squad squad) : base(squad) {
         PatrolPosition = 0;
+    }
+    public override void Update(List<Unit> units)
+    {
+        //updated externally
+    }
+}
+
+public class AssistData : SquadData<Squad>
+{
+    public Squad AssistSquad { get; set; }
+    public override Squad Value { get { return AssistSquad; } }
+    public AssistData(Squad squad) : base(squad)
+    {
+        AssistSquad = null;
     }
     public override void Update(List<Unit> units)
     {

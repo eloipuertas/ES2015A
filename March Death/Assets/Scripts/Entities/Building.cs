@@ -52,7 +52,17 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     private UnitInfo _infoUnitToCreate;
     private bool _creatingUnit = false;
 
+    /// <summary>
+    /// coordinates where new civilians are deployed outside building
+    ///  reached.
+    /// </summary> 
     private Vector3 _deploymentPoint;
+
+    /// <summary>
+    /// coordinates where civilian units travel after been deployed at deployment point.
+    /// </summary>
+    private Vector3 _meetingPoint;
+
     private int _totalUnits = 0;
 
     // This queue will store the units that the building is creating.
@@ -134,8 +144,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         base.Start();
 
 
-        // Instead of adding 10 to the center of the building, we should check the actual size of the building....
-        _deploymentPoint = new Vector3(transform.position.x + 10, transform.position.y, transform.position.z + 10);
+        _meetingPoint = getDefaultMeetingPoint();
         activateFOWEntity();
 
         if (DefaultStatus == EntityStatus.BUILDING_PHASE_1)
@@ -212,24 +221,79 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     }
 
     /// <summary>
-    /// Meeting point where new units walk from deployment point
+    /// Deployment point, units are deployed here if position is available.
+    /// </summary>
+    /// <returns></returns>
+    public Vector3 getDeploymentPoint()
+    {
+        Vector3 position = new Vector3();
+        position = ConstructionGrid.instance.getFreePositionAbleToConstructNearPoint(_center);
+       
+        return _center + ((position - _center)/1.5F);
+
+    }
+    /// <summary>
+    /// Default meeting point. If meeting point is not set unit travel here from deployment point
+    /// </summary>
+    /// <returns></returns>
+    public Vector3 getDefaultMeetingPoint()
+    {
+        Vector3 position = new Vector3();
+        position = ConstructionGrid.instance.getFreePositionAbleToConstructNearPoint(_center);
+       
+        return position;
+
+    }
+
+    /// <summary>
+    /// Default Meeting point where new units walk from deployment point
+    /// </summary>
+    /// <returns>position of meetingpoint</returns>
+    public void setMeetingPoint(Vector3 position)
+    {
+        _meetingPoint = position;
+    }
+
+    /// <summary>
+    /// Current Meeting point where new units walk from deployment point
     /// </summary>
     /// <returns>position of meetingpoint</returns>
     public Vector3 getMeetingPoint()
     {
+        return _meetingPoint;
+    }
+
+    /// <summary>
+    /// check if meeting point is still available
+    /// </summary>
+    /// <returns>position of meetingpoint</returns>
+    public Vector3 findMeetingPoint()
+    {
+
         Vector3 position = new Vector3();
-        position = ConstructionGrid.instance.getFreePositionAbleToConstructNearPoint(_center);
-        return position;
+        GameObject[] objects = Helpers.getObjectsNearPosition(getMeetingPoint(), 1);
+        foreach (GameObject g in objects)
+        {
+            if (g.GetComponent<IBuilding>() != null)
+            {
+                position = getDefaultMeetingPoint();
+                return position;
+            }
+        }
+        return getMeetingPoint();
 
     }
 
     protected virtual void createUnit(UnitTypes type)
     {       
-        GameObject gob = Info.get.createUnit(race, type, getMeetingPoint(), transform.rotation, -1);
+        GameObject gob = Info.get.createUnit(race, type, getDeploymentPoint(), transform.rotation, -1);
         Unit new_unit = gob.GetComponent<Unit>(); 
         BasePlayer.getOwner(this).addEntity(new_unit);
         fire(CREATE_UNIT, new_unit);
-        _totalUnits++;   
+        _totalUnits++;
+    
+        new_unit.moveTo(findMeetingPoint());
+
     }
 
     public bool addUnitQueue(UnitTypes type)

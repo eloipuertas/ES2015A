@@ -1,8 +1,6 @@
 ﻿using Storage;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using Utils;
 
@@ -26,7 +24,6 @@ namespace Assets.Scripts.AI
 
         List<AIModule> modules;
         float[] timers;
-        //TODO: change this when decided about what do we really need to keep about buildings
         public List<Resource> OwnResources { get; set; }
         public List<Barrack> OwnBarracks { get; set; }
         public List<IGameEntity> EnemyBuildings { get; set; }
@@ -40,8 +37,7 @@ namespace Assets.Scripts.AI
         public Vector3 rootBasePosition;
         public List<Unit> Army { get; set; }
         public List<Unit> Workers { get; set; }
-
-        // HACK To signal MicroManager that the game has ended when the AI hero is killed
+        
         public bool FinishPlaying { get { return missionStatus.isGameOver(); } }
 
         public override void Start()

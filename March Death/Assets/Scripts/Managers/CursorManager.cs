@@ -19,6 +19,9 @@ namespace Managers {
         private Texture2D[] _cursors;
         private Vector2 size = new Vector2(32, 32);
         private bool cursorChanged = false;
+        
+        private IGameEntity _lastHitEntity;
+        public IGameEntity LastHitObject { get { return _lastHitEntity; } }
 
         void Start()
         {

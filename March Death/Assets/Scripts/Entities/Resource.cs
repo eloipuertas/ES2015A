@@ -86,6 +86,11 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     List<Unit> workersList = new List<Unit>();
 
+    /// <summary>
+    /// max harvest units this resource can have
+    /// </summary>
+    public int maxHarvestUnits { get; private set; }
+
 
     /// <summary>
     /// HUD, get current civilian units working here
@@ -152,18 +157,6 @@ public class Resource : Building<Resource.Actions>
     /// unitRotation is the rotation of new civilian
     /// </summary>
     private Quaternion _unitRotation;
-
-    /// <summary>
-    /// coordinates where new civilians are positioned before maxUnits limit is
-    ///  reached.
-    /// </summary>
-    private Vector3 meetingPointInsidePosition;
-
-    /// <summary>
-    /// coordinates where new civilians are positioned after maxUnits limit is
-    ///  reached.
-    /// </summary>
-    private Vector3 meetingPointOutsidePosition;
 
     /// <summary>
     /// when you create a civilian some displacement is needed to avoid units
@@ -321,7 +314,7 @@ public class Resource : Building<Resource.Actions>
     protected override void createUnit(UnitTypes type)
     {
 
-        if (harvestUnits < info.resourceAttributes.maxUnits)
+        if (harvestUnits < maxHarvestUnits)
         {
             _unitPosition.Set(_center.x, _center.y, _center.z);
             GameObject gob = Info.get.createUnit(race, type, _unitPosition, _unitRotation, -1);
@@ -348,7 +341,7 @@ public class Resource : Building<Resource.Actions>
     /// Method create civilian unit.
     /// If capacity limit of building is not reached unit is positioned inside
     /// building limits otherwise unit is positioned outside,
-    /// just at desired meeting Point.
+    /// just at desired deployment Point.
     /// civilian sex is randomly selected(last parameter of createUnit method).
     /// </summary>
     /// <returns>civilian GameObject</returns>
@@ -372,8 +365,9 @@ public class Resource : Building<Resource.Actions>
             _collectionRate -= worker.info.attributes.capacity;
             harvestUnits--;
 
-            worker.transform.position = getMeetingPoint();
+            worker.transform.position = getDeploymentPoint();
             worker.bringBack();
+            worker.moveTo(findMeetingPoint());
 
             worker.setStatus(EntityStatus.IDLE);
 
@@ -397,7 +391,7 @@ public class Resource : Building<Resource.Actions>
     private void recruitWorker(Unit explorer)
     {
 
-        if (harvestUnits < info.resourceAttributes.maxUnits)
+        if (harvestUnits < maxHarvestUnits)
         {
             _collectionRate += explorer.info.attributes.capacity;
             harvestUnits++;
@@ -431,7 +425,7 @@ public class Resource : Building<Resource.Actions>
         Assert.IsTrue(entity.info.race == info.race);
 
         // space enough to hold new civil
-        if (harvestUnits < info.resourceAttributes.maxUnits)
+        if (harvestUnits < maxHarvestUnits)
         {
             Unit unit = (Unit)entity;
             unit.vanish();
@@ -485,6 +479,7 @@ public class Resource : Building<Resource.Actions>
         }
 
         statistics = new Statistics(ResourceFromBuilding(type), (int)info.resourceAttributes.updateInterval, 10); // hardcoded, To modify, by now the collection rate is always 10, but theres no workers yet
+        maxHarvestUnits = info.resourceAttributes.maxUnits;
     }
 
     /// <summary>

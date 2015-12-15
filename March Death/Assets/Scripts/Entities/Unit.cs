@@ -566,7 +566,11 @@ public class Unit : GameEntity<Unit.Actions>
         // Set the status
         setStatus(DefaultStatus);
 
-        activateFOWEntity();
+        // Activate fow unless this is a lighthouse attacker
+        if (type != UnitTypes.LIGHTHOUSE_REVEALER)
+        {
+            activateFOWEntity();
+        }
 
         // Statistics available for both AI and Player
         GameObject gameController = GameObject.Find("GameController");
@@ -744,7 +748,7 @@ public class Unit : GameEntity<Unit.Actions>
                     // Check distance to target to know if we are close enough.
                     // When capture distance is reached resource building capture
                     // method is triggered.
-                    /*
+                    
                     if (_target.info.race == this.race)
                     {
                         if (_distanceToTarget <= _target.info.resourceAttributes.trapRange)
@@ -759,7 +763,7 @@ public class Unit : GameEntity<Unit.Actions>
                         }
 
                     }
-                    */
+                    
                     // Update destination only if target has moved
                     Vector3 destination = _closestPointToTarget;
 
@@ -785,7 +789,11 @@ public class Unit : GameEntity<Unit.Actions>
                     // If we are already close enough, stop and attack
                     if (_distanceToTarget <= currentAttackRange())
                     {
-                        _detourAgent.ResetPath();
+                        if (!isImmobile)
+                        {
+                            _detourAgent.ResetPath();
+                        }
+
                         setStatus(EntityStatus.ATTACKING);
                         _followingTarget = false;
                         _lastAttack = Time.time - (1f / info.unitAttributes.attackRate);
@@ -799,7 +807,11 @@ public class Unit : GameEntity<Unit.Actions>
                     }
                 }
 
-                if (!_detourAgent.IsMoving)
+                if (isImmobile)
+                {
+                    setStatus(EntityStatus.IDLE);
+                }
+                else if (!_detourAgent.IsMoving)
                 {
                     if (!_followingTarget)
                     {

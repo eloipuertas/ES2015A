@@ -119,8 +119,8 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
             }
             else
             {
-
-                plane.SetActive(true);
+                if(entity.info.isUnit)
+                    plane.SetActive(true);
             };
             //else Destroy(plane, 0f); _lastHealth = 100f;
 
