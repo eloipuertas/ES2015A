@@ -290,6 +290,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         {
             IGameEntity entity = gameObject.GetComponent<IGameEntity>();
             UnitInfo unitInfo = Info.get.of(info.race, (UnitTypes)_creationQueue.Dequeue());
+			_creatingUnit = false;
 
             Player.getOwner(entity).resources.AddAmount(WorldResources.Type.WOOD, unitInfo.resources.wood);
             Player.getOwner(entity).resources.AddAmount(WorldResources.Type.METAL, unitInfo.resources.metal);

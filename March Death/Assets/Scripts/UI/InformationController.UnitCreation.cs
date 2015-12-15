@@ -62,13 +62,13 @@ public partial class InformationController : MonoBehaviour {
 				Vector2 buttonCenter = new Vector2();
 				buttonCenter.x = creationQueueInitialPoint.x + scaledUnitCreationPanel.x / 2f + (creationQueueButtonSize.x * i) + creationQueueButtonSize.x / 2f;
 				buttonCenter.y = creationQueueInitialPoint.y - scaledUnitCreationPanel.y;
-				GameObject button = CreateCreationUnitButton(buttonCenter, type);
+				GameObject button = CreateCreationUnitButton(buttonCenter, type, i);
 				creationQueueButtons.Add(button);
 			}
 		}
 	}
 
-	private GameObject CreateCreationUnitButton(Vector2 center, UnitTypes type) 
+	private GameObject CreateCreationUnitButton(Vector2 center, UnitTypes type, int position) 
 	{
 		GameObject canvasObject = new GameObject("UnitCreationButtonCanvas");
 		Canvas canvas = canvasObject.AddComponent<Canvas>();
@@ -95,13 +95,15 @@ public partial class InformationController : MonoBehaviour {
 		button.targetGraphic = image;
 		button.onClick.AddListener(() =>
 		{
-			if (currentResource != null) {
-				currentResource.cancelUnitQueue();
-			} else if (currentBarrack != null) {
-				currentBarrack.cancelUnitQueue();
+			if (position == 0) {
+				if (currentResource != null) {
+					currentResource.cancelUnitQueue();
+				} else if (currentBarrack != null) {
+					currentBarrack.cancelUnitQueue();
+				}
+				
+				ShowCreationQueue();
 			}
-
-			ShowCreationQueue();
 		});
 
 
