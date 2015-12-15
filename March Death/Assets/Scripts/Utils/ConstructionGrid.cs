@@ -4,11 +4,14 @@ using System.Collections;
 using System.Linq;
 using System;
 using Pathfinding;
+using Assets.Scripts.AI;
+
+
 
 public class ConstructionGrid : MonoBehaviour
 {
     public static ConstructionGrid instance;
-
+    public AIController.AIMode mode = AIController.AIMode.BATTLE;
     public static Vector3 ERROR = new Vector3(-1, -1, -1);
     private Vector2 dimensions = new Vector2(18f, 18f);
     private ArrayList reservedPositions = new ArrayList();
