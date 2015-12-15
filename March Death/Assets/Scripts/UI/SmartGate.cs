@@ -13,7 +13,11 @@ class SmartGate : MonoBehaviour
     private SphereCollider _collider;
     private List<IGameEntity> _enemies = new List<IGameEntity>();
     private List<IGameEntity> _allies = new List<IGameEntity>();
-    private DetourFlag _door;
+    // when blocking gate is active, only allies can walk through
+    // when is false, enemies can walk through too
+    // we can simulate the behaviour of a real door, shouting the system when there
+    // are allies around
+    private DetourFlag _blocking_gate; 
     private Storage.Races _race;
     private Status _status;
 
@@ -34,7 +38,7 @@ class SmartGate : MonoBehaviour
         _status = Status.CLOSE;
         _animator = transform.parent.GetComponent<Animator>();
         transform.parent.GetComponent<Barrack>().register(Barrack.Actions.BUILDING_FINISHED, OnBuildingFinished);
-        _door = transform.parent.GetComponent<DetourFlag>();
+        _blocking_gate = transform.parent.GetComponent<DetourFlag>();
 
 
 
@@ -163,19 +167,19 @@ class SmartGate : MonoBehaviour
         }
     }
 
-    public void OpenGate(bool _open)
+    public void OpenGate(bool _active)
     {
-        if (_open)
+        if (_active)
         {
 
-            _door.enabled = !_open;
-            _animator.SetBool("open", _open);
+            _blocking_gate.enabled = !_active;
+            _animator.SetBool("open", _active);
             Debug.Log("Gate is open");
         }
         else
         {
-            _door.enabled = _open;
-            _animator.SetBool("open", _open);
+            _blocking_gate.enabled = !_active;
+            _animator.SetBool("open", _active);
             Debug.Log("Gate is closed");
         }
 
