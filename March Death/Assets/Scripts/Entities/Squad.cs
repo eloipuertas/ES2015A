@@ -111,7 +111,20 @@ public sealed class Squad : BareObserver<Squad.Actions>
             _maxAttackRange = 1f;
         }
     }
+    //used for AI so smellEnemies is always true
+    public Squad(Storage.Races race, int error)
+    {
+        _auto = new AutoUnregister(this);
+        _race = race;
 
+        _data.Add(DataType.BOUNDING_BOX, new BoundingBox(this));
+        _data.Add(DataType.ATTACK_VALUE, new AttackValue(this,error));
+        _data.Add(DataType.PATROL_DATA, new PatrolData(this));
+        
+        _maxAttackRange = Storage.Info.get.of(_race, Storage.UnitTypes.THROWN).unitAttributes.rangedAttackFurthest;
+        _data.Add(DataType.SMELLED_ENEMIES, new SmelledEnemies(this));
+
+    }
     private void OnUnitDied(System.Object obj)
     {
         RemoveUnit(((GameObject)obj).GetComponent<Unit>());
@@ -386,14 +399,41 @@ public class AttackValue : SquadData<float>
 {
     private float _attack;
     public override float Value { get { return _attack; } }
-
+    private int error;
     public AttackValue(Squad squad) : base(squad)
     {
+        error = 0;
     }
-
-    public static float OfUnit (Unit unit)
+    public AttackValue(Squad squad,int error) : base(squad)
     {
-        return unit.healthPercentage / 100 * (unit.info.unitAttributes.resistance + unit.info.unitAttributes.attackRate * unit.info.unitAttributes.strength);
+        this.error = error;
+    }
+    //If this ever becomes too resource consuming we can precalculate it for each unit.
+    public static float OfUnit (Unit unit,int error)
+    {
+        Storage.UnitAttributes a = unit.info.unitAttributes;
+        return Mathf.Max(200, ((Mathf.Pow(2, a.strength * 1.05f)) +
+               Mathf.Pow(2, Mathf.Max(
+                   (a.projectileAbility),
+                   (a.weaponAbility * 0.8f))) *
+                   (a.attackRange * 0.2f) + a.resistance + a.wounds+(getError(error)))) *
+                   unit.healthPercentage * 0.003f;
+    }
+    /// <summary>
+    /// Outputs a different error based on the Ai difficulty level, only the easier difficulties should make errors
+    /// errors will be around these levels:
+    ///     difficultyLvl, error
+    ///                 1: 1.20
+    ///                 2: 0.35
+    ///                 3: 0 (always 0)
+    /// </summary>
+    /// <returns></returns>
+    private static float getError(int difficultyLvl)
+    {
+        int error = Utils.D6.get.rollOnce();
+        if (error > (difficultyLvl + 3))
+            return 6 / (difficultyLvl + 1);
+        return 0;
     }
 
     public override void Update(List<Unit> units)
@@ -403,9 +443,8 @@ public class AttackValue : SquadData<float>
             _attack = 0;
             foreach (Unit unit in units)
             {
-                _attack += OfUnit(unit);
+                _attack += OfUnit(unit,error);
             }
-
             _needsUpdate = false;
         }
     }
