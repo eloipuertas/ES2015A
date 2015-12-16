@@ -93,6 +93,11 @@ public class EntityAbilitiesController : MonoBehaviour
         actionPanel.GetComponent<Image>().enabled = true;
         var abilities = entity.info.abilities;
         var nabilities = abilities.Count;
+
+        abilities_on_show.Clear();
+        buttons_on_show.Clear();
+        affordable_buttons.Clear();
+
         for (int i = 0; i < nabilities; i++)
         {
             GameObject button = GameObject.Find("Button " + i);
@@ -125,9 +130,13 @@ public class EntityAbilitiesController : MonoBehaviour
                 //    Debug.LogError("General food quantity: " + BasePlayer.player.resources.getAmount(WorldResources.Type.FOOD));
                 //}
                 // HACK: When this is fired, the button status should be updated! abilityObj.isActive might have changed...
-                
             }
+            bool interactable = ResourcesPlacer.get(BasePlayer.player).enoughResources(abilityObj.info<Storage.EntityAbility>());
+            affordable_buttons[abilityObj] = interactable;
+            buttonComponent.interactable = interactable;
+            buttons_on_show.Add(buttonComponent);
         }
+
     }
     // Hack to get key bindings working.  
     void fixKeybinds(System.Object obj)
