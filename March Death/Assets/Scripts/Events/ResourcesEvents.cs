@@ -90,8 +90,11 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
 
     private void OnCollection(System.Object obj)
     {
-        Goods goods = (Goods) obj;
-        ResourcesPlacer.get.Collect( (WorldResources.Type) goods.type , goods.amount);
+        CollectableGood goods = (CollectableGood) obj;
+
+        Goods good = new Goods();  good = goods.goods;
+
+        ResourcesPlacer.get.Collect( (WorldResources.Type) good.type , good.amount);
     }
 
 
@@ -129,7 +132,10 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
         ResourcesPlacer.get.updatePopulation();
 
         if (entity.info.isResource || entity.info.isUnit)
-            ResourcesPlacer.get.StatisticsChanged(entity, CreatePackageFromEntity(entity));
+        {
+            GrowthStatsPacket packet = CreatePackageFromEntity(entity);
+            ResourcesPlacer.get.StatisticsChanged(entity, packet);
+        }
     }
 
 
@@ -174,8 +180,7 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
         if (entity.info.isUnit)
         {
             Unit unit = (Unit)entity;
-            // packet = new GrowthStatsPacket(WorldResources.Type.FOOD, unit.info.unitAttributes.foodConsumption, 1f); // RAUL_UNCOMMENT (CHANGE SIGN¿?)
-            packet = new GrowthStatsPacket( WorldResources.Type.FOOD , -5f , 10f );
+            packet = new GrowthStatsPacket(WorldResources.Type.FOOD, -unit.info.unitAttributes.foodConsumption, 1f);
         }
 
         return packet;

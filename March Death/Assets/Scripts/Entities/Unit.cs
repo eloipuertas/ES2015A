@@ -217,15 +217,6 @@ public class Unit : GameEntity<Unit.Actions>
             fire(Actions.EXTERMINATED, _entity);
 
         ResourcesEvents.get.unregisterUnitToEvents(_entity);
-        
-        // Clear target, just in case
-        _target = null;
-
-        if (BasePlayer.isOfPlayer(this))
-        {
-            statistics.growth_speed *= -1;
-            fire(Actions.STAT_OUT, statistics);
-        }
 
         fire(Actions.DIED);
     }
@@ -306,6 +297,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// <returns></returns>
     public bool goToBuilding(IGameEntity building)
     {
+
         _target = building;
         _followingTarget = true;
         _movePoint = building.getTransform().position;
@@ -313,7 +305,7 @@ public class Unit : GameEntity<Unit.Actions>
         setStatus(EntityStatus.MOVING);
         fire(Actions.MOVEMENT_START);
         updateDistanceToTarget();
-
+        Debug.Log("Unit: GoToBuilding()");
 
         return true;
     }
@@ -330,12 +322,6 @@ public class Unit : GameEntity<Unit.Actions>
         // Note: Cast is redundant but avoids warning
         if (_target != (IGameEntity)entity)
         {
-            // Cancel attacking current unit if any
-            if (status == EntityStatus.ATTACKING)
-            {
-                stopAttack();
-            }
-
             // Register for DEAD/DESTROYED and HIDDEN
             _auto += entity.registerFatalWounds(onTargetDied);
             _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
@@ -653,8 +639,8 @@ public class Unit : GameEntity<Unit.Actions>
             BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.FOOD, foodConsumed);
 
             Goods goods = new Goods(); // Generate the goods the units eat
-            goods.amount = 5;
-            // goods.amount = this.info.unitAttributes.foodConsumption; // RAUL_UNCOMMENT
+            //goods.amount = 5;
+            goods.amount = this.info.unitAttributes.foodConsumption; // RAUL_UNCOMMENT
             goods.type = Goods.GoodsType.FOOD;
 
             fire(Actions.EAT, goods);

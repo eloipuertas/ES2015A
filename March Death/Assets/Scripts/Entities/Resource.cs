@@ -479,6 +479,7 @@ public class Resource : Building<Resource.Actions>
             register(Actions.CREATED, res_pl.onStatisticsUpdate);
             register(Actions.DEL_STATS, res_pl.onStatisticsUpdate);
             */
+            
         }
 
         statistics = new Statistics(ResourceFromBuilding(type), (int)info.resourceAttributes.updateInterval, 10); // hardcoded, To modify, by now the collection rate is always 10, but theres no workers yet
@@ -503,7 +504,7 @@ public class Resource : Building<Resource.Actions>
         civilInfo = Info.get.of(this.race, UnitTypes.CIVIL);
         _entity = this.GetComponent<IGameEntity>();
         sounds = GameObject.Find("GameController").GetComponent<Managers.SoundsManager>();
-        
+
         // Call Building start
         base.Awake();
     }
@@ -555,7 +556,12 @@ public class Resource : Building<Resource.Actions>
         {
             if (once)
             {
-                fire(Actions.CREATED, statistics);
+                if (Player.isOfPlayer(_entity))
+                {
+                    ResourcesEvents.get.registerResourceToEvents(_entity);
+                    fire(Actions.CREATED, _entity);
+                }
+
                 once = false;
             }
         }
