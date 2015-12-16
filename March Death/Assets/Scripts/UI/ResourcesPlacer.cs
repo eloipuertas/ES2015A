@@ -189,7 +189,8 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
 
     public void updatePopulation()
     {
-        pop.text = PopulationInfo.get.number_of_units.ToString();
+        if(pop != null)
+            pop.text = PopulationInfo.get.number_of_units.ToString();
     }
 
     public void updateStatistics()

@@ -369,6 +369,8 @@ public class Resource : Building<Resource.Actions>
             worker.bringBack();
             worker.moveTo(findMeetingPoint());
 
+            fire(Actions.NEW_HARVEST, _entity);
+
             worker.setStatus(EntityStatus.IDLE);
 
             if (harvestUnits == 0)
@@ -395,7 +397,7 @@ public class Resource : Building<Resource.Actions>
         {
             _collectionRate += explorer.info.attributes.capacity;
             harvestUnits++;
-
+            fire(Actions.NEW_HARVEST, _entity);
             explorer.setStatus(EntityStatus.WORKING);
 
             workersList.Add(explorer);
@@ -444,9 +446,7 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     public override void OnDestroy()
     {
-        statistics.getNegative();
-        fire(Actions.DEL_STATS, statistics);
-
+        fire(Actions.EXTERMINATED, _entity);
         base.OnDestroy();
     }
 
@@ -466,23 +466,7 @@ public class Resource : Building<Resource.Actions>
     }
 
     private void SetupStatistics()
-    {
-        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
-        GameObject gameController = GameObject.Find("GameController");
-        //ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
-
-        if (Player.isOfPlayer(_entity))
-        {
-            //FIXME bug after merging
-            /*
-            register(Actions.COLLECTION, res_pl.onCollection);
-            register(Actions.CREATED, res_pl.onStatisticsUpdate);
-            register(Actions.DEL_STATS, res_pl.onStatisticsUpdate);
-            */
-            
-        }
-
-        statistics = new Statistics(ResourceFromBuilding(type), (int)info.resourceAttributes.updateInterval, 10); // hardcoded, To modify, by now the collection rate is always 10, but theres no workers yet
+    {  
         maxHarvestUnits = info.resourceAttributes.maxUnits;
     }
 
