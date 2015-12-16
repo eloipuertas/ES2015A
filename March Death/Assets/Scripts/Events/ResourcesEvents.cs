@@ -133,10 +133,8 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
 
         if (entity.info.isResource || entity.info.isUnit)
         {
-            Debug.Log("stats_changed_is_resource: " + entity.info.isResource);
-            GrowthStatsPacket packet = CreatePackageFromEntity(entity); // RAUL_DEB
-            Debug.Log("stats_resource: " + packet.amount);
-            ResourcesPlacer.get.StatisticsChanged(entity, packet); // RAUL_DEB
+            GrowthStatsPacket packet = CreatePackageFromEntity(entity);
+            ResourcesPlacer.get.StatisticsChanged(entity, packet);
         }
     }
 
