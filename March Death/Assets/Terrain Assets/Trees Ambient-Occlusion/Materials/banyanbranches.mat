@@ -7,10 +7,10 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: banyanbranches
-  m_Shader: {fileID: 10511, guid: 0000000000000000f000000000000000, type: 0}
+  m_Shader: {fileID: 4800000, guid: 063b0984fb2cd0f49a6135ecca87c509, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 2901
   stringTagMap: {}
   m_SavedProperties:
     serializedVersion: 2
@@ -29,16 +29,20 @@ Material:
         second: .5
       data:
         first:
-          name: _Occlusion
-        second: 2.07547164
-      data:
-        first:
           name: _BaseLight
         second: .292452842
       data:
         first:
           name: _AO
         second: 2.7358489
+      data:
+        first:
+          name: _SquashAmount
+        second: 1
+      data:
+        first:
+          name: _Occlusion
+        second: 2.07547164
     m_Colors:
       data:
         first:
@@ -47,11 +51,19 @@ Material:
       data:
         first:
           name: _Color
-        second: {r: .724498332, g: .724498332, b: .724498332, a: 1}
+        second: {r: 1, g: 1, b: 1, a: 1}
       data:
         first:
           name: _MainTex_ST
         second: {r: 1, g: 1, b: 0, a: 0}
+      data:
+        first:
+          name: _TreeInstanceColor
+        second: {r: 1, g: 1, b: 1, a: 1}
+      data:
+        first:
+          name: _TreeInstanceScale
+        second: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1002 &2100001
 EditorExtensionImpl:
   serializedVersion: 6

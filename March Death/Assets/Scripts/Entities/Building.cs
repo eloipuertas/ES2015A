@@ -39,11 +39,12 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     }
 
     /// Precach some actions
+    public T CREATED { get; set; }
     public T DAMAGED { get; set; }
     public T DESTROYED { get; set; }
     public T CREATE_UNIT { get; set; }
     public T BUILDING_FINISHED { get; set; }
-    public T HEALTH_UPDATED { get; set; }
+    //public T HEALTH_UPDATED { get; set; }
     public T ADDED_QUEUE { get; set; }
     
     private float _totalBuildTime = 0;
@@ -52,7 +53,17 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     private UnitInfo _infoUnitToCreate;
     private bool _creatingUnit = false;
 
+    /// <summary>
+    /// coordinates where new civilians are deployed outside building
+    ///  reached.
+    /// </summary> 
     private Vector3 _deploymentPoint;
+
+    /// <summary>
+    /// coordinates where civilian units travel after been deployed at deployment point.
+    /// </summary>
+    private Vector3 _meetingPoint;
+
     private int _totalUnits = 0;
 
     // This queue will store the units that the building is creating.
@@ -90,14 +101,16 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     /// </summary>
     public override void OnDestroy()
 	{
-		try {
-			ConstructionGrid grid = GameObject.Find("GameController").GetComponent<ConstructionGrid>();
+        GameObject gridGO = GameObject.Find("GameController");
+
+        if (gridGO != null) {
+			ConstructionGrid grid = gridGO.GetComponent<ConstructionGrid>();
 			Vector3 disc_pos = grid.discretizeMapCoords(gameObject.transform.position);
 			grid.liberatePosition(disc_pos);
-		} catch(Exception e) {
-			Debug.LogWarning("Exception while trying to liberate position of a building: " + e.ToString());
 		}
-		base.OnDestroy();
+
+        ResourcesEvents.get.unregisterBuildingToEvents(this);
+        base.OnDestroy();
 	}
 
 
@@ -114,6 +127,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     /// </summary>
     public override void Awake()
     {
+        CREATED = (T)Enum.Parse(typeof(T), "CREATED", true);
         DAMAGED = (T)Enum.Parse(typeof(T), "DAMAGED", true);
         DESTROYED = (T)Enum.Parse(typeof(T), "DESTROYED", true);
         CREATE_UNIT = (T)Enum.Parse(typeof(T), "CREATE_UNIT", true);
@@ -133,9 +147,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         // Setup base
         base.Start();
 
-
-        // Instead of adding 10 to the center of the building, we should check the actual size of the building....
-        _deploymentPoint = new Vector3(transform.position.x + 10, transform.position.y, transform.position.z + 10);
+        _meetingPoint = getDefaultMeetingPoint();
         activateFOWEntity();
 
         if (DefaultStatus == EntityStatus.BUILDING_PHASE_1)
@@ -147,6 +159,10 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         //return (info.buildingAttributes.wounds - _woundsReceived) * 100f / info.buildingAttributes.wounds;
         // Set the status
         setStatus(DefaultStatus);
+
+        // Register for AI and Player
+        ResourcesEvents.get.registerBuildingToEvents(this);
+        fire(CREATED, (IGameEntity)this);
     }
 
     /// <summary>
@@ -188,13 +204,14 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
 
             if (_creationTimer >= _infoUnitToCreate.unitAttributes.creationTime)
             {
+				_creationQueue.Dequeue();
                 createUnit(_infoUnitToCreate.type);
                 _creatingUnit = false;
             }
         }
         else if (_creationQueue.Count > 0)
         {
-            _infoUnitToCreate = Info.get.of(info.race, _creationQueue.Dequeue());
+            _infoUnitToCreate = Info.get.of(info.race, _creationQueue.Peek());
             _creationTimer = 0;
             _creatingUnit = true;
         }
@@ -212,38 +229,78 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     }
 
     /// <summary>
-    /// Meeting point where new units walk from deployment point
+    /// Deployment point, units are deployed here if position is available.
     /// </summary>
-    /// <returns>position of meetingpoint</returns>
-    public Vector3 getMeetingPoint()
+    /// <returns></returns>
+    public Vector3 getDeploymentPoint()
     {
         Vector3 position = new Vector3();
-
         position = ConstructionGrid.instance.getFreePositionAbleToConstructNearPoint(_center);
+       
+        return _center + ((position - _center)/1.5F);
 
-        //Debug.Log("POS: " + position);
+    }
+    /// <summary>
+    /// Default meeting point. If meeting point is not set unit travel here from deployment point
+    /// </summary>
+    /// <returns></returns>
+    public Vector3 getDefaultMeetingPoint()
+    {
+        Vector3 position = new Vector3();
+        position = ConstructionGrid.instance.getFreePositionAbleToConstructNearPoint(_center);
+       
         return position;
 
     }
 
-    
-    protected void createUnit(UnitTypes type)
+    /// <summary>
+    /// Default Meeting point where new units walk from deployment point
+    /// </summary>
+    /// <returns>position of meetingpoint</returns>
+    public void setMeetingPoint(Vector3 position)
     {
-        
-        
-        //Debug.Log("Meeting_Point: " + (getMeetingPoint() - _center));
-        
-        
-        GameObject gob = Info.get.createUnit(race, type, getMeetingPoint(), transform.rotation, -1);
+        _meetingPoint = position;
+    }
+
+    /// <summary>
+    /// Current Meeting point where new units walk from deployment point
+    /// </summary>
+    /// <returns>position of meetingpoint</returns>
+    public Vector3 getMeetingPoint()
+    {
+        return _meetingPoint;
+    }
+
+    /// <summary>
+    /// check if meeting point is still available
+    /// </summary>
+    /// <returns>position of meetingpoint</returns>
+    public Vector3 findMeetingPoint()
+    {
+
+        Vector3 position = new Vector3();
+        GameObject[] objects = Helpers.getObjectsNearPosition(getMeetingPoint(), 1);
+        foreach (GameObject g in objects)
+        {
+            if (g.GetComponent<IBuilding>() != null)
+            {
+                position = getDefaultMeetingPoint();
+                return position;
+            }
+        }
+        return getMeetingPoint();
+
+    }
+
+    protected virtual void createUnit(UnitTypes type)
+    {       
+        GameObject gob = Info.get.createUnit(race, type, getDeploymentPoint(), transform.rotation, -1);
         Unit new_unit = gob.GetComponent<Unit>(); 
         BasePlayer.getOwner(this).addEntity(new_unit);
         fire(CREATE_UNIT, new_unit);
         _totalUnits++;
-        //Debug.Log("Meeting:" + getMeetingPoint());
-        //Debug.Log("Deploy: " + getDeploymentPoint());
-
-        gob.GetComponent<Unit>().moveTo(getMeetingPoint());
-        
+    
+        new_unit.moveTo(findMeetingPoint());
 
     }
 
@@ -267,8 +324,13 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     /// </summary>
     public float getcreationUnitPercentage()
     {
-        return (_creationTimer * 100f) / _infoUnitToCreate.unitAttributes.creationTime;
-
+       
+        if (_infoUnitToCreate!= null )
+        {
+            return (_creationTimer * 100f) / _infoUnitToCreate.unitAttributes.creationTime;
+        }
+        return 0F;
+       
     }
 
     /// <summary>
@@ -289,10 +351,12 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         {
             IGameEntity entity = gameObject.GetComponent<IGameEntity>();
             UnitInfo unitInfo = Info.get.of(info.race, (UnitTypes)_creationQueue.Dequeue());
+			_creatingUnit = false;
 
-            Player.getOwner(entity).resources.AddAmount(WorldResources.Type.WOOD, unitInfo.resources.wood);
-            Player.getOwner(entity).resources.AddAmount(WorldResources.Type.METAL, unitInfo.resources.metal);
-            Player.getOwner(entity).resources.AddAmount(WorldResources.Type.FOOD, unitInfo.resources.food);
+            BasePlayer player = BasePlayer.getOwner(entity);
+            ResourcesPlacer.get(player).Collect(WorldResources.Type.WOOD, unitInfo.resources.wood);
+            ResourcesPlacer.get(player).Collect(WorldResources.Type.METAL, unitInfo.resources.metal);
+            ResourcesPlacer.get(player).Collect(WorldResources.Type.FOOD, unitInfo.resources.food);
         }
     }
 

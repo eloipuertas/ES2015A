@@ -1,8 +1,6 @@
 ﻿using Storage;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using Utils;
 
@@ -13,6 +11,8 @@ namespace Assets.Scripts.AI
 {
     public class AIController : BasePlayer
     {
+        public enum AIMode { CAMPAIGN, BATTLE }
+
         public const bool AI_DEBUG_ENABLED = true;
 
         public MacroManager Macro { get; set; }
@@ -26,7 +26,6 @@ namespace Assets.Scripts.AI
 
         List<AIModule> modules;
         float[] timers;
-        //TODO: change this when decided about what do we really need to keep about buildings
         public List<Resource> OwnResources { get; set; }
         public List<Barrack> OwnBarracks { get; set; }
         public List<IGameEntity> EnemyBuildings { get; set; }
@@ -40,9 +39,9 @@ namespace Assets.Scripts.AI
         public Vector3 rootBasePosition;
         public List<Unit> Army { get; set; }
         public List<Unit> Workers { get; set; }
-
-        // HACK To signal MicroManager that the game has ended when the AI hero is killed
+        
         public bool FinishPlaying { get { return missionStatus.isGameOver(); } }
+        public bool hasStronghold { get; set; }
 
         public override void Start()
         {
@@ -66,13 +65,13 @@ namespace Assets.Scripts.AI
             buildPosition = rootBasePosition;
             Macro = new MacroManager(this);
             Micro = new MicroManager(this);
-            modules.Add(new AIModule(Macro.MacroHigh, 30));
+            modules.Add(new AIModule(Macro.MacroHigh, Macro.architect.constructionGrid.mode == AIMode.BATTLE ? 30 : 1));
             modules.Add(new AIModule(Macro.MacroLow, 5));
             modules.Add(new AIModule(Micro.Micro, 1));
             timers = new float[modules.Count];
+            hasStronghold = true;
             for (int i = 0; i < modules.Count; i++)
                 timers[i] = 0;
-
 
             InstantiateBuildings(me.GetBuildings());
             InstantiateUnits(me.GetUnits());
@@ -91,7 +90,6 @@ namespace Assets.Scripts.AI
             }
 
             missionStatus = new MissionStatus(playerId);
-
         }
 
         void Update()
@@ -138,7 +136,6 @@ namespace Assets.Scripts.AI
             {
                 if (!EnemyBuildings.Contains(g))
                 {
-                    Debug.Log(g.info.name);
                     g.registerFatalWounds(OnEnemyDied);
                     EnemyBuildings.Add(g);
                 }
@@ -164,20 +161,9 @@ namespace Assets.Scripts.AI
         {
             Storage.BuildingInfo i = Storage.Info.get.of(race, type);
 
-            return (resources.getAmount(WorldResources.Type.FOOD) >= i.resources.food &&
-                    resources.getAmount(WorldResources.Type.WOOD) >= i.resources.wood &&
-                    resources.getAmount(WorldResources.Type.METAL) >= i.resources.metal);
-        }
-
-        /// <summary>
-        /// Used to pay something
-        /// </summary>
-        /// <param name="entity"></param>
-        public void checkout(IGameEntity entity)
-        {
-            resources.SubstractAmount(WorldResources.Type.FOOD, entity.info.resources.food);
-            resources.SubstractAmount(WorldResources.Type.WOOD, entity.info.resources.wood);
-            resources.SubstractAmount(WorldResources.Type.METAL, entity.info.resources.metal);
+            return ResourcesPlacer.get(BasePlayer.ia).enoughResources(WorldResources.Type.FOOD, i.resources.food) &&
+                    ResourcesPlacer.get(BasePlayer.ia).enoughResources(WorldResources.Type.WOOD, i.resources.wood) &&
+                    ResourcesPlacer.get(BasePlayer.ia).enoughResources(WorldResources.Type.METAL, i.resources.metal);
         }
 
         public void CreateBuilding(BuildingTypes btype, Vector3 position, Quaternion rotation, AIArchitect architect)
@@ -186,7 +172,6 @@ namespace Assets.Scripts.AI
             IGameEntity entity = g.GetComponent<IGameEntity>();
             entity.registerFatalWounds(architect.onDestroy);
             OnBuildingCreated(entity);
-            if(!AIArchitect.TESTING) checkout(entity);
         }
 
         void OnBuildingCreated(IGameEntity entity)
@@ -222,6 +207,10 @@ namespace Assets.Scripts.AI
                 }
                 else
                 {
+                    if(((BuildingInfo)entity.info).type== BuildingTypes.STRONGHOLD)
+                    {
+                        hasStronghold = false;
+                    }
                     OwnBarracks.Remove((Barrack)entity);
                 }
             }

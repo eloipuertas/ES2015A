@@ -103,6 +103,9 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     Animator _animator = null;
 #endif
 
+    GameObject _humareda = null;
+    GameObject _foc = null;
+
     protected EntityAbility _accumulatedModifier;
     public R accumulatedModifier<R>() where R : EntityAbility
     {
@@ -222,8 +225,12 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         {
             // Try to get class with this name
             string abilityName = ability.ability.Replace(" ", "");
-            Ability newAbility = null;
+            if (abilityName.Length == 0)
+            {
+                abilityName = ability.name.Replace(" ", "");
+            }
 
+            Ability newAbility = null;
             try
             {
                 var constructor = Type.GetType(abilityName).
@@ -270,6 +277,18 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         _obstacle = GetComponent<Pathfinding.DetourObstacle>();
         _collider = GetComponent<Collider>();
         _terrain = Terrain.activeTerrain;
+
+        Transform tempTransform = transform.Find("Humareda");
+        if (tempTransform != null)
+        {
+            _humareda = tempTransform.gameObject;
+        }
+
+        tempTransform = transform.Find("Foc");
+        if (tempTransform != null)
+        {
+            _foc = tempTransform.gameObject;
+        }
     }
 
     public void Destroy(bool immediately = false)
@@ -282,6 +301,15 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 
         // TODO: Should this be automatically handled with events?
         BasePlayer.getOwner(this).removeEntity(this);
+
+        // Stop detour agent
+        doIfUnit(unit =>
+        {
+            if (!unit.isImmobile)
+            {
+                GetComponent<Pathfinding.DetourAgent>().enabled = false;
+            }
+        });
 
         // Play dead and/or destroy
         Destroy(this.gameObject, immediately ? 0.0f : 5.0f);
@@ -307,7 +335,20 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 					if (_woundsReceived == 0) {
 						_autoRecoveryAccom = 0;
 						_autoRecoveryTimer = -1;
-					}
+                        
+                        if (info.isBuilding)
+                        {
+                            if (_humareda)
+                            {
+                                _humareda.SetActive(false);
+                            }
+
+                            if (_foc)
+                            {
+                                _foc.SetActive(false);
+                            }
+                        }
+                    }
 				}
 			}
 		}
@@ -411,6 +452,12 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         bool hitAndWounds = willAttackLand(from, isRanged) && willAttackCauseWounds(from);
         if (hitAndWounds)
         {
+            doIfBuilding(building =>
+            {
+                building.getTransform().Find("Humareda").gameObject.SetActive(true);
+                building.getTransform().Find("Foc").gameObject.SetActive(true);
+            });
+
             _woundsReceived += 1;
             onReceiveDamage();
         }
@@ -428,18 +475,21 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         {
             if (unit.status == EntityStatus.IDLE)
             {
-                unit.attackTarget(from);
+                unit.attackTarget(from, true);
             }
         });
     }
 
-    public void doIfUnit(Action<Unit> callIfTrue)
+    public bool doIfUnit(Action<Unit> callIfTrue)
     {
         Unit unit = this as Unit;
         if (unit != null)
         {
             callIfTrue(unit);
+            return true;
         }
+
+        return false;
     }
 
     public bool doIfBuilding(Action<IBuilding> callIfTrue)

@@ -2,7 +2,7 @@
 #define DETOURTILECACHE_H
 
 #include "DetourStatus.h"
-
+class dtCrowd;
 
 
 typedef unsigned int dtObstacleRef;
@@ -32,7 +32,7 @@ enum ObstacleState
 	DT_OBSTACLE_EMPTY,
 	DT_OBSTACLE_PROCESSING,
 	DT_OBSTACLE_PROCESSED,
-	DT_OBSTACLE_REMOVING,
+	DT_OBSTACLE_REMOVING
 };
 
 static const int DT_MAX_TOUCHED_TILES = 8;
@@ -47,6 +47,24 @@ struct dtTileCacheObstacle
 	unsigned char ntouched;
 	unsigned char npending;
 	dtTileCacheObstacle* next;
+
+	// Use nverts == 0 to differentiate between poly or cylinder obstacle
+	float verts[DT_MAX_CONVEX_HULL_VERTICES * 3];
+	int nverts;
+};
+
+struct dtTileCacheFlag
+{
+	dtCrowd* crowd;
+	unsigned short flags;
+	float pos[3], radius, height;
+	dtCompressedTileRef touched[DT_MAX_TOUCHED_TILES];
+	dtCompressedTileRef pending[DT_MAX_TOUCHED_TILES];
+	unsigned short salt;
+	unsigned char state;
+	unsigned char ntouched;
+	unsigned char npending;
+	dtTileCacheFlag* next;
 
 	// Use nverts == 0 to differentiate between poly or cylinder obstacle
 	float verts[DT_MAX_CONVEX_HULL_VERTICES * 3];
@@ -94,7 +112,11 @@ public:
 	const dtTileCacheObstacle* getObstacleByRef(dtObstacleRef ref);
 	
 	dtObstacleRef getObstacleRef(const dtTileCacheObstacle* obmin) const;
-	
+
+	const dtTileCacheFlag* getFlagByRef(dtObstacleRef ref);
+
+	dtObstacleRef getFlagRef(const dtTileCacheFlag* obmin) const;
+
 	dtStatus init(const dtTileCacheParams* params,
 				  struct dtTileCacheAlloc* talloc,
 				  struct dtTileCacheCompressor* tcomp,
@@ -113,6 +135,9 @@ public:
 	dtStatus addObstacle(const float* pos, const float radius, const float height, dtObstacleRef* result);
 	dtStatus addObstacle(const float* pos, const float* convexHullVertices, int numConvexHullVertices, const float height, dtObstacleRef* result);
 	dtStatus removeObstacle(const dtObstacleRef ref);
+
+	dtStatus addFlag(const float* pos, const float* convexHullVertices, int numConvexHullVertices, const float height, unsigned short flags, dtCrowd* crowd, dtObstacleRef* result);
+	dtStatus removeFlag(const dtObstacleRef ref);
 	
 	dtStatus queryTiles(const float* bmin, const float* bmax,
 						dtCompressedTileRef* results, int* resultCount, const int maxResults) const;
@@ -125,7 +150,8 @@ public:
 	
 	void calcTightTileBounds(const struct dtTileCacheLayerHeader* header, float* bmin, float* bmax) const;
 	
-	void getObstacleBounds(const struct dtTileCacheObstacle* ob, float* bmin, float* bmax) const;
+	template <class T>
+	void getObstacleBounds(const T* ob, float* bmin, float* bmax) const;
 	
 
 	/// Encodes a tile id.
@@ -176,6 +202,12 @@ private:
 		REQUEST_ADD,
 		REQUEST_REMOVE,
 	};
+
+	enum UpdateType
+	{
+		UPDATE_OBSTACLES,
+		UPDATE_FLAGS
+	};
 	
 	struct ObstacleRequest
 	{
@@ -201,15 +233,21 @@ private:
 	
 	dtTileCacheObstacle* m_obstacles;
 	dtTileCacheObstacle* m_nextFreeObstacle;
+
+	dtTileCacheFlag* m_flags;
+	dtTileCacheFlag* m_nextFreeFlag;
 	
 	static const int MAX_REQUESTS = 1024;
 	ObstacleRequest m_reqs[MAX_REQUESTS];
 	int m_nreqs;
+
+	ObstacleRequest m_flags_reqs[MAX_REQUESTS];
+	int m_flags_nreqs;
 	
 	static const int MAX_UPDATE = 64;
 	dtCompressedTileRef m_update[MAX_UPDATE];
 	int m_nupdate;
-	
+	int m_updateType;
 };
 
 dtTileCache* dtAllocTileCache();

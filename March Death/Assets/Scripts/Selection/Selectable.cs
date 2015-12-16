@@ -28,7 +28,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     public Storage.Races race {
         get { return entity.info.race; }
     }
-    
+
     public Selectable() { }
 
     //Pendiente
@@ -56,7 +56,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         	selectedBox = SelectionOverlay.CreateTexture(false);
             plane = SelectionOverlay.getPlane(gameObject, selectedBox, true);
         }
-        else 
+        else
         {
         	bool ownUnit = entity.info.race == player.race;
         	selectedBox = SelectionOverlay.CreateTexture(ownUnit);
@@ -80,18 +80,37 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
         if (currentlySelected)
         {
-            
             // As this is an special case, let's first remove us form the squad
             Unit unit = GetComponent<Unit>();
             if (unit != null)
             {
+                // Remove fromt he squad
                 unit.Squad.RemoveUnit(unit);
+
+                // If it has troop, remove from troop
+                if (unit.Troop != null && unit.Squad != unit.Troop)
+                {
+                    unit.Troop.RemoveUnit(unit);
+                }
+
+                // No more units... deselect if selected
+                if (player.selection.SelectedSquad == unit.Squad && 
+                    player.selection.SelectedSquad.Units.Count == 0)
+                {
+                    player.selection.Deselect(entity);
+                }
 
                 // Now remove us from the squad, so that it doesn't get completely unselected
                 unit.Squad = null;
+
+                // Deselect without changing squad!
+                DeselectEntity();
             }
-            // Deselect now
-            DeselectEntity();
+            else if (entity.info.isBuilding)
+            {
+                // Deselect now
+                player.selection.Deselect(entity);
+            }
         }
     }
 
@@ -107,8 +126,8 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
             }
             else
             {
-
-                plane.SetActive(true);
+                if(entity.info.isUnit)
+                    plane.SetActive(true);
             };
             //else Destroy(plane, 0f); _lastHealth = 100f;
 
@@ -132,7 +151,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
             plane.transform.position = position;
             // rotate the plain to its original position
             plane.transform.rotation = _LifeBarDefaultRotation;
-            
+
 
         }
 
@@ -145,15 +164,6 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
         player.selection.Select(entity);
     }
-
-    /// <summary>
-    /// Individual operation for the current selectable object. Deselects the object from the selection
-    /// </summary>
-	public virtual void DeselectMe()
-    {
-        player.selection.Deselect(entity);
-    }
-
 
     /// <summary>
     /// Sets the selectable entity to selected and triggers selected event
@@ -214,7 +224,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     /// </summary>
     private void RetrieveLightSelection()
     {
-        
+
         GameObject selection = transform.FindChild("EntitySelection").gameObject;
 
         if (!selection) throw new System.Exception("FIX: " + entity.info.race + " - "  + entity.info.name + " prefab needs the EntitySelection prefab which is in Resources/prefab/selection");

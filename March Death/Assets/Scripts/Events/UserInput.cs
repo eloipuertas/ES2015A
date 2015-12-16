@@ -10,9 +10,8 @@ public partial class UserInput : MonoBehaviour
     public enum action { NONE, LEFT_CLICK, RIGHT_CLICK, DRAG }
     private action currentAction;
 
-    private Player player;
-    private SelectionManager sManager { get { return player.selection; } }
-    private BuildingsManager bManager { get { return player.buildings; } }
+    private SelectionManager sManager { get { return BasePlayer.player.selection; } }
+    private BuildingsManager bManager { get { return BasePlayer.player.buildings; } }
     private CursorManager cursor;
 
     //Should be better to create a constants class or structure
@@ -33,6 +32,8 @@ public partial class UserInput : MonoBehaviour
     private Vector3 bottomLeft;
     private Vector3 bottomRight;
 
+    public Vector3 LastTerrainPos { get; set; }
+
     //width and height of the selectionTexture
     private float width() { return mouseButtonCurrentPoint.x - mouseButtonDownPoint.x; }
     private float height() { return (Screen.height - mouseButtonCurrentPoint.y) - (Screen.height - mouseButtonDownPoint.y); }
@@ -45,7 +46,6 @@ public partial class UserInput : MonoBehaviour
     Texture2D cursorAttack;
 
     private RaycastHit hit = new RaycastHit();
-    private Ray ray;
 
     CameraController camera;
 
@@ -63,7 +63,6 @@ public partial class UserInput : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        player = GetComponent<Player>();
         selectionTexture = (Texture2D)Resources.Load("SelectionTexture");
 
         cursorAttack = (Texture2D)Resources.Load("cursor_attack");
@@ -104,8 +103,11 @@ public partial class UserInput : MonoBehaviour
             sManager.DragStart();
         }
 
+        
+        // New approach, checking if the click is over an event system object
+        if(EventSystem.current.IsPointerOverGameObject())
         // FIXME: add HUD colliders
-        if (rectActions.Contains(Input.mousePosition) || rectInformation.Contains(Input.mousePosition) || minimapCamera.pixelRect.Contains(Input.mousePosition) )
+        //if (rectActions.Contains(Input.mousePosition) || rectInformation.Contains(Input.mousePosition) || minimapCamera.pixelRect.Contains(Input.mousePosition) )
         {
             currentAction = action.NONE;
             return;
@@ -138,8 +140,7 @@ public partial class UserInput : MonoBehaviour
 
     private void LeftClick()
     {
-
-        switch (player.currently)
+        switch (BasePlayer.player.currently)
         {
             case Player.status.IDLE:
                 Select();
@@ -155,66 +156,63 @@ public partial class UserInput : MonoBehaviour
         }
     }
 
-
-
     private void RightClick()
     {
-        if (player.isCurrently(Player.status.IDLE))
+        if (BasePlayer.player.isCurrently(Player.status.IDLE))
         {
             //Do nothing
         }
-        else if ( player.isCurrently(Player.status.SELECTED_UNITS) )
+        else if (BasePlayer.player.isCurrently(Player.status.SELECTED_UNITS) )
         {
-            GameObject hitObject = FindHitObject();
-            if (!hitObject) // out of bounds click
+
+            bool hasHit;
+            RaycastHit hit = FindHit(out hasHit, Constants.Layers.HIT_MASK);
+            if (!hasHit) // out of bounds click
             {
                 Debug.Log("The click is out of bounds?");
             }
-            else if (hitObject.name == "Terrain") // if it is the terrain, let's go there
+            else
             {
-                sManager.MoveTo(FindHitPoint());
-            }
-            else // let's find what it is, check if is own unit or rival
-            {
-                IGameEntity entity = hitObject.GetComponent<IGameEntity>();
-                //if entity == null it means it's a nonactor, like a tree
-                if(entity != null)
-                {
-                    if ((entity.info.race != player.race)
-                    && entity.status != EntityStatus.DEAD
-                    && entity.status != EntityStatus.DESTROYED)
-                    {
+                GameObject gameObject = hit.collider.gameObject;
+                int hitLayer = (gameObject ? gameObject.layer : 0);
 
+                if (hitLayer == Constants.Layers.TERRAIN)
+                {
+                    // if resource is selected then we are setting the meeting point
+                    if (sManager.IsBuilding)
+                    {
+                        IBuilding building = sManager.SelectedBuilding;
+                        building.setMeetingPoint(hit.point);
+                    }
+                    else
+                    {
+                        sManager.MoveTo(hit.point); // if it is the terrain,and we are not building let's go there
+                    }
+
+                }
+                else if (hitLayer == Constants.Layers.UNIT || hitLayer == Constants.Layers.BUILDING) // let's find what it is, check if is own unit or rival
+                {
+                    IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+
+                    if (entity.info.race != BasePlayer.player.race
+                        && entity.status != EntityStatus.DEAD
+                        && entity.status != EntityStatus.DESTROYED)
+                    {
                         sManager.AttackTo(entity);
-                        
                     }
                     else if (entity.info.isResource
                             && (entity.status == EntityStatus.IDLE
                             || entity.status == EntityStatus.WORKING))
-
                     {
-                        
-                        if((entity.info.isResource)
-                            && (entity.status == EntityStatus.IDLE || entity.status == EntityStatus.WORKING))
-                            {
-                                sManager.Enter(entity);
-                            }                   
+                        sManager.Enter(entity);
                     }
-                    else // HACK!! go there to by the point in the terrain
-                    {
-                        sManager.MoveTo(Layer.get.PointIn(Layer.Layers.TERRAIN));
-                    }
-                }
-                else // COMBO HACK go there to by the point in the terrain
-                {
-                    sManager.MoveTo(Layer.get.PointIn(Layer.Layers.TERRAIN));
                 }
             }
         }
-        else if (player.isCurrently(Player.status.PLACING_BUILDING))
+        else if (BasePlayer.player.isCurrently(Player.status.PLACING_BUILDING))
         {
             bManager.cancelPlacing();
-            player.setCurrently(Player.status.SELECTED_UNITS);
+            BasePlayer.player.setCurrently(Player.status.SELECTED_UNITS);
         }
     }
 
@@ -224,7 +222,7 @@ public partial class UserInput : MonoBehaviour
     /// </summary>
     private void Drag()
     {
-        switch (player.currently)
+        switch (BasePlayer.player.currently)
         {
             case Player.status.IDLE:
             case Player.status.SELECTED_UNITS:
@@ -235,78 +233,51 @@ public partial class UserInput : MonoBehaviour
 
     private void Select()
     {
-        GameObject hitObject;
-        IGameEntity selectedObject;
+        bool hasHit;
+        RaycastHit hit = FindHit(out hasHit, Constants.Layers.SELECTABLE_MASK);
 
-        //HACK, first checks if there is a unit there
-        if (Layer.get.IsUnit())
+        if (hasHit)
         {
-
-            hitObject = Layer.get.Unit();
-            selectedObject = hitObject.GetComponent<IGameEntity>();
+            IGameEntity selectedObject = hit.collider.gameObject.GetComponent<IGameEntity>();
 
             if (sManager.CanBeSelected(selectedObject))
             {
                 Deselect();
                 sManager.Select(selectedObject);
-                player.setCurrently(Player.status.SELECTED_UNITS);
+                BasePlayer.player.setCurrently(Player.status.SELECTED_UNITS);
             }
             else
             {
                 Deselect();
-
-
+                BasePlayer.player.setCurrently(Player.status.IDLE);
             }
         }
-        else if ((hitObject = FindHitObject()))
+        else
         {
-            selectedObject = hitObject.GetComponent<IGameEntity>();
-
-            // We just be sure that is a selectable object
-            if (selectedObject != null)
-            {
-                if (sManager.CanBeSelected(selectedObject))
-                {
-                    Deselect();
-                    sManager.Select(selectedObject);
-                    player.setCurrently(Player.status.SELECTED_UNITS);
-                }
-                else
-                {
-                    Deselect();
-                    player.setCurrently(Player.status.IDLE);
-                }
-
-            }
-            else
-            {
-                Deselect();
-                player.setCurrently(Player.status.IDLE);
-            }
+            Deselect();
+            BasePlayer.player.setCurrently(Player.status.IDLE);
         }
-        else Deselect();
     }
 
     private void Deselect()
     {
         //Deselect all
         sManager.DeselectCurrent();
-        player.setCurrently(Player.status.IDLE);
+        BasePlayer.player.setCurrently(Player.status.IDLE);
     }
 
     private void PlaceBuilding()
     {
-
         //Place building if position is correct
         if (!EventSystem.current.IsPointerOverGameObject())
         {
             if (bManager.placeBuilding())
             {
-                player.setCurrently(Player.status.SELECTED_UNITS);
+                BasePlayer.player.setCurrently(Player.status.SELECTED_UNITS);
             }
             else
             {
-                player.setCurrently(Player.status.PLACING_BUILDING);
+                BasePlayer.player.setCurrently(Player.status.PLACING_BUILDING);
             }
         }
     }
@@ -376,7 +347,7 @@ public partial class UserInput : MonoBehaviour
         selectedArea[3] = bottomLeft;
 
         Vector3 center = topLeft + (bottomRight - topLeft) / 2;
-        float radius = Mathf.Max(Vector3.Distance(topRight, topLeft), Vector3.Distance(bottomRight, topRight));
+        float radius = Vector3.Distance(topRight, bottomLeft);
         GameObject[] objects = Helpers.getObjectsNearPosition(center, radius);
         List<Unit> newInArea = new List<Unit>();
 
@@ -389,7 +360,7 @@ public partial class UserInput : MonoBehaviour
             }
 
             // Check if it is an unit and race
-            if (entity.info.isBuilding || entity.info.race != player.race)
+            if (entity.info.isBuilding || entity.info.race != BasePlayer.player.race)
             {
                 continue;
             }
@@ -404,7 +375,7 @@ public partial class UserInput : MonoBehaviour
         sManager.DragUpdate(newInArea);
 
         Player.status currentAction = (sManager.SelectedSquad != null && sManager.SelectedSquad.Units.Count > 0) ? Player.status.SELECTED_UNITS : Player.status.IDLE;
-        player.setCurrently(currentAction);
+        BasePlayer.player.setCurrently(currentAction);
     }
 
     //math formula to know if a given point is inside an area
@@ -427,37 +398,12 @@ public partial class UserInput : MonoBehaviour
     /// Returns the object where the mouse hits
     /// </summary>
     /// <returns></returns>
-    public GameObject FindHitObject()
+    public RaycastHit FindHit(out bool hasHit, int mask)
     {
         Ray ray = Camera.main.ScreenPointToRay(mouseButtonCurrentPoint);
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit)) return hit.collider.gameObject;
-        return null;
-    }
-
-    /// <summary>
-    /// Returns the point where the mouse hits
-    /// </summary>
-    /// <returns></returns>
-    public Vector3 FindHitPoint()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(mouseButtonCurrentPoint);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit)) return hit.point;
-        return this.invalidPosition;
-    }
-
-    /// <summary>
-    /// Returns the point of the terrain where the mouse hits
-    /// </summary>
-    /// <returns></returns>
-    public Vector3 FindTerrainHitPoint()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(mouseButtonCurrentPoint);
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, TerrainLayerMask))
-            return hit.point;
-        else
-            return this.invalidPosition;
+        hasHit = Physics.Raycast(ray, out hit, 500f, mask);
+        return hit;
     }
 
     private bool IsSimpleClick(Vector2 v1, Vector2 v2)
@@ -469,23 +415,5 @@ public partial class UserInput : MonoBehaviour
     public action GetCurrentAction()
     {
         return currentAction;
-    }
-
-    /// <summary>
-    /// Returns the object where the mouse hits if is not the terrain
-    /// </summary>
-    /// <returns></returns>
-    public GameObject FindHitEntity()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(mouseButtonCurrentPoint);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit))
-        {
-            if (hit.collider.gameObject.name != "Terrain")
-            {
-                return hit.collider.gameObject;
-            }
-        }
-        return null;
     }
 }

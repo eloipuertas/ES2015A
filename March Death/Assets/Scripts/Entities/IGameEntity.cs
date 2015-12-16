@@ -43,7 +43,7 @@ public interface IGameEntity : IBaseActor
 
     void receiveAttack(Unit from, bool isRanged);
 
-    void doIfUnit(Action<Unit> callIfTrue);
+    bool doIfUnit(Action<Unit> callIfTrue);
     bool doIfBuilding(Action<IBuilding> callIfTrue);
     bool doIfResource(Action<Resource> callIfTrue);
     bool doIfBarrack(Action<Barrack> callIfTrue);

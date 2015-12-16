@@ -6,6 +6,7 @@ using System.Text;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Utils;
 
 namespace Pathfinding
 {
@@ -38,6 +39,12 @@ namespace Pathfinding
 
         [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr getObstacles(IntPtr tileCache, ref int nobstacles);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern uint addAreaFlags(IntPtr tileCache, IntPtr crowd, float[] center, float[] verts, int nverts, float height, ushort flags);
+
+        [DllImport("Recast", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void removeAreaFlags(IntPtr tileCache, uint reference);
         #endregion
 
         #region Private Attributes
@@ -133,13 +140,39 @@ namespace Pathfinding
                 pos.x, pos.y - 3.0f, pos.z
             };
 
-            return Pathfinding.TileCache.addObstacle(_tileCacheHandle.Handle, position, vertices, 4, (int)Mathf.Ceil(block.Size.y));
+            return addObstacle(_tileCacheHandle.Handle, position, vertices, 4, (int)Mathf.Ceil(block.Size.y));
         }
 
         public void RemoveObstacle(uint reference)
         {
             Assert.IsTrue(_tileCacheHandle.Handle.ToInt64() != 0);
-            Pathfinding.TileCache.removeObstacle(_tileCacheHandle.Handle, reference);
+            removeObstacle(_tileCacheHandle.Handle, reference);
+        }
+
+        public void AddAreaFlags(DetourFlag flag)
+        {
+            Assert.IsTrue(_tileCacheHandle.Handle.ToInt64() != 0);
+            Assert.IsTrue(DetourCrowd.Instance.CrowdHandle.Handle.ToInt64() != 0);
+
+            Vector3[] flagVertices = flag.Vertices();
+
+            float[] vertices =
+            {
+                flagVertices[0].x, flagVertices[0].y - 3.0f, flagVertices[0].z,
+                flagVertices[1].x, flagVertices[1].y - 3.0f, flagVertices[1].z,
+                flagVertices[2].x, flagVertices[2].y - 3.0f, flagVertices[2].z,
+                flagVertices[3].x, flagVertices[3].y - 3.0f, flagVertices[3].z,
+            };
+
+
+            Debug.Log("Setting flags " + flag.Flags);
+            flag.ID = addAreaFlags(_tileCacheHandle.Handle, DetourCrowd.Instance.CrowdHandle.Handle, flag.Center.ToFloat(), vertices, 4, flag.Size.y, flag.Flags);
+        }
+
+        public void RemoveAreaFlag(DetourFlag flag)
+        {
+            Assert.IsTrue(_tileCacheHandle.Handle.ToInt64() != 0);
+            removeAreaFlags(_tileCacheHandle.Handle, flag.ID);
         }
     }
 }

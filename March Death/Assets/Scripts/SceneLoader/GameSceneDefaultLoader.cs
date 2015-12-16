@@ -13,6 +13,7 @@ namespace SceneLoader
         public Storage.UnitTypes _unitType = Storage.UnitTypes.HERO;
 
 
+        private bool _destroyWelcome = false;
         private GameObject informationObject = null;
         
         private GameInformation gameInfo;
@@ -24,6 +25,22 @@ namespace SceneLoader
         void Start()
         {
             if (LoadRequiredComponents()) LoadSceneContext();
+            else Destroy(this);
+        }
+
+        void Update()
+        {
+            if (_destroyWelcome)
+            {
+                GameObject gob = GameObject.Find("Welcome-Screen");
+
+                if (gob)
+                {
+                    Time.timeScale = 1;
+                    Destroy(gob);
+                    _destroyWelcome = false;
+                }
+            }
         }
 
         /// <summary>
@@ -41,6 +58,7 @@ namespace SceneLoader
                 informationObject.AddComponent<GameInformation>();
                 gameInfo = informationObject.GetComponent<GameInformation>();
                 gameInfo.setGameMode(GameInformation.GameMode.CAMPAIGN);
+                _destroyWelcome = true;
             }
 
             return true;
@@ -69,7 +87,7 @@ namespace SceneLoader
             }
 
             
-            LoadHUD();            
+            LoadHUD();
         }
 
         public void LoadExtraUnits()
@@ -94,7 +112,7 @@ namespace SceneLoader
                     else
                         position.x += step;
 
-                    player.addEntity(info.createUnit(_playerRace, _unitType, position, new Quaternion(0, 0, 0, 0)).GetComponent<IGameEntity>());
+                    info.createUnit(_playerRace, _unitType, position, new Quaternion(0, 0, 0, 0));
                 }
             }
         }

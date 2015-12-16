@@ -14,7 +14,7 @@ namespace Storage
     /// previously assigned gameobjects might get wrong types
     /// </remarks>
     /// </summary>
-    public enum UnitTypes { CIVIL, HERO, LIGHT, HEAVY, THROWN, CAVALRY, MACHINE, SPECIAL, LIGHTHOUSE_REVEALER };
+    public enum UnitTypes { CIVIL, HERO, LIGHT, HEAVY, THROWN, CAVALRY, MACHINE, SPECIAL, LIGHTHOUSE_REVEALER};
 
     public class UnitInfo : EntityInfo
     {

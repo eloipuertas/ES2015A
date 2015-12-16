@@ -1,98 +1,83 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 
 class LightHouseRevealer : MonoBehaviour
 {
 
     private Storage.Races _race;
+    public enum Status { STOP, FOCUSED, IDLE };
     public enum Direction { CLOCK, COUNTERCLOCK };
     public Direction direction = Direction.CLOCK;
+    public Status status = Status.STOP;
 
-    private float RevealerAngleStep = 1f;
-    private float RevealerOrbitatingRadius = 50;
-    private  float _revealerSphereRadius;
+    private float _revealerAngleStep = 1f;
+    private float _focusingStep = 5f;
+    private float _revealerOrbitatingRadius = 50;
 
-    private Vector3 _basePosition;
+    private Vector3 _referencePosition;
 
-
-    private bool _orbitating = false;
-    private Vector3 _center;
     private GameObject _light;
-    private FOWEntity _fow;
+    private FOWEntity _revealer;
     private GameObject _target;
+
+
     private Unit _attacker;
-    private Vector3 _lastPosition;
-    private Vector3 _lastTargetPosition;
+
+
     private float _offset = 1f;
-    
 
-    void Awake(){ }
-
-    void Start()
+    public virtual void Start()
     {
         //moves the revealer to the orbitating position
+
         transform.position = transform.parent.position;
         _race = transform.parent.GetComponent<Barrack>().getRace();
         _attacker = transform.parent.GetComponent<Unit>();
-        _center = transform.parent.position;
-        _fow = GetComponent<FOWEntity>();
-        _fow.Activate(_race);
-        _revealerSphereRadius = _fow.Range * .5f;
-        _light = transform.parent.FindChild("Light").gameObject;
+
+        _revealer = GetComponent<FOWEntity>();
+        _revealer.Activate(_race);
+
+        _light = transform.parent.FindChild("LightHouse-Detector").gameObject;
         _light.SetActive(false);
-        _lastPosition = new Vector3(9999f, 9999f, 9999f);
+
         transform.parent.GetComponent<Barrack>().register(Barrack.Actions.BUILDING_FINISHED, OnBuildingFinished);
-        _orbitating = true;
+        _target = null;
+
     }
 
 
 
-    void Update()
+    public virtual void Update()
     {
-        if (_orbitating)
+        if (status == Status.IDLE)
         {
             Vector3 rotateDirection = direction == Direction.CLOCK ? Vector3.up : Vector3.down;
-            transform.RotateAround(_center, rotateDirection, RevealerAngleStep);
-            _light.transform.LookAt(transform);
+            transform.RotateAround(_referencePosition, rotateDirection, _revealerAngleStep);
         }
-        /*
-        else if (_target) 
+
+        else if (status == Status.FOCUSED && _target != null)
         {
-            // checks if the target is moving by comparing the last and the current position, so we need to readjust the orbitation
-            if (_lastTargetPosition != _target.transform.position)
+
+            if (EnoughDifference(transform.position, _target.transform.position))
             {
-                _orbitating = true;
-                return;
+                transform.position = GetPosition(_target.transform.position);
+                //transform.position = Vector3.MoveTowards(transform.position, _target.transform.position, _focusingStep);
+
             }
         }
-        */
-        if (_target)
+        else if (status != Status.STOP)
         {
-            Debug.DrawLine(transform.parent.position,_target.transform.position, Color.yellow);
-            Debug.DrawLine(transform.position, _target.transform.position, Color.red);
-
-            if (!CloserToTarget())
-            {
-                // the target is fixed, we are orbitating in wrong direction
-                if (EnoughDifference(_lastTargetPosition, _target.transform.position))
-                {
-                    ToggleDirection();
-                    _orbitating = true;
-                }
-                else
-                {
-                    _orbitating = false;
-                }
-            }
-
-            UpdatePositions();
+            Debug.Log("Trying to acces to a null target");
+            ReturnOrbitatingDistance();
+            SetStatus(Status.IDLE);
+            _target = null;
         }
 
-        
+        _light.transform.LookAt(transform);
+
+       DrawInfo();
+
     }
 
     /// <summary>
@@ -101,12 +86,53 @@ class LightHouseRevealer : MonoBehaviour
     /// <param name="obj"></param>
     public void OnBuildingFinished(object obj)
     {
-        transform.Translate(new Vector3(RevealerOrbitatingRadius, 0f, 0f));
-        _basePosition = transform.position;
+        _referencePosition = transform.parent.position;
+        transform.Translate(new Vector3(_revealerOrbitatingRadius, 0f, 0f));
         _light.SetActive(true);
-        _orbitating = true;
+        SetStatus(Status.IDLE);
+    }
+
+
+    private Vector3 GetPosition(Vector3 target)
+    {
+        float distance = Vector3.Distance(_referencePosition, target);
+
+        if (distance > _revealerOrbitatingRadius)// the target is beyond the radius
+        {
+            //Vector3 direction = (target - _referencePosition);
+            //Vector3 farPoint = (direction / distance) * _revealerOrbitatingRadius;
+
+            Vector3 direction = (target - _referencePosition).normalized;
+            Vector3 farPoint = direction * _revealerOrbitatingRadius;
+
+            return _referencePosition + farPoint;
+
+        }
+
+        return target;
+    }
+
+    
+
+    private void ReturnOrbitatingDistance()
+    {
+
+        float distance = Vector3.Distance(_referencePosition, transform.position);
+        Vector3 direction, movement, farPoint;
+
+        if (distance < _revealerOrbitatingRadius)// the target is closer than the radius
+        {
+            direction = (transform.position - _referencePosition ).normalized;
+            movement = direction * _revealerOrbitatingRadius;
+            farPoint = _referencePosition + movement;
+
+            //haaaaaaack
+            transform.position = farPoint;
+            //Vector3.MoveTowards(transform.position, farPoint, 0f);
+        }
 
     }
+
     /// <summary>
     /// Toggles the orbitating direction
     /// </summary>
@@ -114,95 +140,6 @@ class LightHouseRevealer : MonoBehaviour
     {
         direction = direction == Direction.CLOCK ? Direction.COUNTERCLOCK : Direction.CLOCK;
         Debug.Log("Now rotating " + direction);
-    }
-
-    /// <summary>
-    /// Is the revealer orbitating or not
-    /// </summary>
-    /// <param name="_set"></param>
-    public void SetOrbitating(bool _set)
-    {
-        _orbitating = _set;
-    }
-
-
-    /// <summary>
-    /// Stops orbitating if it's enemy
-    /// </summary>
-    /// <param name="col"></param>
-    void OnTriggerEnter(Collider col)
-    {
-        if (_target) return;
-        GameObject obj = col.gameObject;
-        IGameEntity entity = obj.GetComponent<IGameEntity>();
-        if (entity != null)
-        {
-            if (IsEnemy(entity) && entity.status != EntityStatus.DEAD)
-            {
-                _target = obj;
-                _lastTargetPosition = _target.transform.position;
-                _attacker.attackTarget(entity);
-            }
-
-        }
-    }
-
-    /// <summary>
-    ///  Just start orbitating
-    /// </summary>
-    /// <param name="col"></param>
-    void OnTriggerExit(Collider col)
-    {
-        GameObject obj = col.gameObject;
-        IGameEntity entity = obj.GetComponent<IGameEntity>();
-        if (entity != null)
-        {
-            if (IsEnemy(entity))
-            {
-                _target = null;
-                _orbitating = true;
-                _attacker.stopAttack();
-                RestartLastPosition();
-            }
-
-        }
-    }
-
-
-    /// <summary>
-    /// Returns if the current movement has positioned us closer to the target
-    /// </summary>
-    /// <returns></returns>
-    private bool CloserToTarget()
-    {
-        Vector3 we, he, now, then;
-
-        we = transform.position;
-        he = _target.transform.position;
-        now = we - he;
-        then = _lastPosition - he;
-
-        return now.sqrMagnitude < then.sqrMagnitude;
-
-    }
-
-
-    /// <summary>
-    /// Updates the target and the revealer position
-    /// </summary>
-    private void UpdatePositions()
-    {
-        _lastPosition = transform.position;
-        _lastTargetPosition = _target.transform.position;
-    }
-
-
-    /// <summary>
-    /// Restarts the last position
-    /// </summary>
-    private void RestartLastPosition()
-    {
-        _lastPosition = new Vector3(9999f, 9999f, 9999f);
     }
 
 
@@ -218,16 +155,47 @@ class LightHouseRevealer : MonoBehaviour
         return Vector3.Distance(now, then) > _offset;
     }
 
-    /// <summary>
-    /// Returns if its enemy by checking if it's unity and a different race
-    /// </summary>
-    /// <param name="entity"></param>
-    /// <returns></returns>
-    private bool IsEnemy(IGameEntity entity)
-    {
 
-        return (entity.info.isUnit && entity.info.race != _race);
-        //return entity.info.isUnit;
+    public void SetStatus(Status status)
+    {
+        Debug.Log("Watchtower status: " + status);
+
+        this.status = status;
     }
+
+    public void FocusTarget(IGameEntity entity)
+    {
+        SetStatus(Status.FOCUSED);
+        _target = entity.getGameObject();
+        _attacker.attackTarget(entity);
+
+    }
+
+    public void StopFocusing()
+    {
+        SetStatus(Status.IDLE);
+        _attacker.stopAttack();
+        ReturnOrbitatingDistance();
+        _target = null;
+     }
+
+
+    #region INFO
+
+#if  UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        UnityEditor.Handles.color = Color.yellow;
+        UnityEditor.Handles.DrawWireDisc(transform.parent.position, Vector3.down, _revealerOrbitatingRadius);
+    }
+#endif
+    private void DrawInfo()
+    {
+        if (_target)
+        {
+            Debug.DrawLine(transform.position, _target.transform.position, Color.black);
+        }
+    }
+    #endregion
 }
 

@@ -14,13 +14,13 @@
 		Tags{
 			"SplatCount" = "4"
             "Queue" = "Geometry-99"
-			"RenderType" = "Opaque" 
+			"RenderType" = "Opaque"
 			"IgnoreProjector" = "true"
 		}
 		LOD 200
 		Blend SrcAlpha OneMinusSrcAlpha
 		CGPROGRAM
-			
+
 		#pragma target 4.0
 		#pragma surface surf Lambert decal:add
 
@@ -45,7 +45,7 @@
 		sampler2D _Splat0, _Splat1, _Splat2, _Splat3;
 
 		void surf(Input IN, inout SurfaceOutput o) {
-			
+
 			half4 splat_control = tex2D(_Control, IN.uv_Control);
 			half4 firstSplat = tex2D(_Splat0, IN.uv_Splat0);
 			half3 c;

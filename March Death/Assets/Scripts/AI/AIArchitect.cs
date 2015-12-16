@@ -40,14 +40,18 @@ namespace Assets.Scripts.AI
         public float buildingAngle = 0f;
 
         Dictionary<StructureType, List<Vector3>> avaliablePositions;
-        ConstructionGrid constructionGrid;
+        public ConstructionGrid constructionGrid;
 
         public List<BuildingTypes> buildingPrefs;
+        Queue<BuildingTypes> defences;
 
         int buildingsPlaced;
 
+        bool _placed = false;
+
         public AIArchitect(AIController aiController)
         {
+            defences = new Queue<BuildingTypes>();
             avaliablePositions = new Dictionary<StructureType, List<Vector3>>();
             avaliablePositions.Add(StructureType.MILITARY_BUILDING, new List<Vector3>());
             avaliablePositions.Add(StructureType.RESOURCE_BUILDING, new List<Vector3>());
@@ -59,16 +63,50 @@ namespace Assets.Scripts.AI
             constructionGrid = GameObject.Find("GameController").GetComponent<ConstructionGrid>();
             buildingsPlaced = 0;
             ai = aiController;
-            baseCriticPoints = new List<Vector3>();
 
+            baseCriticPoints = new List<Vector3>();
             constructionGrid.reservePositionForStronghold(ai.rootBasePosition);
 
-            planifyBuildingsAccordingToDifficulty();
-
-            readMapData();
+            if(constructionGrid.mode == AIController.AIMode.BATTLE)
+            {
+                planifyBuildingsAccordingToDifficulty();
+                readMapData();
+            }
         }
 
 
+        public void buildForCampaign()
+        {
+            if (_placed) return;
+            _placed = true;
+            List<BuildingTypes> typesToPlace = new List<BuildingTypes>()
+            {
+                BuildingTypes.ARCHERY,
+                BuildingTypes.BARRACK,
+                BuildingTypes.WATCHTOWER,
+                BuildingTypes.STABLE,
+            };
+            GameObject[] buildingsPositions = GameObject.FindGameObjectsWithTag("Campaign_building_military");
+            foreach (GameObject pos in buildingsPositions)
+            {
+                ai.CreateBuilding(getRandomBuildingType(typesToPlace), pos.gameObject.transform.position, Quaternion.Euler(0, buildingAngle, 0), this);
+                buildingsPlaced++;
+                pos.transform.localScale = Vector3.zero;
+            }
+        }
+
+        public BuildingTypes getRandomBuildingType(List<BuildingTypes> list)
+        {
+            return list[UnityEngine.Random.RandomRange(0, list.Count)];
+        }
+
+        public void addDefence()
+        {
+            if (defences.Count > 0)
+            {
+                buildingPrefs.Add(defences.Dequeue());
+            }
+        }
         /// <summary>
         /// Gets the lists of buildings that we are going to construct for every difficulty
         /// </summary>
@@ -81,14 +119,7 @@ namespace Assets.Scripts.AI
                 {
                     BuildingTypes.FARM,
                     BuildingTypes.MINE,
-                    BuildingTypes.SAWMILL,
-                    BuildingTypes.ARCHERY,
-                    BuildingTypes.BARRACK,
-                    BuildingTypes.STABLE,
-                    BuildingTypes.FARM,
-                    BuildingTypes.MINE,
-                    BuildingTypes.SAWMILL,
-                    BuildingTypes.BARRACK,
+                    BuildingTypes.SAWMILL
                 };
             }
 
@@ -100,19 +131,12 @@ namespace Assets.Scripts.AI
                     BuildingTypes.FARM,
                     BuildingTypes.MINE,
                     BuildingTypes.SAWMILL,
-                    BuildingTypes.ARCHERY,
                     BuildingTypes.FARM,
-                    BuildingTypes.MINE,
-                    BuildingTypes.SAWMILL,
-                    BuildingTypes.BARRACK,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.STABLE,
 
                 };
-
-                for(int i = 0; i < 20; i++)
+                for (int i = 0; i < 20; i++)
                 {
-                    buildingPrefs.Add(BuildingTypes.WATCHTOWER);
+                    defences.Enqueue(BuildingTypes.WATCHTOWER);
                 }
             }
 
@@ -124,30 +148,25 @@ namespace Assets.Scripts.AI
                     BuildingTypes.FARM,
                     BuildingTypes.FARM,
                     BuildingTypes.MINE,
-                    BuildingTypes.SAWMILL,
-                    BuildingTypes.FARM,
-                    BuildingTypes.ARCHERY,
-                    BuildingTypes.BARRACK,
-                    BuildingTypes.WATCHTOWER,
-                    BuildingTypes.STABLE,
+                    BuildingTypes.SAWMILL
                 };
                 int elvesDiscounter = ai.race == Races.ELVES ? 5 : 0;
-
+                
                 for (int i = 0; i < 30 - elvesDiscounter; i++)
                 {
-                    buildingPrefs.Add(BuildingTypes.WATCHTOWER);
+                    defences.Enqueue(BuildingTypes.WATCHTOWER);
                 }
 
                 if(ai.race == Races.ELVES)
                 {
                     for(int i = 0; i < 40; i++)
                     {
-                        buildingPrefs.Add(BuildingTypes.WALL);
+                        defences.Enqueue(BuildingTypes.WALL);
                     }
 
                     for(int i = 0; i < 6; i++)
                     {
-                        buildingPrefs.Add(BuildingTypes.WALLCORNER);
+                        defences.Enqueue(BuildingTypes.WALLCORNER);
                     }
                 }
             }
@@ -321,6 +340,18 @@ namespace Assets.Scripts.AI
                 case BuildingTypes.STABLE:
                     buildingType = StructureType.MILITARY_BUILDING;
                     break;
+                case BuildingTypes.ARTILLERY:
+                    buildingType = StructureType.MILITARY_BUILDING;
+                    break;
+                case BuildingTypes.WORKSHOP:
+                    buildingType = StructureType.MILITARY_BUILDING;
+                    break;
+                case BuildingTypes.ENT:
+                    buildingType = StructureType.MILITARY_BUILDING;
+                    break;
+                case BuildingTypes.GRYPHON:
+                    buildingType = StructureType.MILITARY_BUILDING;
+                    break;
                 case BuildingTypes.WALL:
                     if (avaliablePositions[StructureType.HORIZONTALL_WALL].Count > 0)
                     {
@@ -378,11 +409,6 @@ namespace Assets.Scripts.AI
         /// </summary>
         public void constructNextBuilding()
         {
-
-            if(buildingsPlaced == 0)
-            {
-                fixPositions();
-            }
 
             Vector3 position = getPositionForBuildingType(buildingPrefs[0]);
 
@@ -572,6 +598,18 @@ namespace Assets.Scripts.AI
                     buildingType = StructureType.MILITARY_BUILDING;
                     break;
                 case BuildingTypes.STABLE:
+                    buildingType = StructureType.MILITARY_BUILDING;
+                    break;
+                case BuildingTypes.ARTILLERY:
+                    buildingType = StructureType.MILITARY_BUILDING;
+                    break;
+                case BuildingTypes.WORKSHOP:
+                    buildingType = StructureType.MILITARY_BUILDING;
+                    break;
+                case BuildingTypes.ENT:
+                    buildingType = StructureType.MILITARY_BUILDING;
+                    break;
+                case BuildingTypes.GRYPHON:
                     buildingType = StructureType.MILITARY_BUILDING;
                     break;
                 case BuildingTypes.WALL:

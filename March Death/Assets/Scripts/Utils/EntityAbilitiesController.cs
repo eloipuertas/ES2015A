@@ -23,7 +23,9 @@ public class EntityAbilitiesController : MonoBehaviour
     private static int Button_Columns = 4;
     private static Boolean showText = false;
 
-    public static List<Ability> abilities_on_show;
+    public static List<Ability> abilities_on_show = new List<Ability>();
+    public static List<Button> buttons_on_show = new List<Button>();
+    public static Dictionary<Ability,bool> affordable_buttons = new Dictionary<Ability, bool>();
 
     // Use this for initialization
     void Start()
@@ -31,60 +33,71 @@ public class EntityAbilitiesController : MonoBehaviour
 #if UNITY_5_2
         Physics.queriesHitTriggers = true;
 #endif
-        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
-
         //Register to selectable actions
         Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.SELECTED, onActorSelected, new ActorSelector()
         {
-            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
+            registerCondition = (checkRace) => BasePlayer.isOfPlayer(checkRace.GetComponent<IGameEntity>())
         });
         Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.DESELECTED, onActorDeselected, new ActorSelector()
         {
-            registerCondition = (checkRace) => checkRace.GetComponent<IGameEntity>().info.race == gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()
+            registerCondition = (checkRace) => BasePlayer.isOfPlayer(checkRace.GetComponent<IGameEntity>())
         });
-
-        abilities_on_show = new List<Ability>();
     }
 
     public void onActorSelected(System.Object obj)
     {
 		GameObject gameObject = (GameObject) obj;
 
-        destroyButtons();
-        showActions(gameObject);
+        //destroyButtons();
+        //showActions(gameObject);
+        hideActionButtons(gameObject);
+        showActionButtons(gameObject);
 
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 
         entity.doIfResource(resource => {
-            resource.register(Resource.Actions.BUILDING_FINISHED, showActions);
+            fixKeybinds(gameObject);
+            resource.register(Resource.Actions.BUILDING_FINISHED, showActionButtons);
         });
 
         entity.doIfBarrack(barrack => {
-            barrack.register(Barrack.Actions.BUILDING_FINISHED, showActions);
+            fixKeybinds(gameObject);
+            barrack.register(Barrack.Actions.BUILDING_FINISHED, showActionButtons);
         });
     }
 
     public void onActorDeselected(System.Object obj)
     {
-        destroyButtons();
+        //destroyButtons();
 
         GameObject gameObject = (GameObject) obj;
+
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 
         entity.doIfResource(resource => {
-            resource.unregister(Resource.Actions.BUILDING_FINISHED, showActions);
+            resource.unregister(Resource.Actions.BUILDING_FINISHED, showActionButtons);
         });
 
         entity.doIfBarrack(barrack => {
-            barrack.unregister(Barrack.Actions.BUILDING_FINISHED, showActions);
+            barrack.unregister(Barrack.Actions.BUILDING_FINISHED, showActionButtons);
         });
+
+        hideActionButtons(gameObject);
     }
 
-    private void showActionButtons(GameObject objeto)
+    private void showActionButtons(System.Object obj)
     {
+        GameObject objeto = (GameObject)obj;
         IGameEntity entity = objeto.GetComponent<IGameEntity>();
+        GameObject actionPanel = GameObject.Find("HUD/actions");
+        actionPanel.GetComponent<Image>().enabled = true;
         var abilities = entity.info.abilities;
         var nabilities = abilities.Count;
+
+        abilities_on_show.Clear();
+        buttons_on_show.Clear();
+        affordable_buttons.Clear();
+
         for (int i = 0; i < nabilities; i++)
         {
             GameObject button = GameObject.Find("Button " + i);
@@ -95,29 +108,61 @@ public class EntityAbilitiesController : MonoBehaviour
             var eventTrigger = button.GetComponent<EventTrigger>();
             buttonComponent.onClick.RemoveAllListeners();
 
+            if (abilityObj.isUsable && !abilityObj.isActive)
+            {
+                if (ResourcesPlacer.get(BasePlayer.player).enoughResources(abilityObj._info))
+                {
+                    UnityAction actionMethod = new UnityAction(() =>
+                    {
+                        Debug.Log("* " + abilityObj);
+                        abilityObj.enable();
+                    });
+					image.name=ability;
+                    image.sprite = CreateSprite(ability, image.rectTransform.sizeDelta);
+                    buttonComponent.targetGraphic = image;
+                    buttonComponent.onClick.AddListener(() => actionMethod());
+                    image.enabled = true;
+                    eventTrigger.enabled = true;
+                    buttonComponent.interactable = true;
+                }
+                //if (entity.info.resources.food < BasePlayer.player.resources.getAmount(WorldResources.Type.FOOD))
+                //{
+                //    Debug.LogError("General food quantity: " + BasePlayer.player.resources.getAmount(WorldResources.Type.FOOD));
+                //}
+                // HACK: When this is fired, the button status should be updated! abilityObj.isActive might have changed...
+            }
+            bool interactable = ResourcesPlacer.get(BasePlayer.player).enoughResources(abilityObj.info<Storage.EntityAbility>());
+            affordable_buttons[abilityObj] = interactable;
+            buttonComponent.interactable = interactable;
+            buttons_on_show.Add(buttonComponent);
+        }
+
+    }
+    // Hack to get key bindings working.  
+    void fixKeybinds(System.Object obj)
+    {
+        GameObject gameObject = (GameObject)obj;
+        IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+        var abilities = entity.info.abilities;
+        var nabilities = abilities.Count;
+
+        abilities_on_show.Clear();
+        for (int i = 0; i < nabilities; i++)
+        {
+            String ability = abilities[i].name;
+            Ability abilityObj = entity.getAbility(ability);
             if (abilityObj.isUsable)
             {
-                // HACK: When this is fired, the button status should be updated! abilityObj.isActive might have changed...
-                UnityAction actionMethod = new UnityAction(() =>
-                {
-                    Debug.Log("* " + abilityObj);
-                    abilityObj.enable();
-                });
-                image.sprite = CreateSprite(ability, image.rectTransform.sizeDelta);
-                buttonComponent.targetGraphic = image;
-                buttonComponent.onClick.AddListener(() => actionMethod());
-                image.enabled = true;
-                eventTrigger.enabled = true;
-                buttonComponent.interactable = true;
+                abilities_on_show.Add(abilityObj);
             }
+
         }
     }
-
-	void showActions(System.Object obj)
+    void showActions(System.Object obj)
     {
 		GameObject gameObject = (GameObject) obj;
         GameObject actionPanel = GameObject.Find("HUD/actions");
-        
+
         if (!actionPanel) return;
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
         var rectTransform = actionPanel.GetComponent<RectTransform>();
@@ -131,6 +176,8 @@ public class EntityAbilitiesController : MonoBehaviour
         var nabilities = abilities.Count;
 
         abilities_on_show.Clear();
+        buttons_on_show.Clear();
+        affordable_buttons.Clear();
 
         for (int i = 0; i < nabilities; i++)
         {
@@ -148,8 +195,25 @@ public class EntityAbilitiesController : MonoBehaviour
                 });
                 var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
                 buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Columns) + 1));
-                CreateButton(rectTransform, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
+
+                bool interactable = ResourcesPlacer.get(BasePlayer.player).enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
+                affordable_buttons[abilityObj] = interactable;
+                Button b = CreateButton(rectTransform, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
+                b.interactable = interactable;
+                buttons_on_show.Add(b);
             }
+        }
+
+    }
+
+    public static void ControlButtonsInteractability()
+    {
+        for (int i=0; i < buttons_on_show.Count; i++)
+        {
+            Button b = buttons_on_show[i];
+            bool interactable = ResourcesPlacer.get(BasePlayer.player).enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
+            b.interactable = interactable;
+            affordable_buttons[abilities_on_show[i]] = interactable;
         }
     }
 
@@ -160,15 +224,19 @@ public class EntityAbilitiesController : MonoBehaviour
         var nabilities = abilities.Count;
         for (int i = 0; i < nabilities; i++)
         {
-            GameObject button = GameObject.Find("Button " + i);
+            GameObject button = GameObject.Find(abilities[i].name);
+			if(button==null) button= GameObject.Find("Button "+i);
             var buttonComponent = button.GetComponent<Button>();
             var image = buttonComponent.GetComponent<Image>();
+			image.name="Button "+i;
             var eventTrigger = button.GetComponent<EventTrigger>();
             image.enabled = false;
             eventTrigger.enabled = false;
             buttonComponent.interactable = false;
 
         }
+        GameObject actionPanel = GameObject.Find("HUD/actions");
+        actionPanel.GetComponent<Image>().enabled = false;
     }
 
 
@@ -193,7 +261,7 @@ public class EntityAbilitiesController : MonoBehaviour
     /// <param name="extends">The extents of the button</param>
     /// <param name="action">Actin name</param>
     /// <param name="actionMethod">Method that will be called when we click the button</param>
-    void CreateButton(RectTransform panelTransform, Vector2 center, Vector2 extends, String ability, UnityAction actionMethod, Boolean enabled)
+    Button CreateButton(RectTransform panelTransform, Vector2 center, Vector2 extends, String ability, UnityAction actionMethod, Boolean enabled)
     {
         var transform = panelTransform.transform;
 
@@ -236,6 +304,7 @@ public class EntityAbilitiesController : MonoBehaviour
                                                                          button.GetComponent<RectTransform>().localPosition.y,
                                                                          0f);
 
+        return button;
         //button.enabled = false;
         //button.interactable = false;
         //button.enabled = false;

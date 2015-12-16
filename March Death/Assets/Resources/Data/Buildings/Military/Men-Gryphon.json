@@ -24,6 +24,16 @@
 
     "abilities":
     [
+		{
+            "ability": "Create",
+            "name":"Create Gryphon Unit",
+
+            "tooltipFlags": "DISPLAY_COST, DISPLAY_TARGET",
+            "targetType": "UNIT",
+            "targetRace": "MEN",
+            "targetUnit": "SPECIAL"
+        },
+	
         {
             "name": "Sell",
             "tooltipFlags": "HIDE"

@@ -27,12 +27,14 @@ namespace Managers
         // Do we have squads or buildings?
         private bool _isSquad = true;
         public bool IsQuad { get { return _isSquad; } }
+
         private IBuilding _selectedBuilding;
+        public IBuilding SelectedBuilding { get { return _selectedBuilding; } }
 
         // Debounce multiselection
         private const float DEBOUCE_EVERY_SECS = 0.1f;
         private float _lastDebounce = DEBOUCE_EVERY_SECS;
-        private List<Unit> _lastDebouncedUnits;
+        private List<Unit> _lastDebouncedUnits = new List<Unit>();
 
 
         // the own race
@@ -94,34 +96,35 @@ namespace Managers
         public bool NewTroop(String key)
         {
             Assert.IsFalse(_troops.ContainsKey(key));
-
-            if (_selectedSquad.Units.Count > 1)
+            if (_selectedSquad != null)
             {
-                // Set unit squad for fast access
-                foreach (Unit unit in _selectedSquad.Units)
+                if (_selectedSquad.Units.Count > 1)
                 {
-                    // Is it already in another troop?
-                    foreach (var entry in _troops)
+                    // Set unit squad for fast access
+                    foreach (Unit unit in _selectedSquad.Units)
                     {
-                        if (entry.Value.Units.Contains(unit))
+                        // Is it already in another troop?
+                        if (unit.Troop != null)
                         {
-                            entry.Value.RemoveUnit(unit);
+                            unit.Troop.RemoveUnit(unit);
                         }
+
+                        unit.Squad = _selectedSquad;
+                        unit.Troop = _selectedSquad;
                     }
 
-                    unit.Squad = _selectedSquad;
+                    _troops.Add(key, _selectedSquad);
+
+                    Debug.Log("Created troop: " + key);
+                    return true;
                 }
-
-                _troops.Add(key, _selectedSquad);
-
-                Debug.Log("Created troop: " + key);
-                return true;
+                else
+                {
+                    Debug.Log("Troops should have more than 1 unit");
+                    return false;
+                }
             }
-            else
-            {
-                Debug.Log("Troops should have more than 1 unit");
-                return false;
-            }
+            return false;
         }
 
         /// <summary>
@@ -130,20 +133,28 @@ namespace Managers
         /// <param name="selectable">The entity that is going to be selected </param>
         public void Select(IGameEntity entity)
         {
-            Assert.IsTrue(CanBeSelected(entity));
-
-            _isSquad = entity.info.isUnit;
-            if (_isSquad)
+            try
             {
-                SelectSquad(((Unit)entity).Squad);
+                Assert.IsTrue(CanBeSelected(entity));
+
+                _isSquad = entity.info.isUnit;
+                if (_isSquad)
+                {
+                    SelectSquad(((Unit)entity).Squad);
+                }
+                else
+                {
+                    _selectedBuilding = (IBuilding)entity;
+
+                    Selectable selectable = _selectedBuilding.getGameObject().GetComponent<Selectable>();
+                    selectable.SelectEntity();
+                    fire(Actions.SELECT, selectable);
+                }
             }
-            else
+            catch (Exception e)
             {
-                _selectedBuilding = (IBuilding)entity;
-
-                Selectable selectable = _selectedBuilding.getGameObject().GetComponent<Selectable>();
-                selectable.SelectEntity();
-                fire(Actions.SELECT, selectable);
+                Debug.Log(e);
+                throw e;
             }
         }
 
@@ -210,22 +221,9 @@ namespace Managers
                     // Deselect entity
                     unit.GetComponent<Selectable>().DeselectEntity();
 
-                    // Unless this unit is part of a squad saved as a troop, null it out
-                    bool inTroop = false;
-                    foreach (var entry in _troops)
-                    {
-                        if (entry.Value.Units.Contains(unit))
-                        {
-                            // Restore squad
-                            unit.Squad = entry.Value;
-                            inTroop = true;
-                        }
-                    }
-
-                    if (!inTroop)
-                    {
-                        unit.Squad = null;
-                    }
+                    // Restore the Squad as the Troop it is in
+                    // In case it is not in a troop, it will automatically null it out
+                    unit.Squad = unit.Troop;
                 }
 
                 // Deselect current squad
@@ -246,8 +244,6 @@ namespace Managers
 
             bool deselectBuilding = ((!force && !_isSquad) || force) &&
                 _selectedBuilding != null;
-
-            Debug.Log(deselectSquad + " " + deselectBuilding);
 
             if (deselectSquad)
             {
@@ -284,7 +280,6 @@ namespace Managers
 
         public void DragStart()
         {
-            Debug.Log("DragStart");
             DeselectCurrent(true);
         }
 
@@ -392,14 +387,15 @@ namespace Managers
         {
             if (_selectedSquad != null && _selectedSquad.Units.Count > 0)
             {
+                _selectedSquad.MoveTo(point, unit => fire(Actions.MOVE, unit));
+                Debug.Log("Moving there");
+
                 GameObject banner = SelectionDestination.CreateBanner(_ownRace);
                 banner.GetComponent<SelectionDestination>().Deploy(_selectedSquad.Selectables, point);
 
-                _selectedSquad.MoveTo(point, unit => fire(Actions.MOVE, unit));
-                Debug.Log("Moving there");
+                
             }
         }
-
 
 
         /// <summary>

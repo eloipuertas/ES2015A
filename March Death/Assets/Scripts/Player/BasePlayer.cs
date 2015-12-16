@@ -11,13 +11,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     /// </summary>
     protected Storage.Races _selfRace;
     public Storage.Races race { get { return _selfRace; } }
-
-    /// <summary>
-    /// The resources manager
-    /// </summary>
-    protected Managers.ResourcesManager _resources = new Managers.ResourcesManager();
-    public Managers.ResourcesManager resources { get { return _resources; } }
-
+    
     /// <summary>
     /// The buildings manager
     /// </summary>
@@ -69,15 +63,6 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     public abstract void removeEntity(IGameEntity entity);
     public abstract void addEntity(IGameEntity newEntity);
 
-    public static BasePlayer getOwner(IGameEntity entity)
-    {
-        if (entity.info.race == info.GetPlayerRace())
-        {
-            return player;
-        }
-
-        return ia;
-    }
 
     public static BasePlayer getOwner(Storage.Races race)
     {
@@ -89,15 +74,22 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
         return ia;
     }
 
+    public static BasePlayer getOwner(IGameEntity entity)
+    {
+        return getOwner(entity.info.race);
+    }
+
+    public static bool isOfPlayer(IGameEntity entity)
+    {
+        return getOwner(entity) == player;
+    }
+
     void Update () {}
 
     public void SetInitialResources(uint wood, uint food, uint metal, uint gold)
     {
         // TODO Consider adding a maximum capacity
-        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.FOOD, food));
-        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.WOOD, wood));
-        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.METAL, metal));
-        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.GOLD, gold));
+        ResourcesPlacer.get(this).InitializeResources(wood, food, metal, gold);
     }
 
     protected abstract void AddBuilding(IGameEntity entity);
@@ -124,7 +116,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
                 entity.DefaultStatus = building.status;
                 entity.setStatus(building.status);
             }
-            
+
             AddBuilding(entity);
         }
     }

@@ -9,7 +9,7 @@ public partial class UserInput
     public void CheckKeyboard()
     {
         //creates a new troop
-        if ( Input.GetKeyDown(KeyCode.T))
+        if (Input.GetKeyDown(KeyCode.T))
         {
             string key = (sManager.TroopsCount + 1).ToString();
             if (!sManager.HasTroop(key))
@@ -25,20 +25,21 @@ public partial class UserInput
             if (sManager.HasTroop(key))
             {
                 sManager.SelectTroop(key);
-                player.setCurrently(Player.status.SELECTED_UNITS);
+                BasePlayer.player.setCurrently(Player.status.SELECTED_UNITS);
             }
         }
+
         // Displays the Pause Menu
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             PauseMenuLogic.TogglePauseMenu();
         }
 
-        foreach (Ability ab in EntityAbilitiesController.abilities_on_show)
+        foreach (KeyValuePair<Ability,bool> tuple in EntityAbilitiesController.affordable_buttons)
         {
-            if (Input.GetKeyUp(ab.keyBinding))
+            if (Input.GetKeyUp(tuple.Key.keyBinding) && tuple.Value)
             {
-                ab.enable();
+                tuple.Key.enable();
             }
         }
 

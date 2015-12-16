@@ -23,7 +23,7 @@ public class Player : BasePlayer
 
     //the list of player units in the scene
     public ArrayList currentUnits = new ArrayList ();
-    
+
     private EventsNotifier events;
 
     private bool isGameOverScreenDisplayed = false;
@@ -37,15 +37,21 @@ public class Player : BasePlayer
 
     private bool foodDepleted;
 
+    GameObject gameOverDialog;
+    float timeToShow;
+    const float WAIT_FOR_FINISH = 3.5f;
+
+    ResourcesPlacer _resourcesPlacer;
+
     // Use this for initialization
     public override void Start()
-    {   
+    {
         base.Start();
         _selection = GetComponent<Managers.SelectionManager>();
         //request the race of the player
         _selfRace = info.GetPlayerRace();
         _selection.SetRace(race);
-        
+
         cam = GameObject.FindWithTag("MainCamera").GetComponent<CameraController>();
         events = GetComponent<EventsNotifier>();
 
@@ -53,8 +59,10 @@ public class Player : BasePlayer
         InstantiateBuildings(me.GetBuildings());
         InstantiateUnits(me.GetUnits());
         SetInitialResources(me.GetResources().Wood, me.GetResources().Food, me.GetResources().Metal, me.GetResources().Gold);
-        gameObject.AddComponent<ResourcesPlacer>();
+        // gameObject.AddComponent<ResourcesPlacer>();
+        
         missionStatus = new MissionStatus(playerId);
+        _resourcesPlacer = ResourcesPlacer.get(this); // initialization
 
         // TODO Set this values dynamically
         minFoodTolerance = 100;
@@ -62,7 +70,7 @@ public class Player : BasePlayer
         minMetalTolerance = 500;
         minGoldTolerance = 500;
 
-        foodDepleted = resources.getAmount(WorldResources.Type.FOOD) <= 0;
+        foodDepleted = _resourcesPlacer.Amount(WorldResources.Type.FOOD) <= 0;
 
         ActorSelector selector = new ActorSelector()
         {
@@ -70,6 +78,8 @@ public class Player : BasePlayer
             fireCondition = (g) => true
         };
         Utils.Subscriber<FOWEntity.Actions, FOWEntity>.get.registerForAll(FOWEntity.Actions.DISCOVERED, OnEntityFound, selector);
+
+        timeToShow = WAIT_FOR_FINISH;
 
     }
 
@@ -80,7 +90,6 @@ public class Player : BasePlayer
         {
             if (!isGameOverScreenDisplayed)
             {
-                GameObject gameOverDialog = null;
                 if (missionStatus.hasWon(playerId))
                 {
                     switch (_selfRace)
@@ -105,10 +114,22 @@ public class Player : BasePlayer
                             break;
                     }
                 }
-                Instantiate(gameOverDialog);
+                gameOverDialog = Instantiate(gameOverDialog);
+                gameOverDialog.SetActive(false);
                 isGameOverScreenDisplayed = true;
             }
+            ShowGameOverDialog();
             _currently = status.TERMINATED;
+        }
+    }
+
+    private void ShowGameOverDialog()
+    {
+        timeToShow -= Time.deltaTime;
+        if (timeToShow <= 0)
+        {
+            gameOverDialog.SetActive(true);
+            Time.timeScale = 0;
         }
     }
 
@@ -116,7 +137,7 @@ public class Player : BasePlayer
     {
         _currently = status.TERMINATED;
         Utils.Subscriber<FOWEntity.Actions, FOWEntity>.get.unregisterFromAll(FOWEntity.Actions.DISCOVERED, OnEntityFound);
-
+        if (isGameOverScreenDisplayed) Time.timeScale = 1;
         base.OnDestroy();
     }
 
@@ -135,14 +156,16 @@ public class Player : BasePlayer
     {
         _activeEntities.Add(newEntity);
         registerEntityEvents(newEntity);
+        if (newEntity.info.isBuilding)
+            events.DisplayBuildingUnderConstruction((Storage.BuildingInfo) newEntity.info);
         Debug.Log(_activeEntities.Count + " entities");
     }
 
-	public void FillPlayerUnits(GameObject unit) 
+	public void FillPlayerUnits(GameObject unit)
 	{
 		currentUnits.Add (unit);
 	}
-    
+
     /// <summary>
     /// Returns the count of the current associated entities
     /// </summary>
@@ -175,7 +198,7 @@ public class Player : BasePlayer
     private void displayResourceInfo(WorldResources.Type resourceType, int tolerance)
     {
         int amount;
-        amount = Mathf.FloorToInt(resources.getAmount(resourceType));
+        amount = Mathf.FloorToInt(_resourcesPlacer.Amount(resourceType));
         if (amount <= tolerance)
         {
             if (amount > 0)
@@ -191,7 +214,7 @@ public class Player : BasePlayer
         if (!foodDepleted)
         {
             displayResourceInfo(WorldResources.Type.FOOD, minFoodTolerance);
-            foodDepleted = resources.getAmount(WorldResources.Type.FOOD) <= 0;
+            foodDepleted = _resourcesPlacer.Amount(WorldResources.Type.FOOD) <= 0;
         }
     }
 
@@ -203,7 +226,7 @@ public class Player : BasePlayer
         displayResourceInfo(WorldResources.Type.GOLD, minGoldTolerance);
         events.DisplayUnitCreated(obj);
     }
-    
+
     private void signalMissionUpdate(System.Object obj)
     {
         IGameEntity entity = ((GameObject) obj).GetComponent<IGameEntity>();
@@ -250,7 +273,7 @@ public class Player : BasePlayer
                 barrack.register(Barrack.Actions.CREATE_UNIT, OnUnitCreated);
                 barrack.register(Barrack.Actions.BUILDING_FINISHED, events.DisplayBuildingCreated);
             }
-            else 
+            else
             {
                 Resource resourcesBuilding = (Resource) entity;
                 resourcesBuilding.register(Resource.Actions.DAMAGED, events.DisplayUnderAttack);

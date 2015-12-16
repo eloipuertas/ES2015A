@@ -13,7 +13,7 @@ namespace Assets.Scripts.AI.Agents
 
         private const int CONFIDENCE_IN_ENEMY_ATACK_RANGE = 75;
         private const int CONFIDENCE_HERO_IS_AT_FIFTY_PERCENT = 1000;
-        private const int CONFIDENCE_ASSIST_HELP_NEEDED = 400;
+        private const int CONFIDENCE_ASSIST_HELP_NEEDED = 100;
 
         AttackAgent attackAgent;
         AssistAgent assistAgent;
@@ -40,31 +40,26 @@ namespace Assets.Scripts.AI.Agents
         public override void controlUnits(Squad squad)
         {
             // Mirar on estan els enemics
-			enemySquadBoundingBox = squad.EnemySquad.BoundingBox.Bounds;
-            
+            enemySquadBoundingBox = squad.EnemySquad.BoundingBox.Bounds;
+
             // Mirar on estic jo
             ownSquadBoundingBox = squad.BoundingBox.Bounds;
 
             // Intentar Veure on hauria d'anar una unitat per estar protegida
             recalcSafePoint();
-
-            if (ai.EnemyUnits.Count > 0)
+            foreach (Unit u in squad.Units)
             {
-                foreach (Unit u in squad.Units)
+                if (u.status != EntityStatus.DEAD)
                 {
-                    if (u.status != EntityStatus.DEAD)
-                    {
-                        u.moveTo(safeArea);
-                    }
-
-                    if (AIController.AI_DEBUG_ENABLED)
-                    {
-                        ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
-                    }
+                    u.moveTo(safeArea);
                 }
-                assistAgent.addConfidence(CONFIDENCE_ASSIST_HELP_NEEDED);
-                assistAgent.requestHelp(new KeyValuePair<Squad, int>(squad, CONFIDENCE_ASSIST_HELP_NEEDED));
+
+                if (AIController.AI_DEBUG_ENABLED)
+                {
+                    ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
+                }
             }
+            assistAgent.requestHelp(squad, CONFIDENCE_ASSIST_HELP_NEEDED);
         }
 
 
@@ -83,8 +78,7 @@ namespace Assets.Scripts.AI.Agents
                 foreach (Unit ownUnit in squad.Units)
                 {
                     float distance = Vector3.Distance(enemyUnit.transform.position, ownUnit.transform.position);
-                    //HACK: Change this magic number before intefore integration.
-                    if (distance < enemyUnit.currentAttackRange() + 10)
+                    if (distance < enemyUnit.currentAttackRange() + 100)
                     {
                         //If our hero is in range and is going to die
                         if(ownUnit.type == Storage.UnitTypes.HERO && ownUnit.healthPercentage < HERO_HEALTH_TOLERANCE_BEFORE_RETREAT)
@@ -96,7 +90,6 @@ namespace Assets.Scripts.AI.Agents
                     }
                 }
             }
-             
             return confidence;
         }
 

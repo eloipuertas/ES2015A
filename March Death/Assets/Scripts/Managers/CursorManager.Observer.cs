@@ -51,11 +51,17 @@ namespace Managers
                     // if its dragging we put the pointer cursor
                     _currentCursor = cursor.POINTER;
                     break;
+
                 default :
-                    if(ItsAlly())
-                        _currentCursor = cursor.POINTER;
-                    else
-                       _currentCursor = cursor.MAIN;
+                    bool hasHit;
+                    RaycastHit hit = _inputs.FindHit(out hasHit, Constants.Layers.SELECTABLE_MASK);
+                    if (hasHit)
+                    {
+                        if (ItsAlly(hit.collider.gameObject))
+                            _currentCursor = cursor.POINTER;
+                        else
+                            _currentCursor = cursor.MAIN;
+                    }
                     break;
             }
            
@@ -72,12 +78,20 @@ namespace Managers
 
             if (BasePlayer.player.selection.IsBuilding)
                 _currentCursor = cursor.POINTER;
-            else if(ItsEnemy())
-                _currentCursor = cursor.SWORD;
             else
-                _currentCursor = cursor.POINTER;
-            
-                
+            {
+                bool hasHit;
+                RaycastHit hit = _inputs.FindHit(out hasHit, Constants.Layers.SELECTABLE_MASK);
+                if (hasHit)
+                {
+                    if (ItsEnemy(hit.collider.gameObject))
+                        _currentCursor = cursor.SWORD;
+                    else
+                        _currentCursor = cursor.POINTER;
+                }
+                else
+                    _currentCursor = cursor.POINTER;
+            }
 
         }
 
@@ -87,6 +101,10 @@ namespace Managers
         /// </summary>
         private void CheckPlacing()
         {
+            bool hasHit;
+            RaycastHit hit = _inputs.FindHit(out hasHit, Constants.Layers.TERRAIN_MASK);
+            _inputs.LastTerrainPos = hit.point;
+
             ///Mainly we check if the current position of the building es valid or not
             switch (BasePlayer.player.buildings.currentPlace)
             {
@@ -101,67 +119,39 @@ namespace Managers
         }
 
         /// <summary>
-        /// Checks if the pointd object is an ally
-        /// </summary>
-        private bool ItsAlly() {
-            GameObject _object;
-            if ((_object = _inputs.FindHitEntity()))
-            {
-                return ItsAlly(_object);
-            }
-            else
-                return false;
-        }
-
-        /// <summary>
         /// returns if the input object is ally
         /// </summary>
         /// <param name="_object"></param>
         /// <returns></returns>
-        private bool ItsAlly(GameObject _object)
+        private bool ItsAlly(GameObject gameObject)
         {
-            IGameEntity entity = _object.GetComponent<IGameEntity>();
-            if (entity != null)
-            {
+            _lastHitEntity = gameObject.GetComponent<IGameEntity>();
 
-                if (entity.info.race == BasePlayer.player.race)
+            if (_lastHitEntity != null)
+            {
+                if (_lastHitEntity.info.race == BasePlayer.player.race)
                     return true;
                 else
                     return false;
             }
             else return false;
         }
-
-        /// <summary>
-        /// Returns if the pointed entity is an enemy
-        /// </summary>
-        /// <returns></returns>
-        private bool ItsEnemy() {
-            GameObject _object;
-            if ((_object = _inputs.FindHitEntity()))
-            {
-                return ItsEnemy(_object);
-            }
-            else
-                return false;
-        }
-
         /// <summary>
         /// Returns if the input object is an enemy
         /// </summary>
         /// <param name="_object"></param>
         /// <returns></returns>
-        private bool ItsEnemy(GameObject _object)
+        private bool ItsEnemy(GameObject gameObject)
         {
-            IGameEntity entity = _object.GetComponent<IGameEntity>();
-            if (entity != null)
-            {
+            _lastHitEntity = gameObject.GetComponent<IGameEntity>();
 
+            if (_lastHitEntity != null)
+            {
                 /// if it's dead is not an enemy
-                if (entity.info.race != BasePlayer.player.race 
-                && entity.status != EntityStatus.DEAD 
-                && entity.status != EntityStatus.DESTROYED)
-                return true;
+                if (_lastHitEntity.info.race != BasePlayer.player.race 
+                && _lastHitEntity.status != EntityStatus.DEAD 
+                && _lastHitEntity.status != EntityStatus.DESTROYED)
+                   return true;
                 else
                     return false;
             }

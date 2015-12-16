@@ -29,6 +29,7 @@ public class SelectionDestination : MonoBehaviour {
         _members = new List<Selectable>(members);
         gameObject.SetActive(true);
         RegisterToMembers();
+        Debug.Log("Banner deployed " + gameObject.GetInstanceID());
     }
 
 
@@ -57,7 +58,11 @@ public class SelectionDestination : MonoBehaviour {
 
     private void CheckDestroy()
     {
-        if (_members.Count == 0) Destroy(this.gameObject);
+        if (_members.Count == 0)
+        {
+            Debug.Log("Banner destroyed " + gameObject.GetInstanceID());
+            Destroy(this.gameObject);
+        }
     }
 
 

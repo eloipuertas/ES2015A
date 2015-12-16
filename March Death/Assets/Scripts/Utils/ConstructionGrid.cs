@@ -1,18 +1,25 @@
 
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Linq;
 using System;
+using Pathfinding;
+using Assets.Scripts.AI;
+
+
 
 public class ConstructionGrid : MonoBehaviour
 {
     public static ConstructionGrid instance;
-
+    public AIController.AIMode mode = AIController.AIMode.BATTLE;
     public static Vector3 ERROR = new Vector3(-1, -1, -1);
-    private Vector2 dimensions = new Vector2(15f, 15f);
+    private Vector2 dimensions = new Vector2(18f, 18f);
     private ArrayList reservedPositions = new ArrayList();
     private const float DIFERENCE_OF_HEIGHTS_TOLERANCE = 1.5f;
     const int MAX_RECURSION_DEPTH = 10;
+    Terrain terrain;
+    TerrainData data;
+    TreeInstance[] trees;
 
     void Awake()
     {
@@ -127,6 +134,7 @@ public class ConstructionGrid : MonoBehaviour
     /// <returns></returns>
     public bool isNewPositionAbleForConstrucction(Vector3 discretizedPosition, bool checkFlat = true)
     {
+
         //If this position is contained on the array return false
         if (reservedPositions.Contains(new Vector2(discretizedPosition.x, discretizedPosition.z)))
         {
@@ -134,50 +142,30 @@ public class ConstructionGrid : MonoBehaviour
         }
 
         //next check if the zone is flat enought for construction
-        if (checkFlat) return isFlatEnoughtForConstruction(discretizedPosition);
+        if (checkFlat)
+        {
+            terrain = Terrain.activeTerrain;
+            data = terrain.terrainData;
+            trees = data.treeInstances;
+
+            if (trees.Length > 0)
+            {
+                float width = (float)data.heightmapWidth;
+                float height = (float)data.heightmapHeight;
+                foreach (TreeInstance Location in trees)
+                {
+                    Vector3 position = discretizeMapCoords(Vector3.Scale(Location.position, data.size) + terrain.transform.position);
+                    if (position.x == discretizedPosition.x && position.z == discretizedPosition.z)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return isFlatEnoughtForConstruction(discretizedPosition);
+        }
         else return true;
     }
-
-    /// <summary>
-    /// Reserves a 3 x 3 matrix on the grid for strongholds
-    /// </summary>
-    /// <param name="sp"></param>
-    public void reservePositionForStronghold(Vector3 sp, bool centerToo = false)
-    {
-        Vector3 topLeft, top, topRight,
-                left, right,
-                bottomLeft, bottom, bottomRight;
-
-        topLeft = new Vector3(sp.x - dimensions.x, sp.y, sp.z - dimensions.y);
-        top = new Vector3(sp.x, sp.y, sp.z - dimensions.y);
-        topRight = new Vector3(sp.x + dimensions.x, sp.y, sp.z - dimensions.y);
-
-        left = new Vector3(sp.x - dimensions.x, sp.y, sp.z);
-        right = new Vector3(sp.x + dimensions.x, sp.y, sp.z);
-
-        bottomLeft = new Vector3(sp.x - dimensions.x, sp.y, sp.z + dimensions.y);
-        bottom = new Vector3(sp.x, sp.y, sp.z + dimensions.y);
-        bottomRight = new Vector3(sp.x + dimensions.x, sp.y, sp.z + dimensions.y);
-
-        reservePosition(discretizeMapCoords(topLeft));
-        reservePosition(discretizeMapCoords(top));
-        reservePosition(discretizeMapCoords(topRight));
-
-        reservePosition(discretizeMapCoords(left));
-
-        if (centerToo)
-        {
-            reservePosition(discretizeMapCoords(sp));
-        }
-
-        reservePosition(discretizeMapCoords(right));
-
-        reservePosition(discretizeMapCoords(bottomLeft));
-        reservePosition(discretizeMapCoords(bottom));
-        reservePosition(discretizeMapCoords(bottomRight));
-
-    }
-
 
     /// <summary>
     /// Gets a free position near somewhere
@@ -249,4 +237,46 @@ public class ConstructionGrid : MonoBehaviour
     {
         return dimensions;
     }
+
+
+    /// <summary>
+    /// Reserves a 3 x 3 matrix on the grid for strongholds
+    /// </summary>
+    /// <param name="sp"></param>
+    public void reservePositionForStronghold(Vector3 sp, bool centerToo = false)
+    {
+        Vector3 topLeft, top, topRight,
+                left, right,
+                bottomLeft, bottom, bottomRight;
+
+        topLeft = new Vector3(sp.x - dimensions.x, sp.y, sp.z - dimensions.y);
+        top = new Vector3(sp.x, sp.y, sp.z - dimensions.y);
+        topRight = new Vector3(sp.x + dimensions.x, sp.y, sp.z - dimensions.y);
+
+        left = new Vector3(sp.x - dimensions.x, sp.y, sp.z);
+        right = new Vector3(sp.x + dimensions.x, sp.y, sp.z);
+
+        bottomLeft = new Vector3(sp.x - dimensions.x, sp.y, sp.z + dimensions.y);
+        bottom = new Vector3(sp.x, sp.y, sp.z + dimensions.y);
+        bottomRight = new Vector3(sp.x + dimensions.x, sp.y, sp.z + dimensions.y);
+
+        reservePosition(discretizeMapCoords(topLeft));
+        reservePosition(discretizeMapCoords(top));
+        reservePosition(discretizeMapCoords(topRight));
+
+        reservePosition(discretizeMapCoords(left));
+
+        if (centerToo)
+        {
+            reservePosition(discretizeMapCoords(sp));
+        }
+
+        reservePosition(discretizeMapCoords(right));
+
+        reservePosition(discretizeMapCoords(bottomLeft));
+        reservePosition(discretizeMapCoords(bottom));
+        reservePosition(discretizeMapCoords(bottomRight));
+
+    }
+
 }

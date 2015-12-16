@@ -15,11 +15,11 @@ public class CameraController : MonoBehaviour
         public Vector3 maxxyz;
     }
 
-    public enum  CameraOrientation { NORTH_WEST, SOUTH_WEST, SOUTH_EST, NORTH_EST };
+    public enum CameraOrientation { NORTH_WEST, SOUTH_WEST, SOUTH_EST, NORTH_EST };
     public enum CameraInteractionState { MOVING, STOPPED }
 
-    private const float CAMERA_MAX_ZOOM = 5f;
-    private const float CAMERA_MIN_ZOOM = 80f;
+    private float CAMERA_MAX_ZOOM = 5f;
+    private float CAMERA_MIN_ZOOM = 80f;
     private const float MOUSE_BOUNDS = 2f;
     private const float BASE_ACCELERATION = 80f;
     private const float MAX_ACCELERATION = 200f;
@@ -53,7 +53,9 @@ public class CameraController : MonoBehaviour
 
     private MapBounds map1bounds;
 
-    
+    public enum Cameramode { Campaign, Main };
+
+    public Cameramode mode = Cameramode.Main;
 
     public float defaultLerpTime
     {
@@ -87,12 +89,23 @@ public class CameraController : MonoBehaviour
         isLerping = false;
         map1bounds.maxxyz = new Vector3(870f, 250.34f, 1067f);
         map1bounds.minxyz = new Vector3(-63f, 250.34f, 130f);
+
         actual_state = CameraInteractionState.STOPPED;
         last_state = CameraInteractionState.STOPPED;
         setCameraZoom(40f);
         setCameraSpeed(40f);
         lookAtPoint(new Vector3(896.4047f, 90.51f, 581.8263f));
+
+        if (mode == Cameramode.Campaign)
+        {
+            map1bounds.maxxyz = new Vector3(250f, 250.34f, 528f);
+            map1bounds.minxyz = new Vector3(-63f, 250.34f, 147f);
+            lookAtPoint(new Vector3(246f, 90.51f, -60));
+            CAMERA_MAX_ZOOM = 5f;
+            CAMERA_MIN_ZOOM = 50f;
+        }
     }
+
 
     void Update()
     {

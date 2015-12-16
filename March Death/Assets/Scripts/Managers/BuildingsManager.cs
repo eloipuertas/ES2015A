@@ -112,6 +112,7 @@ namespace Managers
                 _newBuilding.placing = true;
                 _newBuilding.continuousConstruction = continuousConstruction;
                 _player.setCurrently(Player.status.PLACING_BUILDING);
+                CheckBuildingDefaultRotation(race, type);
             }
 
         }
@@ -120,10 +121,7 @@ namespace Managers
         {
             Storage.BuildingInfo i = Storage.Info.get.of(race, type);
 
-            IsEnoughFood = _player.resources.getAmount(WorldResources.Type.FOOD) >= i.resources.food;
-            IsEnoughWood = _player.resources.getAmount(WorldResources.Type.WOOD) >= i.resources.wood;
-            IsEnoughMetal = _player.resources.getAmount(WorldResources.Type.METAL) >= i.resources.metal;
-            return IsEnoughFood && IsEnoughWood && IsEnoughMetal;
+            return ResourcesPlacer.get(BasePlayer.player).enoughResources(i.resources);
         }
 
 
@@ -171,6 +169,10 @@ namespace Managers
             {
                 position.y -= yOffset - 0.1f;
                 obj = Storage.Info.get.createBuilding(race, type, position, rotation);
+                if(type == Storage.BuildingTypes.STRONGHOLD)
+                {
+                    grid.reservePositionForStronghold(position);
+                }
                 grid.reservePosition(position);
             }
             return obj;
@@ -207,6 +209,10 @@ namespace Managers
 
                 GameObject finalBuilding = CreateFinalBuilding(_newBuilding.race, _newBuilding.type);
                 //TODO : (hermetico) restar recursos necesarios para crear el building
+                if (_newBuilding.type == Storage.BuildingTypes.STRONGHOLD)
+                {
+                    grid.reservePositionForStronghold(_newBuilding.building.gameObject.transform.position);
+                }
                 grid.reservePosition(newDestination);
                 newDestination.y -= yoffset - 0.1f;
                 finalBuilding.transform.position = newDestination;
@@ -283,7 +289,7 @@ namespace Managers
         private Vector3 GetNewDestination()
         {
             // 1. getPoint
-            Vector3 toLocation = _inputs.FindTerrainHitPoint();
+            Vector3 toLocation = _inputs.LastTerrainPos;
             // let the buildings not to fall down
             toLocation.y += yoffset;
             // 2. discretize
@@ -292,6 +298,27 @@ namespace Managers
 
         }
 
+
+
+        /// <summary>
+        /// Some buildings need a different rotation, not the default. In order to be shown properly
+        /// </summary>
+        /// <param name="race"></param>
+        /// <param name="type"></param>
+        private void CheckBuildingDefaultRotation(Storage.Races race, Storage.BuildingTypes type)
+        {
+            if (type == Storage.BuildingTypes.SAWMILL)
+            {
+                Debug.Log("Applying rotation to " + type);
+                ApplyRotation();
+            }
+            else if (race == Storage.Races.MEN && type == Storage.BuildingTypes.ARCHERY)
+            {
+                Debug.Log("Applying rotation to " + race + " " + type);
+                ApplyRotation();
+            }
+
+        }
 
         /// <summary>
         /// Moves the building to the mouse position

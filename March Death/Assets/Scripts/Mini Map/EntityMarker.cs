@@ -121,7 +121,7 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
 
             }
             else {
-                Debug.Log(gameObject.name + " has no FowEntity or perhaps has more than one."); // RAUL_DEB
+                Debug.LogError(gameObject.name + " has no FowEntity or perhaps has more than one."); // RAUL_DEB
             }
         }
     }
@@ -133,7 +133,6 @@ public class EntityMarker : SubscribableActor<EntityMarker.Actions, EntityMarker
 
     private void showCreate(int index)
     {
-        Debug.Log(gameObject.name + ": " + "CREATING"); // RAUL_DEB
         creation_rect = MinimapOverlays.CalculateBoxFromCntr(this.transform.position, mainCam, (int)((15f/(15f+11f))*(index+1))); // 11f : hack to make less vig the texture raul_hack
         GUI.DrawTexture(creation_rect, creation_tex) ;
     }
