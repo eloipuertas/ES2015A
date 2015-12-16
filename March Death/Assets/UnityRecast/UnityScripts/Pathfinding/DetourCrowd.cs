@@ -100,7 +100,7 @@ namespace Pathfinding
             
             ushort k = 0;
             var filters = _recastConfig.Filters.ToList();
-
+            filters.Reverse();
             foreach (var filter in filters)
             {
                 ushort include = 0;
