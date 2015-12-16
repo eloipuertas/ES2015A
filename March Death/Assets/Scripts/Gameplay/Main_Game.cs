@@ -87,11 +87,10 @@ public class Main_Game : MonoBehaviour
     private void LoadCampaign()
     {
         info.SetStoryBattle();
-        Debug.Log("Player - There are: " + GameObject.FindGameObjectsWithTag("Campaign_building_barrack_player").Length);
-        Debug.Log("Enemy - There are: " + GameObject.FindGameObjectsWithTag("Campaign_building_barrack_enemy").Length);
+        loadPlayers();
     }
 
-    private void LoadSkirmish()
+    private void loadPlayers()
     {
         int id = 1;
         foreach (Battle.PlayerInformation player in info.GetBattle().GetPlayerInformationList())
@@ -110,6 +109,11 @@ public class Main_Game : MonoBehaviour
             id++;
         }
         // TODO Set initial resources in the map
+    }
+
+    private void LoadSkirmish()
+    {
+        loadPlayers();
     }
 
     public void ClearGame()
