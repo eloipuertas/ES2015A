@@ -8,7 +8,7 @@ class SmartGate : MonoBehaviour
 
 
 
-    private float _radius = 20;
+    private float _radius = 10;
     private Animator _animator;
     private SphereCollider _collider;
     private List<IGameEntity> _enemies = new List<IGameEntity>();
