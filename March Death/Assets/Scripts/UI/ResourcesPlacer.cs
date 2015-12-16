@@ -200,8 +200,6 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
         {
             amount = sumDict(statistics[(WorldResources.Type)i]);
 
-            //Debug.Log("RESOURCE: " + (WorldResources.Type)i + ", amount: " + amount); // RAUL_DEB
-
             if (res_stats[i] != null)
             {
                 res_stats[i].text = "" + Math.Abs(Math.Round(amount, 2));
