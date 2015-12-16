@@ -119,7 +119,7 @@ public class GameSetupScript : MonoBehaviour
                 Destroy(menuMusic);
             }
             if (info.getGameMode() == GameInformation.GameMode.SKIRMISH)
-                Application.LoadLevel(3);
+                Application.LoadLevel("ES2015A");
             else
                 Instantiate(Resources.Load("welcomeStory")).name = "Welcome-Screen";
         }

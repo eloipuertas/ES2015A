@@ -86,8 +86,9 @@ public class Main_Game : MonoBehaviour
 
     private void LoadCampaign()
     {
-        // TODO Replace with appropriate functionality
-        LoadSkirmish();
+        info.SetStoryBattle();
+        Debug.Log("Player - There are: " + GameObject.FindGameObjectsWithTag("Campaign_building_barrack_player").Length);
+        Debug.Log("Enemy - There are: " + GameObject.FindGameObjectsWithTag("Campaign_building_barrack_enemy").Length);
     }
 
     private void LoadSkirmish()

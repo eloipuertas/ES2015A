@@ -3,15 +3,18 @@ using System.Collections;
 
 public class MissionScreen : MonoBehaviour
 {
+    public const string SCREEN_NAME = "Welcome-Screen";
+
     void Start()
     {
         Time.timeScale = 0;
+        // TODO Find "estandarte"; if exists, then update appropriately
     }
 
     public void Close()
     {
         Time.timeScale = 1;
-        Destroy(GameObject.Find("Welcome-Screen"));
+        Destroy(GameObject.Find(SCREEN_NAME));
     }
 
     public void LoadNextLevel()
