@@ -639,8 +639,9 @@ public class Unit : GameEntity<Unit.Actions>
             BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.FOOD, foodConsumed);
 
             Goods goods = new Goods(); // Generate the goods the units eat
-            goods.amount = 5;
-            // goods.amount = this.info.unitAttributes.foodConsumption; // RAUL_UNCOMMENT
+            //goods.amount = 5;
+            goods.amount = this.info.unitAttributes.foodConsumption; // RAUL_UNCOMMENT
+            Debug.Log("goods.amount= " + goods.amount);
             goods.type = Goods.GoodsType.FOOD;
 
             fire(Actions.EAT, goods);

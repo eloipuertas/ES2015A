@@ -200,12 +200,13 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
         {
             amount = sumDict(statistics[(WorldResources.Type)i]);
 
+            //Debug.Log("RESOURCE: " + (WorldResources.Type)i + ", amount: " + amount); // RAUL_DEB
+
             if (res_stats[i] != null)
             {
                 res_stats[i].text = "" + Math.Abs(Math.Round(amount, 2));
                 res_stats[i].color = amount >= 0 ? Color.green : Color.red;
                 arrows[i] = GetArrow(arrows[i], amount);
-                Debug.Log(i + " - " + arrows[i].name);
             }
         }
 
