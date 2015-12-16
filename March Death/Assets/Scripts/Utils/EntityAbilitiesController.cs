@@ -24,6 +24,8 @@ public class EntityAbilitiesController : MonoBehaviour
     private static Boolean showText = false;
 
     public static List<Ability> abilities_on_show = new List<Ability>();
+    public static List<Button> buttons_on_show = new List<Button>();
+    public static Dictionary<Ability,bool> affordable_buttons = new Dictionary<Ability, bool>();
 
     // Use this for initialization
     void Start()
@@ -167,6 +169,8 @@ public class EntityAbilitiesController : MonoBehaviour
         var nabilities = abilities.Count;
 
         abilities_on_show.Clear();
+        buttons_on_show.Clear();
+        affordable_buttons.Clear();
 
         for (int i = 0; i < nabilities; i++)
         {
@@ -184,8 +188,25 @@ public class EntityAbilitiesController : MonoBehaviour
                 });
                 var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
                 buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Columns) + 1));
-                CreateButton(rectTransform, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
+
+                bool interactable = ResourcesPlacer.get.enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
+                affordable_buttons[abilityObj] = interactable;
+                Button b = CreateButton(rectTransform, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
+                b.interactable = interactable;
+                buttons_on_show.Add(b);
             }
+        }
+
+    }
+
+    public static void ControlButtonsInteractability()
+    {
+        for (int i=0; i < buttons_on_show.Count; i++)
+        {
+            Button b = buttons_on_show[i];
+            bool interactable = ResourcesPlacer.get.enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
+            b.interactable = interactable;
+            affordable_buttons[abilities_on_show[i]] = interactable;
         }
     }
 
@@ -233,7 +254,7 @@ public class EntityAbilitiesController : MonoBehaviour
     /// <param name="extends">The extents of the button</param>
     /// <param name="action">Actin name</param>
     /// <param name="actionMethod">Method that will be called when we click the button</param>
-    void CreateButton(RectTransform panelTransform, Vector2 center, Vector2 extends, String ability, UnityAction actionMethod, Boolean enabled)
+    Button CreateButton(RectTransform panelTransform, Vector2 center, Vector2 extends, String ability, UnityAction actionMethod, Boolean enabled)
     {
         var transform = panelTransform.transform;
 
@@ -276,6 +297,7 @@ public class EntityAbilitiesController : MonoBehaviour
                                                                          button.GetComponent<RectTransform>().localPosition.y,
                                                                          0f);
 
+        return button;
         //button.enabled = false;
         //button.interactable = false;
         //button.enabled = false;
