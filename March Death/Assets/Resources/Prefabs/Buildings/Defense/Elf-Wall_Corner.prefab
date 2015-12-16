@@ -1798,7 +1798,6 @@ GameObject:
   - 114: {fileID: 11483086}
   - 114: {fileID: 11447732}
   - 114: {fileID: 11470178}
-  - 114: {fileID: 11437112}
   m_Layer: 11
   m_Name: Elf-Wall_Corner
   m_TagString: Untagged
@@ -2776,7 +2775,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 172170}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 683.491943, y: 78.9918823, z: 882.799866}
+  m_LocalPosition: {x: 780.01239, y: 78.9918823, z: 864.455078}
   m_LocalScale: {x: 1.27499998, y: 1.27499998, z: 1.27499998}
   m_Children:
   - {fileID: 490304}
@@ -5150,21 +5149,6 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &11437112
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 172170}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55673783568d5024f8240d70a3d2456f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DebugOnEditor: 1
-  Position: {x: 0, y: 0, z: 0}
-  Size: {x: 20, y: 10, z: 3.88000011}
-  CheckEverySeconds: 1
 --- !u!114 &11447732
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -5177,8 +5161,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DebugOnEditor: 1
-  Position: {x: 0, y: 0, z: 0}
-  Size: {x: 3.8900001, y: 8.25, z: 19.1399994}
+  Position: {x: 3, y: 0, z: 3}
+  Size: {x: 16, y: 8.25, z: 14}
   CheckEverySeconds: 1
 --- !u!114 &11470178
 MonoBehaviour:

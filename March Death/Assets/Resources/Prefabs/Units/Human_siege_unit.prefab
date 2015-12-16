@@ -2828,7 +2828,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b09a9a421fcedee4ea755b7daade40c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FilterIndex: 0
+  FilterIndex: 1
   Radius: 1.5
   Height: 2
   MaxSpeed: 2
@@ -2993,6 +2993,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: Flags
       value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: FilterIndex
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
