@@ -71,19 +71,23 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
     // EVENT METHODS
 
     private void OnNewHarvest(System.Object obj)
-    {
-        PopulationInfo.get.AddWorker();
-
+    {   
         IGameEntity entity = (IGameEntity)obj;
+
+        if (BasePlayer.getOwner(entity).Equals(BasePlayer.player))
+            PopulationInfo.get.AddWorker();
+
         ResourcesPlacer.get(BasePlayer.getOwner(entity)).StatisticsChanged(entity, CreatePackageFromEntity(entity));
     }
 
 
     private void OnNewExplorer(System.Object obj)
     {
-        PopulationInfo.get.RemoveWorker();
-
         IGameEntity entity = (IGameEntity)obj;
+
+        if (BasePlayer.getOwner(entity).Equals(BasePlayer.player))
+            PopulationInfo.get.RemoveWorker();
+
         ResourcesPlacer.get(BasePlayer.getOwner(entity)).StatisticsChanged(entity, CreatePackageFromEntity(entity));
     }
 
