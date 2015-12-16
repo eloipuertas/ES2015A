@@ -93,6 +93,13 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
                     unit.Troop.RemoveUnit(unit);
                 }
 
+                // No more units... deselect if selected
+                if (player.selection.SelectedSquad == unit.Squad && 
+                    player.selection.SelectedSquad.Units.Count == 0)
+                {
+                    player.selection.Deselect(entity);
+                }
+
                 // Now remove us from the squad, so that it doesn't get completely unselected
                 unit.Squad = null;
 

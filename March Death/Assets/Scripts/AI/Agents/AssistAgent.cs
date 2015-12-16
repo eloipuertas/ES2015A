@@ -16,7 +16,8 @@ namespace Assets.Scripts.AI.Agents
 		{
             Squad assisted = squad.AssistSquad;
             Vector2 cent = assisted.BoundingBox.Bounds.center;
-            Vector3 pos = new Vector3(cent.x, assisted.Units[0].transform.position.y, cent.y);
+            float y = (assisted.Units.Count>0)? assisted.Units[0].transform.position.y : 80f;
+            Vector3 pos = new Vector3(cent.x, y, cent.y);
             Vector2 ocent = squad.BoundingBox.Bounds.center;
             if (Vector2.Distance(cent, ocent) < 30) //join squads
             {

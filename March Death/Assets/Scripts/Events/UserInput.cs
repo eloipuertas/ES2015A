@@ -347,7 +347,7 @@ public partial class UserInput : MonoBehaviour
         selectedArea[3] = bottomLeft;
 
         Vector3 center = topLeft + (bottomRight - topLeft) / 2;
-        float radius = Mathf.Max(Vector3.Distance(topRight, topLeft), Vector3.Distance(bottomRight, topRight));
+        float radius = Vector3.Distance(topRight, bottomLeft);
         GameObject[] objects = Helpers.getObjectsNearPosition(center, radius);
         List<Unit> newInArea = new List<Unit>();
 

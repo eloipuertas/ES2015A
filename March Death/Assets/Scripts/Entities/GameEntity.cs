@@ -103,6 +103,9 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     Animator _animator = null;
 #endif
 
+    GameObject _humareda = null;
+    GameObject _foc = null;
+
     protected EntityAbility _accumulatedModifier;
     public R accumulatedModifier<R>() where R : EntityAbility
     {
@@ -274,6 +277,18 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         _obstacle = GetComponent<Pathfinding.DetourObstacle>();
         _collider = GetComponent<Collider>();
         _terrain = Terrain.activeTerrain;
+
+        Transform tempTransform = transform.Find("Humareda");
+        if (tempTransform != null)
+        {
+            _humareda = tempTransform.gameObject;
+        }
+
+        tempTransform = transform.Find("Foc");
+        if (tempTransform != null)
+        {
+            _foc = tempTransform.gameObject;
+        }
     }
 
     public void Destroy(bool immediately = false)
@@ -321,8 +336,18 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 						_autoRecoveryAccom = 0;
 						_autoRecoveryTimer = -1;
                         
-                        transform.Find("Humareda").gameObject.SetActive(false);
-                        transform.Find("Foc").gameObject.SetActive(false);
+                        if (info.isBuilding)
+                        {
+                            if (_humareda)
+                            {
+                                _humareda.SetActive(false);
+                            }
+
+                            if (_foc)
+                            {
+                                _foc.SetActive(false);
+                            }
+                        }
                     }
 				}
 			}
