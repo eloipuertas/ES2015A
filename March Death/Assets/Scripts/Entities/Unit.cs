@@ -122,6 +122,15 @@ public class Unit : GameEntity<Unit.Actions>
         }
     }
 
+    public bool IsAttacking
+    {
+        get
+        {
+            return status == EntityStatus.ATTACKING ||
+                (status == EntityStatus.MOVING && _followingTarget && _target != null);
+        }
+    }
+
     /// <summary>
     /// Max. euclidean distance to the target
     /// </summary>
