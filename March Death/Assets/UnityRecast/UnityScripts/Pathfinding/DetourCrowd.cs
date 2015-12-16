@@ -302,7 +302,26 @@ namespace Pathfinding
                 agent.IsPathPartial = partial[agent.ID];
 
                 Vector3 newPosition = positions.ToVector3(agent.ID * 3);
-                agent.transform.position = newPosition;
+
+                if (agent.Flies)
+                {
+                    Vector3 curPos = new Vector3(newPosition.x, agent.transform.position.y, newPosition.z);
+
+                    if (agent.GetComponent<Unit>().IsAttacking)
+                    {
+                        Vector3 desPos = new Vector3(newPosition.x, Mathf.Max(newPosition.y, Mathf.Max(newPosition.y, agent.transform.position.y) - 5f * Time.deltaTime), newPosition.z);
+                        agent.transform.position = desPos;
+                    }
+                    else
+                    {
+                        Vector3 desPos = new Vector3(newPosition.x, Mathf.Min(newPosition.y + 20f, Mathf.Max(newPosition.y, agent.transform.position.y) + 5f * Time.deltaTime), newPosition.z);
+                        agent.transform.position = desPos;
+                    }
+                }
+                else
+                {
+                    agent.transform.position = newPosition;
+                }
 
                 if (agent.Velocity.sqrMagnitude != 0)
                 {
