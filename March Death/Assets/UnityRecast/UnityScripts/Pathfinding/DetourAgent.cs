@@ -52,6 +52,7 @@ namespace Pathfinding
         public float Height = 2.0f;
         public float MaxSpeed = 2.0f;
         public float MaxAcceleration = 2.0f;
+        public bool Flies = false;
         
         [SerializeField] [EnumFlagsAttribute]
         public UpdateFlags Flags = UpdateFlags.DT_CROWD_OBSTACLE_AVOIDANCE;
