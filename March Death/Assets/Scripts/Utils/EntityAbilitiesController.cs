@@ -131,7 +131,7 @@ public class EntityAbilitiesController : MonoBehaviour
                 //}
                 // HACK: When this is fired, the button status should be updated! abilityObj.isActive might have changed...
             }
-            bool interactable = ResourcesPlacer.get.enoughResources(abilityObj.info<Storage.EntityAbility>());
+            bool interactable = ResourcesPlacer.get(BasePlayer.player).enoughResources(abilityObj.info<Storage.EntityAbility>());
             affordable_buttons[abilityObj] = interactable;
             buttonComponent.interactable = interactable;
             buttons_on_show.Add(buttonComponent);

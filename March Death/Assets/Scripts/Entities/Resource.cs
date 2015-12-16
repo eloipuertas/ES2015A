@@ -444,6 +444,7 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     public override void OnDestroy()
     {
+        fire(Actions.EXTERMINATED, _entity);
         base.OnDestroy();
     }
 
