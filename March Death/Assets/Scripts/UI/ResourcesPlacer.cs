@@ -63,9 +63,9 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
     /// </summary>
     /// <param name="type"></param>
     /// <param name="amount"></param>
-    public void Collect ( WorldResources.Type type , float amount  )
+    public void Collect(WorldResources.Type type, float amount)
     {
-        resources[type] += (int) amount;
+        resources[type] += (int)amount;
         updateAmounts();
     }
 
@@ -74,7 +74,7 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
     /// </summary>
     /// <param name="type"> </param>
     /// <param name="amount"> </param>
-    public void Consume ( WorldResources.Type type, float amount )
+    public void Consume(WorldResources.Type type, float amount)
     {
         resources[type] -= (int)((resources[type] - amount < 0) ? resources[type] : amount);
         updateAmounts();
@@ -85,7 +85,7 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
     /// </summary>
     /// <param name="amounts">A dictionary where type represents the WorldResources.Type and the 
     /// float represents the amount of WorldResources.Type whe will extract.</param>
-    public void Buy (Dictionary<WorldResources.Type, float> amounts)
+    public void Buy(Dictionary<WorldResources.Type, float> amounts)
     {
         foreach (KeyValuePair<WorldResources.Type, float> tuple in amounts)
             resources[tuple.Key] -= (int)((resources[tuple.Key] - tuple.Value < 0) ? 0 : tuple.Value);
@@ -114,7 +114,7 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
     /// <param name="packet">Package that represents an entity.</param>
     public void StatisticsChanged(IGameEntity entity, GrowthStatsPacket packet)
     {
-        
+
         if (statistics[packet.type].ContainsKey(entity))
         {
             statistics[packet.type][entity] = packet;
@@ -148,7 +148,7 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
     /// </summary>
     /// <param name="dict"></param>
     /// <returns></returns>
-    private float sumDict(Dictionary<IGameEntity,GrowthStatsPacket> dict)
+    private float sumDict(Dictionary<IGameEntity, GrowthStatsPacket> dict)
     {
         float sum = 0;
         float maxTime = 1;
@@ -159,15 +159,15 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
         }
         foreach (KeyValuePair<IGameEntity, GrowthStatsPacket> tuple in dict)
         {
-            sum += (maxTime/tuple.Value.updateTime) * tuple.Value.amount;
+            sum += (maxTime / tuple.Value.updateTime) * tuple.Value.amount;
         }
 
-        return sum/maxTime;
+        return sum / maxTime;
     }
 
-    private Image GetArrow(Image image , float amount)
+    private Image GetArrow(Image image, float amount)
     {
-        image.sprite = ( amount >= 0f ) ? up : down;
+        image.sprite = (amount >= 0f) ? up : down;
         image.color = (amount >= 0f) ? Color.green : Color.red;
 
         return image;
@@ -186,12 +186,12 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
             res_amounts[i].text = "" + resources[(WorldResources.Type)i];
         }
     }
-    
+
     public void updatePopulation()
     {
         pop.text = PopulationInfo.get.number_of_units.ToString();
     }
-    
+
     public void updateStatistics()
     {
         float amount;
@@ -204,7 +204,7 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
             {
                 res_stats[i].text = "" + Math.Abs(Math.Round(amount, 2));
                 res_stats[i].color = amount >= 0 ? Color.green : Color.red;
-                arrows[i] = GetArrow(arrows[i] , amount);
+                arrows[i] = GetArrow(arrows[i], amount);
                 Debug.Log(i + " - " + arrows[i].name);
             }
         }
@@ -214,13 +214,13 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
     public bool enoughResources(EntityAbility info)
     {
         EntityResources res;
-        
-        if(info.targetType.Equals(EntityType.BUILDING))
+
+        if (info.targetType.Equals(EntityType.BUILDING))
             res = Info.get.of(info.targetRace, info.targetBuilding).resources;
         else
             res = Info.get.of(info.targetRace, info.targetUnit).resources;
 
-        if (res.food <= resources[WorldResources.Type.FOOD] && res.wood <= resources[WorldResources.Type.WOOD] && 
+        if (res.food <= resources[WorldResources.Type.FOOD] && res.wood <= resources[WorldResources.Type.WOOD] &&
             res.metal <= resources[WorldResources.Type.METAL])
             return true;
         else
@@ -237,7 +237,7 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
         _player = GameObject.Find("GameController").GetComponent<Player>();
 
         for (int i = 0; i < txt_names.Length; i++)
-        {   
+        {
             GameObject obj;
             Text text;
             Image image;
@@ -263,7 +263,7 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
 
             res_stats.Add(text);
 
-            
+
             obj = GameObject.Find(_arrow);
             if (!obj) throw new Exception("Object " + _arrow + " not found!");
 
@@ -271,7 +271,7 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
             if (!text) throw new Exception("Component " + _arrow + " not found!");
 
             arrows.Add(image);
-            
+
         }
 
         GameObject go = GameObject.Find("HUD/resources/text_population");
@@ -292,7 +292,7 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
             t.fontStyle = FontStyle.BoldAndItalic;
         }
     }
-
+}
 public class CollectableGood
 {
     public IGameEntity entity;

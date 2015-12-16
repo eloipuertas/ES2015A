@@ -579,7 +579,7 @@ public class Unit : GameEntity<Unit.Actions>
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
         GameObject gameController = GameObject.Find("GameController");
         ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
-        register(Actions.EAT, res_pl.onFoodConsumption);
+        //register(Actions.EAT, res_pl.onFoodConsumption);
 
         _entity = this.GetComponent<IGameEntity>();
         
@@ -683,10 +683,11 @@ public class Unit : GameEntity<Unit.Actions>
                                 _projectileThrown = true;
                                 Vector3 projectile_position = new Vector3(transform.position.x, transform.position.y + GetComponent<Collider>().bounds.size.y, transform.position.z);
                                 GameObject projectile = Info.get.createProjectile(projectile_position, transform.rotation);
-                                Projectile projectile_cl = projectile.GetComponent<Projectile>();
+                                //FIXME bug after merge
+                                //Projectile projectile_cl = projectile.GetComponent<Projectile>();
                                 Vector3 projectileEndPoint = new Vector3(_target.getTransform().position.x, _target.getTransform().position.y + _target.getGameObject().GetComponent<Collider>().bounds.size.y, _target.getTransform().position.z);
-
-                                projectile_cl.setProps(projectileEndPoint, this, info.unitAttributes.projectileSpeed, info.unitAttributes.projectileRadius);
+                                //FIXME bug after merge
+                                //projectile_cl.setProps(projectileEndPoint, this, info.unitAttributes.projectileSpeed, info.unitAttributes.projectileRadius);
                                 _lastAttack = Time.time;
                             }
                         } else {
@@ -700,10 +701,7 @@ public class Unit : GameEntity<Unit.Actions>
                                 _lastAttack += (1f / info.unitAttributes.attackRate);
                             }
                         }
-                        else
-                        {
-                            _target.receiveAttack(this, canDoRangedAttack());
-                        }
+
 
                         _lastAttack = Time.time;
                     }
