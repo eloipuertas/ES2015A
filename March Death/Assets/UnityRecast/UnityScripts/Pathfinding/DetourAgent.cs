@@ -116,6 +116,7 @@ namespace Pathfinding
             ap.updateFlags = (byte)Flags;
             ap.obstacleAvoidanceType = (byte)AvoidanceType;
             ap.separationWeight = SeparationWeight;
+            ap.queryFilterType = (byte)FilterIndex;
 
             if (!firstUpdate)
             {
