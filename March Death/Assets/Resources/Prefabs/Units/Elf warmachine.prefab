@@ -4240,7 +4240,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 124812}
-  m_LocalRotation: {x: -.542548776, y: -.614388347, z: -.154076055, w: .551750422}
+  m_LocalRotation: {x: -.542548716, y: -.614388287, z: -.15407604, w: .551750362}
   m_LocalPosition: {x: 8.79168471e-09, y: .00183595775, z: 1.34110445e-09}
   m_LocalScale: {x: 1.00000095, y: 1.00000012, z: .99999994}
   m_Children:
@@ -4457,11 +4457,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b09a9a421fcedee4ea755b7daade40c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  FilterIndex: 0
   Radius: 1.5
   Height: 2
   MaxSpeed: 2
   MaxAcceleration: 2
-  Flags: 31
+  Flags: -1
   AvoidanceType: 1
   SeparationWeight: .5
 --- !u!114 &11475718

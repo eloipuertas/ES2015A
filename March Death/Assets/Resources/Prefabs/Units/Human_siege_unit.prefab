@@ -2828,11 +2828,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b09a9a421fcedee4ea755b7daade40c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  FilterIndex: 1
   Radius: 1.5
   Height: 2
   MaxSpeed: 2
   MaxAcceleration: 2
-  Flags: 31
+  Flags: -1
   AvoidanceType: 1
   SeparationWeight: .5
 --- !u!114 &11462468
@@ -2988,6 +2989,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Layer
       value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Flags
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: FilterIndex
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
