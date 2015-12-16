@@ -8,8 +8,9 @@ namespace Assets.Scripts.AI.Agents
 		const int CONFIDENCE_OWN_SQUAD_SUPREMACY = 75;
         const int CONFIDENCE_ENEMY_SQUAD_HAS_HERO = 500;
 		const int CONFIDENCE_OWN_SQUAD_SUPREMACI_MAX_MULTITPLIER = 5;
+        const int REQUEST_PRIORITY = 74;
 
-		float _maxUnitRange;
+        float _maxUnitRange;
 		Storage.Races _enemyRace;
 
         int conf;
@@ -68,7 +69,7 @@ namespace Assets.Scripts.AI.Agents
                         ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
                     }
                 }
-                    
+                assistAgent.requestHelp(squad, REQUEST_PRIORITY);
             }
         }
         

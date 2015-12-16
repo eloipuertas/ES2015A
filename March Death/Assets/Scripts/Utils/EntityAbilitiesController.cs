@@ -54,11 +54,13 @@ public class EntityAbilitiesController : MonoBehaviour
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 
         entity.doIfResource(resource => {
-            resource.register(Resource.Actions.BUILDING_FINISHED, showActions);
+            fixKeybinds(gameObject);
+            resource.register(Resource.Actions.BUILDING_FINISHED, showActionButtons);
         });
 
         entity.doIfBarrack(barrack => {
-            barrack.register(Barrack.Actions.BUILDING_FINISHED, showActions);
+            fixKeybinds(gameObject);
+            barrack.register(Barrack.Actions.BUILDING_FINISHED, showActionButtons);
         });
     }
 
@@ -68,21 +70,22 @@ public class EntityAbilitiesController : MonoBehaviour
 
         GameObject gameObject = (GameObject) obj;
 
-        hideActionButtons(gameObject);
-
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
 
         entity.doIfResource(resource => {
-            resource.unregister(Resource.Actions.BUILDING_FINISHED, showActions);
+            resource.unregister(Resource.Actions.BUILDING_FINISHED, showActionButtons);
         });
 
         entity.doIfBarrack(barrack => {
-            barrack.unregister(Barrack.Actions.BUILDING_FINISHED, showActions);
+            barrack.unregister(Barrack.Actions.BUILDING_FINISHED, showActionButtons);
         });
+
+        hideActionButtons(gameObject);
     }
 
-    private void showActionButtons(GameObject objeto)
+    private void showActionButtons(System.Object obj)
     {
+        GameObject objeto = (GameObject)obj;
         IGameEntity entity = objeto.GetComponent<IGameEntity>();
         GameObject actionPanel = GameObject.Find("HUD/actions");
         actionPanel.GetComponent<Image>().enabled = true;
@@ -109,6 +112,7 @@ public class EntityAbilitiesController : MonoBehaviour
                         Debug.Log("* " + abilityObj);
                         abilityObj.enable();
                     });
+					image.name=ability;
                     image.sprite = CreateSprite(ability, image.rectTransform.sizeDelta);
                     buttonComponent.targetGraphic = image;
                     buttonComponent.onClick.AddListener(() => actionMethod());
@@ -125,8 +129,27 @@ public class EntityAbilitiesController : MonoBehaviour
             }
         }
     }
+    // Hack to get key bindings working.  
+    void fixKeybinds(System.Object obj)
+    {
+        GameObject gameObject = (GameObject)obj;
+        IGameEntity entity = gameObject.GetComponent<IGameEntity>();
+        var abilities = entity.info.abilities;
+        var nabilities = abilities.Count;
 
-	void showActions(System.Object obj)
+        abilities_on_show.Clear();
+        for (int i = 0; i < nabilities; i++)
+        {
+            String ability = abilities[i].name;
+            Ability abilityObj = entity.getAbility(ability);
+            if (abilityObj.isUsable)
+            {
+                abilities_on_show.Add(abilityObj);
+            }
+
+        }
+    }
+    void showActions(System.Object obj)
     {
 		GameObject gameObject = (GameObject) obj;
         GameObject actionPanel = GameObject.Find("HUD/actions");
@@ -173,9 +196,11 @@ public class EntityAbilitiesController : MonoBehaviour
         var nabilities = abilities.Count;
         for (int i = 0; i < nabilities; i++)
         {
-            GameObject button = GameObject.Find("Button " + i);
+            GameObject button = GameObject.Find(abilities[i].name);
+			if(button==null) button= GameObject.Find("Button "+i);
             var buttonComponent = button.GetComponent<Button>();
             var image = buttonComponent.GetComponent<Image>();
+			image.name="Button "+i;
             var eventTrigger = button.GetComponent<EventTrigger>();
             image.enabled = false;
             eventTrigger.enabled = false;

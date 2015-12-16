@@ -59,31 +59,34 @@ namespace Assets.Scripts.AI
                 {
                     // Update squad
                     squads[i].Update();
-                    float bVal = float.MinValue;
-                    BaseAgent bAgent = agents[0];
-                    int val;
-                    foreach (BaseAgent a in agents)
+                    if (squads[i].Units.Count > 0)
                     {
-                        val = a.getConfidence(squads[i]);
-                        if (AIController.AI_DEBUG_ENABLED) ai.aiDebug.setAgentConfidence(a.agentName, val);
-                        if (val > bVal)
+                        float bVal = float.MinValue;
+                        BaseAgent bAgent = agents[0];
+                        int val;
+                        foreach (BaseAgent a in agents)
                         {
-                            bVal = val;
-                            bAgent = a;
+                            val = a.getConfidence(squads[i]);
+                            if (AIController.AI_DEBUG_ENABLED) ai.aiDebug.setAgentConfidence(a.agentName, val);
+                            if (val > bVal)
+                            {
+                                bVal = val;
+                                bAgent = a;
+                            }
                         }
-                    }
 
-                    squads[i].UserData = bAgent;
-                    if (AIController.AI_DEBUG_ENABLED)
-                    {
-                        ai.aiDebug.setControllingAgent(bAgent.agentName, bVal);
-                    }
+                        squads[i].UserData = bAgent;
+                        if (AIController.AI_DEBUG_ENABLED)
+                        {
+                            ai.aiDebug.setControllingAgent(bAgent.agentName, bVal);
+                        }
 
-                    bAgent.controlUnits(squads[i]);
+                        bAgent.controlUnits(squads[i]);
 
-                    foreach (BaseAgent agent in agents)
-                    {
-                        agent.PostSquad();
+                        foreach (BaseAgent agent in agents)
+                        {
+                            agent.PostSquad();
+                        }
                     }
                 }
 

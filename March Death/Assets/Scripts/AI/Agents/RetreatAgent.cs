@@ -13,7 +13,7 @@ namespace Assets.Scripts.AI.Agents
 
         private const int CONFIDENCE_IN_ENEMY_ATACK_RANGE = 75;
         private const int CONFIDENCE_HERO_IS_AT_FIFTY_PERCENT = 1000;
-        private const int CONFIDENCE_ASSIST_HELP_NEEDED = 400;
+        private const int CONFIDENCE_ASSIST_HELP_NEEDED = 100;
 
         AttackAgent attackAgent;
         AssistAgent assistAgent;
@@ -39,31 +39,27 @@ namespace Assets.Scripts.AI.Agents
 
         public override void controlUnits(Squad squad)
         {
-            if (ai.EnemyUnits.Count > 0)
+            // Mirar on estan els enemics
+            enemySquadBoundingBox = squad.EnemySquad.BoundingBox.Bounds;
+
+            // Mirar on estic jo
+            ownSquadBoundingBox = squad.BoundingBox.Bounds;
+
+            // Intentar Veure on hauria d'anar una unitat per estar protegida
+            recalcSafePoint();
+            foreach (Unit u in squad.Units)
             {
-                // Mirar on estan els enemics
-                enemySquadBoundingBox = squad.EnemySquad.BoundingBox.Bounds;
-
-                // Mirar on estic jo
-                ownSquadBoundingBox = squad.BoundingBox.Bounds;
-
-                // Intentar Veure on hauria d'anar una unitat per estar protegida
-                recalcSafePoint();
-                foreach (Unit u in squad.Units)
+                if (u.status != EntityStatus.DEAD)
                 {
-                    if (u.status != EntityStatus.DEAD)
-                    {
-                        u.moveTo(safeArea);
-                    }
-
-                    if (AIController.AI_DEBUG_ENABLED)
-                    {
-                        ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
-                    }
+                    u.moveTo(safeArea);
                 }
-                assistAgent.addConfidence(CONFIDENCE_ASSIST_HELP_NEEDED);
-                assistAgent.requestHelp(new KeyValuePair<Squad, int>(squad, CONFIDENCE_ASSIST_HELP_NEEDED));
+
+                if (AIController.AI_DEBUG_ENABLED)
+                {
+                    ai.aiDebug.registerDebugInfoAboutUnit(u, this.agentName);
+                }
             }
+            assistAgent.requestHelp(squad, CONFIDENCE_ASSIST_HELP_NEEDED);
         }
 
 
@@ -94,7 +90,6 @@ namespace Assets.Scripts.AI.Agents
                     }
                 }
             }
-             
             return confidence;
         }
 

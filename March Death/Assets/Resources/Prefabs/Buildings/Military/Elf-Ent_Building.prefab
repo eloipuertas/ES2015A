@@ -571,7 +571,7 @@ GameObject:
   - 4: {fileID: 497096}
   - 33: {fileID: 3379328}
   - 23: {fileID: 2389722}
-  m_Layer: 11
+  m_Layer: 9
   m_Name: Plano subdividido
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2650,7 +2650,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 160048}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 766.818542, y: 79.0026245, z: 861.629211}
+  m_LocalPosition: {x: 790.306152, y: 79.0026245, z: 858.74231}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 478026}
@@ -4955,8 +4955,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 20, y: 30, z: 20}
-  m_Center: {x: 0, y: 15, z: 0}
+  m_Size: {x: 20, y: 25, z: 20}
+  m_Center: {x: 0, y: 12.4499998, z: 0}
 --- !u!95 &9547922
 Animator:
   serializedVersion: 3
@@ -5013,7 +5013,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DebugOnEditor: 1
   Position: {x: 0, y: 0, z: 0}
-  Size: {x: 20, y: 40, z: 20}
+  Size: {x: 20, y: 25, z: 20}
   CheckEverySeconds: 1
 --- !u!114 &11497610
 MonoBehaviour:
@@ -7388,7 +7388,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Layer
-      value: 11
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
