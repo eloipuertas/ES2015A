@@ -217,6 +217,9 @@ public class Unit : GameEntity<Unit.Actions>
 
         fire(Actions.DIED);
 
+        // Clear target, just in case
+        _target = null;
+
         if (BasePlayer.isOfPlayer(this))
         {
             statistics.growth_speed *= -1;
@@ -300,7 +303,6 @@ public class Unit : GameEntity<Unit.Actions>
     /// <returns></returns>
     public bool goToBuilding(IGameEntity building)
     {
-
         _target = building;
         _followingTarget = true;
         _movePoint = building.getTransform().position;
@@ -325,6 +327,12 @@ public class Unit : GameEntity<Unit.Actions>
         // Note: Cast is redundant but avoids warning
         if (_target != (IGameEntity)entity)
         {
+            // Cancel attacking current unit if any
+            if (status == EntityStatus.ATTACKING)
+            {
+                stopAttack();
+            }
+
             // Register for DEAD/DESTROYED and HIDDEN
             _auto += entity.registerFatalWounds(onTargetDied);
             _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
