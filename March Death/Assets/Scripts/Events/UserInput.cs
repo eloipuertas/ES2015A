@@ -103,8 +103,11 @@ public partial class UserInput : MonoBehaviour
             sManager.DragStart();
         }
 
+        
+        // New approach, checking if the click is over an event system object
+        if(EventSystem.current.IsPointerOverGameObject())
         // FIXME: add HUD colliders
-        if (rectActions.Contains(Input.mousePosition) || rectInformation.Contains(Input.mousePosition) || minimapCamera.pixelRect.Contains(Input.mousePosition) )
+        //if (rectActions.Contains(Input.mousePosition) || rectInformation.Contains(Input.mousePosition) || minimapCamera.pixelRect.Contains(Input.mousePosition) )
         {
             currentAction = action.NONE;
             return;
@@ -344,7 +347,7 @@ public partial class UserInput : MonoBehaviour
         selectedArea[3] = bottomLeft;
 
         Vector3 center = topLeft + (bottomRight - topLeft) / 2;
-        float radius = Mathf.Max(Vector3.Distance(topRight, topLeft), Vector3.Distance(bottomRight, topRight));
+        float radius = Vector3.Distance(topRight, bottomLeft);
         GameObject[] objects = Helpers.getObjectsNearPosition(center, radius);
         List<Unit> newInArea = new List<Unit>();
 

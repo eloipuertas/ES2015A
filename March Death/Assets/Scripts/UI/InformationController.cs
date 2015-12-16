@@ -76,9 +76,13 @@ public partial class InformationController : MonoBehaviour
 		panelSize = rectTransform.sizeDelta;
 		center = rectTransform.position;
 		globalScaleXY = new Vector2(rectTransform.lossyScale.x, rectTransform.lossyScale.y);
-		unitCreationPanel = Vector2.Scale(panelSize, globalScaleXY);
+
+        //FIXME Bug after merge
+        Vector2 unitCreationPanel;
+        unitCreationPanel = Vector2.Scale(panelSize, globalScaleXY);
 		creationQueueButtonSize = new Vector2(unitCreationPanel.x / 5, unitCreationPanel.y);
 		creationQueueInitialPoint = new Vector2(center.x - unitCreationPanel.x, center.y + unitCreationPanel.y);
+        
 
         //Inicializate window extended info
         windowInfo = GameObject.Find("HUD/windowInfo");

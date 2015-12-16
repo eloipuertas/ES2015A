@@ -6,105 +6,184 @@ using System.Collections.Generic;
 using Utils;
 using System;
 
-public class ResourcesPlacer : MonoBehaviour
+public class ResourcesPlacer : Singleton<ResourcesPlacer>
 {
     // attributes
-    private const float UPDATE_STATS = 1.5f;
-    private float _timer = 1.5f;
-
     private readonly string[] txt_names = { "meat", "wood", "metal" };
-    private WorldResources.Type[] t = { WorldResources.Type.FOOD, WorldResources.Type.WOOD, WorldResources.Type.METAL };
-    private List<Text> res_amounts;
-    private List<Text> res_stats;
+    private readonly string[] txt_namesOther = { "food", "wood", "metal" };
+
+    private List<Text> res_amounts, res_stats;
+
+    /// <summary>
+    /// Population text where number of units are displayed
+    /// </summary>
     private Text pop;
+    private Player _player;
 
-    private float[] _statistics = { 0f, 0f, 0f };
+    private Sprite up;
+    private Sprite down;
 
-    void Start()
+    private List<Image> arrows;
+
+    Dictionary<WorldResources.Type, int> resources;
+    Dictionary<WorldResources.Type, Dictionary<IGameEntity, GrowthStatsPacket>> statistics;
+
+
+    private ResourcesPlacer()
     {
         res_amounts = new List<Text>();
         res_stats = new List<Text>();
-        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
+        arrows = new List<Image>();
 
-        for (int i = 0; i < txt_names.Length; i++)
-        {
+        Setup();
 
-            GameObject obj;
-            Text text;
+        initializeResources();
+        initializeStatistics();
 
-            string _text = "HUD/resources/text_" + txt_names[i];
-            string _stats = "HUD/resources/text_" + txt_names[i] + "_hour";
-
-
-            obj = GameObject.Find(_text);
-            if (!obj) throw new Exception("Object " + _text + " not found!");
-
-            text = obj.GetComponent<Text>();
-            if (!text) throw new Exception("Component " + _text + " not found!");
-
-            res_amounts.Add(text);
-
-            obj = GameObject.Find(_stats);
-            if (!obj) throw new Exception("Object " + _text + " not found!");
-
-            text = obj.GetComponent<Text>();
-            if (!text) throw new Exception("Component " + _text + " not found!");
-
-            res_stats.Add(text);
-        }
-
-        GameObject go = GameObject.Find("HUD/resources/text_population");
-        if (!go) throw new Exception("Object text_population not found!");
-
-        pop = go.GetComponent<Text>();
-
-        setupText();
         updateAmounts();
-
-        // Regiter for all unit created events
-        Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.CREATED, onUnitCreated);
+        updateStatistics();
+        updatePopulation();
     }
 
-    void Update()
+
+    // Resources 
+
+    private void initializeResources()
     {
-        if (_timer >= UPDATE_STATS)
+        resources = new Dictionary<WorldResources.Type, int>()
         {
-            updateStatistics();
-            updatePopulation();
-            _timer = 0f;
-        }
-        else _timer += Time.deltaTime;
-
+            { WorldResources.Type.FOOD ,  (int) _player.resources.getAmount(WorldResources.Type.FOOD) } ,
+            { WorldResources.Type.WOOD ,  (int) _player.resources.getAmount(WorldResources.Type.WOOD) } ,
+            { WorldResources.Type.METAL , (int) _player.resources.getAmount(WorldResources.Type.METAL) }
+        };
     }
-
-    void OnDestroy()
-    {
-        Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.CREATED, onUnitCreated);
-    }
-
-    // PUBLIC METHODS
 
     /// <summary>
-    /// Substracts the costs for the unit from the players deposit.
+    /// Collect an amount (amount) from a type (type).  
     /// </summary>
-    /// <param name="entity"></param>
-    public void updateUnitCreated(IGameEntity entity)
+    /// <param name="type"></param>
+    /// <param name="amount"></param>
+    public void Collect(WorldResources.Type type, float amount)
     {
-        BasePlayer.getOwner(entity).resources.SubstractAmount(WorldResources.Type.FOOD, entity.info.resources.food);
-        BasePlayer.getOwner(entity).resources.SubstractAmount(WorldResources.Type.WOOD, entity.info.resources.wood);
-        BasePlayer.getOwner(entity).resources.SubstractAmount(WorldResources.Type.METAL, entity.info.resources.metal);
-
-        if (BasePlayer.isOfPlayer(entity))
-        {
-            updateAmounts();
-        }
+        resources[type] += (int)amount;
+        updateAmounts();
     }
+
+    /// <summary>
+    /// Units consume a certain amount froma a certain WorldResources.Type
+    /// </summary>
+    /// <param name="type"> </param>
+    /// <param name="amount"> </param>
+    public void Consume(WorldResources.Type type, float amount)
+    {
+        resources[type] -= (int)((resources[type] - amount < 0) ? resources[type] : amount);
+        updateAmounts();
+    }
+
+    /// <summary>
+    /// Method to remove resources from the top HUD when you buy an ability.
+    /// </summary>
+    /// <param name="amounts">A dictionary where type represents the WorldResources.Type and the 
+    /// float represents the amount of WorldResources.Type whe will extract.</param>
+    public void Buy(Dictionary<WorldResources.Type, float> amounts)
+    {
+        foreach (KeyValuePair<WorldResources.Type, float> tuple in amounts)
+            resources[tuple.Key] -= (int)((resources[tuple.Key] - tuple.Value < 0) ? 0 : tuple.Value);
+
+        updateAmounts();
+    }
+
+
+    // Statistics 
+
+    private void initializeStatistics()
+    {
+        statistics = new Dictionary<WorldResources.Type, Dictionary<IGameEntity, GrowthStatsPacket>>()
+        {
+            { WorldResources.Type.FOOD  , new Dictionary<IGameEntity, GrowthStatsPacket>() { } } ,
+            { WorldResources.Type.WOOD  , new Dictionary<IGameEntity, GrowthStatsPacket>() { } } ,
+            { WorldResources.Type.METAL , new Dictionary<IGameEntity, GrowthStatsPacket>() { } }
+        };
+    }
+
+    /// <summary>
+    /// Method to call when a unit or a resource is created or when a resource building 
+    /// adds or removes a worker. 
+    /// </summary>
+    /// <param name="entity">Entity where their inner stats have changed.</param>
+    /// <param name="packet">Package that represents an entity.</param>
+    public void StatisticsChanged(IGameEntity entity, GrowthStatsPacket packet)
+    {
+
+        if (statistics[packet.type].ContainsKey(entity))
+        {
+            statistics[packet.type][entity] = packet;
+        }
+        else
+        {
+            statistics[packet.type].Add(entity, packet);
+        }
+
+        updateStatistics();
+    }
+
+    /// <summary>
+    /// Removes entity from the main dictionary.
+    /// </summary>
+    /// <param name="type">Type of resource this entity creates/destroys.</param>
+    /// <param name="entity">Entity to Destroy.</param>
+    public void RemoveEntity(WorldResources.Type type, IGameEntity entity)
+    {
+        statistics[type].Remove(entity);
+        updateStatistics();
+    }
+
+
+
+
+    // Others
+
+    /// <summary>
+    /// Returns the stat from a given dictionary.
+    /// </summary>
+    /// <param name="dict"></param>
+    /// <returns></returns>
+    private float sumDict(Dictionary<IGameEntity, GrowthStatsPacket> dict)
+    {
+        float sum = 0;
+        float maxTime = 1;
+
+        foreach (KeyValuePair<IGameEntity, GrowthStatsPacket> tuple in dict)
+        {
+            if (maxTime < tuple.Value.updateTime) maxTime = tuple.Value.updateTime;
+        }
+        foreach (KeyValuePair<IGameEntity, GrowthStatsPacket> tuple in dict)
+        {
+            sum += (maxTime / tuple.Value.updateTime) * tuple.Value.amount;
+        }
+
+        return sum / maxTime;
+    }
+
+    private Image GetArrow(Image image, float amount)
+    {
+        image.sprite = (amount >= 0f) ? up : down;
+        image.color = (amount >= 0f) ? Color.green : Color.red;
+
+        return image;
+    }
+
+
+
+    // Updating Texts
 
     public void updateAmounts()
     {
+        EntityAbilitiesController.ControlButtonsInteractability();
+
         for (int i = 0; i < txt_names.Length; i++)
         {
-            res_amounts[i].text = "" + BasePlayer.player.resources.getAmount(t[i]);
+            res_amounts[i].text = "" + resources[(WorldResources.Type)i];
         }
     }
 
@@ -115,144 +194,105 @@ public class ResourcesPlacer : MonoBehaviour
 
     public void updateStatistics()
     {
+        float amount;
+
         for (int i = 0; i < txt_names.Length; i++)
         {
-            res_stats[i].text = "" + System.Math.Round(_statistics[i], 2) + "/s";
-            res_stats[i].color = _statistics[i] >= 0 ? Color.gray : Color.red;
+            amount = sumDict(statistics[(WorldResources.Type)i]);
+
+            if (res_stats[i] != null)
+            {
+                res_stats[i].text = "" + Math.Abs(Math.Round(amount, 2));
+                res_stats[i].color = amount >= 0 ? Color.green : Color.red;
+                arrows[i] = GetArrow(arrows[i], amount);
+                Debug.Log(i + " - " + arrows[i].name);
+            }
         }
+
     }
 
-    public void insufficientFundsColor(IGameEntity entity)
+    public bool enoughResources(EntityAbility info)
     {
-        if (entity.info.resources.food > BasePlayer.player.resources.getAmount(WorldResources.Type.FOOD))
-            res_amounts[0].color = Color.red;
-        if (entity.info.resources.wood > BasePlayer.player.resources.getAmount(WorldResources.Type.WOOD))
-            res_amounts[1].color = Color.red;
-        if (entity.info.resources.metal > BasePlayer.player.resources.getAmount(WorldResources.Type.METAL))
-            res_amounts[2].color = Color.red;
+        EntityResources res;
+
+        if (info.targetType.Equals(EntityType.BUILDING))
+            res = Info.get.of(info.targetRace, info.targetBuilding).resources;
+        else
+            res = Info.get.of(info.targetRace, info.targetUnit).resources;
+
+        if (res.food <= resources[WorldResources.Type.FOOD] && res.wood <= resources[WorldResources.Type.WOOD] &&
+            res.metal <= resources[WorldResources.Type.METAL])
+            return true;
+        else
+            return false;
     }
 
-    public void clearColor()
-    {
-        foreach (Text t in res_amounts)
-            t.color = Color.white;
-    }
-
-    // PRIVATE METHODS
+    // Setup GameObjects
 
     /// <summary>
-    /// Checks if the game object is a hero or a stronghold. (Improve)
+    /// Just initializations.
     /// </summary>
-    /// <param name="ige"></param>
-    /// <returns></returns>
-    private bool isStarter(IGameEntity ige)
+    private void Setup()
     {
-        if (ige.info.isBuilding)
-        {
-            // TODO: If more Stronghold(s) can ever be done, this will not work
-            if (ige.info.isBarrack)
-            {
-                return ((Barrack)ige).type == BuildingTypes.STRONGHOLD;
-            }
+        _player = GameObject.Find("GameController").GetComponent<Player>();
 
-            return false;
-        }
-        else
+        for (int i = 0; i < txt_names.Length; i++)
         {
-            // TODO: If more Hero(s) can ever be done, this will not work
-            return ((Unit)ige).type != UnitTypes.HERO;
-        }
-    }
+            GameObject obj;
+            Text text;
+            Image image;
 
-    private void setupText()
-    {
+            string _text = "HUD/resources/text_" + txt_names[i];
+            string _stats = "HUD/resources/text_" + txt_names[i] + "_hour";
+            string _arrow = "HUD/resources/flecha_" + txt_namesOther[i];
+
+            obj = GameObject.Find(_text);
+            if (!obj) throw new Exception("Object " + _text + " not found!");
+
+            text = obj.GetComponent<Text>();
+            if (!text) throw new Exception("Component " + _text + " not found!");
+
+            res_amounts.Add(text);
+
+
+            obj = GameObject.Find(_stats);
+            if (!obj) throw new Exception("Object " + _stats + " not found!");
+
+            text = obj.GetComponent<Text>();
+            if (!text) throw new Exception("Component " + _stats + " not found!");
+
+            res_stats.Add(text);
+
+
+            obj = GameObject.Find(_arrow);
+            if (!obj) throw new Exception("Object " + _arrow + " not found!");
+
+            image = obj.GetComponent<Image>();
+            if (!text) throw new Exception("Component " + _arrow + " not found!");
+
+            arrows.Add(image);
+
+        }
+
+        GameObject go = GameObject.Find("HUD/resources/text_population");
+        if (!go) throw new Exception("Object text_population not found!");
+
+
+        pop = go.GetComponent<Text>();
+
+        up = Resources.Load<Sprite>("Statistics_icons/flecha_verde");
+        if (up == null) throw new NullReferenceException("Up icon not found!");
+
+        down = Resources.Load<Sprite>("Statistics_icons/flecha_roja");
+        if (down == null) throw new NullReferenceException("Down icon not found!");
+
         foreach (Text t in res_amounts)
         {
             t.color = Color.white;
             t.fontStyle = FontStyle.BoldAndItalic;
         }
     }
-
-
-    // EVENTS
-
-    void onUnitCreated(System.Object obj)
-    {
-        GameObject go = (GameObject)obj;
-
-        if (go)
-        {
-            IGameEntity i_game = go.GetComponent<IGameEntity>();
-
-            if (!isStarter(i_game))
-            {
-                updateUnitCreated(i_game);
-            }
-        }
-    }
-
-
-    public void onStatisticsUpdate(System.Object obj)
-    {
-        Statistics st = (Statistics)obj;
-
-        switch (st._type)
-        {
-            case WorldResources.Type.FOOD:
-                _statistics[0] += st.growth_speed;
-                break;
-            case WorldResources.Type.WOOD:
-                _statistics[1] += st.growth_speed;
-                break;
-            case WorldResources.Type.METAL:
-                _statistics[2] += st.growth_speed;
-                break;
-            default:
-                break;
-        }
-
-    }
-
-    public void onFoodConsumption(System.Object obj)
-    {
-        CollectableGood collectable = (CollectableGood)obj;
-        Goods goods = collectable.goods;
-
-        BasePlayer.getOwner(collectable.entity).resources.SubstractAmount(t[0], goods.amount); // t[0] is FOOD
-
-        if (BasePlayer.isOfPlayer(collectable.entity))
-        {
-            updateAmounts();
-        }
-    }
-
-    public void onCollection(System.Object obj)
-    {
-        CollectableGood collectable = (CollectableGood)obj;
-        Goods goods = collectable.goods;
-
-        switch (goods.type)
-        {
-            case Goods.GoodsType.FOOD:
-                BasePlayer.getOwner(collectable.entity).resources.AddAmount(t[0], goods.amount);
-                break;
-            case Goods.GoodsType.WOOD:
-                BasePlayer.getOwner(collectable.entity).resources.AddAmount(t[1], goods.amount);
-                break;
-            case Goods.GoodsType.METAL:
-                BasePlayer.getOwner(collectable.entity).resources.AddAmount(t[2], goods.amount);
-                break;
-            default:
-                break;
-        }
-
-        if (BasePlayer.isOfPlayer(collectable.entity))
-        {
-            updateAmounts();
-        }
-    }
 }
-
 public class CollectableGood
 {
     public IGameEntity entity;

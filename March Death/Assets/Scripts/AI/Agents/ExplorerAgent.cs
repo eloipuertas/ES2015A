@@ -120,7 +120,7 @@ namespace Assets.Scripts.AI.Agents
             // Update squads exploring
             ++numberSquadsExploring;
 
-            if(squad.Units[0].type == Storage.UnitTypes.HERO && Time.time > HERO_GO_TO_BASE && !destinatedToBase)
+            if(squad.Units[0].type == Storage.UnitTypes.HERO && squad.Units.Count == 1 && Time.time > HERO_GO_TO_BASE && !destinatedToBase)
             {
                 squad.Units[0].moveTo(new Vector3(ai.rootBasePosition.x + 30f, ai.rootBasePosition.y, ai.rootBasePosition.z + 10f));
                 this.destinatedToBase = true;

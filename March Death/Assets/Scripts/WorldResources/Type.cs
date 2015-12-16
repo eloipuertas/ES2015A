@@ -2,6 +2,6 @@
 {
     public enum Type
     {
-        WOOD, FOOD, METAL, GOLD
+        FOOD, WOOD, METAL, GOLD
     }
 }

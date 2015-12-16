@@ -24,7 +24,7 @@ namespace Assets.Scripts.AI.Agents
         /// </summary>
         Stack<int> timings;
         bool attacking;
-        IGameEntity target;
+        IGameEntity target, lastTarget;
         List<Vector3> patrolPoints;
         System.Random rnd;
 
@@ -40,6 +40,8 @@ namespace Assets.Scripts.AI.Agents
             patrolPoints = ai.Macro.architect.baseCriticPoints;
             attacking = false;
             FIND_PLAYER_RATE = FIND_PLAYER_RATE - 60 * ai.DifficultyLvl;
+            lastTarget = null;
+            target = null;
         }
         public override void controlUnits(Squad squad)
         {
@@ -47,14 +49,7 @@ namespace Assets.Scripts.AI.Agents
             {
                 if(target != null && target.status != EntityStatus.DESTROYED)
                 {
-                    try
-                    {
-                        squad.AttackTo(target);                 
-                    }
-                    catch(Exception ex)
-                    {
-                        target = null;
-                    }
+                        squad.AttackTo(target);
                 }
                 else
                 {
@@ -216,11 +211,33 @@ namespace Assets.Scripts.AI.Agents
                 else
                 {
                     lastSmell = Time.time;
-                    target = ai.race == Storage.Races.ELVES ? Helpers.getBuildingsOfRaceNearPosition(ai.Micro.squads[0].BoundingBox.Bounds.center, 2000f, Storage.Races.MEN)[0] : Helpers.getBuildingsOfRaceNearPosition(ai.Micro.squads[0].BoundingBox.Bounds.center, 800f, Storage.Races.ELVES)[0];
-                    ai.EnemyBuildings.Add(target);
+                    List<IBuilding> detected = ai.race == Storage.Races.ELVES ? Helpers.getBuildingsOfRaceNearPosition(ai.Micro.squads[0].BoundingBox.Bounds.center, 2000f, Storage.Races.MEN) : Helpers.getBuildingsOfRaceNearPosition(ai.Micro.squads[0].BoundingBox.Bounds.center, 800f, Storage.Races.ELVES);
+                    if(detected.Count > 0)
+                    {
+                        ai.EnemyBuildings.Add(detected[0]);
+                    }
                 }
             }
+
+            if(target != null && target != lastTarget)
+            {
+                target.registerFatalWounds(OnEntityLost);
+            }
+
+            lastTarget = target;         
         }
+
+        void OnEntityLost(System.Object obj)
+        {
+            IGameEntity g = ((GameObject)obj).GetComponent<IGameEntity>();
+            if (g.info.isUnit)
+            {
+                g.unregisterFatalWounds(OnEntityLost);
+                target = null;
+                findTarget();
+            }
+        }
+
         private void RemovePush()
         {
             attacking = false;

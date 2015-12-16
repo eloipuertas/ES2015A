@@ -133,20 +133,28 @@ namespace Managers
         /// <param name="selectable">The entity that is going to be selected </param>
         public void Select(IGameEntity entity)
         {
-            Assert.IsTrue(CanBeSelected(entity));
-
-            _isSquad = entity.info.isUnit;
-            if (_isSquad)
+            try
             {
-                SelectSquad(((Unit)entity).Squad);
+                Assert.IsTrue(CanBeSelected(entity));
+
+                _isSquad = entity.info.isUnit;
+                if (_isSquad)
+                {
+                    SelectSquad(((Unit)entity).Squad);
+                }
+                else
+                {
+                    _selectedBuilding = (IBuilding)entity;
+
+                    Selectable selectable = _selectedBuilding.getGameObject().GetComponent<Selectable>();
+                    selectable.SelectEntity();
+                    fire(Actions.SELECT, selectable);
+                }
             }
-            else
+            catch (Exception e)
             {
-                _selectedBuilding = (IBuilding)entity;
-
-                Selectable selectable = _selectedBuilding.getGameObject().GetComponent<Selectable>();
-                selectable.SelectEntity();
-                fire(Actions.SELECT, selectable);
+                Debug.Log(e);
+                throw e;
             }
         }
 

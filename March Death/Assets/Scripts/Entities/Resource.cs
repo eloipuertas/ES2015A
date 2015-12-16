@@ -9,7 +9,7 @@ using UnityEngine.Assertions;
 public class Resource : Building<Resource.Actions>
 {
 
-    public enum Actions { CREATED, DAMAGED, DESTROYED, BUILDING_FINISHED, COLLECTION, CREATE_UNIT, DEL_STATS, HEALTH_UPDATED, ADDED_QUEUE };
+    public enum Actions { CREATED, DAMAGED, DESTROYED, BUILDING_FINISHED, COLLECTION, CREATE_UNIT, DEL_STATS, HEALTH_UPDATED, ADDED_QUEUE, NEW_HARVEST, EXTERMINATED, NEW_EXPLORER };
 
     /// <summary>
     /// civilian creation waste some time. When units are being created status
@@ -469,13 +469,16 @@ public class Resource : Building<Resource.Actions>
     {
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
         GameObject gameController = GameObject.Find("GameController");
-        ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
+        //ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
 
         if (Player.isOfPlayer(_entity))
         {
+            //FIXME bug after merging
+            /*
             register(Actions.COLLECTION, res_pl.onCollection);
             register(Actions.CREATED, res_pl.onStatisticsUpdate);
             register(Actions.DEL_STATS, res_pl.onStatisticsUpdate);
+            */
         }
 
         statistics = new Statistics(ResourceFromBuilding(type), (int)info.resourceAttributes.updateInterval, 10); // hardcoded, To modify, by now the collection rate is always 10, but theres no workers yet

@@ -100,13 +100,14 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     /// </summary>
     public override void OnDestroy()
 	{
-		try {
-			ConstructionGrid grid = GameObject.Find("GameController").GetComponent<ConstructionGrid>();
+        GameObject gridGO = GameObject.Find("GameController");
+
+        if (gridGO != null) {
+			ConstructionGrid grid = gridGO.GetComponent<ConstructionGrid>();
 			Vector3 disc_pos = grid.discretizeMapCoords(gameObject.transform.position);
 			grid.liberatePosition(disc_pos);
-		} catch(Exception e) {
-			Debug.LogWarning("Exception while trying to liberate position of a building: " + e.ToString());
-		}
+		} 
+
 		base.OnDestroy();
 	}
 
@@ -197,13 +198,14 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
 
             if (_creationTimer >= _infoUnitToCreate.unitAttributes.creationTime)
             {
+				_creationQueue.Dequeue();
                 createUnit(_infoUnitToCreate.type);
                 _creatingUnit = false;
             }
         }
         else if (_creationQueue.Count > 0)
         {
-            _infoUnitToCreate = Info.get.of(info.race, _creationQueue.Dequeue());
+            _infoUnitToCreate = Info.get.of(info.race, _creationQueue.Peek());
             _creationTimer = 0;
             _creatingUnit = true;
         }
@@ -343,6 +345,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         {
             IGameEntity entity = gameObject.GetComponent<IGameEntity>();
             UnitInfo unitInfo = Info.get.of(info.race, (UnitTypes)_creationQueue.Dequeue());
+			_creatingUnit = false;
 
             Player.getOwner(entity).resources.AddAmount(WorldResources.Type.WOOD, unitInfo.resources.wood);
             Player.getOwner(entity).resources.AddAmount(WorldResources.Type.METAL, unitInfo.resources.metal);
