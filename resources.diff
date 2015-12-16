@@ -1,0 +1,1257 @@
+diff --git a/March Death/Assets/Scripts/AI/AIController.cs b/March Death/Assets/Scripts/AI/AIController.cs
+index 7751351..52335c6 100644
+--- a/March Death/Assets/Scripts/AI/AIController.cs	
++++ b/March Death/Assets/Scripts/AI/AIController.cs	
+@@ -160,9 +160,9 @@ namespace Assets.Scripts.AI
+         {
+             Storage.BuildingInfo i = Storage.Info.get.of(race, type);
+ 
+-            return (resources.getAmount(WorldResources.Type.FOOD) >= i.resources.food &&
+-                    resources.getAmount(WorldResources.Type.WOOD) >= i.resources.wood &&
+-                    resources.getAmount(WorldResources.Type.METAL) >= i.resources.metal);
++            return ResourcesPlacer.get(BasePlayer.ia).enoughResources(WorldResources.Type.FOOD, i.resources.food) &&
++                    ResourcesPlacer.get(BasePlayer.ia).enoughResources(WorldResources.Type.WOOD, i.resources.wood) &&
++                    ResourcesPlacer.get(BasePlayer.ia).enoughResources(WorldResources.Type.METAL, i.resources.metal);
+         }
+ 
+         public void CreateBuilding(BuildingTypes btype, Vector3 position, Quaternion rotation, AIArchitect architect)
+diff --git a/March Death/Assets/Scripts/AI/AIDebugSystem.cs b/March Death/Assets/Scripts/AI/AIDebugSystem.cs
+index a70731d..1ccc06e 100644
+--- a/March Death/Assets/Scripts/AI/AIDebugSystem.cs	
++++ b/March Death/Assets/Scripts/AI/AIDebugSystem.cs	
+@@ -115,13 +115,13 @@ public class AIDebugSystem : MonoBehaviour {
+     void showResources(int windowID)
+     {
+         GUI.contentColor = Color.red;
+-        GUI.Label(new Rect(marginLeft, 20, textWidth, textHeight), "Food: " + controller.resources.getAmount(WorldResources.Type.FOOD).ToString());
++        GUI.Label(new Rect(marginLeft, 20, textWidth, textHeight), "Food: " + ResourcesPlacer.get(BasePlayer.ia).Amount(WorldResources.Type.FOOD).ToString());
+         GUI.contentColor = Color.white;
+-        GUI.Label(new Rect(marginLeft, 40, textWidth, textHeight), "Wood: " + controller.resources.getAmount(WorldResources.Type.WOOD).ToString());
++        GUI.Label(new Rect(marginLeft, 40, textWidth, textHeight), "Wood: " + ResourcesPlacer.get(BasePlayer.ia).Amount(WorldResources.Type.WOOD).ToString());
+         GUI.contentColor = Color.yellow;
+-        GUI.Label(new Rect(marginLeft, 60, textWidth, textHeight), "Gold: " + controller.resources.getAmount(WorldResources.Type.GOLD).ToString());
++        GUI.Label(new Rect(marginLeft, 60, textWidth, textHeight), "Gold: " + ResourcesPlacer.get(BasePlayer.ia).Amount(WorldResources.Type.GOLD).ToString());
+         GUI.contentColor = Color.cyan;
+-        GUI.Label(new Rect(marginLeft, 80, textWidth, textHeight), "Metal: " + controller.resources.getAmount(WorldResources.Type.METAL).ToString());
++        GUI.Label(new Rect(marginLeft, 80, textWidth, textHeight), "Metal: " + ResourcesPlacer.get(BasePlayer.ia).Amount(WorldResources.Type.METAL).ToString());
+         GUI.DragWindow();
+     }
+ 
+diff --git a/March Death/Assets/Scripts/Entities/Abilities/Create.cs b/March Death/Assets/Scripts/Entities/Abilities/Create.cs
+index a02c284..cbafc89 100644
+--- a/March Death/Assets/Scripts/Entities/Abilities/Create.cs	
++++ b/March Death/Assets/Scripts/Entities/Abilities/Create.cs	
+@@ -23,9 +23,9 @@ public class Create : Ability
+     {
+         get
+         {
+-            return BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.FOOD, _infoToBuild.resources.food) &&
+-					BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.WOOD, _infoToBuild.resources.wood) &&
+-					BasePlayer.getOwner(_entity).resources.IsEnough(WorldResources.Type.METAL, _infoToBuild.resources.metal) &&
++            BasePlayer player = BasePlayer.getOwner(_entity);
++
++            return ResourcesPlacer.get(player).enoughResources(_info) &&
+ 					(_entity.status == EntityStatus.IDLE || _entity.status == EntityStatus.WORKING);
+         }
+     }
+diff --git a/March Death/Assets/Scripts/Entities/Abilities/Sell.cs b/March Death/Assets/Scripts/Entities/Abilities/Sell.cs
+index 532dcd4..43d3f2b 100644
+--- a/March Death/Assets/Scripts/Entities/Abilities/Sell.cs	
++++ b/March Death/Assets/Scripts/Entities/Abilities/Sell.cs	
+@@ -41,9 +41,10 @@ class Sell : Ability
+ 
+         if (resources != null)
+         {
+-            BasePlayer.getOwner(entity).resources.AddAmount(WorldResources.Type.WOOD, resources.wood);
+-            BasePlayer.getOwner(entity).resources.AddAmount(WorldResources.Type.METAL, resources.metal);
+-            BasePlayer.getOwner(entity).resources.AddAmount(WorldResources.Type.FOOD, resources.food);
++            BasePlayer player = BasePlayer.getOwner(entity);
++            ResourcesPlacer.get(player).Collect(WorldResources.Type.FOOD, resources.food);
++            ResourcesPlacer.get(player).Collect(WorldResources.Type.WOOD, resources.wood);
++            ResourcesPlacer.get(player).Collect(WorldResources.Type.METAL, resources.metal);
+         }
+         else
+         {
+diff --git a/March Death/Assets/Scripts/Entities/Barrack.cs b/March Death/Assets/Scripts/Entities/Barrack.cs
+index 1965ae6..683ab0e 100644
+--- a/March Death/Assets/Scripts/Entities/Barrack.cs	
++++ b/March Death/Assets/Scripts/Entities/Barrack.cs	
+@@ -8,8 +8,6 @@ public class Barrack : Building<Barrack.Actions>
+ {
+     public enum Actions {CREATED, DAMAGED, DESTROYED, CREATE_UNIT, BUILDING_FINISHED, HEALTH_UPDATED, ADDED_QUEUE};
+ 
+-    private IGameEntity _entity;
+-
+     /// <summary>
+     /// Object initialization
+     /// </summary>
+@@ -24,12 +22,5 @@ public class Barrack : Building<Barrack.Actions>
+     public override void Start()
+     {
+         base.Start();
+-
+-        _entity = this.GetComponent<IGameEntity>();
+-
+-        ResourcesEvents.get.registerResourceToEvents(_entity);
+-
+-        if (BasePlayer.player.race.Equals(_info.race) && !type.Equals(BuildingTypes.STRONGHOLD))
+-            fire(Actions.CREATED, _entity);
+     }
+ }
+diff --git a/March Death/Assets/Scripts/Entities/Building.cs b/March Death/Assets/Scripts/Entities/Building.cs
+index a2df463..1e248fb 100644
+--- a/March Death/Assets/Scripts/Entities/Building.cs	
++++ b/March Death/Assets/Scripts/Entities/Building.cs	
+@@ -39,6 +39,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
+     }
+ 
+     /// Precach some actions
++    public T CREATED { get; set; }
+     public T DAMAGED { get; set; }
+     public T DESTROYED { get; set; }
+     public T CREATE_UNIT { get; set; }
+@@ -106,9 +107,10 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
+ 			ConstructionGrid grid = gridGO.GetComponent<ConstructionGrid>();
+ 			Vector3 disc_pos = grid.discretizeMapCoords(gameObject.transform.position);
+ 			grid.liberatePosition(disc_pos);
+-		} 
++		}
+ 
+-		base.OnDestroy();
++        ResourcesEvents.get.unregisterBuildingToEvents(this);
++        base.OnDestroy();
+ 	}
+ 
+ 
+@@ -125,6 +127,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
+     /// </summary>
+     public override void Awake()
+     {
++        CREATED = (T)Enum.Parse(typeof(T), "CREATED", true);
+         DAMAGED = (T)Enum.Parse(typeof(T), "DAMAGED", true);
+         DESTROYED = (T)Enum.Parse(typeof(T), "DESTROYED", true);
+         CREATE_UNIT = (T)Enum.Parse(typeof(T), "CREATE_UNIT", true);
+@@ -144,7 +147,6 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
+         // Setup base
+         base.Start();
+ 
+-
+         _meetingPoint = getDefaultMeetingPoint();
+         activateFOWEntity();
+ 
+@@ -157,6 +159,10 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
+         //return (info.buildingAttributes.wounds - _woundsReceived) * 100f / info.buildingAttributes.wounds;
+         // Set the status
+         setStatus(DefaultStatus);
++
++        // Register for AI and Player
++        ResourcesEvents.get.registerBuildingToEvents(this);
++        fire(CREATED, (IGameEntity)this);
+     }
+ 
+     /// <summary>
+@@ -347,9 +353,10 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
+             UnitInfo unitInfo = Info.get.of(info.race, (UnitTypes)_creationQueue.Dequeue());
+ 			_creatingUnit = false;
+ 
+-            Player.getOwner(entity).resources.AddAmount(WorldResources.Type.WOOD, unitInfo.resources.wood);
+-            Player.getOwner(entity).resources.AddAmount(WorldResources.Type.METAL, unitInfo.resources.metal);
+-            Player.getOwner(entity).resources.AddAmount(WorldResources.Type.FOOD, unitInfo.resources.food);
++            BasePlayer player = BasePlayer.getOwner(entity);
++            ResourcesPlacer.get(player).Collect(WorldResources.Type.WOOD, unitInfo.resources.wood);
++            ResourcesPlacer.get(player).Collect(WorldResources.Type.METAL, unitInfo.resources.metal);
++            ResourcesPlacer.get(player).Collect(WorldResources.Type.FOOD, unitInfo.resources.food);
+         }
+     }
+ 
+diff --git a/March Death/Assets/Scripts/Entities/GameEntity.cs b/March Death/Assets/Scripts/Entities/GameEntity.cs
+index d7d9e37..a94afe3 100644
+--- a/March Death/Assets/Scripts/Entities/GameEntity.cs	
++++ b/March Death/Assets/Scripts/Entities/GameEntity.cs	
+@@ -480,13 +480,16 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
+         });
+     }
+ 
+-    public void doIfUnit(Action<Unit> callIfTrue)
++    public bool doIfUnit(Action<Unit> callIfTrue)
+     {
+         Unit unit = this as Unit;
+         if (unit != null)
+         {
+             callIfTrue(unit);
++            return true;
+         }
++
++        return false;
+     }
+ 
+     public bool doIfBuilding(Action<IBuilding> callIfTrue)
+diff --git a/March Death/Assets/Scripts/Entities/IGameEntity.cs b/March Death/Assets/Scripts/Entities/IGameEntity.cs
+index dc31c37..6eeadae 100644
+--- a/March Death/Assets/Scripts/Entities/IGameEntity.cs	
++++ b/March Death/Assets/Scripts/Entities/IGameEntity.cs	
+@@ -43,7 +43,7 @@ public interface IGameEntity : IBaseActor
+ 
+     void receiveAttack(Unit from, bool isRanged);
+ 
+-    void doIfUnit(Action<Unit> callIfTrue);
++    bool doIfUnit(Action<Unit> callIfTrue);
+     bool doIfBuilding(Action<IBuilding> callIfTrue);
+     bool doIfResource(Action<Resource> callIfTrue);
+     bool doIfBarrack(Action<Barrack> callIfTrue);
+diff --git a/March Death/Assets/Scripts/Entities/Resource.cs b/March Death/Assets/Scripts/Entities/Resource.cs
+index 2620600..40e00c0 100644
+--- a/March Death/Assets/Scripts/Entities/Resource.cs	
++++ b/March Death/Assets/Scripts/Entities/Resource.cs	
+@@ -22,8 +22,6 @@ public class Resource : Building<Resource.Actions>
+     /// </summary>
+     Managers.SoundsManager sounds;
+ 
+-    public Statistics statistics;
+-
+     // Constructor
+     public Resource() { }
+ 
+@@ -193,8 +191,7 @@ public class Resource : Building<Resource.Actions>
+ 
+     private readonly object syncLock = new object();
+     bool hasCreatedCivil = false;
+-
+-    private bool once = true;
++    
+ 
+     List<GameObject> pendingProducers = new List<GameObject>();
+     List<GameObject> pendingWanderers = new List<GameObject>();
+@@ -289,18 +286,15 @@ public class Resource : Building<Resource.Actions>
+ 
+             if (type.Equals(BuildingTypes.FARM))
+             {
+-                BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.FOOD, amount);
+-                collectable.goods.type = Goods.GoodsType.FOOD;
++                collectable.goods.type = WorldResources.Type.FOOD;
+             }
+             else if (type.Equals(BuildingTypes.MINE))
+             {
+-                BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.METAL, amount);
+-                collectable.goods.type = Goods.GoodsType.METAL;
++                collectable.goods.type = WorldResources.Type.METAL;
+             }
+             else
+             {
+-                BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.WOOD, amount);
+-                collectable.goods.type = Goods.GoodsType.WOOD;
++                collectable.goods.type = WorldResources.Type.WOOD;
+             }
+             fire(Actions.COLLECTION, collectable);
+         }
+@@ -313,7 +307,6 @@ public class Resource : Building<Resource.Actions>
+     /// <param name="type"></param>
+     protected override void createUnit(UnitTypes type)
+     {
+-
+         if (harvestUnits < maxHarvestUnits)
+         {
+             _unitPosition.Set(_center.x, _center.y, _center.z);
+@@ -330,11 +323,14 @@ public class Resource : Building<Resource.Actions>
+             setStatus(EntityStatus.WORKING);
+ 
+             _collectionRate += Info.get.of(race, UnitTypes.CIVIL).attributes.capacity;
++
++            fire(Actions.NEW_HARVEST, (IGameEntity)this);
+         }
+         else
+         {
+             base.createUnit(type);
+         }
++
+         _createStatus = createCivilStatus.IDLE;
+     }
+     /// <summary>
+@@ -357,7 +353,6 @@ public class Resource : Building<Resource.Actions>
+     /// </summary>
+     public Unit recruitExplorer()
+     {
+-
+         if (harvestUnits > 0)
+         {
+             Unit worker;
+@@ -375,6 +370,8 @@ public class Resource : Building<Resource.Actions>
+             {
+                 setStatus(EntityStatus.IDLE);
+             }
++
++            fire(Actions.NEW_EXPLORER, (IGameEntity)this);
+             return worker;
+         }
+         else
+@@ -390,7 +387,6 @@ public class Resource : Building<Resource.Actions>
+     /// </summary>
+     private void recruitWorker(Unit explorer)
+     {
+-
+         if (harvestUnits < maxHarvestUnits)
+         {
+             _collectionRate += explorer.info.attributes.capacity;
+@@ -403,6 +399,8 @@ public class Resource : Building<Resource.Actions>
+             {
+                 setStatus(EntityStatus.WORKING);
+             }
++
++            fire(Actions.NEW_HARVEST, (IGameEntity)this);
+         }
+         else
+         {
+@@ -444,9 +442,6 @@ public class Resource : Building<Resource.Actions>
+     /// </summary>
+     public override void OnDestroy()
+     {
+-        statistics.getNegative();
+-        fire(Actions.DEL_STATS, statistics);
+-
+         base.OnDestroy();
+     }
+ 
+@@ -464,27 +459,7 @@ public class Resource : Building<Resource.Actions>
+                 throw new Exception("That resource type does not exist!");
+         }
+     }
+-
+-    private void SetupStatistics()
+-    {
+-        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
+-        GameObject gameController = GameObject.Find("GameController");
+-        //ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
+-
+-        if (Player.isOfPlayer(_entity))
+-        {
+-            //FIXME bug after merging
+-            /*
+-            register(Actions.COLLECTION, res_pl.onCollection);
+-            register(Actions.CREATED, res_pl.onStatisticsUpdate);
+-            register(Actions.DEL_STATS, res_pl.onStatisticsUpdate);
+-            */
+-        }
+-
+-        statistics = new Statistics(ResourceFromBuilding(type), (int)info.resourceAttributes.updateInterval, 10); // hardcoded, To modify, by now the collection rate is always 10, but theres no workers yet
+-        maxHarvestUnits = info.resourceAttributes.maxUnits;
+-    }
+-
++    
+     /// <summary>
+     /// Object initialization
+     /// </summary>
+@@ -514,7 +489,7 @@ public class Resource : Building<Resource.Actions>
+         base.Start();
+         this.GetComponent<Rigidbody>().isKinematic = false;
+ 
+-        SetupStatistics();
++        maxHarvestUnits = info.resourceAttributes.maxUnits;
+     }
+ 
+ 
+@@ -527,7 +502,6 @@ public class Resource : Building<Resource.Actions>
+     {
+         base.Update();
+ 
+-
+         switch (status)
+         {
+             case EntityStatus.IDLE:
+@@ -549,20 +523,6 @@ public class Resource : Building<Resource.Actions>
+         }
+     }
+ 
+-    public override void setStatus(EntityStatus newStatus)
+-    {
+-        if (status == EntityStatus.IDLE && newStatus == EntityStatus.WORKING)
+-        {
+-            if (once)
+-            {
+-                fire(Actions.CREATED, statistics);
+-                once = false;
+-            }
+-        }
+-
+-        base.setStatus(newStatus);
+-    }
+-
+     /// <summary>
+     /// When built, it's called
+     /// </summary>
+diff --git a/March Death/Assets/Scripts/Entities/Unit.cs b/March Death/Assets/Scripts/Entities/Unit.cs
+index d908855..c9705af 100644
+--- a/March Death/Assets/Scripts/Entities/Unit.cs	
++++ b/March Death/Assets/Scripts/Entities/Unit.cs	
+@@ -13,7 +13,7 @@ using Pathfinding;
+ /// </summary>
+ public class Unit : GameEntity<Unit.Actions>
+ {
+-    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EXTERMINATED, EAT, DIED, STAT_OUT, TARGET_TERMINATED, HEALTH_UPDATED };
++    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EXTERMINATED, EAT, DIED, TARGET_TERMINATED, HEALTH_UPDATED };
+     public enum Gender { MALE, FEMALE }
+ 
+     private EntityStatus _defaultStatus = EntityStatus.IDLE;
+@@ -29,23 +29,19 @@ public class Unit : GameEntity<Unit.Actions>
+         }
+     }
+ 
+-    private IGameEntity _entity;
+-
+     public Unit() { }
+ 
+     /// <summary>
+     /// Interval between resources update in miliseconds
+     /// </summary>
+-    const float RESOURCES_UPDATE_INTERVAL = 15.0f;
++    public const float RESOURCES_UPDATE_INTERVAL = 15.0f;
+ 
+     /// <summary>
+     /// Update follow distance when greater than this value
+     /// Do note this values is the SQUARED (^2) value of the real distance
+     /// </summary>
+     const float SQR_UPDATE_DISTANCE = 75.0f;
+-
+-    Statistics statistics;
+-
++    
+     ///<sumary>
+     /// Auto-unregister events when we are destroyed
+     ///</sumary>
+@@ -213,20 +209,14 @@ public class Unit : GameEntity<Unit.Actions>
+     /// </summary>
+     protected override void onFatalWounds()
+     {
+-        if(BasePlayer.player.race.Equals(_entity.info.race))
+-            fire(Actions.EXTERMINATED, _entity);
++        if(BasePlayer.player.race.Equals(info.race))
++            fire(Actions.EXTERMINATED, (IGameEntity)this);
+ 
+-        ResourcesEvents.get.unregisterUnitToEvents(_entity);
++        ResourcesEvents.get.unregisterUnitToEvents(this);
+         
+         // Clear target, just in case
+         _target = null;
+ 
+-        if (BasePlayer.isOfPlayer(this))
+-        {
+-            statistics.growth_speed *= -1;
+-            fire(Actions.STAT_OUT, statistics);
+-        }
+-
+         fire(Actions.DIED);
+     }
+ 
+@@ -588,20 +578,9 @@ public class Unit : GameEntity<Unit.Actions>
+         {
+             activateFOWEntity();
+         }
+-
+-        // Statistics available for both AI and Player
+-        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
+-        GameObject gameController = GameObject.Find("GameController");
+-        //ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
+-        //register(Actions.EAT, res_pl.onFoodConsumption);
+-
+-        _entity = this.GetComponent<IGameEntity>();
+         
+-
+-        if (Player.getOwner(this).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
+-        {
+-            ResourcesEvents.get.registerUnitToEvents(_entity);
+-        }
++        // Register for both AI and player
++        ResourcesEvents.get.registerUnitToEvents(this);
+ 
+         // Set detour params (can't be done until Start is done)
+         if (!isImmobile)
+@@ -611,8 +590,7 @@ public class Unit : GameEntity<Unit.Actions>
+             _detourAgent.UpdateParams();
+         }
+ 
+-        if(BasePlayer.player.race.Equals(_info.race))
+-            fire(Actions.CREATED, _entity);
++        fire(Actions.CREATED, (IGameEntity)this);
+     }
+ 
+     /// <summary>
+@@ -645,19 +623,16 @@ public class Unit : GameEntity<Unit.Actions>
+             {
+                 goldProduced = info.unitAttributes.goldProduction * resourcesElapsed;
+                 goldConsumed = 0;
+-            }
+-
++            }
++
+             // Update this unit resources
+-            BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.GOLD, goldProduced);
+-            BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.GOLD, goldConsumed);
+-            BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.FOOD, foodConsumed);
+-
+-            Goods goods = new Goods(); // Generate the goods the units eat
+-            goods.amount = 5;
+-            // goods.amount = this.info.unitAttributes.foodConsumption; // RAUL_UNCOMMENT
+-            goods.type = Goods.GoodsType.FOOD;
++            CollectableGood collectable = new CollectableGood(); // Generate the goods the units eat
++            collectable.entity = this;
++            collectable.goods = new Goods();
++            collectable.goods.type = WorldResources.Type.FOOD;
++            collectable.goods.amount = info.unitAttributes.foodConsumption;
+ 
+-            fire(Actions.EAT, goods);
++            fire(Actions.EAT, collectable);
+         }
+ 
+         // Status dependant functionality
+diff --git a/March Death/Assets/Scripts/Events/ResourcesEvents.cs b/March Death/Assets/Scripts/Events/ResourcesEvents.cs
+index 1a5d5fd..777e2ec 100644
+--- a/March Death/Assets/Scripts/Events/ResourcesEvents.cs	
++++ b/March Death/Assets/Scripts/Events/ResourcesEvents.cs	
+@@ -9,7 +9,7 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
+     private ResourcesEvents() { }
+ 
+     // REGISTER METHODS
+-    public void registerResourceToEvents(IGameEntity entity)
++    public void registerBuildingToEvents(IGameEntity entity)
+     {
+         if (entity.info.isResource)
+         {
+@@ -20,7 +20,7 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
+             resource.register(Resource.Actions.CREATED, OnCreated);
+             resource.register(Resource.Actions.EXTERMINATED, OnDestroyed);
+         }
+-        if (entity.info.isBarrack)
++        else if (entity.info.isBarrack)
+         {
+             Barrack barrack = (Barrack)entity;
+             barrack.register(Barrack.Actions.CREATED, OnCreated);
+@@ -38,7 +38,7 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
+         }
+     }
+ 
+-    public void unregisterResourceToEvents(IGameEntity entity)
++    public void unregisterBuildingToEvents(IGameEntity entity)
+     {
+         if (entity.info.isResource)
+         {
+@@ -49,7 +49,7 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
+             resource.unregister(Resource.Actions.CREATED, OnCreated);
+             resource.unregister(Resource.Actions.EXTERMINATED, OnDestroyed);
+         }
+-        if (entity.info.isBarrack)
++        else if (entity.info.isBarrack)
+         {
+             Barrack barrack = (Barrack)entity;
+             barrack.unregister(Barrack.Actions.CREATED, OnCreated);
+@@ -75,7 +75,7 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
+         PopulationInfo.get.AddWorker();
+ 
+         IGameEntity entity = (IGameEntity)obj;
+-        ResourcesPlacer.get.StatisticsChanged(entity, CreatePackageFromEntity(entity));
++        ResourcesPlacer.get(BasePlayer.getOwner(entity)).StatisticsChanged(entity, CreatePackageFromEntity(entity));
+     }
+ 
+ 
+@@ -84,21 +84,23 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
+         PopulationInfo.get.RemoveWorker();
+ 
+         IGameEntity entity = (IGameEntity)obj;
+-        ResourcesPlacer.get.StatisticsChanged(entity, CreatePackageFromEntity(entity));
++        ResourcesPlacer.get(BasePlayer.getOwner(entity)).StatisticsChanged(entity, CreatePackageFromEntity(entity));
+     }
+ 
+ 
+     private void OnCollection(System.Object obj)
+     {
+-        Goods goods = (Goods) obj;
+-        ResourcesPlacer.get.Collect( (WorldResources.Type) goods.type , goods.amount);
++        CollectableGood collectable = (CollectableGood) obj;
++        BasePlayer player = BasePlayer.getOwner(collectable.entity);
++        ResourcesPlacer.get(player).Collect(collectable.goods.type, collectable.goods.amount);
+     }
+ 
+ 
+     private void OnConsumption(System.Object obj)
+     {
+-        Goods goods = (Goods)obj;
+-        ResourcesPlacer.get.Consume((WorldResources.Type) goods.type, goods.amount);
++        CollectableGood collectable = (CollectableGood)obj;
++        BasePlayer player = BasePlayer.getOwner(collectable.entity);
++        ResourcesPlacer.get(player).Collect(collectable.goods.type, collectable.goods.amount);
+     }
+ 
+ 
+@@ -114,41 +116,52 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
+             {  WorldResources.Type.METAL , res.metal }
+         };
+ 
+-        if (entity.info.isUnit) {
+-            if (((Unit)entity).type.Equals(UnitTypes.HERO))
++        BasePlayer owner = BasePlayer.getOwner(entity);
++        ResourcesPlacer placer = ResourcesPlacer.get(owner);
++
++        bool isUnit = entity.doIfUnit(unit =>
++        {
++            if (unit.type != UnitTypes.HERO)
+             {
+-                ResourcesPlacer.get.Buy(d);
++                placer.Buy(d);
+             }
+-        }
++        });
+ 
+-        if (entity.info.isBuilding)
++        if (!isUnit)
+         {
+-            ResourcesPlacer.get.Buy(d);
++            if (((BuildingInfo)entity.info).type != BuildingTypes.STRONGHOLD)
++            {
++                placer.Buy(d);
++            }
+         }
+ 
+-        ResourcesPlacer.get.updatePopulation();
++        placer.updatePopulation();
+ 
+         if (entity.info.isResource || entity.info.isUnit)
+-            ResourcesPlacer.get.StatisticsChanged(entity, CreatePackageFromEntity(entity));
++        {
++            placer.StatisticsChanged(entity, CreatePackageFromEntity(entity));
++        }
+     }
+ 
+ 
+     private void OnDestroyed(System.Object obj)
+     {
+         IGameEntity entity = (IGameEntity)obj;
++        BasePlayer owner = BasePlayer.getOwner(entity);
++        ResourcesPlacer placer = ResourcesPlacer.get(owner);
+ 
+         if (entity.info.isUnit)
+         {
+             Unit unit = (Unit)entity;
+-            ResourcesPlacer.get.RemoveEntity(WorldResources.Type.FOOD, entity);
++            placer.RemoveEntity(WorldResources.Type.FOOD, entity);
+         }
+-        if (entity.info.isResource)
++        else if (((BuildingInfo)entity.info).type != BuildingTypes.STRONGHOLD)
+         {
+             Resource resource = (Resource)entity;
+-            ResourcesPlacer.get.RemoveEntity(GetElementFromResource(resource), entity);
++            placer.RemoveEntity(GetElementFromResource(resource), entity);
+         }
+ 
+-        ResourcesPlacer.get.updatePopulation();
++        placer.updatePopulation();
+ 
+     }
+ 
+@@ -174,8 +187,7 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
+         if (entity.info.isUnit)
+         {
+             Unit unit = (Unit)entity;
+-            // packet = new GrowthStatsPacket(WorldResources.Type.FOOD, unit.info.unitAttributes.foodConsumption, 1f); // RAUL_UNCOMMENT (CHANGE SIGN¿?)
+-            packet = new GrowthStatsPacket( WorldResources.Type.FOOD , -5f , 10f );
++            packet = new GrowthStatsPacket(WorldResources.Type.FOOD, -unit.info.unitAttributes.foodConsumption, 1f);
+         }
+ 
+         return packet;
+diff --git a/March Death/Assets/Scripts/Managers/BuildingsManager.cs b/March Death/Assets/Scripts/Managers/BuildingsManager.cs
+index 00e3e92..16acb43 100644
+--- a/March Death/Assets/Scripts/Managers/BuildingsManager.cs	
++++ b/March Death/Assets/Scripts/Managers/BuildingsManager.cs	
+@@ -121,10 +121,7 @@ namespace Managers
+         {
+             Storage.BuildingInfo i = Storage.Info.get.of(race, type);
+ 
+-            IsEnoughFood = _player.resources.getAmount(WorldResources.Type.FOOD) >= i.resources.food;
+-            IsEnoughWood = _player.resources.getAmount(WorldResources.Type.WOOD) >= i.resources.wood;
+-            IsEnoughMetal = _player.resources.getAmount(WorldResources.Type.METAL) >= i.resources.metal;
+-            return IsEnoughFood && IsEnoughWood && IsEnoughMetal;
++            return ResourcesPlacer.get(BasePlayer.player).enoughResources(i.resources);
+         }
+ 
+ 
+diff --git a/March Death/Assets/Scripts/Managers/IResourcesManager.cs b/March Death/Assets/Scripts/Managers/IResourcesManager.cs
+index ff0d418..e69de29 100644
+--- a/March Death/Assets/Scripts/Managers/IResourcesManager.cs	
++++ b/March Death/Assets/Scripts/Managers/IResourcesManager.cs	
+@@ -1,58 +0,0 @@
+-using WorldResources;
+-namespace Managers
+-{
+-    
+-    public interface IResourcesManager
+-    {
+-
+-        /// <summary>
+-        /// Adds the amount
+-        /// </summary>
+-        /// <param name="type"></param>
+-        /// <param name="amount"></param>
+-        void AddAmount(Type type, float amount);
+-        
+-        /// <summary>
+-        /// Adds the amount
+-        /// </summary>
+-        /// <param name="other"></param>
+-        void AddAmount(WorldResources.Resource other);
+-
+-        /// <summary>
+-        /// Substracts the amount and returns the remaining
+-        /// </summary>
+-        /// <param name="type"></param>
+-        /// <param name="amount"></param>
+-        /// <returns></returns>
+-        float SubstractAmount(Type type, float amount);
+-
+-        /// <summary>
+-        /// Substracts the amount and returns the remaining
+-        /// </summary>
+-        /// <param name="other"></param>
+-        /// <returns></returns>
+-        float SubstractAmount(WorldResources.Resource other);
+-
+-        /// <summary>
+-        /// Checks the current amount and returns true if is higher or equal to the input amount
+-        /// and false otherwise
+-        /// </summary>
+-        /// <param name="type"></param>
+-        /// <param name="amount"></param>
+-        /// <returns></returns>
+-        bool IsEnough(Type type, float amount);
+-
+-        /// <summary>
+-        /// Checks the current amount and returns true if is higher or equal to the input amount
+-        /// and false otherwise
+-        /// </summary>
+-        /// <param name="type"></param>
+-        /// <param name="amount"></param>
+-        /// <returns></returns>
+-        bool IsEnough(WorldResources.Resource other);
+-
+-
+-    }
+-
+-
+-}
+\ No newline at end of file
+diff --git a/March Death/Assets/Scripts/Managers/ResourcesManager.cs b/March Death/Assets/Scripts/Managers/ResourcesManager.cs
+index fe6256a..e69de29 100644
+--- a/March Death/Assets/Scripts/Managers/ResourcesManager.cs	
++++ b/March Death/Assets/Scripts/Managers/ResourcesManager.cs	
+@@ -1,104 +0,0 @@
+-using WorldResources;
+-using System.Collections.Generic;
+-
+-
+-namespace Managers
+-{
+-
+-    public class ResourcesManager : IResourcesManager
+-    {
+-
+-
+-        private Dictionary<Type, Deposit> _deposits;
+-
+-        public ResourcesManager()
+-        {
+-            _deposits = new Dictionary<Type, Deposit>();
+-        }
+-
+-
+-        public void InitDeposit(WorldResources.Resource resource, int capacity = 0)
+-        {
+-            WorldResources.Type type = resource.GetResourceType();
+-            if (!_deposits.ContainsKey(type))
+-            {
+-                Deposit diposit = new Deposit(resource, capacity);
+-                _deposits.Add(type, diposit);
+-            }
+-            else
+-            {
+-                _deposits[type].AddAmount(capacity);
+-            }
+-        }
+-
+-        public void EmptyDeposits()
+-        {
+-            foreach (var deposit in _deposits.Values)
+-            {
+-                deposit.Empty();
+-            }
+-        }
+-
+-
+-        public bool IsEnough(WorldResources.Resource other)
+-        {
+-            if (_deposits.ContainsKey(other.GetResourceType()))
+-            {
+-                return _deposits[other.GetResourceType()].GetAmount() >= other.GetAmount();
+-
+-            }
+-            else
+-                throw new System.Exception("Type not in deposits");
+-
+-        }
+-
+-
+-        public bool IsEnough(Type type, float amount)
+-        {
+-            return IsEnough(new WorldResources.Resource(type, amount));
+-        }
+-
+-
+-        public float SubstractAmount(WorldResources.Resource other)
+-        {
+-            if (_deposits.ContainsKey(other.GetResourceType()))
+-            {
+-                return _deposits[other.GetResourceType()].Substract(other);
+-            }
+-            else
+-                throw new System.Exception("Type not in deposits");
+-            
+-        }
+-
+-
+-        public float SubstractAmount(Type type, float amount)
+-        {
+-            return SubstractAmount(new WorldResources.Resource(type, amount));
+-
+-        }
+-
+-
+-        public void AddAmount(WorldResources.Resource other)
+-        {
+-            if (_deposits.ContainsKey(other.GetResourceType()))
+-            {
+-                 _deposits[other.GetResourceType()].AddAmount(other.GetAmount());
+-            }
+-            else
+-                throw new System.Exception("Type not in deposits");
+-        }
+-
+-
+-        public void AddAmount(Type type, float amount)
+-        {
+-            AddAmount(new WorldResources.Resource(type, amount));
+-        }
+-
+-        public float getAmount(Type type)
+-        {
+-            return _deposits[type].GetAmount();
+-        }
+-
+-    }
+-
+-}
+diff --git a/March Death/Assets/Scripts/Player/BasePlayer.cs b/March Death/Assets/Scripts/Player/BasePlayer.cs
+index b7ac22b..e0f02cc 100644
+--- a/March Death/Assets/Scripts/Player/BasePlayer.cs	
++++ b/March Death/Assets/Scripts/Player/BasePlayer.cs	
+@@ -11,13 +11,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
+     /// </summary>
+     protected Storage.Races _selfRace;
+     public Storage.Races race { get { return _selfRace; } }
+-
+-    /// <summary>
+-    /// The resources manager
+-    /// </summary>
+-    protected Managers.ResourcesManager _resources = new Managers.ResourcesManager();
+-    public Managers.ResourcesManager resources { get { return _resources; } }
+-
++    
+     /// <summary>
+     /// The buildings manager
+     /// </summary>
+@@ -95,10 +89,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
+     public void SetInitialResources(uint wood, uint food, uint metal, uint gold)
+     {
+         // TODO Consider adding a maximum capacity
+-        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.FOOD, food));
+-        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.WOOD, wood));
+-        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.METAL, metal));
+-        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.GOLD, gold));
++        ResourcesPlacer.get(this).InitializeResources(wood, food, metal, gold);
+     }
+ 
+     protected abstract void AddBuilding(IGameEntity entity);
+diff --git a/March Death/Assets/Scripts/Player/Player.cs b/March Death/Assets/Scripts/Player/Player.cs
+index 0230323..ffb3545 100644
+--- a/March Death/Assets/Scripts/Player/Player.cs	
++++ b/March Death/Assets/Scripts/Player/Player.cs	
+@@ -41,6 +41,8 @@ public class Player : BasePlayer
+     float timeToShow;
+     const float WAIT_FOR_FINISH = 3.5f;
+ 
++    ResourcesPlacer _resourcesPlacer;
++
+     // Use this for initialization
+     public override void Start()
+     {
+@@ -60,7 +62,7 @@ public class Player : BasePlayer
+         // gameObject.AddComponent<ResourcesPlacer>();
+         
+         missionStatus = new MissionStatus(playerId);
+-        ResourcesPlacer r = ResourcesPlacer.get; // initialization
++        _resourcesPlacer = ResourcesPlacer.get(this); // initialization
+ 
+         // TODO Set this values dynamically
+         minFoodTolerance = 100;
+@@ -68,7 +70,7 @@ public class Player : BasePlayer
+         minMetalTolerance = 500;
+         minGoldTolerance = 500;
+ 
+-        foodDepleted = resources.getAmount(WorldResources.Type.FOOD) <= 0;
++        foodDepleted = _resourcesPlacer.Amount(WorldResources.Type.FOOD) <= 0;
+ 
+         ActorSelector selector = new ActorSelector()
+         {
+@@ -196,7 +198,7 @@ public class Player : BasePlayer
+     private void displayResourceInfo(WorldResources.Type resourceType, int tolerance)
+     {
+         int amount;
+-        amount = Mathf.FloorToInt(resources.getAmount(resourceType));
++        amount = Mathf.FloorToInt(_resourcesPlacer.Amount(resourceType));
+         if (amount <= tolerance)
+         {
+             if (amount > 0)
+@@ -212,7 +214,7 @@ public class Player : BasePlayer
+         if (!foodDepleted)
+         {
+             displayResourceInfo(WorldResources.Type.FOOD, minFoodTolerance);
+-            foodDepleted = resources.getAmount(WorldResources.Type.FOOD) <= 0;
++            foodDepleted = _resourcesPlacer.Amount(WorldResources.Type.FOOD) <= 0;
+         }
+     }
+ 
+diff --git a/March Death/Assets/Scripts/Storage/Resources/Goods.cs b/March Death/Assets/Scripts/Storage/Resources/Goods.cs
+index 2756b34..1bbe98c 100644
+--- a/March Death/Assets/Scripts/Storage/Resources/Goods.cs	
++++ b/March Death/Assets/Scripts/Storage/Resources/Goods.cs	
+@@ -13,13 +13,8 @@ namespace Storage
+         // constructor
+         public Goods() { }
+ 
+-        public enum GoodsType { FOOD, WOOD, METAL };
+-
+         public float amount { get; set; }
+-        public GoodsType type { get; set; }
+-
++        public WorldResources.Type type { get; set; }
+     }
+ }
+ 
+-
+-
+diff --git a/March Death/Assets/Scripts/UI/ResourcesPlacer.cs b/March Death/Assets/Scripts/UI/ResourcesPlacer.cs
+index 96c3b9b..d445c66 100644
+--- a/March Death/Assets/Scripts/UI/ResourcesPlacer.cs	
++++ b/March Death/Assets/Scripts/UI/ResourcesPlacer.cs	
+@@ -6,7 +6,7 @@ using System.Collections.Generic;
+ using Utils;
+ using System;
+ 
+-public class ResourcesPlacer : Singleton<ResourcesPlacer>
++public class ResourcesPlacer
+ {
+     // attributes
+     private readonly string[] txt_names = { "meat", "wood", "metal" };
+@@ -18,7 +18,7 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
+     /// Population text where number of units are displayed
+     /// </summary>
+     private Text pop;
+-    private Player _player;
++    private BasePlayer _owner;
+ 
+     private Sprite up;
+     private Sprite down;
+@@ -28,34 +28,46 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
+     Dictionary<WorldResources.Type, int> resources;
+     Dictionary<WorldResources.Type, Dictionary<IGameEntity, GrowthStatsPacket>> statistics;
+ 
++    private static Dictionary<BasePlayer, ResourcesPlacer> _instances = new Dictionary<BasePlayer, ResourcesPlacer>();
+ 
+-    private ResourcesPlacer()
++    private ResourcesPlacer(BasePlayer owner)
+     {
++        _owner = owner;
+         res_amounts = new List<Text>();
+         res_stats = new List<Text>();
+         arrows = new List<Image>();
+ 
+         Setup();
++    }
+ 
+-        initializeResources();
+-        initializeStatistics();
+-
+-        updateAmounts();
+-        updateStatistics();
+-        updatePopulation();
++    public static ResourcesPlacer get(BasePlayer player)
++    {
++        if (!_instances.ContainsKey(player))
++        {
++            _instances.Add(player, new ResourcesPlacer(player));
++        }
++
++        return _instances[player];
+     }
+ 
+ 
+     // Resources 
+ 
+-    private void initializeResources()
++    public void InitializeResources(uint wood, uint food, uint metal, uint gold)
+     {
+         resources = new Dictionary<WorldResources.Type, int>()
+         {
+-            { WorldResources.Type.FOOD ,  (int) _player.resources.getAmount(WorldResources.Type.FOOD) } ,
+-            { WorldResources.Type.WOOD ,  (int) _player.resources.getAmount(WorldResources.Type.WOOD) } ,
+-            { WorldResources.Type.METAL , (int) _player.resources.getAmount(WorldResources.Type.METAL) }
++            { WorldResources.Type.FOOD , (int) food } ,
++            { WorldResources.Type.WOOD , (int) wood } ,
++            { WorldResources.Type.METAL, (int) metal },
++            { WorldResources.Type.GOLD,  (int) gold }
+         };
++
++        initializeStatistics();
++
++        updateAmounts();
++        updateStatistics();
++        updatePopulation();
+     }
+ 
+     /// <summary>
+@@ -93,6 +105,10 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
+         updateAmounts();
+     }
+ 
++    public float Amount(WorldResources.Type type)
++    {
++        return resources[type];
++    }
+ 
+     // Statistics 
+ 
+@@ -138,9 +154,6 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
+         updateStatistics();
+     }
+ 
+-
+-
+-
+     // Others
+ 
+     /// <summary>
+@@ -179,6 +192,11 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
+ 
+     public void updateAmounts()
+     {
++        if (_owner != BasePlayer.player)
++        {
++            return;
++        }
++
+         EntityAbilitiesController.ControlButtonsInteractability();
+ 
+         for (int i = 0; i < txt_names.Length; i++)
+@@ -189,11 +207,21 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
+ 
+     public void updatePopulation()
+     {
++        if (_owner != BasePlayer.player)
++        {
++            return;
++        }
++
+         pop.text = PopulationInfo.get.number_of_units.ToString();
+     }
+ 
+     public void updateStatistics()
+     {
++        if (_owner != BasePlayer.player)
++        {
++            return;
++        }
++
+         float amount;
+ 
+         for (int i = 0; i < txt_names.Length; i++)
+@@ -212,19 +240,23 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
+     }
+ 
+     public bool enoughResources(EntityAbility info)
+-    {
+-        EntityResources res;
+-
++    {
+         if (info.targetType.Equals(EntityType.BUILDING))
+-            res = Info.get.of(info.targetRace, info.targetBuilding).resources;
+-        else
+-            res = Info.get.of(info.targetRace, info.targetUnit).resources;
++            return enoughResources(Info.get.of(info.targetRace, info.targetBuilding).resources);
++
++        return enoughResources(Info.get.of(info.targetRace, info.targetUnit).resources);
++    }
+ 
+-        if (res.food <= resources[WorldResources.Type.FOOD] && res.wood <= resources[WorldResources.Type.WOOD] &&
+-            res.metal <= resources[WorldResources.Type.METAL])
+-            return true;
+-        else
+-            return false;
++    public bool enoughResources(EntityResources res)
++    {        
++        return enoughResources(WorldResources.Type.FOOD, res.food) &&
++                enoughResources(WorldResources.Type.METAL, res.metal) &&
++                enoughResources(WorldResources.Type.WOOD, res.wood);
++    }
++
++    public bool enoughResources(WorldResources.Type type, float amount)
++    {
++        return amount <= resources[type];
+     }
+ 
+     // Setup GameObjects
+@@ -234,7 +266,10 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
+     /// </summary>
+     private void Setup()
+     {
+-        _player = GameObject.Find("GameController").GetComponent<Player>();
++        if (_owner != BasePlayer.player)
++        {
++            return;
++        }
+ 
+         for (int i = 0; i < txt_names.Length; i++)
+         {
+diff --git a/March Death/Assets/Scripts/UI/Statistics.cs b/March Death/Assets/Scripts/UI/Statistics.cs
+index 60ada85..5f28270 100644
+--- a/March Death/Assets/Scripts/UI/Statistics.cs	
++++ b/March Death/Assets/Scripts/UI/Statistics.cs	
+@@ -1,90 +1 @@
+-﻿using UnityEngine;
+-using System.Collections;
+-using Utils;
+-
+-public class Statistics
+-{
+-    public WorldResources.Type _type { get; private set; }
+-    public float _time { private get; set; }
+-    public float _amount { private get; set; }
+-
+-    private float _growth_speed;
+-    public float growth_speed {
+-        get { return ((float)_amount / (float)_time); }
+-        set { _growth_speed = value; }
+-    }
+-
+-    /// <summary>
+-    /// Statistics constructor. time and amount are 0 by default.
+-    /// </summary>
+-    /// <param name="type">Type of the Resources.</param>
+-    public Statistics(WorldResources.Type type)
+-    {
+-        _time = 1;
+-        _amount = 0;
+-        _type = type;
+-    }
+-
+-    /// <summary>
+-    /// Ststistics constructor.
+-    /// </summary>
+-    /// <param name="type">Type of the Resources.</param>
+-    /// <param name="time">Time of refresh.</param>
+-    /// <param name="amount">Amount of resource for each refresh cycle,</param>
+-    public Statistics(WorldResources.Type type, float time, float amount)
+-    {
+-        _time = time;
+-        _amount = amount;
+-        _type = type;
+-    }
+-
+-    public void getNegative()
+-    {
+-        _amount *= -1;
+-    }
+-
+-    public static Statistics operator +(Statistics self, Statistics other)
+-    {
+-        float lcm = LCM(self._time, other._time);
+-
+-        self._amount = (((float)((lcm/self._time) * self._amount)) + ((lcm / (float)other._time) * other._amount));
+-        self._time = lcm;
+-
+-        return self;
+-    }
+-
+-    public static Statistics operator -(Statistics self, Statistics other)
+-    {
+-        float lcm = LCM(self._time, other._time);
+-
+-        self._amount = ((((lcm / (float)self._time) * self._amount)) - ((lcm / (float)other._time) * other._amount));
+-        self._time = lcm;
+-
+-        return self;
+-    }
+-
+-    // Assistant methods
+-    private static float LCM(float a, float b)
+-    {
+-        float num1, num2;
+-
+-        if (a > b)
+-        {
+-            num1 = a; num2 = b;
+-        }
+-        else
+-        {
+-            num1 = b; num2 = a;
+-        }
+-
+-        for (int i = 1; i <= num2; i++)
+-        {
+-            if ((num1 * i) % num2 == 0)
+-            {
+-                return i * num1;
+-            }
+-        }
+-
+-        return num2;
+-    }
+-}
++﻿
+\ No newline at end of file
+diff --git a/March Death/Assets/Scripts/Utils/EntityAbilitiesController.cs b/March Death/Assets/Scripts/Utils/EntityAbilitiesController.cs
+index 616005d..2944dee 100644
+--- a/March Death/Assets/Scripts/Utils/EntityAbilitiesController.cs	
++++ b/March Death/Assets/Scripts/Utils/EntityAbilitiesController.cs	
+@@ -105,9 +105,7 @@ public class EntityAbilitiesController : MonoBehaviour
+ 
+             if (abilityObj.isUsable && !abilityObj.isActive)
+             {
+-                if (BasePlayer.player.resources.IsEnough(WorldResources.Type.FOOD, entity.info.resources.food) &&
+-                    BasePlayer.player.resources.IsEnough(WorldResources.Type.METAL, entity.info.resources.metal) &&
+-                    BasePlayer.player.resources.IsEnough(WorldResources.Type.WOOD, entity.info.resources.wood))
++                if (ResourcesPlacer.get(BasePlayer.player).enoughResources(abilityObj._info))
+                 {
+                     UnityAction actionMethod = new UnityAction(() =>
+                     {
+@@ -189,7 +187,7 @@ public class EntityAbilitiesController : MonoBehaviour
+                 var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
+                 buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Columns) + 1));
+ 
+-                bool interactable = ResourcesPlacer.get.enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
++                bool interactable = ResourcesPlacer.get(BasePlayer.player).enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
+                 affordable_buttons[abilityObj] = interactable;
+                 Button b = CreateButton(rectTransform, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
+                 b.interactable = interactable;
+@@ -204,7 +202,7 @@ public class EntityAbilitiesController : MonoBehaviour
+         for (int i=0; i < buttons_on_show.Count; i++)
+         {
+             Button b = buttons_on_show[i];
+-            bool interactable = ResourcesPlacer.get.enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
++            bool interactable = ResourcesPlacer.get(BasePlayer.player).enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
+             b.interactable = interactable;
+             affordable_buttons[abilities_on_show[i]] = interactable;
+         }
