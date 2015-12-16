@@ -13,7 +13,7 @@ using Pathfinding;
 /// </summary>
 public class Unit : GameEntity<Unit.Actions>
 {
-    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EXTERMINATED, EAT, DIED, STAT_OUT, TARGET_TERMINATED, HEALTH_UPDATED };
+    public enum Actions { CREATED, MOVEMENT_START, MOVEMENT_END, DAMAGED, EXTERMINATED, EAT, DIED, TARGET_TERMINATED, HEALTH_UPDATED };
     public enum Gender { MALE, FEMALE }
 
     private EntityStatus _defaultStatus = EntityStatus.IDLE;
@@ -29,23 +29,19 @@ public class Unit : GameEntity<Unit.Actions>
         }
     }
 
-    private IGameEntity _entity;
-
     public Unit() { }
 
     /// <summary>
     /// Interval between resources update in miliseconds
     /// </summary>
-    const float RESOURCES_UPDATE_INTERVAL = 15.0f;
+    public const float RESOURCES_UPDATE_INTERVAL = 15.0f;
 
     /// <summary>
     /// Update follow distance when greater than this value
     /// Do note this values is the SQUARED (^2) value of the real distance
     /// </summary>
     const float SQR_UPDATE_DISTANCE = 75.0f;
-
-    Statistics statistics;
-
+    
     ///<sumary>
     /// Auto-unregister events when we are destroyed
     ///</sumary>
@@ -213,10 +209,12 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     protected override void onFatalWounds()
     {
-        if(BasePlayer.player.race.Equals(_entity.info.race))
-            fire(Actions.EXTERMINATED, _entity);
-
-        ResourcesEvents.get.unregisterUnitToEvents(_entity);
+        fire(Actions.EXTERMINATED, (IGameEntity)this);
+        
+        ResourcesEvents.get.unregisterUnitToEvents(this);
+        
+        // Clear target, just in case
+        _target = null;
 
         fire(Actions.DIED);
     }
@@ -574,20 +572,9 @@ public class Unit : GameEntity<Unit.Actions>
         {
             activateFOWEntity();
         }
-
-        // Statistics available for both AI and Player
-        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
-        GameObject gameController = GameObject.Find("GameController");
-        //ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
-        //register(Actions.EAT, res_pl.onFoodConsumption);
-
-        _entity = this.GetComponent<IGameEntity>();
         
-
-        if (Player.getOwner(this).race.Equals(gameInformationObject.GetComponent<GameInformation>().GetPlayerRace()))
-        {
-            ResourcesEvents.get.registerUnitToEvents(_entity);
-        }
+        // Register for both AI and player
+        ResourcesEvents.get.registerUnitToEvents(this);
 
         // Set detour params (can't be done until Start is done)
         if (!isImmobile)
@@ -597,8 +584,7 @@ public class Unit : GameEntity<Unit.Actions>
             _detourAgent.UpdateParams();
         }
 
-        if(BasePlayer.player.race.Equals(_info.race))
-            fire(Actions.CREATED, _entity);
+        fire(Actions.CREATED, (IGameEntity)this);
     }
 
     /// <summary>
@@ -634,16 +620,13 @@ public class Unit : GameEntity<Unit.Actions>
             }
 
             // Update this unit resources
-            BasePlayer.getOwner(this).resources.AddAmount(WorldResources.Type.GOLD, goldProduced);
-            BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.GOLD, goldConsumed);
-            BasePlayer.getOwner(this).resources.SubstractAmount(WorldResources.Type.FOOD, foodConsumed);
+            CollectableGood collectable = new CollectableGood(); // Generate the goods the units eat
+            collectable.entity = this;
+            collectable.goods = new Goods();
+            collectable.goods.type = WorldResources.Type.FOOD;
+            collectable.goods.amount = info.unitAttributes.foodConsumption;
 
-            Goods goods = new Goods(); // Generate the goods the units eat
-            //goods.amount = 5;
-            goods.amount = this.info.unitAttributes.foodConsumption; // RAUL_UNCOMMENT
-            goods.type = Goods.GoodsType.FOOD;
-
-            fire(Actions.EAT, goods);
+            fire(Actions.EAT, collectable);
         }
 
         // Status dependant functionality

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Utils;
 using System;
 
-public class ResourcesPlacer : Singleton<ResourcesPlacer>
+public class ResourcesPlacer
 {
     // attributes
     private readonly string[] txt_names = { "meat", "wood", "metal" };
@@ -18,7 +18,7 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
     /// Population text where number of units are displayed
     /// </summary>
     private Text pop;
-    private Player _player;
+    private BasePlayer _owner;
 
     private Sprite up;
     private Sprite down;
@@ -28,34 +28,46 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
     Dictionary<WorldResources.Type, int> resources;
     Dictionary<WorldResources.Type, Dictionary<IGameEntity, GrowthStatsPacket>> statistics;
 
+    private static Dictionary<BasePlayer, ResourcesPlacer> _instances = new Dictionary<BasePlayer, ResourcesPlacer>();
 
-    private ResourcesPlacer()
+    private ResourcesPlacer(BasePlayer owner)
     {
+        _owner = owner;
         res_amounts = new List<Text>();
         res_stats = new List<Text>();
         arrows = new List<Image>();
 
         Setup();
+    }
 
-        initializeResources();
-        initializeStatistics();
+    public static ResourcesPlacer get(BasePlayer player)
+    {
+        if (!_instances.ContainsKey(player))
+        {
+            _instances.Add(player, new ResourcesPlacer(player));
+        }
 
-        updateAmounts();
-        updateStatistics();
-        updatePopulation();
+        return _instances[player];
     }
 
 
     // Resources 
 
-    private void initializeResources()
+    public void InitializeResources(uint wood, uint food, uint metal, uint gold)
     {
         resources = new Dictionary<WorldResources.Type, int>()
         {
-            { WorldResources.Type.FOOD ,  (int) _player.resources.getAmount(WorldResources.Type.FOOD) } ,
-            { WorldResources.Type.WOOD ,  (int) _player.resources.getAmount(WorldResources.Type.WOOD) } ,
-            { WorldResources.Type.METAL , (int) _player.resources.getAmount(WorldResources.Type.METAL) }
+            { WorldResources.Type.FOOD , (int) food } ,
+            { WorldResources.Type.WOOD , (int) wood } ,
+            { WorldResources.Type.METAL, (int) metal },
+            { WorldResources.Type.GOLD,  (int) gold }
         };
+
+        initializeStatistics();
+
+        updateAmounts();
+        updateStatistics();
+        updatePopulation();
     }
 
     /// <summary>
@@ -93,6 +105,10 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
         updateAmounts();
     }
 
+    public float Amount(WorldResources.Type type)
+    {
+        return resources[type];
+    }
 
     // Statistics 
 
@@ -138,9 +154,6 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
         updateStatistics();
     }
 
-
-
-
     // Others
 
     /// <summary>
@@ -179,6 +192,11 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
 
     public void updateAmounts()
     {
+        if (_owner != BasePlayer.player)
+        {
+            return;
+        }
+
         EntityAbilitiesController.ControlButtonsInteractability();
 
         for (int i = 0; i < txt_names.Length; i++)
@@ -189,12 +207,21 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
 
     public void updatePopulation()
     {
-        if(pop != null)
-            pop.text = PopulationInfo.get.number_of_units.ToString();
+        if (_owner != BasePlayer.player)
+        {
+            return;
+        }
+
+        pop.text = PopulationInfo.get.number_of_units.ToString();
     }
 
     public void updateStatistics()
     {
+        if (_owner != BasePlayer.player)
+        {
+            return;
+        }
+
         float amount;
 
         for (int i = 0; i < txt_names.Length; i++)
@@ -213,18 +240,22 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
 
     public bool enoughResources(EntityAbility info)
     {
-        EntityResources res;
-
         if (info.targetType.Equals(EntityType.BUILDING))
-            res = Info.get.of(info.targetRace, info.targetBuilding).resources;
-        else
-            res = Info.get.of(info.targetRace, info.targetUnit).resources;
+            return enoughResources(Info.get.of(info.targetRace, info.targetBuilding).resources);
 
-        if (res.food <= resources[WorldResources.Type.FOOD] && res.wood <= resources[WorldResources.Type.WOOD] &&
-            res.metal <= resources[WorldResources.Type.METAL])
-            return true;
-        else
-            return false;
+        return enoughResources(Info.get.of(info.targetRace, info.targetUnit).resources);
+    }
+
+    public bool enoughResources(EntityResources res)
+    {        
+        return enoughResources(WorldResources.Type.FOOD, res.food) &&
+                enoughResources(WorldResources.Type.METAL, res.metal) &&
+                enoughResources(WorldResources.Type.WOOD, res.wood);
+    }
+
+    public bool enoughResources(WorldResources.Type type, float amount)
+    {
+        return amount <= resources[type];
     }
 
     // Setup GameObjects
@@ -234,7 +265,10 @@ public class ResourcesPlacer : Singleton<ResourcesPlacer>
     /// </summary>
     private void Setup()
     {
-        _player = GameObject.Find("GameController").GetComponent<Player>();
+        if (_owner != BasePlayer.player)
+        {
+            return;
+        }
 
         for (int i = 0; i < txt_names.Length; i++)
         {

@@ -11,13 +11,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     /// </summary>
     protected Storage.Races _selfRace;
     public Storage.Races race { get { return _selfRace; } }
-
-    /// <summary>
-    /// The resources manager
-    /// </summary>
-    protected Managers.ResourcesManager _resources = new Managers.ResourcesManager();
-    public Managers.ResourcesManager resources { get { return _resources; } }
-
+    
     /// <summary>
     /// The buildings manager
     /// </summary>
@@ -95,10 +89,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     public void SetInitialResources(uint wood, uint food, uint metal, uint gold)
     {
         // TODO Consider adding a maximum capacity
-        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.FOOD, food));
-        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.WOOD, wood));
-        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.METAL, metal));
-        _resources.InitDeposit(new WorldResources.Resource(WorldResources.Type.GOLD, gold));
+        ResourcesPlacer.get(this).InitializeResources(wood, food, metal, gold);
     }
 
     protected abstract void AddBuilding(IGameEntity entity);

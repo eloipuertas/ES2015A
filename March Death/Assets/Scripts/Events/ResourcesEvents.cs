@@ -9,7 +9,7 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
     private ResourcesEvents() { }
 
     // REGISTER METHODS
-    public void registerResourceToEvents(IGameEntity entity)
+    public void registerBuildingToEvents(IGameEntity entity)
     {
         if (entity.info.isResource)
         {
@@ -20,7 +20,7 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
             resource.register(Resource.Actions.CREATED, OnCreated);
             resource.register(Resource.Actions.EXTERMINATED, OnDestroyed);
         }
-        if (entity.info.isBarrack)
+        else if (entity.info.isBarrack)
         {
             Barrack barrack = (Barrack)entity;
             barrack.register(Barrack.Actions.CREATED, OnCreated);
@@ -38,7 +38,7 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
         }
     }
 
-    public void unregisterResourceToEvents(IGameEntity entity)
+    public void unregisterBuildingToEvents(IGameEntity entity)
     {
         if (entity.info.isResource)
         {
@@ -49,7 +49,7 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
             resource.unregister(Resource.Actions.CREATED, OnCreated);
             resource.unregister(Resource.Actions.EXTERMINATED, OnDestroyed);
         }
-        if (entity.info.isBarrack)
+        else if (entity.info.isBarrack)
         {
             Barrack barrack = (Barrack)entity;
             barrack.unregister(Barrack.Actions.CREATED, OnCreated);
@@ -75,7 +75,7 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
         PopulationInfo.get.AddWorker();
 
         IGameEntity entity = (IGameEntity)obj;
-        ResourcesPlacer.get.StatisticsChanged(entity, CreatePackageFromEntity(entity));
+        ResourcesPlacer.get(BasePlayer.getOwner(entity)).StatisticsChanged(entity, CreatePackageFromEntity(entity));
     }
 
 
@@ -84,24 +84,23 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
         PopulationInfo.get.RemoveWorker();
 
         IGameEntity entity = (IGameEntity)obj;
-        ResourcesPlacer.get.StatisticsChanged(entity, CreatePackageFromEntity(entity));
+        ResourcesPlacer.get(BasePlayer.getOwner(entity)).StatisticsChanged(entity, CreatePackageFromEntity(entity));
     }
 
 
     private void OnCollection(System.Object obj)
     {
-        CollectableGood goods = (CollectableGood) obj;
-
-        Goods good = new Goods();  good = goods.goods;
-
-        ResourcesPlacer.get.Collect( (WorldResources.Type) good.type , good.amount);
+        CollectableGood collectable = (CollectableGood) obj;
+        BasePlayer player = BasePlayer.getOwner(collectable.entity);
+        ResourcesPlacer.get(player).Collect(collectable.goods.type, collectable.goods.amount);
     }
 
 
     private void OnConsumption(System.Object obj)
     {
-        Goods goods = (Goods)obj;
-        ResourcesPlacer.get.Consume((WorldResources.Type) goods.type, goods.amount);
+        CollectableGood collectable = (CollectableGood)obj;
+        BasePlayer player = BasePlayer.getOwner(collectable.entity);
+        ResourcesPlacer.get(player).Collect(collectable.goods.type, collectable.goods.amount);
     }
 
 
@@ -117,24 +116,30 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
             {  WorldResources.Type.METAL , res.metal }
         };
 
-        if (entity.info.isUnit) {
-            if (((Unit)entity).type.Equals(UnitTypes.HERO))
+        BasePlayer owner = BasePlayer.getOwner(entity);
+        ResourcesPlacer placer = ResourcesPlacer.get(owner);
+
+        bool isUnit = entity.doIfUnit(unit =>
+        {
+            if (unit.type != UnitTypes.HERO)
             {
-                ResourcesPlacer.get.Buy(d);
+                placer.Buy(d);
+            }
+        });
+
+        if (!isUnit)
+        {
+            if (((BuildingInfo)entity.info).type != BuildingTypes.STRONGHOLD)
+            {
+                placer.Buy(d);
             }
         }
 
-        if (entity.info.isBuilding)
-        {
-            ResourcesPlacer.get.Buy(d);
-        }
-
-        ResourcesPlacer.get.updatePopulation();
+        placer.updatePopulation();
 
         if (entity.info.isResource || entity.info.isUnit)
         {
-            GrowthStatsPacket packet = CreatePackageFromEntity(entity);
-            ResourcesPlacer.get.StatisticsChanged(entity, packet);
+            placer.StatisticsChanged(entity, CreatePackageFromEntity(entity));
         }
     }
 
@@ -142,19 +147,21 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
     private void OnDestroyed(System.Object obj)
     {
         IGameEntity entity = (IGameEntity)obj;
+        BasePlayer owner = BasePlayer.getOwner(entity);
+        ResourcesPlacer placer = ResourcesPlacer.get(owner);
 
         if (entity.info.isUnit)
         {
             Unit unit = (Unit)entity;
-            ResourcesPlacer.get.RemoveEntity(WorldResources.Type.FOOD, entity);
+            placer.RemoveEntity(WorldResources.Type.FOOD, entity);
         }
-        if (entity.info.isResource)
+        else if (((BuildingInfo)entity.info).type != BuildingTypes.STRONGHOLD)
         {
             Resource resource = (Resource)entity;
-            ResourcesPlacer.get.RemoveEntity(GetElementFromResource(resource), entity);
+            placer.RemoveEntity(GetElementFromResource(resource), entity);
         }
 
-        ResourcesPlacer.get.updatePopulation();
+        placer.updatePopulation();
 
     }
 

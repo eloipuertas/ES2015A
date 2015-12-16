@@ -41,9 +41,10 @@ class Sell : Ability
 
         if (resources != null)
         {
-            BasePlayer.getOwner(entity).resources.AddAmount(WorldResources.Type.WOOD, resources.wood);
-            BasePlayer.getOwner(entity).resources.AddAmount(WorldResources.Type.METAL, resources.metal);
-            BasePlayer.getOwner(entity).resources.AddAmount(WorldResources.Type.FOOD, resources.food);
+            BasePlayer player = BasePlayer.getOwner(entity);
+            ResourcesPlacer.get(player).Collect(WorldResources.Type.FOOD, resources.food);
+            ResourcesPlacer.get(player).Collect(WorldResources.Type.WOOD, resources.wood);
+            ResourcesPlacer.get(player).Collect(WorldResources.Type.METAL, resources.metal);
         }
         else
         {

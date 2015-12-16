@@ -13,13 +13,8 @@ namespace Storage
         // constructor
         public Goods() { }
 
-        public enum GoodsType { FOOD, WOOD, METAL };
-
         public float amount { get; set; }
-        public GoodsType type { get; set; }
-
+        public WorldResources.Type type { get; set; }
     }
 }
-
-
 

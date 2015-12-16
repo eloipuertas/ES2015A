@@ -115,13 +115,13 @@ public class AIDebugSystem : MonoBehaviour {
     void showResources(int windowID)
     {
         GUI.contentColor = Color.red;
-        GUI.Label(new Rect(marginLeft, 20, textWidth, textHeight), "Food: " + controller.resources.getAmount(WorldResources.Type.FOOD).ToString());
+        GUI.Label(new Rect(marginLeft, 20, textWidth, textHeight), "Food: " + ResourcesPlacer.get(BasePlayer.ia).Amount(WorldResources.Type.FOOD).ToString());
         GUI.contentColor = Color.white;
-        GUI.Label(new Rect(marginLeft, 40, textWidth, textHeight), "Wood: " + controller.resources.getAmount(WorldResources.Type.WOOD).ToString());
+        GUI.Label(new Rect(marginLeft, 40, textWidth, textHeight), "Wood: " + ResourcesPlacer.get(BasePlayer.ia).Amount(WorldResources.Type.WOOD).ToString());
         GUI.contentColor = Color.yellow;
-        GUI.Label(new Rect(marginLeft, 60, textWidth, textHeight), "Gold: " + controller.resources.getAmount(WorldResources.Type.GOLD).ToString());
+        GUI.Label(new Rect(marginLeft, 60, textWidth, textHeight), "Gold: " + ResourcesPlacer.get(BasePlayer.ia).Amount(WorldResources.Type.GOLD).ToString());
         GUI.contentColor = Color.cyan;
-        GUI.Label(new Rect(marginLeft, 80, textWidth, textHeight), "Metal: " + controller.resources.getAmount(WorldResources.Type.METAL).ToString());
+        GUI.Label(new Rect(marginLeft, 80, textWidth, textHeight), "Metal: " + ResourcesPlacer.get(BasePlayer.ia).Amount(WorldResources.Type.METAL).ToString());
         GUI.DragWindow();
     }
 

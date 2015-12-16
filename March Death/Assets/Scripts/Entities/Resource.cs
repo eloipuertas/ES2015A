@@ -22,8 +22,6 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     Managers.SoundsManager sounds;
 
-    public Statistics statistics;
-
     // Constructor
     public Resource() { }
 
@@ -193,8 +191,7 @@ public class Resource : Building<Resource.Actions>
 
     private readonly object syncLock = new object();
     bool hasCreatedCivil = false;
-
-    private bool once = true;
+    
 
     List<GameObject> pendingProducers = new List<GameObject>();
     List<GameObject> pendingWanderers = new List<GameObject>();
@@ -289,18 +286,15 @@ public class Resource : Building<Resource.Actions>
 
             if (type.Equals(BuildingTypes.FARM))
             {
-                BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.FOOD, amount);
-                collectable.goods.type = Goods.GoodsType.FOOD;
+                collectable.goods.type = WorldResources.Type.FOOD;
             }
             else if (type.Equals(BuildingTypes.MINE))
             {
-                BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.METAL, amount);
-                collectable.goods.type = Goods.GoodsType.METAL;
+                collectable.goods.type = WorldResources.Type.METAL;
             }
             else
             {
-                BasePlayer.getOwner(_entity).resources.AddAmount(WorldResources.Type.WOOD, amount);
-                collectable.goods.type = Goods.GoodsType.WOOD;
+                collectable.goods.type = WorldResources.Type.WOOD;
             }
             fire(Actions.COLLECTION, collectable);
         }
@@ -313,7 +307,6 @@ public class Resource : Building<Resource.Actions>
     /// <param name="type"></param>
     protected override void createUnit(UnitTypes type)
     {
-
         if (harvestUnits < maxHarvestUnits)
         {
             _unitPosition.Set(_center.x, _center.y, _center.z);
@@ -330,11 +323,14 @@ public class Resource : Building<Resource.Actions>
             setStatus(EntityStatus.WORKING);
 
             _collectionRate += Info.get.of(race, UnitTypes.CIVIL).attributes.capacity;
+
+            fire(Actions.NEW_HARVEST, (IGameEntity)this);
         }
         else
         {
             base.createUnit(type);
         }
+
         _createStatus = createCivilStatus.IDLE;
     }
     /// <summary>
@@ -357,7 +353,6 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     public Unit recruitExplorer()
     {
-
         if (harvestUnits > 0)
         {
             Unit worker;
@@ -377,6 +372,8 @@ public class Resource : Building<Resource.Actions>
             {
                 setStatus(EntityStatus.IDLE);
             }
+
+            fire(Actions.NEW_EXPLORER, (IGameEntity)this);
             return worker;
         }
         else
@@ -392,7 +389,6 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     private void recruitWorker(Unit explorer)
     {
-
         if (harvestUnits < maxHarvestUnits)
         {
             _collectionRate += explorer.info.attributes.capacity;
@@ -405,6 +401,8 @@ public class Resource : Building<Resource.Actions>
             {
                 setStatus(EntityStatus.WORKING);
             }
+
+            fire(Actions.NEW_HARVEST, (IGameEntity)this);
         }
         else
         {
@@ -446,7 +444,6 @@ public class Resource : Building<Resource.Actions>
     /// </summary>
     public override void OnDestroy()
     {
-        fire(Actions.EXTERMINATED, _entity);
         base.OnDestroy();
     }
 
@@ -463,11 +460,6 @@ public class Resource : Building<Resource.Actions>
             default:
                 throw new Exception("That resource type does not exist!");
         }
-    }
-
-    private void SetupStatistics()
-    {  
-        maxHarvestUnits = info.resourceAttributes.maxUnits;
     }
 
     /// <summary>
@@ -499,7 +491,7 @@ public class Resource : Building<Resource.Actions>
         base.Start();
         this.GetComponent<Rigidbody>().isKinematic = false;
 
-        SetupStatistics();
+        maxHarvestUnits = info.resourceAttributes.maxUnits;
     }
 
 
@@ -511,7 +503,6 @@ public class Resource : Building<Resource.Actions>
     override public void Update()
     {
         base.Update();
-
 
         switch (status)
         {
@@ -532,25 +523,6 @@ public class Resource : Building<Resource.Actions>
                 }
                 break;
         }
-    }
-
-    public override void setStatus(EntityStatus newStatus)
-    {
-        if (status == EntityStatus.IDLE && newStatus == EntityStatus.WORKING)
-        {
-            if (once)
-            {
-                if (Player.isOfPlayer(_entity))
-                {
-                    ResourcesEvents.get.registerResourceToEvents(_entity);
-                    fire(Actions.CREATED, _entity);
-                }
-
-                once = false;
-            }
-        }
-
-        base.setStatus(newStatus);
     }
 
     /// <summary>
