@@ -343,14 +343,16 @@ public class GameInformation : MonoBehaviour
         Battle.PlayerInformation player = new Battle.PlayerInformation(race);
         stronghold = GameObject.Find(strongholdGameObject);
         player.AddBuilding(BuildingTypes.STRONGHOLD, stronghold.transform.position.x, stronghold.transform.position.z);
+        player.SetInitialResources(2000, 2000, 2000, 2000);
         return player;
     }
 
     public void SetStoryBattle()
     {
-        Battle battle = new Battle();
+        game = new Battle();
         Races enemyRace = playerRace == Races.ELVES ? Races.MEN : Races.ELVES;
-        battle.AddPlayerInformation(initializePlayer(playerRace, "Cube_Player_Stronghold"));
-        battle.AddPlayerInformation(initializePlayer(enemyRace, "Cube_Enemy_Stronghold"));
+        game.AddPlayerInformation(initializePlayer(playerRace, "Cube_Player_Stronghold"));
+        game.AddPlayerInformation(initializePlayer(enemyRace, "Cube_Enemy_Stronghold"));
+        game.SetWorldResources(5000, 5000, 5000);
     }
 }
