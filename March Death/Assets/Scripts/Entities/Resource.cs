@@ -469,7 +469,7 @@ public class Resource : Building<Resource.Actions>
     {
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
         GameObject gameController = GameObject.Find("GameController");
-        ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
+        //ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
 
         if (Player.isOfPlayer(_entity))
         {

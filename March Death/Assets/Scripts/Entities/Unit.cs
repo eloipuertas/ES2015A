@@ -578,7 +578,7 @@ public class Unit : GameEntity<Unit.Actions>
         // Statistics available for both AI and Player
         GameObject gameInformationObject = GameObject.Find("GameInformationObject");
         GameObject gameController = GameObject.Find("GameController");
-        ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
+        //ResourcesPlacer res_pl = gameController.GetComponent<ResourcesPlacer>();
         //register(Actions.EAT, res_pl.onFoodConsumption);
 
         _entity = this.GetComponent<IGameEntity>();
