@@ -343,6 +343,7 @@ public class GameInformation : MonoBehaviour
         Battle.PlayerInformation player = new Battle.PlayerInformation(race);
         stronghold = GameObject.Find(strongholdGameObject);
         player.AddBuilding(BuildingTypes.STRONGHOLD, stronghold.transform.position.x, stronghold.transform.position.z);
+        player.AddUnit(UnitTypes.HERO, stronghold.transform.position.x - 50, stronghold.transform.position.z);
         player.SetInitialResources(2000, 2000, 2000, 2000);
         return player;
     }
@@ -354,5 +355,8 @@ public class GameInformation : MonoBehaviour
         game.AddPlayerInformation(initializePlayer(playerRace, "Cube_Player_Stronghold"));
         game.AddPlayerInformation(initializePlayer(enemyRace, "Cube_Enemy_Stronghold"));
         game.SetWorldResources(5000, 5000, 5000);
+        Battle.MissionDefinition.TargetType t = new Battle.MissionDefinition.TargetType();
+        t.building = BuildingTypes.STRONGHOLD;
+        game.AddMission(Battle.MissionType.DESTROY, 1, EntityType.BUILDING, t, 0, true, "");
     }
 }
