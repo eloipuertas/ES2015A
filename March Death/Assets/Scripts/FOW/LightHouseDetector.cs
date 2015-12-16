@@ -6,7 +6,8 @@ using UnityEngine;
 
 class LightHouseDetector : MonoBehaviour
 {
-    private float _radius = 60;
+    private float _radius = 80;
+    private float _scaleOffset = 2f;
     private SphereCollider _collider;
     private LightHouseRevealer _revealer;
     private List<IGameEntity> _targets = new List<IGameEntity>();
@@ -18,14 +19,14 @@ class LightHouseDetector : MonoBehaviour
         _race = transform.parent.GetComponent<Barrack>().getRace();
         _revealer = transform.parent.FindChild("LightHouse-Revealer").GetComponent<LightHouseRevealer>();
         _collider = GetComponent<SphereCollider>();
-        _collider.radius = _radius;
+        _collider.radius = _radius / _scaleOffset;
         _collider.center = new Vector3(0f, -8f, 0f);
 
     }
 
     public void Update()
     {
-        //DrawInfo(); <- buggy
+        DrawInfo();// <- buggy
     }
 
     /// <summary>

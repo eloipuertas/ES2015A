@@ -41,6 +41,7 @@ namespace Assets.Scripts.AI
         public List<Unit> Workers { get; set; }
         
         public bool FinishPlaying { get { return missionStatus.isGameOver(); } }
+        public bool hasStronghold { get; set; }
 
         public override void Start()
         {
@@ -68,6 +69,7 @@ namespace Assets.Scripts.AI
             modules.Add(new AIModule(Macro.MacroLow, 5));
             modules.Add(new AIModule(Micro.Micro, 1));
             timers = new float[modules.Count];
+            hasStronghold = true;
             for (int i = 0; i < modules.Count; i++)
                 timers[i] = 0;
 
@@ -88,7 +90,6 @@ namespace Assets.Scripts.AI
             }
 
             missionStatus = new MissionStatus(playerId);
-
         }
 
         void Update()
@@ -206,6 +207,10 @@ namespace Assets.Scripts.AI
                 }
                 else
                 {
+                    if(((BuildingInfo)entity.info).type== BuildingTypes.STRONGHOLD)
+                    {
+                        hasStronghold = false;
+                    }
                     OwnBarracks.Remove((Barrack)entity);
                 }
             }

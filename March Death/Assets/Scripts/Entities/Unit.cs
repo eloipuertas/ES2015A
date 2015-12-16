@@ -209,9 +209,8 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     protected override void onFatalWounds()
     {
-        if(BasePlayer.player.race.Equals(info.race))
-            fire(Actions.EXTERMINATED, (IGameEntity)this);
-
+        fire(Actions.EXTERMINATED, (IGameEntity)this);
+        
         ResourcesEvents.get.unregisterUnitToEvents(this);
         
         // Clear target, just in case
@@ -296,6 +295,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// <returns></returns>
     public bool goToBuilding(IGameEntity building)
     {
+
         _target = building;
         _followingTarget = true;
         _movePoint = building.getTransform().position;
@@ -303,7 +303,7 @@ public class Unit : GameEntity<Unit.Actions>
         setStatus(EntityStatus.MOVING);
         fire(Actions.MOVEMENT_START);
         updateDistanceToTarget();
-
+        Debug.Log("Unit: GoToBuilding()");
 
         return true;
     }
@@ -320,12 +320,6 @@ public class Unit : GameEntity<Unit.Actions>
         // Note: Cast is redundant but avoids warning
         if (_target != (IGameEntity)entity)
         {
-            // Cancel attacking current unit if any
-            if (status == EntityStatus.ATTACKING)
-            {
-                stopAttack();
-            }
-
             // Register for DEAD/DESTROYED and HIDDEN
             _auto += entity.registerFatalWounds(onTargetDied);
             _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);

@@ -459,7 +459,7 @@ public class Resource : Building<Resource.Actions>
                 throw new Exception("That resource type does not exist!");
         }
     }
-    
+
     /// <summary>
     /// Object initialization
     /// </summary>
@@ -478,7 +478,7 @@ public class Resource : Building<Resource.Actions>
         civilInfo = Info.get.of(this.race, UnitTypes.CIVIL);
         _entity = this.GetComponent<IGameEntity>();
         sounds = GameObject.Find("GameController").GetComponent<Managers.SoundsManager>();
-        
+
         // Call Building start
         base.Awake();
     }

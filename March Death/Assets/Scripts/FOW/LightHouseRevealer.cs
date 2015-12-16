@@ -13,7 +13,7 @@ class LightHouseRevealer : MonoBehaviour
 
     private float _revealerAngleStep = 1f;
     private float _focusingStep = 5f;
-    private float _revealerOrbitatingRadius = 45;
+    private float _revealerOrbitatingRadius = 50;
 
     private Vector3 _referencePosition;
 
@@ -62,7 +62,7 @@ class LightHouseRevealer : MonoBehaviour
             if (EnoughDifference(transform.position, _target.transform.position))
             {
                 transform.position = GetPosition(_target.transform.position);
-                transform.position = Vector3.MoveTowards(transform.position, _target.transform.position, _focusingStep);
+                //transform.position = Vector3.MoveTowards(transform.position, _target.transform.position, _focusingStep);
 
             }
         }
