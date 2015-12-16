@@ -20,30 +20,83 @@ namespace Assets.Scripts.AI
         Dictionary<UnitTypes, int> UnitPref;
         AIController ai;
         public AIArchitect architect;
-        static Dictionary<UnitTypes, BuildingTypes> unitToBuildMap = new Dictionary<UnitTypes, BuildingTypes>()
-        {
-            {UnitTypes.HEAVY,BuildingTypes.BARRACK},
-            {UnitTypes.LIGHT,BuildingTypes.BARRACK},
-            {UnitTypes.THROWN,BuildingTypes.ARCHERY}
-        };
+        Dictionary<UnitTypes, BuildingTypes> unitToBuildMap;
         public MacroManager(AIController ai)
         {
             this.ai = ai;
 
             UnitPref = new Dictionary<UnitTypes, int>();
-            UnitPref.Add(UnitTypes.HEAVY, 5);
-            UnitPref.Add(UnitTypes.LIGHT, 0);
-            UnitPref.Add(UnitTypes.THROWN, 0);
+            //Here is where we could use personalities, if they were implemented.
+            List<int> randomPref = Shuffle<int>(new List<int>
+            {
+                80,100,85,97
+            });
+            UnitPref.Add(UnitTypes.HEAVY, randomPref[0]);
+            UnitPref.Add(UnitTypes.LIGHT, randomPref[1]);
+            UnitPref.Add(UnitTypes.THROWN, randomPref[2]);
+            UnitPref.Add(UnitTypes.CAVALRY, randomPref[3]);
+            UnitPref.Add(UnitTypes.MACHINE, 50);
+            UnitPref.Add(UnitTypes.SPECIAL, 30);
+            unitToBuildMap = new Dictionary<UnitTypes, BuildingTypes>()
+                {
+                    {UnitTypes.HEAVY,BuildingTypes.BARRACK},
+                    {UnitTypes.LIGHT,BuildingTypes.BARRACK},
+                    {UnitTypes.THROWN,BuildingTypes.ARCHERY},
+                    {UnitTypes.CAVALRY,BuildingTypes.STABLE},
+                };
+            if (ai.race== Races.ELVES) //Goddammit, why couldn't this buildings have the same type
+            {
+                unitToBuildMap.Add(UnitTypes.SPECIAL,BuildingTypes.ENT);
+                unitToBuildMap.Add(UnitTypes.MACHINE, BuildingTypes.WORKSHOP);
+            }
+            else
+            {
+                unitToBuildMap.Add(UnitTypes.SPECIAL, BuildingTypes.GRYPHON);
+                unitToBuildMap.Add(UnitTypes.MACHINE, BuildingTypes.ARTILLERY);
+            }
             architect = new AIArchitect(ai);
+        }
+        //Fisher-Yates
+        public List<T> Shuffle<T>(List<T> l)
+        {
+            System.Random rng = new System.Random();
+            int n = l.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                T val = l[k];
+                l[k] = l[n];
+                l[n] = val;
+            }
+            return l;
         }
         /// <summary>
         /// Called every few seconds, plans ahead and makes lists with what it wants
         /// </summary>
         public void MacroHigh()
         {
-            foreach (Resource r in ai.OwnResources)
-                if (r.harvestUnits == r.maxHarvestUnits) 
-                    architect.buildingPrefs.Add(r.type);
+
+            BuildArmyBuildings();
+            BuildResourceBuildings();
+            BuildDefences();
+            if (architect.constructionGrid.mode == AIController.AIMode.CAMPAIGN)
+            {
+                architect.buildForCampaign();
+            }
+        }
+        private void BuildDefences()
+        {
+            if (ai.resources.getAmount(WorldResources.Type.WOOD) > 400)
+            {
+                for (int i = 0; i < (ai.DifficultyLvl * 3); i++)
+                {
+                    architect.addDefence();
+                }
+            }
+        }
+        private void BuildArmyBuildings()
+        {
             List<UnitTypes> keys = new List<UnitTypes>(UnitPref.Keys);
             foreach (var key in keys)
             {
@@ -54,23 +107,39 @@ namespace Assets.Scripts.AI
                 }
                 else if (val > 100)
                 {
-                    if(architect.constructionGrid.mode == AIController.AIMode.BATTLE)
+                    if (architect.constructionGrid.mode == AIController.AIMode.BATTLE)
                     {
                         architect.buildingPrefs.Insert(0, unitToBuildMap[key]);
                     }
                 }
             }
-            if(architect.constructionGrid.mode == AIController.AIMode.CAMPAIGN)
+        }
+        /// <summary>
+        /// Checks if our resource buildings are all almost full, and if they are then it adds another instance to be build
+        /// </summary>
+        private void BuildResourceBuildings()
+        {
+            List<BuildingTypes> toAdd = new List<BuildingTypes>()
             {
-                architect.buildForCampaign();
+                BuildingTypes.FARM,
+                BuildingTypes.MINE,
+                BuildingTypes.SAWMILL
+            };
+            foreach (Resource r in ai.OwnResources)
+            {
+                if (r.harvestUnits < r.maxHarvestUnits - 1)
+                {
+                    toAdd.Remove(r.type);
+                }
             }
+            architect.buildingPrefs.AddRange(toAdd);
         }
         /// <summar>
         /// Called fast enough, acomplishes what the macroHigh asks for
         /// </summary>
         public void MacroLow()
         {
-            if (architect.constructionGrid.mode == AIController.AIMode.BATTLE && architect.buildingPrefs.Count > 0)
+            if (architect.constructionGrid.mode == AIController.AIMode.BATTLE && architect.buildingPrefs.Count > 0 && ai.hasStronghold)
             {
                 architect.constructNextBuilding();
             }
@@ -85,7 +154,7 @@ namespace Assets.Scripts.AI
             {
                 if (b.type == needed)
                 {
-                    UnitPref[bUnit] += (b.addUnitQueue(bUnit)) ? -1 : 0;
+                    UnitPref[bUnit] += (b.addUnitQueue(bUnit)) ? -3 : 0;
                 }
             }
         }
