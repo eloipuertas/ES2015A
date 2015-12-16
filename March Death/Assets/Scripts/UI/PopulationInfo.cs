@@ -11,6 +11,8 @@ public sealed class PopulationInfo : Singleton<PopulationInfo>
     Dictionary<BuildingTypes, int> buildings;
     Dictionary<UnitTypes, int> units;
 
+    Dictionary<string, int> general_stats;
+
     public int number_of_units { get; private set; }
     public int number_of_buildings { get; private set; }
 
@@ -18,6 +20,8 @@ public sealed class PopulationInfo : Singleton<PopulationInfo>
     {
         buildings = new Dictionary<BuildingTypes, int>();
         units = new Dictionary<UnitTypes, int>();
+
+        general_stats = new Dictionary<string, int>();
 
         Setup();
     }
@@ -36,6 +40,7 @@ public sealed class PopulationInfo : Singleton<PopulationInfo>
         }
 
         number_of_buildings += 1;
+        general_stats["buildings"] = number_of_buildings;
     }
 
     private void addToUnit(UnitTypes type)
@@ -50,6 +55,7 @@ public sealed class PopulationInfo : Singleton<PopulationInfo>
         }
 
         number_of_units += 1;
+        general_stats["units"] = number_of_units;
     }
 
     private void removeToBuilding(BuildingTypes type)
@@ -64,6 +70,8 @@ public sealed class PopulationInfo : Singleton<PopulationInfo>
         }
 
         number_of_buildings -= 1;
+        general_stats["destroyed_buildings"] += 1;
+        general_stats["buildings"] = number_of_units;
     }
 
     private void removeToUnit(UnitTypes type)
@@ -78,6 +86,8 @@ public sealed class PopulationInfo : Singleton<PopulationInfo>
         }
 
         number_of_units -= 1;
+        general_stats["dead_units"] += 1;
+        general_stats["units"] = number_of_units;
     }
 
     /// <summary>
@@ -112,6 +122,15 @@ public sealed class PopulationInfo : Singleton<PopulationInfo>
         }
     }
 
+    public void AddWorker()
+    {
+        general_stats["workers"] += 1;
+    }
+
+    public void RemoveWorker()
+    {
+        general_stats["workers"] -= 1;
+    }
 
     /*****************************************************************
      *          OTHER METHODS
@@ -184,6 +203,30 @@ public sealed class PopulationInfo : Singleton<PopulationInfo>
         return strList;
     }
 
+    public List<string> GetGeneralKeys()
+    {
+        List<string> strList = new List<string>();
+
+        foreach (KeyValuePair<string, int> entry in general_stats)
+        {
+            strList.Add(entry.Key);
+        }
+
+        return strList;
+    }
+
+    public List<string> GetGeneralValues()
+    {
+        List<string> strList = new List<string>();
+
+        foreach (KeyValuePair<string, int> entry in general_stats)
+        {
+            strList.Add(entry.Value.ToString());
+        }
+
+        return strList;
+    }
+
 
     // INITIALIZE
     private void Setup()
@@ -202,5 +245,12 @@ public sealed class PopulationInfo : Singleton<PopulationInfo>
         buildings[BuildingTypes.STRONGHOLD] += 1;
         number_of_units = 1;
         number_of_buildings = 1;
+
+        initializeGeneralStats(); 
+    }
+
+    private void initializeGeneralStats()
+    {
+        general_stats = new Dictionary<string, int> { { "units", 1 }, { "buildings", 1 }, { "workers", 0} , { "dead_units", 0 }, { "destroyed_buildings", 0 } };
     }
 }
