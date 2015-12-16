@@ -122,6 +122,12 @@ namespace Storage
                 case "Create Artillery":
                     keyBinding = KeyCode.R;
                     break;
+                case "Create Ent":
+                    keyBinding = KeyCode.E;
+                    break;
+                case "Create WorkShop":
+                    keyBinding = KeyCode.H;
+                    break;
                 case "Create Stable":
                     keyBinding = KeyCode.C;
                     break;
