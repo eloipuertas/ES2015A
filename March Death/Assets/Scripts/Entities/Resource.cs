@@ -364,7 +364,6 @@ public class Resource : Building<Resource.Actions>
             worker.bringBack();
             worker.moveTo(findMeetingPoint());
 
-            fire(Actions.NEW_HARVEST, _entity);
 
             worker.setStatus(EntityStatus.IDLE);
 
@@ -393,7 +392,7 @@ public class Resource : Building<Resource.Actions>
         {
             _collectionRate += explorer.info.attributes.capacity;
             harvestUnits++;
-            fire(Actions.NEW_HARVEST, _entity);
+
             explorer.setStatus(EntityStatus.WORKING);
 
             workersList.Add(explorer);
