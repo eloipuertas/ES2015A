@@ -587,7 +587,7 @@ GameObject:
   - 114: {fileID: 11475586}
   - 114: {fileID: 11409208}
   m_Layer: 10
-  m_Name: Eloi
+  m_Name: SpecialOne
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1912,7 +1912,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   race: 0
-  type: 7
+  type: 8
   gender: 0
   _distanceToTarget: 0
 --- !u!114 &11421416
@@ -2098,6 +2098,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: Flags
       value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: type
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
