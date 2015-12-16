@@ -480,13 +480,16 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         });
     }
 
-    public void doIfUnit(Action<Unit> callIfTrue)
+    public bool doIfUnit(Action<Unit> callIfTrue)
     {
         Unit unit = this as Unit;
         if (unit != null)
         {
             callIfTrue(unit);
+            return true;
         }
+
+        return false;
     }
 
     public bool doIfBuilding(Action<IBuilding> callIfTrue)

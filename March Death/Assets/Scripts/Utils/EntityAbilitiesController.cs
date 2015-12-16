@@ -105,9 +105,7 @@ public class EntityAbilitiesController : MonoBehaviour
 
             if (abilityObj.isUsable && !abilityObj.isActive)
             {
-                if (BasePlayer.player.resources.IsEnough(WorldResources.Type.FOOD, entity.info.resources.food) &&
-                    BasePlayer.player.resources.IsEnough(WorldResources.Type.METAL, entity.info.resources.metal) &&
-                    BasePlayer.player.resources.IsEnough(WorldResources.Type.WOOD, entity.info.resources.wood))
+                if (ResourcesPlacer.get(BasePlayer.player).enoughResources(abilityObj._info))
                 {
                     UnityAction actionMethod = new UnityAction(() =>
                     {
@@ -189,7 +187,7 @@ public class EntityAbilitiesController : MonoBehaviour
                 var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
                 buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Columns) + 1));
 
-                bool interactable = ResourcesPlacer.get.enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
+                bool interactable = ResourcesPlacer.get(BasePlayer.player).enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
                 affordable_buttons[abilityObj] = interactable;
                 Button b = CreateButton(rectTransform, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
                 b.interactable = interactable;
@@ -204,7 +202,7 @@ public class EntityAbilitiesController : MonoBehaviour
         for (int i=0; i < buttons_on_show.Count; i++)
         {
             Button b = buttons_on_show[i];
-            bool interactable = ResourcesPlacer.get.enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
+            bool interactable = ResourcesPlacer.get(BasePlayer.player).enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
             b.interactable = interactable;
             affordable_buttons[abilities_on_show[i]] = interactable;
         }

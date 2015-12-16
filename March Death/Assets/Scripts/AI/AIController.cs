@@ -160,9 +160,9 @@ namespace Assets.Scripts.AI
         {
             Storage.BuildingInfo i = Storage.Info.get.of(race, type);
 
-            return (resources.getAmount(WorldResources.Type.FOOD) >= i.resources.food &&
-                    resources.getAmount(WorldResources.Type.WOOD) >= i.resources.wood &&
-                    resources.getAmount(WorldResources.Type.METAL) >= i.resources.metal);
+            return ResourcesPlacer.get(BasePlayer.ia).enoughResources(WorldResources.Type.FOOD, i.resources.food) &&
+                    ResourcesPlacer.get(BasePlayer.ia).enoughResources(WorldResources.Type.WOOD, i.resources.wood) &&
+                    ResourcesPlacer.get(BasePlayer.ia).enoughResources(WorldResources.Type.METAL, i.resources.metal);
         }
 
         public void CreateBuilding(BuildingTypes btype, Vector3 position, Quaternion rotation, AIArchitect architect)

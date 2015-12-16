@@ -41,6 +41,8 @@ public class Player : BasePlayer
     float timeToShow;
     const float WAIT_FOR_FINISH = 3.5f;
 
+    ResourcesPlacer _resourcesPlacer;
+
     // Use this for initialization
     public override void Start()
     {
@@ -60,7 +62,7 @@ public class Player : BasePlayer
         // gameObject.AddComponent<ResourcesPlacer>();
         
         missionStatus = new MissionStatus(playerId);
-        ResourcesPlacer r = ResourcesPlacer.get; // initialization
+        _resourcesPlacer = ResourcesPlacer.get(this); // initialization
 
         // TODO Set this values dynamically
         minFoodTolerance = 100;
@@ -68,7 +70,7 @@ public class Player : BasePlayer
         minMetalTolerance = 500;
         minGoldTolerance = 500;
 
-        foodDepleted = resources.getAmount(WorldResources.Type.FOOD) <= 0;
+        foodDepleted = _resourcesPlacer.Amount(WorldResources.Type.FOOD) <= 0;
 
         ActorSelector selector = new ActorSelector()
         {
@@ -196,7 +198,7 @@ public class Player : BasePlayer
     private void displayResourceInfo(WorldResources.Type resourceType, int tolerance)
     {
         int amount;
-        amount = Mathf.FloorToInt(resources.getAmount(resourceType));
+        amount = Mathf.FloorToInt(_resourcesPlacer.Amount(resourceType));
         if (amount <= tolerance)
         {
             if (amount > 0)
@@ -212,7 +214,7 @@ public class Player : BasePlayer
         if (!foodDepleted)
         {
             displayResourceInfo(WorldResources.Type.FOOD, minFoodTolerance);
-            foodDepleted = resources.getAmount(WorldResources.Type.FOOD) <= 0;
+            foodDepleted = _resourcesPlacer.Amount(WorldResources.Type.FOOD) <= 0;
         }
     }
 
