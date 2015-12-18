@@ -209,7 +209,6 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 480854}
-  - 114: {fileID: 11406788}
   m_Layer: 0
   m_Name: elves
   m_TagString: Untagged
@@ -519,19 +518,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 171838}
   m_Mesh: {fileID: 4300000, guid: 4de84b623f388ff4c8e9463100b54141, type: 3}
---- !u!114 &11406788
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 190968}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: caa19c7f960625f4b83094529589a1c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  IsActor: 1
-  Range: 10
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

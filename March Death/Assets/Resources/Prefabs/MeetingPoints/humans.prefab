@@ -85,7 +85,6 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 402436}
-  - 114: {fileID: 11488986}
   m_Layer: 0
   m_Name: humans
   m_TagString: Untagged
@@ -519,19 +518,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100608}
   m_Mesh: {fileID: 4300004, guid: 65e52f3a1ac600944b86477aa62ec01f, type: 3}
---- !u!114 &11488986
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 124794}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: caa19c7f960625f4b83094529589a1c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  IsActor: 1
-  Range: 10
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
