@@ -10,4 +10,5 @@ public interface IBuilding : IGameEntity, IBaseActor
     Vector3 findMeetingPoint();
     void hideMeetingPoint();
     void showMeetingPoint();
+    bool hasMeetingPoint();
 }

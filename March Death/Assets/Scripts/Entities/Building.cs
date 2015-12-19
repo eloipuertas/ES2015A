@@ -148,9 +148,14 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         // Setup base
         base.Start();
 
-        _meetingPointObject = Utils.MeetingPoint.CreatePoint(race);
-        //_meetingPoint = getDefaultMeetingPoint();
-        _meetingPointObject.transform.position = getDefaultMeetingPoint();
+        if (hasMeetingPoint())
+        {
+            _meetingPointObject = Utils.MeetingPoint.CreatePoint(race);
+            _meetingPointObject.transform.position = getDefaultMeetingPoint();
+        }
+        
+       
+        
         activateFOWEntity();
 
         if (DefaultStatus == EntityStatus.BUILDING_PHASE_1)
@@ -289,7 +294,28 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     {
         return _meetingPointObject.transform.position; 
     }
-
+    /// <summary>
+    /// Check what buildings have meeting point
+    /// </summary>
+    /// <returns></returns>
+    public bool hasMeetingPoint()
+    {
+        if (type == BuildingTypes.ARCHERY ||
+            type == BuildingTypes.ARTILLERY ||
+            type == BuildingTypes.BARRACK ||
+            type == BuildingTypes.ENT ||
+            type == BuildingTypes.FARM ||
+            type == BuildingTypes.GRYPHON ||
+            type == BuildingTypes.MINE ||
+            type == BuildingTypes.SAWMILL ||
+            type == BuildingTypes.SPECIAL ||
+            type == BuildingTypes.STABLE ||
+            type == BuildingTypes.WORKSHOP)
+        {
+            return true;
+        }
+        return false;
+    }
     /// <summary>
     /// check if meeting point is still available
     /// </summary>
