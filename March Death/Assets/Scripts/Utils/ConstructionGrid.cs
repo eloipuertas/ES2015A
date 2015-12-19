@@ -117,10 +117,10 @@ public class ConstructionGrid : MonoBehaviour
 
         float min_height = heights.Min();
 
-        if (min_height < 79.0f)
+        /*if (min_height < 79.0f)
         {
             return false;
-        }
+        }*/
 
         float difference = max_height - min_height;
 
