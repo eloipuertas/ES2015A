@@ -20,8 +20,6 @@ public class Main_Game : MonoBehaviour
         StartGame();
         bm.Player = user;
         UserInput inputs = gameObject.AddComponent<UserInput>();
-        inputs.TerrainLayerMask = new LayerMask();
-        inputs.TerrainLayerMask = 520;// HACK LayerMask.NameToLayer("Terrain"); didn't work
         bm.Inputs = inputs;
         LoadInitialScreen();
     }
