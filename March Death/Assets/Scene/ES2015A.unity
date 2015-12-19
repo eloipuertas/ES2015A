@@ -300,7 +300,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
 --- !u!114 &85871691
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -591,7 +591,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   polymesh: {fileID: 11400000, guid: 26535da75e2ef5843a869e7e30a2d766, type: 2}
-  navmeshData: {fileID: 11400000, guid: 1718af745ef7d834497935cf22c3c1b5, type: 2}
+  navmeshData: {fileID: 11400000, guid: ac0fd2f2bc8f16645ab4b22617a67ccc, type: 2}
   MaxAgents: 4096
   AgentMaxRadius: 2
   RenderInGame: 0
@@ -608,6 +608,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83f1a2db45cf084418a0694669db59f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mode: 1
 --- !u!114 &865109086
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -635,11 +636,23 @@ MonoBehaviour:
     Cost: 1
   - LayerID: WATER
     Cost: 1
+  - LayerID: DOOR_HUMAN
+    Cost: 1
+  - LayerID: DOOR_ELF
+    Cost: 1
   Filters:
   - Include:
     - Name: WALKABLE
+    - Name: DOOR_HUMAN
     Exclude:
     - Name: WATER
+    - Name: DOOR_ELF
+  - Include:
+    - Name: WALKABLE
+    - Name: DOOR_ELF
+    Exclude:
+    - Name: WATER
+    - Name: DOOR_HUMAN
 --- !u!114 &865109088
 MonoBehaviour:
   m_ObjectHideFlags: 0

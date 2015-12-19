@@ -23,6 +23,7 @@ public class EntityAbilitiesController : MonoBehaviour
     private static int Button_Columns = 4;
     private static Boolean showText = false;
 
+    public static List<Ability> abilities_for_keybinds = new List<Ability>();
     public static List<Ability> abilities_on_show = new List<Ability>();
     public static List<Button> buttons_on_show = new List<Button>();
     public static Dictionary<Ability,bool> affordable_buttons = new Dictionary<Ability, bool>();
@@ -54,14 +55,12 @@ public class EntityAbilitiesController : MonoBehaviour
         showActionButtons(gameObject);
 
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-
-        entity.doIfResource(resource => {
-            fixKeybinds(gameObject);
+        
+        entity.doIfResource(resource => {      
             resource.register(Resource.Actions.BUILDING_FINISHED, showActionButtons);
         });
 
-        entity.doIfBarrack(barrack => {
-            fixKeybinds(gameObject);
+        entity.doIfBarrack(barrack => {   
             barrack.register(Barrack.Actions.BUILDING_FINISHED, showActionButtons);
         });
     }
@@ -93,21 +92,27 @@ public class EntityAbilitiesController : MonoBehaviour
         actionPanel.GetComponent<Image>().enabled = true;
         var abilities = entity.info.abilities;
         var nabilities = abilities.Count;
+
+        //abilities_on_show.Clear();
+        buttons_on_show.Clear();
+        affordable_buttons.Clear();
+        
         for (int i = 0; i < nabilities; i++)
         {
             GameObject button = GameObject.Find("Button " + i);
+            
             String ability = abilities[i].name;
             Ability abilityObj = entity.getAbility(ability);
-            var buttonComponent = button.GetComponent<Button>();
+            if (button == null){ continue; }// fix to avoid nullreference
+            Button buttonComponent = button.GetComponent<Button>();
+            
             var image = buttonComponent.GetComponent<Image>();
             var eventTrigger = button.GetComponent<EventTrigger>();
             buttonComponent.onClick.RemoveAllListeners();
 
             if (abilityObj.isUsable && !abilityObj.isActive)
             {
-                if (BasePlayer.player.resources.IsEnough(WorldResources.Type.FOOD, entity.info.resources.food) &&
-                    BasePlayer.player.resources.IsEnough(WorldResources.Type.METAL, entity.info.resources.metal) &&
-                    BasePlayer.player.resources.IsEnough(WorldResources.Type.WOOD, entity.info.resources.wood))
+                if (ResourcesPlacer.get(BasePlayer.player).enoughResources(abilityObj._info))
                 {
                     UnityAction actionMethod = new UnityAction(() =>
                     {
@@ -127,30 +132,15 @@ public class EntityAbilitiesController : MonoBehaviour
                 //    Debug.LogError("General food quantity: " + BasePlayer.player.resources.getAmount(WorldResources.Type.FOOD));
                 //}
                 // HACK: When this is fired, the button status should be updated! abilityObj.isActive might have changed...
-                
             }
+            bool interactable = ResourcesPlacer.get(BasePlayer.player).enoughResources(abilityObj.info<Storage.EntityAbility>());
+            affordable_buttons[abilityObj] = interactable;
+            buttonComponent.interactable = interactable;
+            buttons_on_show.Add(buttonComponent);
         }
-    }
-    // Hack to get key bindings working.  
-    void fixKeybinds(System.Object obj)
-    {
-        GameObject gameObject = (GameObject)obj;
-        IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-        var abilities = entity.info.abilities;
-        var nabilities = abilities.Count;
 
-        abilities_on_show.Clear();
-        for (int i = 0; i < nabilities; i++)
-        {
-            String ability = abilities[i].name;
-            Ability abilityObj = entity.getAbility(ability);
-            if (abilityObj.isUsable)
-            {
-                abilities_on_show.Add(abilityObj);
-            }
-
-        }
     }
+    
     void showActions(System.Object obj)
     {
 		GameObject gameObject = (GameObject) obj;
@@ -189,7 +179,7 @@ public class EntityAbilitiesController : MonoBehaviour
                 var buttonCenter = point + buttonExtents * (2 * (i % Button_Columns) + 1);
                 buttonCenter.y = point.y - (buttonExtents.y * (2 * (i / Button_Columns) + 1));
 
-                bool interactable = ResourcesPlacer.get.enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
+                bool interactable = ResourcesPlacer.get(BasePlayer.player).enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
                 affordable_buttons[abilityObj] = interactable;
                 Button b = CreateButton(rectTransform, buttonCenter, buttonExtents, ability, actionMethod, !abilityObj.isActive);
                 b.interactable = interactable;
@@ -201,10 +191,10 @@ public class EntityAbilitiesController : MonoBehaviour
 
     public static void ControlButtonsInteractability()
     {
-        for (int i=0; i < buttons_on_show.Count; i++)
+        for (int i=0; i < abilities_on_show.Count; i++)
         {
             Button b = buttons_on_show[i];
-            bool interactable = ResourcesPlacer.get.enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
+            bool interactable = ResourcesPlacer.get(BasePlayer.player).enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
             b.interactable = interactable;
             affordable_buttons[abilities_on_show[i]] = interactable;
         }

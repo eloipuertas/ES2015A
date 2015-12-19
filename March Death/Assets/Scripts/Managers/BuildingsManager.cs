@@ -121,10 +121,7 @@ namespace Managers
         {
             Storage.BuildingInfo i = Storage.Info.get.of(race, type);
 
-            IsEnoughFood = _player.resources.getAmount(WorldResources.Type.FOOD) >= i.resources.food;
-            IsEnoughWood = _player.resources.getAmount(WorldResources.Type.WOOD) >= i.resources.wood;
-            IsEnoughMetal = _player.resources.getAmount(WorldResources.Type.METAL) >= i.resources.metal;
-            return IsEnoughFood && IsEnoughWood && IsEnoughMetal;
+            return ResourcesPlacer.get(BasePlayer.player).enoughResources(i.resources);
         }
 
 

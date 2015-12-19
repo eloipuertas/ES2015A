@@ -87,7 +87,7 @@ namespace Assets.Scripts.AI
         }
         private void BuildDefences()
         {
-            if (ai.resources.getAmount(WorldResources.Type.WOOD) > 400)
+            if (ResourcesPlacer.get(BasePlayer.ia).Amount(WorldResources.Type.WOOD) > 400)
             {
                 for (int i = 0; i < (ai.DifficultyLvl * 3); i++)
                 {

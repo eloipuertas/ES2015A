@@ -29,6 +29,11 @@ public partial class UserInput
             }
         }
 
+        if ((Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftControl)) && Input.GetKeyDown(KeyCode.E))
+        {
+            Debug.Log("CTRL + E");
+
+        }
         // Displays the Pause Menu
         if (Input.GetKeyDown(KeyCode.Escape))
         {

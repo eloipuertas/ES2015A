@@ -7,4 +7,8 @@ public interface IBuilding : IGameEntity, IBaseActor
 {
     bool addUnitQueue(UnitTypes type);
     void setMeetingPoint(Vector3 position);
+    Vector3 findMeetingPoint();
+    void hideMeetingPoint();
+    void showMeetingPoint();
+    bool hasMeetingPoint();
 }
