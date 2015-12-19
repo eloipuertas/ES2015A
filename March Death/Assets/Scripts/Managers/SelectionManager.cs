@@ -145,8 +145,11 @@ namespace Managers
                 else
                 {
                     _selectedBuilding = (IBuilding)entity;
+                    _selectedBuilding.setMeetingPoint(_selectedBuilding.findMeetingPoint());
+                    // enable meetingPoint
+                    _selectedBuilding.showMeetingPoint();
 
-                    Selectable selectable = _selectedBuilding.getGameObject().GetComponent<Selectable>();
+                     Selectable selectable = _selectedBuilding.getGameObject().GetComponent<Selectable>();
                     selectable.SelectEntity();
                     fire(Actions.SELECT, selectable);
                 }
@@ -231,9 +234,11 @@ namespace Managers
             }
             else if (entity == _selectedBuilding)
             {
+                // Hide meeting Point when not selected
+                
+                _selectedBuilding.hideMeetingPoint();  
                 // Deselect current building
-                _selectedBuilding.getGameObject().GetComponent<Selectable>().DeselectEntity();
-                _selectedBuilding = null;
+               _selectedBuilding.getGameObject().GetComponent<Selectable>().DeselectEntity();
             }
         }
 

@@ -19,9 +19,9 @@ namespace Utils
                     break;
                 case Storage.Races.MEN:
                     point = Instantiate((GameObject)Resources.Load("Prefabs/MeetingPoints/Humans", typeof(GameObject)));
-                    break;
-
+                    break;              
             }
+            point.SetActive(false);
 
             return point;
         }

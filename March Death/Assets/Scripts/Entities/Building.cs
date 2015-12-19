@@ -256,6 +256,21 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
 
     }
 
+    
+    public void hideMeetingPoint()
+    {
+        if (_meetingPointObject != null)
+        {
+            _meetingPointObject.SetActive(false);
+        }
+        
+    }
+
+    public void showMeetingPoint()
+    {
+        _meetingPointObject.SetActive(true);
+    }
+
     /// <summary>
     /// Default Meeting point where new units walk from deployment point
     /// </summary>
