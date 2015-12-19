@@ -24,8 +24,6 @@ public class MiniMapController : MonoBehaviour
     {
         this.GetComponent<AudioListener>().enabled = false;
 
-		mapContainer = GameObject.Find ("HUD").transform.FindChild ("Map");
-
         _camera = this.GetComponent<Camera>();
         _camera.orthographic = true;
 
