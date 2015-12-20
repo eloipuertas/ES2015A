@@ -22,11 +22,12 @@ public class EntityAbilitiesController : Singleton<EntityAbilitiesController>
     private static int Button_Rows = 3;
     private static int Button_Columns = 4;
     private static Boolean showText = false;
-
+    
+    public List<Ability> abilities_for_keybinds = new List<Ability>();
     public List<Ability> abilities_on_show = new List<Ability>();
     public List<Button> buttons_on_show = new List<Button>();
     public Dictionary<Ability,bool> affordable_buttons = new Dictionary<Ability, bool>();
-
+    
     // Use this for initialization
     private EntityAbilitiesController()
     {
@@ -55,14 +56,12 @@ public class EntityAbilitiesController : Singleton<EntityAbilitiesController>
         showActionButtons(gameObject);
 
         IGameEntity entity = gameObject.GetComponent<IGameEntity>();
-
-        entity.doIfResource(resource => {
-            fixKeybinds(gameObject);
+        
+        entity.doIfResource(resource => {      
             resource.register(Resource.Actions.BUILDING_FINISHED, showActionButtons);
         });
 
-        entity.doIfBarrack(barrack => {
-            fixKeybinds(gameObject);
+        entity.doIfBarrack(barrack => {   
             barrack.register(Barrack.Actions.BUILDING_FINISHED, showActionButtons);
         });
     }
@@ -95,16 +94,19 @@ public class EntityAbilitiesController : Singleton<EntityAbilitiesController>
         var abilities = entity.info.abilities;
         var nabilities = abilities.Count;
 
-        abilities_on_show.Clear();
+        //abilities_on_show.Clear();
         buttons_on_show.Clear();
         affordable_buttons.Clear();
-
+        
         for (int i = 0; i < nabilities; i++)
         {
             GameObject button = GameObject.Find("Button " + i);
+            
             String ability = abilities[i].name;
             Ability abilityObj = entity.getAbility(ability);
-            var buttonComponent = button.GetComponent<Button>();
+            if (button == null){ continue; }// fix to avoid nullreference
+            Button buttonComponent = button.GetComponent<Button>();
+            
             var image = buttonComponent.GetComponent<Image>();
             var eventTrigger = button.GetComponent<EventTrigger>();
             buttonComponent.onClick.RemoveAllListeners();
@@ -211,7 +213,7 @@ public class EntityAbilitiesController : Singleton<EntityAbilitiesController>
 
     public void ControlButtonsInteractability()
     {
-        for (int i=0; i < buttons_on_show.Count; i++)
+        for (int i=0; i < abilities_on_show.Count; i++)
         {
             Button b = buttons_on_show[i];
             bool interactable = ResourcesPlacer.get(BasePlayer.player).enoughResources(abilities_on_show[i].info<Storage.EntityAbility>());
@@ -417,6 +419,7 @@ public class EntityAbilitiesController : Singleton<EntityAbilitiesController>
         Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.SELECTED, onActorSelected);
         Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.DESELECTED, onActorDeselected);
 
+        abilities_for_keybinds.Clear();
         abilities_on_show.Clear();
         buttons_on_show.Clear();
         affordable_buttons.Clear();

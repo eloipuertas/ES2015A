@@ -4,33 +4,46 @@ using System.Collections;
 public class TutorialLogic : MonoBehaviour
 {
 
-    static readonly Color UP_CLICK = new Color(1.0f, 1.0f, 1.0f, 0.6f); // WHITE
-    static readonly Color DOWN_CLICK = new Color(0.0f, 0.0f, 0.0f, 0.6f); // GREY
-    static readonly Color ENTER_OVER = new Color(0.8f, 1.0f, 0.0f, 0.6f); // YELLOW - GREEN
-    static readonly Color EXIT_OVER = new Color(1.0f, 1.0f, 1.0f, 0.6f); // WHITE
-    static readonly Color YELLOW = new Color(1.0f, 0.92f, 0.016f, 1f); //YELLOW
+    
 
+
+
+    
+
+    public static TutorialLogic instance = null;
     // Use this for initialization
     void Start()
     {
+        if (instance == null)
+        {
+            instance = this;
+            Debug.Log("loading tutorial");
+        }
+
 
     }
 
-
-    /* MOUSE OVER */
-
-    /* This method changes the color of the object we are over on entering */
-    void OnMouseEnter()
+    public void Update()
     {
-        GetComponent<Renderer>().material.color = YELLOW;
-        //bStillInside = true;
-    }
 
-    /* This method changes the color of the object we are over on exiting */
-    void OnMouseExit()
-    {
-        GetComponent<Renderer>().material.color = EXIT_OVER;
-        //bStillInside = false;
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.LoadLevel(0);
+        }
+
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+
+            Application.LoadLevel(1);
+
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+
+            Application.LoadLevel(4);
+
+        }
     }
 
     public void TutorialSecond()

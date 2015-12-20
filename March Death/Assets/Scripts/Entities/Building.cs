@@ -62,7 +62,8 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     /// <summary>
     /// coordinates where civilian units travel after been deployed at deployment point.
     /// </summary>
-    private Vector3 _meetingPoint;
+    //private Vector3 _meetingPoint;
+    private GameObject _meetingPointObject;
 
     private int _totalUnits = 0;
 
@@ -147,7 +148,14 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
         // Setup base
         base.Start();
 
-        _meetingPoint = getDefaultMeetingPoint();
+        if (hasMeetingPoint())
+        {
+            _meetingPointObject = Utils.MeetingPoint.CreatePoint(race);
+            _meetingPointObject.transform.position = getDefaultMeetingPoint();
+        }
+        
+       
+        
         activateFOWEntity();
 
         if (DefaultStatus == EntityStatus.BUILDING_PHASE_1)
@@ -253,13 +261,29 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
 
     }
 
+    
+    public void hideMeetingPoint()
+    {
+        if (_meetingPointObject != null)
+        {
+            _meetingPointObject.SetActive(false);
+        }
+        
+    }
+
+    public void showMeetingPoint()
+    {
+        _meetingPointObject.SetActive(true);
+    }
+
     /// <summary>
     /// Default Meeting point where new units walk from deployment point
     /// </summary>
     /// <returns>position of meetingpoint</returns>
     public void setMeetingPoint(Vector3 position)
     {
-        _meetingPoint = position;
+        //_meetingPoint = position;
+        _meetingPointObject.transform.position = position;
     }
 
     /// <summary>
@@ -268,9 +292,30 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     /// <returns>position of meetingpoint</returns>
     public Vector3 getMeetingPoint()
     {
-        return _meetingPoint;
+        return _meetingPointObject.transform.position; 
     }
-
+    /// <summary>
+    /// Check what buildings have meeting point
+    /// </summary>
+    /// <returns></returns>
+    public bool hasMeetingPoint()
+    {
+        if (type == BuildingTypes.ARCHERY ||
+            type == BuildingTypes.ARTILLERY ||
+            type == BuildingTypes.BARRACK ||
+            type == BuildingTypes.ENT ||
+            type == BuildingTypes.FARM ||
+            type == BuildingTypes.GRYPHON ||
+            type == BuildingTypes.MINE ||
+            type == BuildingTypes.SAWMILL ||
+            type == BuildingTypes.SPECIAL ||
+            type == BuildingTypes.STABLE ||
+            type == BuildingTypes.WORKSHOP)
+        {
+            return true;
+        }
+        return false;
+    }
     /// <summary>
     /// check if meeting point is still available
     /// </summary>
