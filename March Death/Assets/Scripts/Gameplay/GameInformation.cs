@@ -343,7 +343,7 @@ public class GameInformation : MonoBehaviour
         GameObject stronghold;
         Battle.PlayerInformation player = new Battle.PlayerInformation(race);
         stronghold = GameObject.Find(strongholdGameObject);
-        player.AddBuilding(BuildingTypes.STRONGHOLD, stronghold.transform.position.x, stronghold.transform.position.z);
+        player.AddBuilding(BuildingTypes.STRONGHOLD, stronghold.transform.position.x, stronghold.transform.position.z, EntityStatus.IDLE);
         player.AddUnit(UnitTypes.HERO, stronghold.transform.position.x - 50, stronghold.transform.position.z);
         player.SetInitialResources(2000, 2000, 2000, 2000);
         return player;
