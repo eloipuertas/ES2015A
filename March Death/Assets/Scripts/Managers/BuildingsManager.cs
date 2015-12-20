@@ -8,14 +8,13 @@ namespace Managers
         public enum Place { ABLE, NOT_ABLE }
         private Place _currentPlace = Place.ABLE;
         public Place currentPlace { get { return _currentPlace; } }
-        private Player _player;
         private UserInput _inputs;
-        public Player Player { set { _player = value; } }
         public UserInput Inputs { get { return _inputs; } set { _inputs = value; } }
         private CursorManager cursor;
         private ConstructionGrid grid;
         private Color red = Color.red;
         private Color green = Color.green;
+
         private struct NewBuilding
         {
             public GameObject ghost;
@@ -111,7 +110,7 @@ namespace Managers
                 _newBuilding.material = _newBuilding.ghost.GetComponent<Renderer>().material;
                 _newBuilding.placing = true;
                 _newBuilding.continuousConstruction = continuousConstruction;
-                _player.setCurrently(Player.status.PLACING_BUILDING);
+                BasePlayer.player.setCurrently(Player.status.PLACING_BUILDING);
                 CheckBuildingDefaultRotation(race, type);
             }
 
@@ -222,7 +221,7 @@ namespace Managers
                 
                // IGameEntity entity = finalBuilding.gameObject.GetComponent<IGameEntity>(); // Esto no iria así ? (Ferran)
                 IGameEntity entity = finalBuilding.GetComponent<IGameEntity>();
-                _player.addEntity(entity);
+                BasePlayer.player.addEntity(entity);
 
                 if (!_newBuilding.continuousConstruction)
                 {

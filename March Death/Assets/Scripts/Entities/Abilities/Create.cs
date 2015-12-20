@@ -6,8 +6,6 @@ using UnityEngine;
 
 public class Create : Ability
 {
-	private static BuildingsManager BuildingsMgr = null;
-
 	private IGameEntity _entity;
 	private EntityInfo _infoToBuild;
 
@@ -44,11 +42,6 @@ public class Create : Ability
 				_infoToBuild = Info.get.of(_info.targetRace, _info.targetBuilding);
 				break;
 		}
-
-		if (BuildingsMgr == null)
-		{
-			BuildingsMgr = GameObject.Find("GameController").GetComponent<Main_Game>().BuildingsMgr;
-		}
     }
 
     public override void disable()
@@ -76,7 +69,7 @@ public class Create : Ability
 				break;
 
             case EntityType.BUILDING:
-				BuildingsMgr.createBuilding(_info.targetRace, _info.targetBuilding);
+                BasePlayer.player.buildings.createBuilding(_info.targetRace, _info.targetBuilding);
 				break;
 		}
 

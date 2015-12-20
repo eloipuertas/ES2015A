@@ -35,7 +35,7 @@ public partial class UserInput
             PauseMenuLogic.TogglePauseMenu();
         }
 
-        foreach (KeyValuePair<Ability,bool> tuple in EntityAbilitiesController.affordable_buttons)
+        foreach (KeyValuePair<Ability,bool> tuple in EntityAbilitiesController.get.affordable_buttons)
         {
             if (Input.GetKeyUp(tuple.Key.keyBinding) && tuple.Value)
             {

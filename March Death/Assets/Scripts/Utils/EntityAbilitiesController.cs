@@ -8,7 +8,7 @@ using System;
 using Utils;
 using System.IO;
 
-public class EntityAbilitiesController : MonoBehaviour
+public class EntityAbilitiesController : Singleton<EntityAbilitiesController>
 {
     //private static int Arial_Fifteen_Size_X = 10;
     //private static int Arial_Fifteen_Size_y = 23;
@@ -23,16 +23,17 @@ public class EntityAbilitiesController : MonoBehaviour
     private static int Button_Columns = 4;
     private static Boolean showText = false;
 
-    public static List<Ability> abilities_on_show = new List<Ability>();
-    public static List<Button> buttons_on_show = new List<Button>();
-    public static Dictionary<Ability,bool> affordable_buttons = new Dictionary<Ability, bool>();
+    public List<Ability> abilities_on_show = new List<Ability>();
+    public List<Button> buttons_on_show = new List<Button>();
+    public Dictionary<Ability,bool> affordable_buttons = new Dictionary<Ability, bool>();
 
     // Use this for initialization
-    void Start()
+    private EntityAbilitiesController()
     {
 #if UNITY_5_2
         Physics.queriesHitTriggers = true;
 #endif
+
         //Register to selectable actions
         Subscriber<Selectable.Actions, Selectable>.get.registerForAll(Selectable.Actions.SELECTED, onActorSelected, new ActorSelector()
         {
@@ -43,7 +44,7 @@ public class EntityAbilitiesController : MonoBehaviour
             registerCondition = (checkRace) => BasePlayer.isOfPlayer(checkRace.GetComponent<IGameEntity>())
         });
     }
-
+    
     public void onActorSelected(System.Object obj)
     {
 		GameObject gameObject = (GameObject) obj;
@@ -138,6 +139,7 @@ public class EntityAbilitiesController : MonoBehaviour
         }
 
     }
+
     // Hack to get key bindings working.  
     void fixKeybinds(System.Object obj)
     {
@@ -158,6 +160,7 @@ public class EntityAbilitiesController : MonoBehaviour
 
         }
     }
+
     void showActions(System.Object obj)
     {
 		GameObject gameObject = (GameObject) obj;
@@ -206,7 +209,7 @@ public class EntityAbilitiesController : MonoBehaviour
 
     }
 
-    public static void ControlButtonsInteractability()
+    public void ControlButtonsInteractability()
     {
         for (int i=0; i < buttons_on_show.Count; i++)
         {
@@ -247,7 +250,7 @@ public class EntityAbilitiesController : MonoBehaviour
         {
             foreach (GameObject button in actionButtons)
             {
-                Destroy(button);
+                GameObject.Destroy(button);
             }
         }
     }
@@ -316,7 +319,7 @@ public class EntityAbilitiesController : MonoBehaviour
         var oldTooltip = GameObject.Find("tooltip");
         if (oldTooltip)
         {
-            Destroy(oldTooltip);
+            GameObject.Destroy(oldTooltip);
         }
         PointerEventData data = baseEvent as PointerEventData;
         GameObject panel = GameObject.Find("HUD/actions");
@@ -379,7 +382,7 @@ public class EntityAbilitiesController : MonoBehaviour
     private void mouseExit(BaseEventData baseEvent)
     {
         var tooltip = GameObject.Find("tooltip");
-        Destroy(tooltip);
+        GameObject.Destroy(tooltip);
     }
 
     /// <summary>
@@ -409,15 +412,15 @@ public class EntityAbilitiesController : MonoBehaviour
         return newImg;
     }
 
-    public void Clear()
+    public override void Clear()
     {
         Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.SELECTED, onActorSelected);
         Subscriber<Selectable.Actions, Selectable>.get.unregisterFromAll(Selectable.Actions.DESELECTED, onActorDeselected);
-    }
 
-    void OnDestroy()
-    {
-        Clear();
-    }
+        abilities_on_show.Clear();
+        buttons_on_show.Clear();
+        affordable_buttons.Clear();
 
+        base.Clear();
+    }
 }

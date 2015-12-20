@@ -18,7 +18,7 @@ public class Main_Game : MonoBehaviour
         sounds = GameObject.Find("GameController").GetComponent<Managers.SoundsManager>();
         if (info) info.LoadHUD();
         StartGame();
-        bm.Player = user;
+        
         UserInput inputs = gameObject.AddComponent<UserInput>();
         inputs.TerrainLayerMask = new LayerMask();
         inputs.TerrainLayerMask = 520;// HACK LayerMask.NameToLayer("Terrain"); didn't work
@@ -91,6 +91,8 @@ public class Main_Game : MonoBehaviour
         GameObject obj;
         obj = GameObject.Find("GameInformationObject").gameObject;
         Destroy(obj);
+
+        EntityAbilitiesController.get.Clear();
     }
 
     void Update()
