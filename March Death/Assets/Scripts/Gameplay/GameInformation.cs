@@ -163,7 +163,8 @@ public class GameInformation : MonoBehaviour
         var button = GameObject.Find(name);
 		var buttonImage = button.GetComponent<Image>();
 		var buttonTransform = buttonImage.rectTransform;
-		if (buttonImage.name != "Sell" && buttonImage.name != "Recruit Explorer") {
+		if (buttonImage.name != "Sell" && buttonImage.name != "Recruit Explorer"
+		    && buttonImage.name!="Rotate") {
 			buttonImage.sprite = CreateHoverSprite (buttonImage.name, buttonTransform.sizeDelta);     
 		}
         var tooltip = new GameObject("tooltip");
