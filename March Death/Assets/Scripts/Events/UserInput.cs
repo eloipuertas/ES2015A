@@ -49,8 +49,6 @@ public partial class UserInput : MonoBehaviour
 
     CameraController camera;
 
-    public LayerMask TerrainLayerMask;
-
     Rect rectActions;
     Rect rectInformation;
 

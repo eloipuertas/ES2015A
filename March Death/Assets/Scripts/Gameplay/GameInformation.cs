@@ -321,7 +321,6 @@ public class GameInformation : MonoBehaviour
 
     private void hardcodedBattle()
     {
-        // TODO Read battle information from a JSON file or resulting object from a JSON deserializer
         game = new Battle();
         Battle.MissionDefinition.TargetType t = new Battle.MissionDefinition.TargetType();
         t.unit = UnitTypes.HERO;
@@ -337,5 +336,28 @@ public class GameInformation : MonoBehaviour
         player.SetInitialResources(2000, 2000, 2000, 2000);
         game.AddPlayerInformation(player);
         game.SetWorldResources(5000, 5000, 5000);
+    }
+
+    private Battle.PlayerInformation initializePlayer(Storage.Races race, string strongholdGameObject)
+    {
+        GameObject stronghold;
+        Battle.PlayerInformation player = new Battle.PlayerInformation(race);
+        stronghold = GameObject.Find(strongholdGameObject);
+        player.AddBuilding(BuildingTypes.STRONGHOLD, stronghold.transform.position.x, stronghold.transform.position.z);
+        player.AddUnit(UnitTypes.HERO, stronghold.transform.position.x - 50, stronghold.transform.position.z);
+        player.SetInitialResources(2000, 2000, 2000, 2000);
+        return player;
+    }
+
+    public void SetStoryBattle()
+    {
+        game = new Battle();
+        Races enemyRace = playerRace == Races.ELVES ? Races.MEN : Races.ELVES;
+        game.AddPlayerInformation(initializePlayer(playerRace, "Cube_Player_Stronghold"));
+        game.AddPlayerInformation(initializePlayer(enemyRace, "Cube_Enemy_Stronghold"));
+        game.SetWorldResources(5000, 5000, 5000);
+        Battle.MissionDefinition.TargetType t = new Battle.MissionDefinition.TargetType();
+        t.building = BuildingTypes.STRONGHOLD;
+        game.AddMission(Battle.MissionType.DESTROY, 1, EntityType.BUILDING, t, 0, true, "");
     }
 }

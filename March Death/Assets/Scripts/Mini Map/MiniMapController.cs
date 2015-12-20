@@ -19,12 +19,13 @@ public class MiniMapController : MonoBehaviour
     Vector3 cameraOffset;
 	Transform mapContainer;
 
+    GameInformation info;
+
     // Use this for initialization
     void Start()
     {
+        info = (GameInformation)GameObject.Find("GameInformationObject").GetComponent("GameInformation");
         this.GetComponent<AudioListener>().enabled = false;
-
-		mapContainer = GameObject.Find ("HUD").transform.FindChild ("Map");
 
         _camera = this.GetComponent<Camera>();
         _camera.orthographic = true;
@@ -193,7 +194,6 @@ public class MiniMapController : MonoBehaviour
 
 	private Rect recalcViewport()
 	{
-		GameInformation info = (GameInformation)GameObject.Find("GameInformationObject").GetComponent("GameInformation");
 		float viewPortPosX, viewPortPosY;
 		float viewPortW, viewPortH;
 		

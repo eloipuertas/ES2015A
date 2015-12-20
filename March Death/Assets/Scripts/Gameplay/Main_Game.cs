@@ -20,8 +20,6 @@ public class Main_Game : MonoBehaviour
         StartGame();
         
         UserInput inputs = gameObject.AddComponent<UserInput>();
-        inputs.TerrainLayerMask = new LayerMask();
-        inputs.TerrainLayerMask = 520;// HACK LayerMask.NameToLayer("Terrain"); didn't work
         bm.Inputs = inputs;
         LoadInitialScreen();
     }
@@ -33,15 +31,40 @@ public class Main_Game : MonoBehaviour
 
     void LoadInitialScreen()
     {
-        switch (info.GetPlayerRace())
+        GameObject welcomeScreen = null;
+        switch (info.getGameMode())
         {
-            case Races.ELVES:
-                Instantiate(Resources.Load("WelcomeScreen-Elf")).name = "Welcome-Screen";
+            case GameInformation.GameMode.SKIRMISH:
+                switch (info.GetPlayerRace())
+                {
+                    case Races.ELVES:
+                        welcomeScreen = (GameObject) Instantiate(Resources.Load("WelcomeScreen-Elf"));
+                        break;
+                    case Races.MEN:
+                        welcomeScreen = (GameObject) Instantiate(Resources.Load("WelcomeScreen-Human"));
+                        break;
+                }
                 break;
-            case Races.MEN:
-                Instantiate(Resources.Load("WelcomeScreen-Human")).name = "Welcome-Screen";
+            case GameInformation.GameMode.CAMPAIGN:
+                if (Application.loadedLevelName.Equals("ES2015A_Q1"))
+                {
+                    welcomeScreen = (GameObject) Instantiate(Resources.Load("mission1"));
+                }
+                else if (Application.loadedLevelName.Equals("ES2015A_Q2"))
+                {
+                    welcomeScreen = (GameObject) Instantiate(Resources.Load("mission2"));
+                }
+                else if (Application.loadedLevelName.Equals("ES2015A_Q3"))
+                {
+                    welcomeScreen = (GameObject) Instantiate(Resources.Load("mission3"));
+                }
+                else if (Application.loadedLevelName.Equals("ES2015A_Q4"))
+                {
+                    welcomeScreen = (GameObject) Instantiate(Resources.Load("mission4"));
+                }
                 break;
         }
+        welcomeScreen.name = "Welcome-Screen";
     }
 
     public void StartGame()
@@ -61,11 +84,11 @@ public class Main_Game : MonoBehaviour
 
     private void LoadCampaign()
     {
-        // TODO Replace with appropriate functionality
-        LoadSkirmish();
+        info.SetStoryBattle();
+        loadPlayers();
     }
 
-    private void LoadSkirmish()
+    private void loadPlayers()
     {
         int id = 1;
         foreach (Battle.PlayerInformation player in info.GetBattle().GetPlayerInformationList())
@@ -84,6 +107,11 @@ public class Main_Game : MonoBehaviour
             id++;
         }
         // TODO Set initial resources in the map
+    }
+
+    private void LoadSkirmish()
+    {
+        loadPlayers();
     }
 
     public void ClearGame()

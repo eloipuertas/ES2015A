@@ -72,6 +72,10 @@ namespace Assets.Scripts.AI
                 planifyBuildingsAccordingToDifficulty();
                 readMapData();
             }
+            else
+            {
+                buildingPrefs = new List<BuildingTypes>();
+            }
         }
 
 
