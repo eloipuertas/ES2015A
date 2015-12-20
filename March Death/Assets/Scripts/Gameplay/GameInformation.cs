@@ -351,6 +351,12 @@ public class GameInformation : MonoBehaviour
 
     public void SetStoryBattle()
     {
+        if (GameObject.Find("Cube_Player_Stronghold") == null)
+        {
+            Debug.Log("loading hardcoded mode");
+            hardcodedBattle();
+            return;
+        }
         game = new Battle();
         Races enemyRace = playerRace == Races.ELVES ? Races.MEN : Races.ELVES;
         game.AddPlayerInformation(initializePlayer(playerRace, "Cube_Player_Stronghold"));
