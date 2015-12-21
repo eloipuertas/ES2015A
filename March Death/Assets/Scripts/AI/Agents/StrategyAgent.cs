@@ -58,24 +58,28 @@ namespace Assets.Scripts.AI.Agents
             }
             else
             {
-                int posInd = squad.PatrolPosition;
-                Vector3 targetPos = patrolPoints[posInd];
-                Vector2 sc = squad.BoundingBox.Bounds.center;
-                if (Vector3.Distance(new Vector3(sc.x, targetPos.y, sc.y), targetPos) < 5)
+                //Add patrolling
+                if (patrolPoints.Count > 0)
                 {
-                    //Got to the destination, let's go for the next one
-                    if (posInd >= patrolPoints.Count-1)
+                    int posInd = squad.PatrolPosition;
+                    Vector3 targetPos = patrolPoints[posInd];
+                    Vector2 sc = squad.BoundingBox.Bounds.center;
+                    if (Vector3.Distance(new Vector3(sc.x, targetPos.y, sc.y), targetPos) < 5)
                     {
-                        posInd = 0;
+                        //Got to the destination, let's go for the next one
+                        if (posInd >= patrolPoints.Count - 1)
+                        {
+                            posInd = 0;
+                        }
+                        else
+                        {
+                            posInd++;
+                        }
+                        targetPos = patrolPoints[posInd];
+                        squad.PatrolPosition = posInd;
                     }
-                    else
-                    {
-                        posInd++;
-                    }
-                    targetPos = patrolPoints[posInd];
-                    squad.PatrolPosition = posInd;
+                    squad.MoveTo(targetPos);
                 }
-                squad.MoveTo(targetPos);
             }
             if (AIController.AI_DEBUG_ENABLED)
             {

@@ -65,9 +65,9 @@ namespace Assets.Scripts.AI
             buildPosition = rootBasePosition;
             Macro = new MacroManager(this);
             Micro = new MicroManager(this);
-            modules.Add(new AIModule(Macro.MacroHigh, Macro.architect.constructionGrid.mode == AIMode.BATTLE ? (30+ DifficultyLvl*3) : 1));
-            modules.Add(new AIModule(Macro.MacroLow, 5 + DifficultyLvl));
-            modules.Add(new AIModule(Micro.Micro, DifficultyLvl));
+            modules.Add(new AIModule(Macro.MacroHigh, Macro.architect.constructionGrid.mode == AIMode.BATTLE ? (33 - DifficultyLvl*3) : 1));
+            modules.Add(new AIModule(Macro.MacroLow, 8 - DifficultyLvl));
+            modules.Add(new AIModule(Micro.Micro,  4 - DifficultyLvl));
             timers = new float[modules.Count];
             hasStronghold = true;
             for (int i = 0; i < modules.Count; i++)
