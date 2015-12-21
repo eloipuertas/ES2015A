@@ -28,6 +28,7 @@ namespace Managers
         private bool _isSquad = true;
         public bool IsQuad { get { return _isSquad; } }
 
+		private bool removedSelected = false;
         private IBuilding _selectedBuilding;
         public IBuilding SelectedBuilding { get { return _selectedBuilding; } }
 
@@ -244,18 +245,18 @@ namespace Managers
                     _selectedBuilding.hideMeetingPoint();  
                     // Deselect current building
                 }
-                
-               _selectedBuilding.getGameObject().GetComponent<Selectable>().DeselectEntity();
+					_selectedBuilding.getGameObject().GetComponent<Selectable>().DeselectEntity();
+               		
             }
         }
 
         public void DeselectCurrent(bool force = false)
-        {
+		{
             bool deselectSquad = ((!force && _isSquad) || force) &&
                 _selectedSquad != null && _selectedSquad.Units.Count > 0;
 
             bool deselectBuilding = ((!force && !_isSquad) || force) &&
-                _selectedBuilding != null;
+                _selectedBuilding != null && (!removedSelected);
 
             if (deselectSquad)
             {
@@ -435,5 +436,25 @@ namespace Managers
                 Debug.Log("Walking to building");
             }
         }
+
+		public void switchSelectBuilding(){
+			if (removedSelected) {
+				removedSelected = false;
+			} else {
+				removedSelected = true;
+			}
+		}
+
+		public bool isRemoved(){
+			return removedSelected;
+		}
+	
+		public void deselectBuilding(){
+			removedSelected = true;
+		}
+
+		public void selectBuilding(){
+			removedSelected = false;
+		}
     }
 }

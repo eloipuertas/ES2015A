@@ -150,7 +150,6 @@ public partial class UserInput : MonoBehaviour
             case Player.status.PLACING_BUILDING:
                 PlaceBuilding();
                 break;
-
         }
     }
 
@@ -237,10 +236,10 @@ public partial class UserInput : MonoBehaviour
         if (hasHit)
         {
             IGameEntity selectedObject = hit.collider.gameObject.GetComponent<IGameEntity>();
-
             if (sManager.CanBeSelected(selectedObject))
             {
                 Deselect();
+				sManager.selectBuilding();
                 sManager.Select(selectedObject);
                 BasePlayer.player.setCurrently(Player.status.SELECTED_UNITS);
             }
@@ -260,8 +259,8 @@ public partial class UserInput : MonoBehaviour
     private void Deselect()
     {
         //Deselect all
-        sManager.DeselectCurrent();
-        BasePlayer.player.setCurrently(Player.status.IDLE);
+		sManager.DeselectCurrent();
+		BasePlayer.player.setCurrently(Player.status.IDLE);
     }
 
     private void PlaceBuilding()
