@@ -84,7 +84,7 @@ public class Main_Game : MonoBehaviour
 
     private void LoadCampaign()
     {
-        info.SetStoryBattle();
+        info.SetStoryPlayers();
         loadPlayers();
     }
 
