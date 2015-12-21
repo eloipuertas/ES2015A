@@ -57,7 +57,7 @@ namespace SceneLoader
                 informationObject = new GameObject("GameInformationObject");
                 informationObject.AddComponent<GameInformation>();
                 gameInfo = informationObject.GetComponent<GameInformation>();
-                gameInfo.setGameMode(GameInformation.GameMode.CAMPAIGN);
+                gameInfo.setGameMode(GameInformation.GameMode.SKIRMISH);
                 _destroyWelcome = true;
             }
 
