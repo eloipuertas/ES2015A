@@ -46,7 +46,7 @@ namespace Assets.Scripts.AI
         public override void Start()
         {
             base.Start();
-            DifficultyLvl = 2; //TODO remove when this gets assigned from the menu
+            DifficultyLvl = info.Difficulty;
             _selfRace = info.GetPlayerRace() == Races.MEN ? Races.ELVES : Races.MEN;
 
             //Init lists
@@ -65,9 +65,9 @@ namespace Assets.Scripts.AI
             buildPosition = rootBasePosition;
             Macro = new MacroManager(this);
             Micro = new MicroManager(this);
-            modules.Add(new AIModule(Macro.MacroHigh, Macro.architect.constructionGrid.mode == AIMode.BATTLE ? 30 : 1));
-            modules.Add(new AIModule(Macro.MacroLow, 5));
-            modules.Add(new AIModule(Micro.Micro, 1));
+            modules.Add(new AIModule(Macro.MacroHigh, Macro.architect.constructionGrid.mode == AIMode.BATTLE ? (30+ DifficultyLvl*3) : 1));
+            modules.Add(new AIModule(Macro.MacroLow, 5 + DifficultyLvl));
+            modules.Add(new AIModule(Micro.Micro, DifficultyLvl));
             timers = new float[modules.Count];
             hasStronghold = true;
             for (int i = 0; i < modules.Count; i++)
