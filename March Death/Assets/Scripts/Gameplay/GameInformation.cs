@@ -301,7 +301,15 @@ public class GameInformation : MonoBehaviour
     public void setGameMode(GameMode mode)
     {
         gameMode = mode;
-        hardcodedBattle();    // HACK Sets the campaign while the real functionality isn't implemented
+        switch (gameMode)
+        {
+            case GameMode.SKIRMISH:
+                hardcodedBattle();
+                break;
+            case GameMode.CAMPAIGN:
+                SetStoryBattle();
+                break;
+        }
     }
 
     public GameMode getGameMode()
@@ -349,15 +357,20 @@ public class GameInformation : MonoBehaviour
         return player;
     }
 
-    public void SetStoryBattle()
+    private void SetStoryBattle()
     {
         game = new Battle();
-        Races enemyRace = playerRace == Races.ELVES ? Races.MEN : Races.ELVES;
-        game.AddPlayerInformation(initializePlayer(playerRace, "Cube_Player_Stronghold"));
-        game.AddPlayerInformation(initializePlayer(enemyRace, "Cube_Enemy_Stronghold"));
         game.SetWorldResources(5000, 5000, 5000);
         Battle.MissionDefinition.TargetType t = new Battle.MissionDefinition.TargetType();
         t.building = BuildingTypes.STRONGHOLD;
         game.AddMission(Battle.MissionType.DESTROY, 1, EntityType.BUILDING, t, 0, true, "");
+    }
+
+    public void SetStoryPlayers()
+    {
+        if (game == null) setGameMode(GameMode.CAMPAIGN);
+        Races enemyRace = playerRace == Races.ELVES ? Races.MEN : Races.ELVES;
+        game.AddPlayerInformation(initializePlayer(playerRace, "Cube_Player_Stronghold"));
+        game.AddPlayerInformation(initializePlayer(enemyRace, "Cube_Enemy_Stronghold"));
     }
 }
