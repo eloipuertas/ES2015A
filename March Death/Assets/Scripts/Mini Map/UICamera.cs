@@ -14,7 +14,10 @@ public class UICamera : MonoBehaviour {
         _minCam = GameObject.Find("Minimap Camera").GetComponent<Camera>();
         _uiCam = gameObject.GetComponent<Camera>();
 
-	}
+        // Hack to make it update
+        _uiCam.enabled = false;
+        _uiCam.enabled = true;
+    }
 	
 	void Update () {
 
