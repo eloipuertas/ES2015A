@@ -25,6 +25,11 @@ public class MissionScreen : MonoBehaviour
     public void LoadMainMenu()
     {
         Time.timeScale = 1;
+        GameObject main = GameObject.FindWithTag("GameController");
+        if (main)
+        {
+            main.GetComponent<Main_Game>().ClearGame();
+        }
         Application.LoadLevel(0);
     }
 
