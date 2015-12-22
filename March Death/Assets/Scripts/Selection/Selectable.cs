@@ -151,10 +151,13 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
                 _lastHealth = entity.healthPercentage;
                 healthRatio = _lastHealth / 100f;
                 SelectionOverlay.UpdateTexture(plane, selectedBox, healthRatio);
-            }
+
+            
+        }
 
 
-        if (currentlySelected)
+
+        if (_attackedEntity || (currentlySelected && entity.info.isUnit))
         {
 
             selectedRect = SelectionOverlay.CalculateBox(_collider);
@@ -166,13 +169,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
             // rotate the plain to its original position
             plane.transform.rotation = _LifeBarDefaultRotation;
 
-            
-        }
 
-
-
-        if (_attackedEntity || (currentlySelected && entity.info.isUnit))
-        {
             if (!_selectionVisible)
             {
                 plane.SetActive(true);

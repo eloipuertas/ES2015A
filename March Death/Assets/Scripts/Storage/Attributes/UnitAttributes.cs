@@ -15,10 +15,12 @@ namespace Storage
         public float rangedAttackFurthest = 0;
         public float rangedAttackNearest = 0;
         public float projectileRadius = 0;
+        public float projectileScale = 0;
         public int projectileSpeed = 0;
+        public float projectileOffset = 1f;
 
         public float attackRate;
-        public float movementRate;
+        public float movementRate = 1f;
 
         public float foodConsumption = 0.001f;
         public float goldConsumption;
