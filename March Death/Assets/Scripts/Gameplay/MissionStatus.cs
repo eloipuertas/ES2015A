@@ -5,7 +5,7 @@ public class MissionStatus
 {
     private Dictionary<Storage.BuildingTypes, uint[]> buildings;
     private Dictionary<Storage.UnitTypes, uint[]> units;
-    private Dictionary<WorldResources.Type, uint[]> resources;
+    //private Dictionary<WorldResources.Type, uint[]> resources;
 
     private int owner;
 
@@ -63,6 +63,7 @@ public class MissionStatus
 
     public void OnResourceAmountChanged(WorldResources.Type type, uint newAmmount) {}
 
+    /*
     public void OnResourceAdded(WorldResources.Type type, uint ammount)
     {
         uint[] missionTargets;
@@ -98,6 +99,7 @@ public class MissionStatus
             // TODO Logic for resource keeping
         }
     }
+    */
 
     public void OnBuildingCreated(Storage.BuildingTypes type)
     {

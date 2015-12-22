@@ -136,6 +136,7 @@ public class GameSetupScript : MonoBehaviour
 
     public void Cancel()
     {
+        Destroy(info.gameObject);
         Application.LoadLevel(0);
     }
 }
