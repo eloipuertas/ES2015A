@@ -1125,6 +1125,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &189006
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 444486}
+  - 114: {fileID: 11410716}
+  - 119: {fileID: 11915178}
+  m_Layer: 10
+  m_Name: EntitySelection
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &190104
 GameObject:
   m_ObjectHideFlags: 1
@@ -1628,7 +1645,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 139172}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 395.337341, y: 79.0026245, z: 673.35968}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 478384}
@@ -1646,6 +1663,7 @@ Transform:
   - {fileID: 467174}
   - {fileID: 469008}
   - {fileID: 410722}
+  - {fileID: 444486}
   m_Father: {fileID: 0}
   m_RootOrder: 0
 --- !u!4 &441366
@@ -1698,6 +1716,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 439658}
   m_RootOrder: 3
+--- !u!4 &444486
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 189006}
+  m_LocalRotation: {x: .707106829, y: 0, z: 0, w: .707106709}
+  m_LocalPosition: {x: .100000001, y: 53.6399994, z: 0}
+  m_LocalScale: {x: 1.64999998, y: 1.26999998, z: 1.98000002}
+  m_Children: []
+  m_Father: {fileID: 439658}
+  m_RootOrder: 15
 --- !u!4 &445414
 Transform:
   m_ObjectHideFlags: 1
@@ -2766,6 +2796,17 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11410716
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 189006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4f3a2240e8be8c48b8dc39005ac3c20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11448682
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2813,6 +2854,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider: {fileID: 0}
+--- !u!119 &11915178
+Projector:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 189006}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_NearClipPlane: .100000001
+  m_FarClipPlane: 100
+  m_FieldOfView: 60
+  m_AspectRatio: 1
+  m_Orthographic: 1
+  m_OrthographicSize: 2.74000001
+  m_Material: {fileID: 2100000, guid: d7e7703eede09674aa0385b976896c3e, type: 2}
+  m_IgnoreLayers:
+    serializedVersion: 2
+    m_Bits: 4294966783
 --- !u!137 &13704508
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
