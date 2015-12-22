@@ -331,18 +331,14 @@ public class Unit : GameEntity<Unit.Actions>
         {
             // Register for DEAD/DESTROYED and HIDDEN
             _auto += entity.registerFatalWounds(onTargetDied);
-            if (entity.GetComponent<FOWEntity>() != null)
-            {
-                _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
-            }
-            
+            _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
 
             // if target has changed, hide old target health
             Selectable selectable = null;
             if (_target != null)
             {
             	selectable = _target.getGameObject().GetComponent<Selectable>();
-                if (selectable!=null) selectable.NotAttackedEntity();
+            	selectable.NotAttackedEntity();
             }
 
             _target = entity;
@@ -351,7 +347,7 @@ public class Unit : GameEntity<Unit.Actions>
 
             // Show target health
             selectable = _target.getGameObject().GetComponent<Selectable>();
-            if (selectable != null) selectable.AttackedEntity();
+            selectable.AttackedEntity();
 
             // Update distance for immediate usage (ie. canDoRangedAttack)
             updateDistanceToTarget();
