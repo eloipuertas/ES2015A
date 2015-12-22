@@ -33,7 +33,7 @@ public class GameInformation : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-
+        Difficulty = 1;
     }
 
     // Update is called once per frame
