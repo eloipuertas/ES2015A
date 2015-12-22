@@ -83,6 +83,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &105906
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 479304}
+  - 114: {fileID: 11401760}
+  - 119: {fileID: 11981766}
+  m_Layer: 10
+  m_Name: EntitySelection
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &106780
 GameObject:
   m_ObjectHideFlags: 1
@@ -1551,7 +1568,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 183798}
-  m_LocalRotation: {x: .0706725046, y: -.130148724, z: .115822196, w: .982166946}
+  m_LocalRotation: {x: .0706725121, y: -.130148739, z: .115822203, w: .982167006}
   m_LocalPosition: {x: 1.23342794e-10, y: .000429288542, z: -7.37042996e-11}
   m_LocalScale: {x: 1, y: .99999994, z: 1}
   m_Children:
@@ -2153,7 +2170,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 101288}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 269.674652, y: 79.0026245, z: 758.417236}
+  m_LocalPosition: {x: 319.727814, y: 79.0026245, z: 607.256592}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 468452}
@@ -2185,6 +2202,7 @@ Transform:
   - {fileID: 496548}
   - {fileID: 437736}
   - {fileID: 400148}
+  - {fileID: 479304}
   m_Father: {fileID: 0}
   m_RootOrder: 0
 --- !u!4 &448174
@@ -2243,7 +2261,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 141188}
-  m_LocalRotation: {x: .095772475, y: -.128261387, z: .118842036, w: .979925096}
+  m_LocalRotation: {x: .0957724825, y: -.128261402, z: .118842043, w: .979925156}
   m_LocalPosition: {x: 2.38613101e-10, y: .000729624415, z: 1.38384512e-10}
   m_LocalScale: {x: 1, y: 1, z: 1.00000012}
   m_Children:
@@ -2442,7 +2460,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 157698}
-  m_LocalRotation: {x: -.264819533, y: -.221986845, z: .544393539, w: .764348269}
+  m_LocalRotation: {x: -.264819533, y: -.22198683, z: .544393539, w: .764348209}
   m_LocalPosition: {x: 2.81970671e-12, y: .00191103481, z: -5.10650022e-10}
   m_LocalScale: {x: 1.00000405, y: 1.00000453, z: 1.00000417}
   m_Children:
@@ -2474,6 +2492,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 447826}
   m_RootOrder: 9
+--- !u!4 &479304
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 105906}
+  m_LocalRotation: {x: .707106829, y: 0, z: 0, w: .707106709}
+  m_LocalPosition: {x: .100000001, y: 53.6399994, z: 2.24000001}
+  m_LocalScale: {x: 1.64999998, y: 1.26999998, z: 1.98000002}
+  m_Children: []
+  m_Father: {fileID: 447826}
+  m_RootOrder: 29
 --- !u!4 &479672
 Transform:
   m_ObjectHideFlags: 1
@@ -3157,6 +3187,17 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11401760
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 105906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4f3a2240e8be8c48b8dc39005ac3c20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11410218
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3204,6 +3245,24 @@ MonoBehaviour:
   type: 3
   gender: 0
   _distanceToTarget: 0
+--- !u!119 &11981766
+Projector:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 105906}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_NearClipPlane: .100000001
+  m_FarClipPlane: 100
+  m_FieldOfView: 60
+  m_AspectRatio: 1
+  m_Orthographic: 1
+  m_OrthographicSize: 2.74000001
+  m_Material: {fileID: 2100000, guid: d7e7703eede09674aa0385b976896c3e, type: 2}
+  m_IgnoreLayers:
+    serializedVersion: 2
+    m_Bits: 4294966783
 --- !u!137 &13705482
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
