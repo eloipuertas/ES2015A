@@ -145,8 +145,6 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
 
 
-        if (_attackedEntity)
-        {
             // only updates the texture if there's been a change in the healthy -> improves quite a lot the results in the profiler inspector
             if (_lastHealth != entity.healthPercentage)
             {
@@ -154,7 +152,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
                 healthRatio = _lastHealth / 100f;
                 SelectionOverlay.UpdateTexture(plane, selectedBox, healthRatio);
             }
-        }
+
 
         if (currentlySelected)
         {
@@ -227,8 +225,11 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     /// </summary>
     public virtual void AttackedEntity()
     {
-    	this._attackedEntity = true;
-        StartCoroutine(DisableAttackedEntity());
+        if (!this._attackedEntity)
+        {
+            this._attackedEntity = true;
+            StartCoroutine(DisableAttackedEntity());
+        }
     }
 
     IEnumerator DisableAttackedEntity()
