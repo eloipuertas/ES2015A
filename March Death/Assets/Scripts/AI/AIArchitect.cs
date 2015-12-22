@@ -94,6 +94,7 @@ namespace Assets.Scripts.AI
             foreach (GameObject pos in buildingsPositions)
             {
                 ai.CreateBuilding(getRandomBuildingType(typesToPlace), pos.gameObject.transform.position, Quaternion.Euler(0, buildingAngle, 0), this);
+                constructionGrid.reservePosition(constructionGrid.discretizeMapCoords(pos.gameObject.transform.position));
                 buildingsPlaced++;
                 pos.transform.localScale = Vector3.zero;
             }
@@ -438,6 +439,7 @@ namespace Assets.Scripts.AI
                     }
                 }
                 ai.CreateBuilding(buildingPrefs[0], position, Quaternion.Euler(0, buildingAngle, 0), this);
+                constructionGrid.reservePosition(constructionGrid.discretizeMapCoords(position));
                 buildingPrefs.RemoveAt(0);
                 buildingsPlaced++;
             }
