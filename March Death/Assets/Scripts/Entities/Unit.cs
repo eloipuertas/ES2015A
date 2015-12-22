@@ -326,6 +326,11 @@ public class Unit : GameEntity<Unit.Actions>
     /// <returns>Returns true if target is in range, false otherwise</returns>
     public bool attackTarget<A>(GameEntity<A> entity, bool selfDefense) where A : struct, IConvertible
     {
+        if (entity.info.isPseudoUnit)
+        {
+            return attackTarget(entity.transform.GetComponentInParent<Barrack>(), selfDefense);
+        }
+
         // Note: Cast is redundant but avoids warning
         if (_target != (IGameEntity)entity)
         {
