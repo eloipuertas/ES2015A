@@ -33,6 +33,12 @@ public class MissionScreen : MonoBehaviour
         Application.LoadLevel(0);
     }
 
-    public void RestartMission() {}
+    /// <summary>
+    /// Re-loads the current scene.
+    /// </summary>
+    public void RestartMission()
+    {
+        Application.LoadLevel(Application.loadedLevel);
+    }
 }
 

@@ -11,7 +11,7 @@ public class MissionStatus
 
     private MissionController controller;
 
-    private static readonly int ACCUMULATE = 0;
+    //private static readonly int ACCUMULATE = 0;
 
     public MissionStatus(int owner)
     {
@@ -69,6 +69,7 @@ public class MissionStatus
         if (resources.TryGetValue(type, out missionTargets))
         {
             // Logic for the resource finding (accumulation) mission
+            // The idea is to balance the resource amount to be zero
             if (missionTargets[0] != 0)
             {
                 if (missionTargets[0] < ammount)
@@ -103,7 +104,7 @@ public class MissionStatus
         uint[] missionTargets;
         if (buildings.TryGetValue(type, out missionTargets))
         {
-            if (missionTargets[1] > 0)
+            if (missionTargets[1] > 0)   // There are targets in the "to be created" slot
             {
                 missionTargets[1]--;
                 if (missionTargets[1] == 0)
@@ -119,7 +120,7 @@ public class MissionStatus
         uint[] missionTargets;
         if (buildings.TryGetValue(type, out missionTargets))
         {
-            if (missionTargets[0] > 0)
+            if (missionTargets[0] > 0)   // There are targets in the "to be destroyed" slot
             {
                 missionTargets[0]--;
                 if (missionTargets[0] == 0)
@@ -137,7 +138,7 @@ public class MissionStatus
         uint[] missionTargets;
         if (units.TryGetValue(type, out missionTargets))
         {
-            if (missionTargets[1] > 0)
+            if (missionTargets[1] > 0)   // There are targets in the "to be created" slot
             {
                 missionTargets[1]--;
                 if (missionTargets[1] == 0)
@@ -153,7 +154,7 @@ public class MissionStatus
         uint[] missionTargets;
         if (units.TryGetValue(type, out missionTargets))
         {
-            if (missionTargets[0] > 0)
+            if (missionTargets[0] > 0)   // There are targets in the "to be destroyed" slot
             {
                 missionTargets[0]--;
                 if (missionTargets[0] == 0)

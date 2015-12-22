@@ -38,6 +38,10 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     public static AIController ia { get { return (AIController)_ia; } }
 
     protected int playerId = 0;
+    /// <summary>
+    /// Sets the player ID. Make sure to use a number greater than zero.
+    /// </summary>
+    /// <value>The player I.</value>
     public int PlayerID { set { playerId = value; } }
 
     protected MissionStatus missionStatus;
