@@ -159,12 +159,12 @@ namespace Managers
         /// <param name="type">The type of building.</param>
         /// <param name="race">The race this building belongs to.</param>
         public GameObject createBuilding(Vector3 position, Quaternion rotation,
-                                         Storage.BuildingTypes type, Storage.Races race, float yOffset = 0)
+                                         Storage.BuildingTypes type, Storage.Races race, bool checkFow,float yOffset = 0)
         {
             GameObject obj = null;
             position.y += yOffset;
             position = grid.discretizeMapCoords(position);
-            if (grid.isNewPositionAbleForConstrucction(position))
+            if (grid.isNewPositionAbleForConstrucction(position, checkFow))
             {
                 position.y -= yOffset - 0.1f;
                 obj = Storage.Info.get.createBuilding(race, type, position, rotation);
@@ -187,7 +187,7 @@ namespace Managers
         {
             bool check = false;
 
-            check = grid.isNewPositionAbleForConstrucction(location);
+            check = grid.isNewPositionAbleForConstrucction(location,true);
 
             return check;
 

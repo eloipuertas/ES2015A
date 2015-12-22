@@ -108,7 +108,7 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
             position.y = terrain.SampleHeight(position);
             created = _buildings.createBuilding(position, Quaternion.Euler(0,0,0),
                                         building.type.building,
-                                        _selfRace, 1.0f);
+                                        _selfRace, false, 1.0f);
 
             IGameEntity entity = created.GetComponent<IGameEntity>();
             if (building.hasStatus)

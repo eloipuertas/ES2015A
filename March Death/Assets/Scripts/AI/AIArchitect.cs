@@ -241,7 +241,7 @@ namespace Assets.Scripts.AI
                     processingPos = constructionGrid.discretizeMapCoords(processingPos);
 
                     //In order to be more flexible we need to check if we can construct
-                    if (!constructionGrid.isNewPositionAbleForConstrucction(processingPos))
+                    if (!constructionGrid.isNewPositionAbleForConstrucction(processingPos,false))
                     {
                         continue;
                     }
@@ -397,7 +397,7 @@ namespace Assets.Scripts.AI
             {
                 int pos = UnityEngine.Random.Range(0, positionsForType.Count);
                 // Recheck positions in order to know if player has constructed on this position
-                if (constructionGrid.isNewPositionAbleForConstrucction(positionsForType[pos]))
+                if (constructionGrid.isNewPositionAbleForConstrucction(positionsForType[pos],false))
                 {
                     requestedPosition = positionsForType[pos];
                     found = true;
