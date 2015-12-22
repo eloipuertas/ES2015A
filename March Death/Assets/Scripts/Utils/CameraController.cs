@@ -176,7 +176,7 @@ public class CameraController : MonoBehaviour
     }
 
     /// <summary>
-    /// Enables the manual control with standard WASD and arrow keys.
+    /// Enables the manual control with arrow keys.
     /// </summary>
     public void enableManualControl()
     {
@@ -402,21 +402,21 @@ public class CameraController : MonoBehaviour
         last_state = actual_state;
         actual_state = CameraInteractionState.STOPPED;
 
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) || Input.mousePosition.y >= Screen.height - MOUSE_BOUNDS )
+        if ( Input.GetKey(KeyCode.UpArrow) || Input.mousePosition.y >= Screen.height - MOUSE_BOUNDS )
         {
             _internalDisplacement = Vector3.forward * Time.deltaTime * (_cameraSpeed + _acceleration);
             cameraContainer.transform.Translate(_internalDisplacement); 
             actual_state = CameraInteractionState.MOVING;
         }
 
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) || Input.mousePosition.x <= MOUSE_BOUNDS )
+        if ( Input.GetKey(KeyCode.LeftArrow) || Input.mousePosition.x <= MOUSE_BOUNDS )
         {
             _internalDisplacement = Vector3.left * Time.deltaTime * (_cameraSpeed + _acceleration);
             cameraContainer.transform.Translate(_internalDisplacement);
             actual_state = CameraInteractionState.MOVING;
         }
 
-        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) || Input.mousePosition.y <= MOUSE_BOUNDS )
+        if ( Input.GetKey(KeyCode.DownArrow) || Input.mousePosition.y <= MOUSE_BOUNDS )
         {
             _internalDisplacement = Vector3.back * Time.deltaTime * (_cameraSpeed + _acceleration);
             Vector3 nextFramePosition = cameraContainer.transform.position + _internalDisplacement;
@@ -424,7 +424,7 @@ public class CameraController : MonoBehaviour
             actual_state = CameraInteractionState.MOVING;
         }
 
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || Input.mousePosition.x >= Screen.width - MOUSE_BOUNDS )
+        if ( Input.GetKey(KeyCode.RightArrow) || Input.mousePosition.x >= Screen.width - MOUSE_BOUNDS )
         {
             _internalDisplacement = Vector3.right * Time.deltaTime * (_cameraSpeed + _acceleration);
             cameraContainer.transform.Translate(_internalDisplacement); 
