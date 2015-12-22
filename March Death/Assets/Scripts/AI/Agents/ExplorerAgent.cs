@@ -30,7 +30,8 @@ namespace Assets.Scripts.AI.Agents
         const int CONFIDENCE_TOO_MANY_EXPLORING = -25;
         const int CONFIDENCE_EXPLORER_BY_DEFAULT = 50;
 		const int CONFIDENCE_EXPLORER_ALL_CIVILS = 50;
-		const int CONFIDENCE_EXPLORER_DISABLED = -1;
+        const int CONFIDENCE_TOO_MANY_INGROUP = -15;
+        const int CONFIDENCE_EXPLORER_DISABLED = -1;
 		const int CONFIDENCE_HERO_ALREADY_FOUND = 0;
 
         const float HERO_GO_TO_BASE = 60 * 1f; //The first minute hero can explore after that he will stay at base
@@ -38,7 +39,6 @@ namespace Assets.Scripts.AI.Agents
         bool isEnabled = true;
         int numberSquadsExploring = 0;
         bool heroVisible;
-		bool allCivils;
 
         Terrain terrain;
         AssistAgent assistAgent;
@@ -116,10 +116,7 @@ namespace Assets.Scripts.AI.Agents
             {
                 return;
             }
-
-            // Update squads exploring
-            ++numberSquadsExploring;
-
+            
             if(squad.Units[0].type == Storage.UnitTypes.HERO && squad.Units.Count == 1 && Time.time > HERO_GO_TO_BASE && !destinatedToBase)
             {
                 squad.Units[0].moveTo(new Vector3(ai.rootBasePosition.x + 30f, ai.rootBasePosition.y, ai.rootBasePosition.z + 10f));
@@ -128,6 +125,9 @@ namespace Assets.Scripts.AI.Agents
             }
 
             if (squad.Units[0].type == Storage.UnitTypes.HERO && destinatedToBase) return;
+
+            // Update squads exploring
+            ++numberSquadsExploring;
 
             if (fowManager.Enabled)
             {
@@ -272,8 +272,8 @@ namespace Assets.Scripts.AI.Agents
         {
             if (numberSquadsExploring < MaxExplorerSquads && numberSquadsExploring>0)
             {
-                if (ai.Macro.canTakeArms() >= 2)
-                    ai.Macro.takeArms(2);
+                if (ai.Macro.canTakeArms() >= 1)
+                    ai.Macro.takeArms(1);
             }
         }
         static float angleDirection(Vector3 from, Vector3 initialTo, Vector3 newTo)
@@ -374,8 +374,9 @@ namespace Assets.Scripts.AI.Agents
                 return CONFIDENCE_HERO_ALREADY_FOUND;
 			}
 
-			//If all units of the squad adds some more confidence to this behaivour
-			foreach(Unit unit in squad.Units)
+            //If all units of the squad adds some more confidence to this behaivour
+            bool allCivils = true;
+            foreach (Unit unit in squad.Units)
 			{
 				if(unit.type != Storage.UnitTypes.CIVIL)
 				{
@@ -387,6 +388,10 @@ namespace Assets.Scripts.AI.Agents
 			{
 				confidence += CONFIDENCE_EXPLORER_ALL_CIVILS;
 			}
+            if (squad.Units.Count > 1)
+            {
+                confidence += CONFIDENCE_TOO_MANY_INGROUP;
+            }
             
             if (numberSquadsExploring > MaxExplorerSquads)
             {
