@@ -331,14 +331,18 @@ public class Unit : GameEntity<Unit.Actions>
         {
             // Register for DEAD/DESTROYED and HIDDEN
             _auto += entity.registerFatalWounds(onTargetDied);
-            _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
+            if (entity.GetComponent<FOWEntity>() != null)
+            {
+                _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
+            }
+            
 
             // if target has changed, hide old target health
             Selectable selectable = null;
             if (_target != null)
             {
             	selectable = _target.getGameObject().GetComponent<Selectable>();
-            	selectable.NotAttackedEntity();
+                if (selectable!=null) selectable.NotAttackedEntity();
             }
 
             _target = entity;
@@ -347,7 +351,7 @@ public class Unit : GameEntity<Unit.Actions>
 
             // Show target health
             selectable = _target.getGameObject().GetComponent<Selectable>();
-            selectable.AttackedEntity();
+            if (selectable != null) selectable.AttackedEntity();
 
             // Update distance for immediate usage (ie. canDoRangedAttack)
             updateDistanceToTarget();
@@ -672,14 +676,17 @@ public class Unit : GameEntity<Unit.Actions>
                             if (_projectileThrown) {
                                 _projectileThrown = false;
                             } else {
+
                                 _projectileThrown = true;
-                                Vector3 projectile_position = new Vector3(transform.position.x, transform.position.y + GetComponent<Collider>().bounds.size.y, transform.position.z);
-                                GameObject projectile = Info.get.createProjectile(projectile_position, transform.rotation);
-                                //FIXME bug after merge
-                                //Projectile projectile_cl = projectile.GetComponent<Projectile>();
-                                Vector3 projectileEndPoint = new Vector3(_target.getTransform().position.x, _target.getTransform().position.y + _target.getGameObject().GetComponent<Collider>().bounds.size.y, _target.getTransform().position.z);
-                                //FIXME bug after merge
-                                //projectile_cl.setProps(projectileEndPoint, this, info.unitAttributes.projectileSpeed, info.unitAttributes.projectileRadius);
+                                Vector3 projectile_position, projectileEndPoint;
+
+                                projectileEndPoint = _target.getTransform().position;
+                                // move the projectile a bit from the center towards the _target
+                                projectile_position = Vector3.MoveTowards(transform.position, projectileEndPoint, info.unitAttributes.projectileOffset);
+                                // we now can define a scale for the projectile
+                                GameObject projectile = Info.get.createProjectile(projectile_position, transform.rotation, info.unitAttributes.projectileScale);
+                                Projectile projectile_cl = projectile.GetComponent<Projectile>();
+                                projectile_cl.setProps(projectileEndPoint, this, info.unitAttributes.projectileSpeed, info.unitAttributes.projectileRadius);
                                 _lastAttack = Time.time;
                             }
                         } else {
@@ -749,7 +756,7 @@ public class Unit : GameEntity<Unit.Actions>
                     // When capture distance is reached resource building capture
                     // method is triggered.
 
-                    if (_target.info.race == this.race)
+                    if (_target.info.race == this.race && !isImmobile)
                     {
                         if (_distanceToTarget <= _target.info.resourceAttributes.trapRange)
 

@@ -201,47 +201,55 @@ namespace Managers
             Vector3 newDestination = GetNewDestination();
             // if is not a vaild point, the building remains quiet
             if (newDestination == _inputs.invalidPosition) return false;
-            
+
             // alter the color if is not a valid location
-            if (checkLocation(newDestination) && isAffordable(_newBuilding.race, _newBuilding.type))
+            if (checkLocation(newDestination))
             {
-
-                GameObject finalBuilding = CreateFinalBuilding(_newBuilding.race, _newBuilding.type);
-                //TODO : (hermetico) restar recursos necesarios para crear el building
-                if (_newBuilding.type == Storage.BuildingTypes.STRONGHOLD)
+                if (isAffordable(_newBuilding.race, _newBuilding.type))
                 {
-                    grid.reservePositionForStronghold(_newBuilding.building.gameObject.transform.position);
-                }
-                grid.reservePosition(newDestination);
-                newDestination.y -= yoffset - 0.1f;
-                finalBuilding.transform.position = newDestination;
-                finalBuilding.transform.rotation = _newBuilding.ghost.transform.rotation;
 
-                //TODO : check another way to get the IGameEntity
-                
-               // IGameEntity entity = finalBuilding.gameObject.GetComponent<IGameEntity>(); // Esto no iria así ? (Ferran)
-                IGameEntity entity = finalBuilding.GetComponent<IGameEntity>();
-                BasePlayer.player.addEntity(entity);
+                    GameObject finalBuilding = CreateFinalBuilding(_newBuilding.race, _newBuilding.type);
+                    //TODO : (hermetico) restar recursos necesarios para crear el building
+                    if (_newBuilding.type == Storage.BuildingTypes.STRONGHOLD)
+                    {
+                        grid.reservePositionForStronghold(_newBuilding.building.gameObject.transform.position);
+                    }
+                    grid.reservePosition(newDestination);
+                    newDestination.y -= yoffset - 0.1f;
+                    finalBuilding.transform.position = newDestination;
+                    finalBuilding.transform.rotation = _newBuilding.ghost.transform.rotation;
 
-                if (!_newBuilding.continuousConstruction)
-                {
-                    // remaining operations
-                    _finishPlacing();
-                    return true;
+                    //TODO : check another way to get the IGameEntity
+
+                    // IGameEntity entity = finalBuilding.gameObject.GetComponent<IGameEntity>(); // Esto no iria así ? (Ferran)
+                    IGameEntity entity = finalBuilding.GetComponent<IGameEntity>();
+                    BasePlayer.player.addEntity(entity);
+
+                    if (!_newBuilding.continuousConstruction)
+                    {
+                        // remaining operations
+                        _finishPlacing();
+                        return true;
+                    }
+                    else
+                        return false;
                 }
                 else
+                {
+                    if (!IsEnoughFood)
+                        notifier.DisplayNotEnoughResources(WorldResources.Type.FOOD);
+                    if (!IsEnoughMetal)
+                        notifier.DisplayNotEnoughResources(WorldResources.Type.METAL);
+                    if (!IsEnoughWood)
+                        notifier.DisplayNotEnoughResources(WorldResources.Type.WOOD);
                     return false;
+                }
             }
             else
             {
-                if (!IsEnoughFood)
-                    notifier.DisplayNotEnoughResources(WorldResources.Type.FOOD);
-                if (!IsEnoughMetal)
-                    notifier.DisplayNotEnoughResources(WorldResources.Type.METAL);
-                if (!IsEnoughWood)
-                    notifier.DisplayNotEnoughResources(WorldResources.Type.WOOD);
                 return false;
             }
+            
 
         }
 

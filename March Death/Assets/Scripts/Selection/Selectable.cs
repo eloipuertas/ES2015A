@@ -145,18 +145,19 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     {
 
 
-        if (_attackedEntity)
-        {
             // only updates the texture if there's been a change in the healthy -> improves quite a lot the results in the profiler inspector
             if (_lastHealth != entity.healthPercentage)
             {
                 _lastHealth = entity.healthPercentage;
                 healthRatio = _lastHealth / 100f;
                 SelectionOverlay.UpdateTexture(plane, selectedBox, healthRatio);
-            }
+
+            
         }
 
-        if (currentlySelected)
+
+
+        if (_attackedEntity || (currentlySelected && entity.info.isUnit))
         {
 
             selectedRect = SelectionOverlay.CalculateBox(_collider);
@@ -168,13 +169,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
             // rotate the plain to its original position
             plane.transform.rotation = _LifeBarDefaultRotation;
 
-            
-        }
 
-
-
-        if (_attackedEntity || (currentlySelected && entity.info.isUnit))
-        {
             if (!_selectionVisible)
             {
                 plane.SetActive(true);
@@ -227,8 +222,11 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     /// </summary>
     public virtual void AttackedEntity()
     {
-    	this._attackedEntity = true;
-        StartCoroutine(DisableAttackedEntity());
+        if (!this._attackedEntity)
+        {
+            this._attackedEntity = true;
+            StartCoroutine(DisableAttackedEntity());
+        }
     }
 
     IEnumerator DisableAttackedEntity()
