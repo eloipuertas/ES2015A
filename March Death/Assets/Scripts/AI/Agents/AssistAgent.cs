@@ -19,7 +19,7 @@ namespace Assets.Scripts.AI.Agents
             float y = (assisted.Units.Count>0)? assisted.Units[0].transform.position.y : 80f;
             Vector3 pos = new Vector3(cent.x, y, cent.y);
             Vector2 ocent = squad.BoundingBox.Bounds.center;
-            if (Vector2.Distance(cent, ocent) < 30) //join squads
+            if (Vector2.Distance(cent, ocent) < 20) //join squads
             {
                 assisted.AddUnits(squad.Units);
                 ai.Micro.squads.Remove(squad);
@@ -53,7 +53,11 @@ namespace Assets.Scripts.AI.Agents
                 {
                     int conf = request.Value.Priority;
                     float dist = Vector2.Distance(request.Key.BoundingBox.Bounds.center, squad.BoundingBox.Bounds.center);
-                    if (dist > 200)
+                    if (ai.StoryMode && dist > 20)
+                    {
+                        conf = 0;
+                    }
+                    else if (dist > 200)
                     {
                         conf = conf / 4;
                     }

@@ -15,11 +15,11 @@ namespace Assets.Scripts.AI
 {
     public class MicroManager
     {
-		public const int AGENT_ATACK = 0;
-		public const int AGENT_EXPLORER = 1;
-		public const int AGENT_RETREAT = 2;
-		public const int AGENT_ASSIST = 3;
-        public const int AGENT_STRATEGY = 4;
+		public int AGENT_ATACK = 0;
+		public int AGENT_EXPLORER = 1;
+		public int AGENT_RETREAT = 2;
+		public int AGENT_ASSIST = 3;
+        public int AGENT_STRATEGY = 4;
 
         AIController ai;
         /// <summary>
@@ -34,10 +34,24 @@ namespace Assets.Scripts.AI
             this.ai = ai;
             AssistAgent assistAgent = new AssistAgent(ai, "Assist");
             AttackAgent aA = new AttackAgent(ai, assistAgent, "Atack");
-            agents.Add(new ExplorerAgent(ai, assistAgent, "Explorer"));
             agents.Add(aA);
+            AGENT_ATACK = 0;
+            if (!ai.StoryMode)
+            {
+                AGENT_EXPLORER = 1;
+                AGENT_RETREAT = 2;
+                AGENT_ASSIST = 3;
+                AGENT_STRATEGY = 4;
+                agents.Add(new ExplorerAgent(ai, assistAgent, "Explorer"));
+            }
+            else
+            {
+                AGENT_RETREAT = 1;
+                AGENT_ASSIST = 2;
+                AGENT_STRATEGY = 3;
+            }
             agents.Add(new RetreatAgent(ai, aA, assistAgent, "Retreat"));
-			agents.Add(assistAgent);
+            agents.Add(assistAgent);
             agents.Add(new StrategyAgent(ai, assistAgent, "Strategy"));
             squads.Add(new Squad(ai.race,ai.DifficultyLvl)); //Hero
             squads.Add(new Squad(ai.race, ai.DifficultyLvl));
@@ -133,7 +147,7 @@ namespace Assets.Scripts.AI
             {
                 squads[0].AddUnit(u);
             }
-            else if(u.type == Storage.UnitTypes.CIVIL)
+            else if(ai.StoryMode || u.type == Storage.UnitTypes.CIVIL)
             {
                 Squad s = new Squad(ai.race,ai.DifficultyLvl);
                 s.AddUnit(u);
