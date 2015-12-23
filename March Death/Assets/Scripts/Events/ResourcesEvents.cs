@@ -104,7 +104,7 @@ public class ResourcesEvents : Singleton<ResourcesEvents>
     {
         CollectableGood collectable = (CollectableGood)obj;
         BasePlayer player = BasePlayer.getOwner(collectable.entity);
-        ResourcesPlacer.get(player).Collect(collectable.goods.type, collectable.goods.amount);
+        ResourcesPlacer.get(player).Consume(collectable.goods.type, collectable.goods.amount);
     }
 
 

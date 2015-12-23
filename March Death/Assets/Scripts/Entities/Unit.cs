@@ -657,7 +657,7 @@ public class Unit : GameEntity<Unit.Actions>
             collectable.entity = this;
             collectable.goods = new Goods();
             collectable.goods.type = WorldResources.Type.FOOD;
-            collectable.goods.amount = info.unitAttributes.foodConsumption;
+            collectable.goods.amount = info.unitAttributes.foodConsumption * RESOURCES_UPDATE_INTERVAL;
 
             fire(Actions.EAT, collectable);
         }
