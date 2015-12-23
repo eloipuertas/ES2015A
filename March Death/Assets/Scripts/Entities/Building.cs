@@ -117,7 +117,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
 
         base.OnDestroy();
         
-        Assert.IsTrue(status == EntityStatus.DEAD);
+        Assert.IsTrue(status == EntityStatus.DESTROYED);
     }
 
 
