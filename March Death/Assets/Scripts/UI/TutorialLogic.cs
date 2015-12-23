@@ -1,15 +1,8 @@
-using UnityEngine;
+ using UnityEngine;
 using System.Collections;
 
 public class TutorialLogic : MonoBehaviour
 {
-
-    
-
-
-
-    
-
     public static TutorialLogic instance = null;
     // Use this for initialization
     void Start()
@@ -25,8 +18,6 @@ public class TutorialLogic : MonoBehaviour
 
     public void Update()
     {
-
-
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Application.LoadLevel(0);
@@ -41,14 +32,14 @@ public class TutorialLogic : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
 
-            Application.LoadLevel(4);
+            Application.LoadLevel("TutorialScreenTwo");
 
         }
     }
 
     public void TutorialSecond()
     {
-        Application.LoadLevel(4);
+        Application.LoadLevel("TutorialScreenTwo");
     }
 
     public void TutorialFirst()
