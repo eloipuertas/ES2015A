@@ -105,7 +105,7 @@ public class MiniMapController : MonoBehaviour
     {
         if (main_zoom != mainCam.orthographicSize) // if the zoom has changed
         {
-            float diff = (mainCam.orthographicSize - main_zoom) / 6.0f; // to reduce the zoom vel increment value (hack)
+            float diff = (mainCam.orthographicSize - main_zoom) / 6.0f; // to reduce the zoom vel increment value (hack)     
             rect_marker.width += diff; rect_marker.height = rect_marker.width/mainCam.aspect;
             rect_marker.center -= new Vector2(diff/2, diff/(2*mainCam.aspect));
             main_zoom = mainCam.orthographicSize;
@@ -162,17 +162,24 @@ public class MiniMapController : MonoBehaviour
             _camera.WorldToScreenPoint(corners[1])
         };
 
+        // It wasnt expected to put the Stronghold so on the border of the map.
+        if (Mathf.Abs(corners[0][0] - corners_minimap[0][0]) > 600 ||          
+            Mathf.Abs(corners[0][0] - corners_minimap[0][0]) > 600)
+        {
+            corners_minimap = new Vector3[2] { new Vector3(63.6f, 147.7f, 978), new Vector3(71.6f, 151, 910.3f) };
+        }
+
         Rect r = new Rect();
 
-        r.xMax = corners_minimap[1].x + 0;
-        r.xMin = corners_minimap[0].x - 0;
-        r.yMax = Screen.height - corners_minimap[1].y + 0;
-        r.yMin = Screen.height - corners_minimap[0].y - 0;
+        r.xMax = corners_minimap[1].x;
+        r.xMin = corners_minimap[0].x;
+        r.yMax = Screen.height - corners_minimap[1].y;
+        r.yMin = Screen.height - corners_minimap[0].y;
 
         Vector3 v = _camera.WorldToScreenPoint(mainCam.transform.position - mainCam.GetComponent<CameraController>().getCameraOffset);
         v.y = Screen.height - v.y;
         r.center = v;
-  
+
         return r;
     }
 
@@ -200,10 +207,10 @@ public class MiniMapController : MonoBehaviour
 		switch (info.GetPlayerRace()) {
 		case Storage.Races.MEN:
 			viewPortPosX = 0.021f;
-			viewPortPosY = 0.02f; // _prev = 0.007f
+			viewPortPosY = 0.02f; 
 			
 			// The minimap size
-			viewPortW = (1f / (float)Screen.width) * ((float)Screen.width / 5.6701f);  // _prev = 3.9701f
+			viewPortW = (1f / (float)Screen.width) * ((float)Screen.width / 5.6701f);  
 			// the height will be the ratio of the hole for the map 140/201
 			viewPortH = (1f / (float)Screen.height) * (((float)Screen.width / 4.0701f) * (140f / 201f));
 			break;
