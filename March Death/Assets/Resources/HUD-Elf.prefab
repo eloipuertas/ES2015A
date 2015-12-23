@@ -110,7 +110,6 @@ GameObject:
   - 224: {fileID: 22407232}
   - 222: {fileID: 22224826}
   - 114: {fileID: 11411248}
-  - 114: {fileID: 11454076}
   m_Layer: 5
   m_Name: actions
   m_TagString: Untagged
@@ -1538,17 +1537,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 115f57c5a09604948af5af757085cade, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &11454076
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 117462}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 534114ba01723ff49a09c4b5cecff82c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &11454908
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2335,7 +2323,7 @@ Canvas:
   m_GameObject: {fileID: 118690}
   m_Enabled: 1
   serializedVersion: 2
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_Camera: {fileID: 0}
   m_PlaneDistance: 2
   m_PixelPerfect: 0
@@ -3087,7 +3075,11 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: m_RenderMode
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 118690}

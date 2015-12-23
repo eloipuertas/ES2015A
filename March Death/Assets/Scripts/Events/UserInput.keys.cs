@@ -29,13 +29,34 @@ public partial class UserInput
             }
         }
 
+        if ((Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftControl)) && Input.GetKeyDown(KeyCode.E))
+        {
+            Vector3 position;
+            RaycastHit hit;
+            bool hasHit;
+            position = FindHit(out hasHit, Constants.Layers.TERRAIN_MASK).point;
+            GameObject gameObject = Storage.Info.get.createUnit(BasePlayer.player.race, Storage.UnitTypes.SPECIALONE, position, Quaternion.Euler(0f, 0f, 0f), 0);
+
+            BasePlayer.player.addEntity(gameObject.GetComponent<IGameEntity>());
+            Debug.Log("New SpecialOne Unit!");
+            /*
+
+            Vector3 CameraCenter = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 2, Camera.main.nearClipPlane));
+            if (Physics.Raycast(CameraCenter, transform.forward, out hit, 500f, Constants.Layers.TERRAIN_MASK))
+            {
+                position = hit.point;
+                
+            }    
+            */
+        }
+
         // Displays the Pause Menu
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             PauseMenuLogic.TogglePauseMenu();
         }
 
-        foreach (KeyValuePair<Ability,bool> tuple in EntityAbilitiesController.affordable_buttons)
+        foreach (KeyValuePair<Ability,bool> tuple in EntityAbilitiesController.get.affordable_buttons)
         {
             if (Input.GetKeyUp(tuple.Key.keyBinding) && tuple.Value)
             {

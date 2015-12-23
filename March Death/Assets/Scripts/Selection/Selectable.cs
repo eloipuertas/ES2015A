@@ -20,10 +20,13 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     private Quaternion _LifeBarDefaultRotation;
 
     public bool currentlySelected { get; set; }
+    private bool _attackedEntity = false;
+    private bool _selectionVisible = false;
     private float healthRatio = 1f;
     private float _lastHealth = 0f;
     private bool entityMoving = true;
-    private bool _changedVisible = false;
+    private float _TimeToShowAttackedEntity = 10f;
+    
 
     public Storage.Races race {
         get { return entity.info.race; }
@@ -74,6 +77,13 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         // only apply for units of the player
         if (entity.info.isUnit && player.race == race) RetrieveLightSelection();
         else _unitSelection = null;
+
+
+        currentlySelected = false;
+        _selectionVisible = true;
+        _attackedEntity = false;
+        AdjustTexture();
+
     }
 
     public void OnDisable()
@@ -114,36 +124,43 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
         }
     }
 
-    public override void Update() { }
+
+    /// <summary>
+    /// Adjust the texture initally, needed for the buildings
+    /// </summary>
+    public void AdjustTexture() {
+
+        selectedRect = SelectionOverlay.CalculateBox(_collider);
+
+        Vector3 position = this.gameObject.transform.position;
+        position.y = _collider.bounds.max.y + (_collider.bounds.size.y * .5f);
+        // move the plane a little bit from the center
+        plane.transform.position = position;
+        // rotate the plain to its original position
+        plane.transform.rotation = _LifeBarDefaultRotation;
+
+    }
 
     protected virtual void LateUpdate()
     {
-        if (!(currentlySelected ^ _changedVisible))
-        {
-            if (!currentlySelected)
-            {
-                plane.SetActive(false);
-            }
-            else
-            {
-                if(entity.info.isUnit)
-                    plane.SetActive(true);
-            };
-            //else Destroy(plane, 0f); _lastHealth = 100f;
 
-            _changedVisible = !currentlySelected;
-        }
 
-        if (currentlySelected)
-        {
-            selectedRect = SelectionOverlay.CalculateBox(_collider);
             // only updates the texture if there's been a change in the healthy -> improves quite a lot the results in the profiler inspector
             if (_lastHealth != entity.healthPercentage)
             {
                 _lastHealth = entity.healthPercentage;
                 healthRatio = _lastHealth / 100f;
                 SelectionOverlay.UpdateTexture(plane, selectedBox, healthRatio);
-            }
+
+            
+        }
+
+
+
+        if (_attackedEntity || (currentlySelected && entity.info.isUnit))
+        {
+
+            selectedRect = SelectionOverlay.CalculateBox(_collider);
 
             Vector3 position = this.gameObject.transform.position;
             position.y = _collider.bounds.max.y + (_collider.bounds.size.y * .5f);
@@ -153,7 +170,21 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
             plane.transform.rotation = _LifeBarDefaultRotation;
 
 
+            if (!_selectionVisible)
+            {
+                plane.SetActive(true);
+                _selectionVisible = true;
+            }
         }
+        else
+        {
+            if(_selectionVisible)
+            {
+                plane.SetActive(false);
+                _selectionVisible = false;
+            }
+        }
+
 
     }
 
@@ -191,7 +222,17 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     /// </summary>
     public virtual void AttackedEntity()
     {
-    	this.currentlySelected = true;
+        if (!this._attackedEntity)
+        {
+            this._attackedEntity = true;
+            StartCoroutine(DisableAttackedEntity());
+        }
+    }
+
+    IEnumerator DisableAttackedEntity()
+    {
+        yield return new WaitForSeconds(_TimeToShowAttackedEntity);
+        NotAttackedEntity();
     }
 
     /// <summary>
@@ -200,7 +241,7 @@ public class Selectable : SubscribableActor<Selectable.Actions, Selectable>
     /// </summary>
     public virtual void NotAttackedEntity()
     {
-    	this.currentlySelected = false;
+    	this._attackedEntity = false;
     }
 
     public void onUnitDied(System.Object obj)

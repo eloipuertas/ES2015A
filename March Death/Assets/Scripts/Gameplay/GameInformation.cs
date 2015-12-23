@@ -33,7 +33,7 @@ public class GameInformation : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-
+        Difficulty = 1;
     }
 
     // Update is called once per frame
@@ -163,7 +163,8 @@ public class GameInformation : MonoBehaviour
         var button = GameObject.Find(name);
 		var buttonImage = button.GetComponent<Image>();
 		var buttonTransform = buttonImage.rectTransform;
-		if (buttonImage.name != "Sell" && buttonImage.name != "Recruit Explorer") {
+		if (buttonImage.name != "Sell" && buttonImage.name != "Recruit Explorer"
+		    && buttonImage.name!="Rotate") {
 			buttonImage.sprite = CreateHoverSprite (buttonImage.name, buttonTransform.sizeDelta);     
 		}
         var tooltip = new GameObject("tooltip");
@@ -300,7 +301,15 @@ public class GameInformation : MonoBehaviour
     public void setGameMode(GameMode mode)
     {
         gameMode = mode;
-        hardcodedBattle();    // HACK Sets the campaign while the real functionality isn't implemented
+        switch (gameMode)
+        {
+            case GameMode.SKIRMISH:
+                hardcodedBattle();
+                break;
+            case GameMode.CAMPAIGN:
+                SetStoryBattle();
+                break;
+        }
     }
 
     public GameMode getGameMode()
@@ -318,23 +327,71 @@ public class GameInformation : MonoBehaviour
         return game;
     }
 
+    /// <summary>
+    /// Sets the battle with predefined parameters for the mission, player
+    /// settings, and resources.
+    /// </summary>
     private void hardcodedBattle()
     {
-        // TODO Read battle information from a JSON file or resulting object from a JSON deserializer
         game = new Battle();
+        // Sets the mission
         Battle.MissionDefinition.TargetType t = new Battle.MissionDefinition.TargetType();
         t.unit = UnitTypes.HERO;
         game.AddMission(Battle.MissionType.DESTROY, 1, EntityType.UNIT, t, 0, true, "");
+        // Initializes the human civilization
         Battle.PlayerInformation player = new Battle.PlayerInformation(Races.MEN);
-        player.AddBuilding(BuildingTypes.STRONGHOLD, 777, 779, EntityStatus.IDLE);
-        player.AddUnit(UnitTypes.HERO, 825.6648f, 806.5628f);
+        player.AddBuilding(BuildingTypes.STRONGHOLD, 752, 880, EntityStatus.IDLE);
+        player.AddUnit(UnitTypes.HERO, 764.9564f, 823.0175f);
         player.SetInitialResources(2000, 2000, 2000, 2000);
         game.AddPlayerInformation(player);
+        // Initializes the elven civilization
         player = new Battle.PlayerInformation(Races.ELVES);
         player.AddUnit(UnitTypes.HERO, 331.35f, 575.81f);
         player.AddBuilding(BuildingTypes.STRONGHOLD, 283.7f, 562.5f, EntityStatus.IDLE);
         player.SetInitialResources(2000, 2000, 2000, 2000);
         game.AddPlayerInformation(player);
+
         game.SetWorldResources(5000, 5000, 5000);
+    }
+
+    /// <summary>
+    /// Initializes a player for a battle.
+    /// </summary>
+    /// <returns>The player.</returns>
+    /// <param name="race">The player's race.</param>
+    /// <param name="strongholdGameObject">Name of the game object placed where
+    /// the player's stronghold should be.</param>
+    private Battle.PlayerInformation initializePlayer(Storage.Races race, string strongholdGameObject)
+    {
+        GameObject stronghold;
+        Battle.PlayerInformation player = new Battle.PlayerInformation(race);
+        stronghold = GameObject.Find(strongholdGameObject);
+        player.AddBuilding(BuildingTypes.STRONGHOLD, stronghold.transform.position.x, stronghold.transform.position.z, EntityStatus.IDLE);
+        player.AddUnit(UnitTypes.HERO, stronghold.transform.position.x - 50, stronghold.transform.position.z);
+        player.SetInitialResources(2000, 2000, 2000, 2000);
+        return player;
+    }
+
+    /// <summary>
+    /// Sets the story battle: mission and world resources. Players must be set separately.
+    /// </summary>
+    private void SetStoryBattle()
+    {
+        game = new Battle();
+        game.SetWorldResources(5000, 5000, 5000);
+        Battle.MissionDefinition.TargetType t = new Battle.MissionDefinition.TargetType();
+        t.building = BuildingTypes.STRONGHOLD;
+        game.AddMission(Battle.MissionType.DESTROY, 1, EntityType.BUILDING, t, 0, true, "");
+    }
+
+    /// <summary>
+    /// Sets the story players.
+    /// </summary>
+    public void SetStoryPlayers()
+    {
+        setGameMode(GameMode.CAMPAIGN);
+        Races enemyRace = playerRace == Races.ELVES ? Races.MEN : Races.ELVES;
+        game.AddPlayerInformation(initializePlayer(playerRace, "Cube_Player_Stronghold"));
+        game.AddPlayerInformation(initializePlayer(enemyRace, "Cube_Enemy_Stronghold"));
     }
 }

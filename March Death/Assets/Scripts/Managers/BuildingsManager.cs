@@ -8,14 +8,13 @@ namespace Managers
         public enum Place { ABLE, NOT_ABLE }
         private Place _currentPlace = Place.ABLE;
         public Place currentPlace { get { return _currentPlace; } }
-        private Player _player;
         private UserInput _inputs;
-        public Player Player { set { _player = value; } }
         public UserInput Inputs { get { return _inputs; } set { _inputs = value; } }
         private CursorManager cursor;
         private ConstructionGrid grid;
         private Color red = Color.red;
         private Color green = Color.green;
+
         private struct NewBuilding
         {
             public GameObject ghost;
@@ -111,7 +110,7 @@ namespace Managers
                 _newBuilding.material = _newBuilding.ghost.GetComponent<Renderer>().material;
                 _newBuilding.placing = true;
                 _newBuilding.continuousConstruction = continuousConstruction;
-                _player.setCurrently(Player.status.PLACING_BUILDING);
+                BasePlayer.player.setCurrently(Player.status.PLACING_BUILDING);
                 CheckBuildingDefaultRotation(race, type);
             }
 
@@ -160,12 +159,12 @@ namespace Managers
         /// <param name="type">The type of building.</param>
         /// <param name="race">The race this building belongs to.</param>
         public GameObject createBuilding(Vector3 position, Quaternion rotation,
-                                         Storage.BuildingTypes type, Storage.Races race, float yOffset = 0)
+                                         Storage.BuildingTypes type, Storage.Races race, bool checkFow,float yOffset = 0)
         {
             GameObject obj = null;
             position.y += yOffset;
             position = grid.discretizeMapCoords(position);
-            if (grid.isNewPositionAbleForConstrucction(position))
+            if (grid.isNewPositionAbleForConstrucction(position, checkFow))
             {
                 position.y -= yOffset - 0.1f;
                 obj = Storage.Info.get.createBuilding(race, type, position, rotation);
@@ -188,7 +187,7 @@ namespace Managers
         {
             bool check = false;
 
-            check = grid.isNewPositionAbleForConstrucction(location);
+            check = grid.isNewPositionAbleForConstrucction(location,true);
 
             return check;
 
@@ -202,47 +201,55 @@ namespace Managers
             Vector3 newDestination = GetNewDestination();
             // if is not a vaild point, the building remains quiet
             if (newDestination == _inputs.invalidPosition) return false;
-            
+
             // alter the color if is not a valid location
-            if (checkLocation(newDestination) && isAffordable(_newBuilding.race, _newBuilding.type))
+            if (checkLocation(newDestination))
             {
-
-                GameObject finalBuilding = CreateFinalBuilding(_newBuilding.race, _newBuilding.type);
-                //TODO : (hermetico) restar recursos necesarios para crear el building
-                if (_newBuilding.type == Storage.BuildingTypes.STRONGHOLD)
+                if (isAffordable(_newBuilding.race, _newBuilding.type))
                 {
-                    grid.reservePositionForStronghold(_newBuilding.building.gameObject.transform.position);
-                }
-                grid.reservePosition(newDestination);
-                newDestination.y -= yoffset - 0.1f;
-                finalBuilding.transform.position = newDestination;
-                finalBuilding.transform.rotation = _newBuilding.ghost.transform.rotation;
 
-                //TODO : check another way to get the IGameEntity
-                
-               // IGameEntity entity = finalBuilding.gameObject.GetComponent<IGameEntity>(); // Esto no iria así ? (Ferran)
-                IGameEntity entity = finalBuilding.GetComponent<IGameEntity>();
-                _player.addEntity(entity);
+                    GameObject finalBuilding = CreateFinalBuilding(_newBuilding.race, _newBuilding.type);
+                    //TODO : (hermetico) restar recursos necesarios para crear el building
+                    if (_newBuilding.type == Storage.BuildingTypes.STRONGHOLD)
+                    {
+                        grid.reservePositionForStronghold(_newBuilding.building.gameObject.transform.position);
+                    }
+                    grid.reservePosition(newDestination);
+                    newDestination.y -= yoffset - 0.1f;
+                    finalBuilding.transform.position = newDestination;
+                    finalBuilding.transform.rotation = _newBuilding.ghost.transform.rotation;
 
-                if (!_newBuilding.continuousConstruction)
-                {
-                    // remaining operations
-                    _finishPlacing();
-                    return true;
+                    //TODO : check another way to get the IGameEntity
+
+                    // IGameEntity entity = finalBuilding.gameObject.GetComponent<IGameEntity>(); // Esto no iria así ? (Ferran)
+                    IGameEntity entity = finalBuilding.GetComponent<IGameEntity>();
+                    BasePlayer.player.addEntity(entity);
+
+                    if (!_newBuilding.continuousConstruction)
+                    {
+                        // remaining operations
+                        _finishPlacing();
+                        return true;
+                    }
+                    else
+                        return false;
                 }
                 else
+                {
+                    if (!IsEnoughFood)
+                        notifier.DisplayNotEnoughResources(WorldResources.Type.FOOD);
+                    if (!IsEnoughMetal)
+                        notifier.DisplayNotEnoughResources(WorldResources.Type.METAL);
+                    if (!IsEnoughWood)
+                        notifier.DisplayNotEnoughResources(WorldResources.Type.WOOD);
                     return false;
+                }
             }
             else
             {
-                if (!IsEnoughFood)
-                    notifier.DisplayNotEnoughResources(WorldResources.Type.FOOD);
-                if (!IsEnoughMetal)
-                    notifier.DisplayNotEnoughResources(WorldResources.Type.METAL);
-                if (!IsEnoughWood)
-                    notifier.DisplayNotEnoughResources(WorldResources.Type.WOOD);
                 return false;
             }
+            
 
         }
 

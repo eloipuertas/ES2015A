@@ -20,12 +20,16 @@ public class ConstructionGrid : MonoBehaviour
     Terrain terrain;
     TerrainData data;
     TreeInstance[] trees;
-
+    FOWManager fow;
     void Awake()
     {
         instance = this;
     }
 
+    void Start()
+    {
+        fow = FOWManager.Instance;
+    }
 
     /// <returns></returns>
 	public Vector3 discretizeMapCoords(Vector3 position)
@@ -36,7 +40,6 @@ public class ConstructionGrid : MonoBehaviour
         discretizedCoords.y = position.y;
         return discretizedCoords;
     }
-
     /*
     void Update()
     {
@@ -117,10 +120,10 @@ public class ConstructionGrid : MonoBehaviour
 
         float min_height = heights.Min();
 
-        if (min_height < 79.0f)
+        /*if (min_height < 79.0f)
         {
             return false;
-        }
+        }*/
 
         float difference = max_height - min_height;
 
@@ -132,15 +135,22 @@ public class ConstructionGrid : MonoBehaviour
     /// </summary>
     /// <param name="discretizedPosition"></param>
     /// <returns></returns>
-    public bool isNewPositionAbleForConstrucction(Vector3 discretizedPosition, bool checkFlat = true)
+    public bool isNewPositionAbleForConstrucction(Vector3 discretizedPosition,bool checkFoW, bool checkFlat = true)
     {
-
+        Vector2 vec2 = new Vector2(discretizedPosition.x, discretizedPosition.z);
         //If this position is contained on the array return false
-        if (reservedPositions.Contains(new Vector2(discretizedPosition.x, discretizedPosition.z)))
+        if (reservedPositions.Contains(vec2))
         {
             return false;
         }
 
+        //Check FOW
+        Rect square = new Rect(vec2, dimensions);
+        //If we haven't explored this position
+        if(checkFoW && !fow.isThereinRect(square,FOWManager.visible.visible))
+        {
+            return false;
+        }
         //next check if the zone is flat enought for construction
         if (checkFlat)
         {
@@ -214,7 +224,7 @@ public class ConstructionGrid : MonoBehaviour
         {
             i++;
 
-            if (isNewPositionAbleForConstrucction(discretizeMapCoords(possibilities[i])))
+            if (isNewPositionAbleForConstrucction(discretizeMapCoords(possibilities[i]),false))
 
             {
                 found = true;

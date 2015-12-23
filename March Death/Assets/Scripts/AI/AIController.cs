@@ -42,11 +42,12 @@ namespace Assets.Scripts.AI
         
         public bool FinishPlaying { get { return missionStatus.isGameOver(); } }
         public bool hasStronghold { get; set; }
+        public bool StoryMode { get; private set; }
 
         public override void Start()
         {
             base.Start();
-            DifficultyLvl = 2; //TODO remove when this gets assigned from the menu
+            DifficultyLvl = info.Difficulty;
             _selfRace = info.GetPlayerRace() == Races.MEN ? Races.ELVES : Races.MEN;
 
             //Init lists
@@ -64,10 +65,11 @@ namespace Assets.Scripts.AI
             rootBasePosition = new Vector3(pos.X, 80, pos.Y);
             buildPosition = rootBasePosition;
             Macro = new MacroManager(this);
+            StoryMode = Macro.architect.constructionGrid.mode != AIMode.BATTLE;
             Micro = new MicroManager(this);
-            modules.Add(new AIModule(Macro.MacroHigh, Macro.architect.constructionGrid.mode == AIMode.BATTLE ? 30 : 1));
-            modules.Add(new AIModule(Macro.MacroLow, 5));
-            modules.Add(new AIModule(Micro.Micro, 1));
+            modules.Add(new AIModule(Macro.MacroHigh, !StoryMode ? (39 - DifficultyLvl*3) : 1));
+            modules.Add(new AIModule(Macro.MacroLow, 8 - DifficultyLvl));
+            modules.Add(new AIModule(Micro.Micro,  4 - DifficultyLvl));
             timers = new float[modules.Count];
             hasStronghold = true;
             for (int i = 0; i < modules.Count; i++)

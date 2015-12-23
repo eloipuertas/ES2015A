@@ -70,19 +70,14 @@ public partial class InformationController : MonoBehaviour
         squadsButtonSize = new Vector2(panelSize.x / squadsColumns, panelSize.y / squadsRows);
         squadsInitialPoint = new Vector2(center.x - panelSize.x / 2, center.y + panelSize.y / 2);
         MAX_SQUADS_BUTTONS = squadsColumns * squadsRows;
-
-        //Inicializate parameters for unit creation buttons
+		
 		rectTransform = GameObject.Find("Information").transform.FindChild("UnitCreationPanel").GetComponent<RectTransform>();
 		panelSize = rectTransform.sizeDelta;
 		center = rectTransform.position;
 		globalScaleXY = new Vector2(rectTransform.lossyScale.x, rectTransform.lossyScale.y);
-
-        //FIXME Bug after merge
-        Vector2 unitCreationPanel;
         unitCreationPanel = Vector2.Scale(panelSize, globalScaleXY);
 		creationQueueButtonSize = new Vector2(unitCreationPanel.x / 5, unitCreationPanel.y);
 		creationQueueInitialPoint = new Vector2(center.x - unitCreationPanel.x, center.y + unitCreationPanel.y);
-        
 
         //Inicializate window extended info
         windowInfo = GameObject.Find("HUD/windowInfo");

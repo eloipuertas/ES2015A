@@ -33,20 +33,25 @@ class LightHouseRevealer : MonoBehaviour
 
         transform.position = transform.parent.position;
         _race = transform.parent.GetComponent<Barrack>().getRace();
-        _attacker = transform.parent.GetComponent<Unit>();
+        //_attacker = transform.parent.GetComponent<Unit>();
 
         _revealer = GetComponent<FOWEntity>();
         _revealer.Activate(_race);
 
         _light = transform.parent.FindChild("LightHouse-Detector").gameObject;
+        _attacker = transform.parent.FindChild("LightHouse-Detector").GetComponent<Unit>();
         _light.SetActive(false);
 
         transform.parent.GetComponent<Barrack>().register(Barrack.Actions.BUILDING_FINISHED, OnBuildingFinished);
+        transform.parent.GetComponent<Barrack>().register(Barrack.Actions.DESTROYED, OnBuildingDestroyed);
         _target = null;
 
     }
 
-
+    public void OnBuildingDestroyed(System.Object obj)
+    {
+        _attacker.stopAttack();
+    }
 
     public virtual void Update()
     {

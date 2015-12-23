@@ -2,6 +2,8 @@
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
+
 using Utils;
 using Storage;
 using Pathfinding;
@@ -183,10 +185,9 @@ public class Unit : GameEntity<Unit.Actions>
     /// <param name="gob"></param>
     private void onTargetDied(System.Object obj)
     {
-        setStatus(EntityStatus.IDLE);
-        // TODO: After merge, I had a conflich in this line and I hesitated what to do
         fire(Actions.TARGET_TERMINATED, obj);
 
+        setStatus(EntityStatus.IDLE);
         _target = null;
     }
 
@@ -209,7 +210,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     protected override void onReceiveDamage()
 	{
-		base.onReceiveDamage ();
+		base.onReceiveDamage();
         fire(Actions.DAMAGED);
     }
 
@@ -218,6 +219,8 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     protected override void onFatalWounds()
     {
+        setStatus(EntityStatus.DEAD);
+
         fire(Actions.EXTERMINATED, (IGameEntity)this);
         
         ResourcesEvents.get.unregisterUnitToEvents(this);
@@ -226,6 +229,14 @@ public class Unit : GameEntity<Unit.Actions>
         _target = null;
 
         fire(Actions.DIED);
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+
+        Assert.IsTrue(_target == null);
+        Assert.IsTrue(status == EntityStatus.DEAD);
     }
 
     /// <summary>
@@ -326,21 +337,34 @@ public class Unit : GameEntity<Unit.Actions>
     /// <returns>Returns true if target is in range, false otherwise</returns>
     public bool attackTarget<A>(GameEntity<A> entity, bool selfDefense) where A : struct, IConvertible
     {
+        // HACK: Ideally, we should not have to consider an special case for WatchTower / LightHouse Revealer
+        if (entity.info.isPseudoUnit)
+        {
+            Barrack barrack = entity.transform.GetComponentInParent<Barrack>();
+            if (barrack.status != EntityStatus.DESTROYED)
+            {
+                return attackTarget(barrack, selfDefense);
+            }
+
+            return false;
+        }
+
         // Note: Cast is redundant but avoids warning
         if (_target != (IGameEntity)entity)
         {
+            // Stop attacking current target
+            Selectable selectable = null;
+            if (status == EntityStatus.ATTACKING)
+            {
+                selectable = _target.getGameObject().GetComponent<Selectable>();
+                selectable.NotAttackedEntity();
+                stopAttack();
+            }
+
             // Register for DEAD/DESTROYED and HIDDEN
             _auto += entity.registerFatalWounds(onTargetDied);
             _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
-
-            // if target has changed, hide old target health
-            Selectable selectable = null;
-            if (_target != null)
-            {
-            	selectable = _target.getGameObject().GetComponent<Selectable>();
-            	selectable.NotAttackedEntity();
-            }
-
+            
             _target = entity;
             _selfDefense = selfDefense;
             _lastAttack = Time.time - (1f / info.unitAttributes.attackRate);
@@ -633,7 +657,7 @@ public class Unit : GameEntity<Unit.Actions>
             collectable.entity = this;
             collectable.goods = new Goods();
             collectable.goods.type = WorldResources.Type.FOOD;
-            collectable.goods.amount = info.unitAttributes.foodConsumption;
+            collectable.goods.amount = info.unitAttributes.foodConsumption * RESOURCES_UPDATE_INTERVAL;
 
             fire(Actions.EAT, collectable);
         }
@@ -672,20 +696,24 @@ public class Unit : GameEntity<Unit.Actions>
                             if (_projectileThrown) {
                                 _projectileThrown = false;
                             } else {
+
                                 _projectileThrown = true;
-                                Vector3 projectile_position = new Vector3(transform.position.x, transform.position.y + GetComponent<Collider>().bounds.size.y, transform.position.z);
-                                GameObject projectile = Info.get.createProjectile(projectile_position, transform.rotation);
-                                //FIXME bug after merge
-                                //Projectile projectile_cl = projectile.GetComponent<Projectile>();
-                                Vector3 projectileEndPoint = new Vector3(_target.getTransform().position.x, _target.getTransform().position.y + _target.getGameObject().GetComponent<Collider>().bounds.size.y, _target.getTransform().position.z);
-                                //FIXME bug after merge
-                                //projectile_cl.setProps(projectileEndPoint, this, info.unitAttributes.projectileSpeed, info.unitAttributes.projectileRadius);
+                                Vector3 projectile_position, projectileEndPoint;
+
+                                projectileEndPoint = _target.getTransform().position;
+                                // move the projectile a bit from the center towards the _target
+                                projectile_position = Vector3.MoveTowards(transform.position, projectileEndPoint, info.unitAttributes.projectileOffset);
+                                // we now can define a scale for the projectile
+                                GameObject projectile = Info.get.createProjectile(projectile_position, transform.rotation, info.unitAttributes.projectileScale);
+                                Projectile projectile_cl = projectile.GetComponent<Projectile>();
+                                projectile_cl.setProps(projectileEndPoint, this, info.unitAttributes.projectileSpeed, info.unitAttributes.projectileRadius);
                                 _lastAttack = Time.time;
                             }
                         } else {
                             while (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate)) {
                                 // Target might be null if inside the while the target unit is killed
-                                if (_target != null) {
+                                if (_target != null)
+                                {
                                     _target.receiveAttack(this, canDoRangedAttack());
                                 }
 
@@ -749,7 +777,7 @@ public class Unit : GameEntity<Unit.Actions>
                     // When capture distance is reached resource building capture
                     // method is triggered.
 
-                    if (_target.info.race == this.race)
+                    if (_target.info.race == this.race && !isImmobile)
                     {
                         if (_distanceToTarget <= _target.info.resourceAttributes.trapRange)
 

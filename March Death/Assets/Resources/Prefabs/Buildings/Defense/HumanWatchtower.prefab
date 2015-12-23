@@ -3000,6 +3000,8 @@ GameObject:
   - 108: {fileID: 10824380}
   - 135: {fileID: 13527566}
   - 114: {fileID: 11436672}
+  - 95: {fileID: 9590962}
+  - 114: {fileID: 11429570}
   m_Layer: 2
   m_Name: LightHouse-Detector
   m_TagString: Untagged
@@ -4504,7 +4506,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 184004}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 689.198242, y: 79.0026245, z: 823.875977}
+  m_LocalPosition: {x: 284.458801, y: 79.0026245, z: 550.214966}
   m_LocalScale: {x: 2, y: 2.20000005, z: 2}
   m_Children:
   - {fileID: 495766}
@@ -5610,7 +5612,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 162084}
-  m_LocalRotation: {x: .642431676, y: .642431736, z: -.295434356, w: -.295434445}
+  m_LocalRotation: {x: .642431736, y: .642431796, z: -.295434386, w: -.295434475}
   m_LocalPosition: {x: -1.46182203, y: 5.44527435, z: -1.09159517}
   m_LocalScale: {x: 6.88587618, y: 91.1731644, z: 89.0733414}
   m_Children: []
@@ -6160,6 +6162,23 @@ Animator:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 184004}
+  m_Enabled: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 1f8f7e9f33186a846a5bb32e952ec12b, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+--- !u!95 &9590962
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 194280}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 1f8f7e9f33186a846a5bb32e952ec12b, type: 2}
@@ -6215,6 +6234,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   race: 0
   type: 10
+--- !u!114 &11429570
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 194280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40d423a6be68c17458a847c1bf328e80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 0
+  type: 8
+  gender: 0
+  _distanceToTarget: 0
 --- !u!114 &11434516
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -6285,7 +6319,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 184004}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 40d423a6be68c17458a847c1bf328e80, type: 3}
   m_Name: 
@@ -6558,7 +6592,7 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: .00313186646, y: 7.36713409e-05, z: -9.53674316e-07}
+    m_Center: {x: .00313234329, y: 7.36713409e-05, z: 0}
     m_Extent: {x: .00766438525, y: .0109999646, z: .00630623568}
   m_DirtyAABB: 0
 --- !u!183 &18314540
@@ -9367,7 +9401,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: Range

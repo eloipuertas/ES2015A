@@ -72,6 +72,10 @@ namespace Assets.Scripts.AI
                 planifyBuildingsAccordingToDifficulty();
                 readMapData();
             }
+            else
+            {
+                buildingPrefs = new List<BuildingTypes>();
+            }
         }
 
 
@@ -90,6 +94,7 @@ namespace Assets.Scripts.AI
             foreach (GameObject pos in buildingsPositions)
             {
                 ai.CreateBuilding(getRandomBuildingType(typesToPlace), pos.gameObject.transform.position, Quaternion.Euler(0, buildingAngle, 0), this);
+                constructionGrid.reservePosition(constructionGrid.discretizeMapCoords(pos.gameObject.transform.position));
                 buildingsPlaced++;
                 pos.transform.localScale = Vector3.zero;
             }
@@ -237,7 +242,7 @@ namespace Assets.Scripts.AI
                     processingPos = constructionGrid.discretizeMapCoords(processingPos);
 
                     //In order to be more flexible we need to check if we can construct
-                    if (!constructionGrid.isNewPositionAbleForConstrucction(processingPos))
+                    if (!constructionGrid.isNewPositionAbleForConstrucction(processingPos,false))
                     {
                         continue;
                     }
@@ -393,7 +398,7 @@ namespace Assets.Scripts.AI
             {
                 int pos = UnityEngine.Random.Range(0, positionsForType.Count);
                 // Recheck positions in order to know if player has constructed on this position
-                if (constructionGrid.isNewPositionAbleForConstrucction(positionsForType[pos]))
+                if (constructionGrid.isNewPositionAbleForConstrucction(positionsForType[pos],false))
                 {
                     requestedPosition = positionsForType[pos];
                     found = true;
@@ -434,6 +439,7 @@ namespace Assets.Scripts.AI
                     }
                 }
                 ai.CreateBuilding(buildingPrefs[0], position, Quaternion.Euler(0, buildingAngle, 0), this);
+                constructionGrid.reservePosition(constructionGrid.discretizeMapCoords(position));
                 buildingPrefs.RemoveAt(0);
                 buildingsPlaced++;
             }

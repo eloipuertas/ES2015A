@@ -143,18 +143,24 @@ namespace Assets.Scripts.AI
             {
                 architect.constructNextBuilding();
             }
-            foreach (Resource r in ai.OwnResources)
+            if(!ai.StoryMode || ai.Workers.Count < 20)
             {
-                if (r.harvestUnits < r.maxHarvestUnits)
-                    r.newCivilian();
-            }
-            UnitTypes bUnit = (UnitPref.Aggregate((a, b) => a.Value > b.Value ? a : b)).Key;
-            BuildingTypes needed = unitToBuildMap[bUnit];
-            foreach (Barrack b in ai.OwnBarracks)
-            {
-                if (b.type == needed)
+                foreach (Resource r in ai.OwnResources)
                 {
-                    UnitPref[bUnit] += (b.addUnitQueue(bUnit)) ? -3 : 0;
+                    if (r.harvestUnits < r.maxHarvestUnits)
+                        r.newCivilian();
+                }
+            }
+            if (!ai.StoryMode || ai.Army.Count < 20)
+            {
+                UnitTypes bUnit = (UnitPref.Aggregate((a, b) => a.Value > b.Value ? a : b)).Key;
+                BuildingTypes needed = unitToBuildMap[bUnit];
+                foreach (Barrack b in ai.OwnBarracks)
+                {
+                    if (b.type == needed)
+                    {
+                        UnitPref[bUnit] += (b.addUnitQueue(bUnit)) ? -3 : 0;
+                    }
                 }
             }
         }

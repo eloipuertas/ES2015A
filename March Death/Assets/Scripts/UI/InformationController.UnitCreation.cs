@@ -14,7 +14,7 @@ public partial class InformationController : MonoBehaviour {
 	//objects for creation units queue
 	Vector2 creationQueueButtonSize;
 	Vector2 creationQueueInitialPoint;
-	Vector2 scaledUnitCreationPanel;
+	Vector2 unitCreationPanel;
 	Resource currentResource;
 	Barrack currentBarrack;
 
@@ -60,8 +60,8 @@ public partial class InformationController : MonoBehaviour {
 			for (int i = 0; i < creationUnitQueue.Length; i++) {
 				UnitTypes type = creationUnitQueue[i];
 				Vector2 buttonCenter = new Vector2();
-				buttonCenter.x = creationQueueInitialPoint.x + scaledUnitCreationPanel.x / 2f + (creationQueueButtonSize.x * i) + creationQueueButtonSize.x / 2f;
-				buttonCenter.y = creationQueueInitialPoint.y - scaledUnitCreationPanel.y;
+				buttonCenter.x = creationQueueInitialPoint.x + unitCreationPanel.x / 2f + (creationQueueButtonSize.x * i) + creationQueueButtonSize.x / 2f;
+				buttonCenter.y = creationQueueInitialPoint.y - unitCreationPanel.y;
 				GameObject button = CreateCreationUnitButton(buttonCenter, type, i);
 				creationQueueButtons.Add(button);
 			}

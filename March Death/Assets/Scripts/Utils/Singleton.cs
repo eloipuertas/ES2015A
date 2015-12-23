@@ -47,6 +47,11 @@ namespace Utils
                 return instance;
             }
         }
+
+        public virtual void Clear()
+        {
+            instance = null;
+        }
     }
 
 }

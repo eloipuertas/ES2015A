@@ -1,5 +1,5 @@
 using System;
-﻿using Storage;
+using Storage;
 using Utils;
 
 // Values are set only for clarity purposes on the Animator

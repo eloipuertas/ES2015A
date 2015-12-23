@@ -28,7 +28,17 @@ namespace Storage
         {
             get
             {
-                return entityType == EntityType.UNIT;
+                return entityType == EntityType.UNIT && 
+                    ((UnitInfo)this).type != UnitTypes.LIGHTHOUSE_REVEALER;
+            }
+        }
+
+        public bool isPseudoUnit
+        {
+            get
+            {
+                return entityType == EntityType.UNIT &&
+                    ((UnitInfo)this).type == UnitTypes.LIGHTHOUSE_REVEALER;
             }
         }
 
@@ -106,7 +116,7 @@ namespace Storage
         {
             get
             {
-                if (!isUnit)
+                if (!isUnit && !isPseudoUnit)
                 {
                     return null;
                 }

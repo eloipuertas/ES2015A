@@ -70,7 +70,7 @@ public class Projectile : MonoBehaviour
         
         foreach (IGameEntity inRadiusObject in objectsInRadius.ToArray())
         {
-            if (inRadiusObject.status != EntityStatus.DEAD)
+            if (inRadiusObject.status != EntityStatus.DEAD && !inRadiusObject.info.isPseudoUnit)
             {
                 //Debug.Log(inRadiusObject);
                 inRadiusObject.receiveAttack(_owner, _owner.canDoRangedAttack());

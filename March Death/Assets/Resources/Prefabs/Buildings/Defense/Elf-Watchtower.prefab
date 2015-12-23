@@ -2241,6 +2241,8 @@ GameObject:
   - 108: {fileID: 10805986}
   - 135: {fileID: 13545120}
   - 114: {fileID: 11470546}
+  - 95: {fileID: 9568306}
+  - 114: {fileID: 11435752}
   m_Layer: 2
   m_Name: LightHouse-Detector
   m_TagString: Untagged
@@ -3975,7 +3977,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 189714}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 6.34000015, z: 0}
+  m_LocalPosition: {x: 0, y: 8.43999958, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 493856}
@@ -4375,7 +4377,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 185688}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 300.125092, y: -44.003479, z: 227.565063}
+  m_LocalPosition: {x: 485.706665, y: -43.9973755, z: 518.660767}
   m_LocalScale: {x: 2, y: 2.20000005, z: 2}
   m_Children:
   - {fileID: 475374}
@@ -4926,7 +4928,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 7.5, y: 10, z: 7.5}
+  m_Size: {x: 5.11000013, y: 12.7299995, z: 5.63999987}
   m_Center: {x: 0, y: 5, z: 0}
 --- !u!95 &9563846
 Animator:
@@ -4935,6 +4937,23 @@ Animator:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 185688}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 2eb75c47113b76d40a4d64ca9e1c4149, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+--- !u!95 &9568306
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 189714}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 2eb75c47113b76d40a4d64ca9e1c4149, type: 2}
@@ -5043,6 +5062,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider: {fileID: 0}
+--- !u!114 &11435752
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 189714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40d423a6be68c17458a847c1bf328e80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  race: 1
+  type: 8
+  gender: 0
+  _distanceToTarget: 0
 --- !u!114 &11453332
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -5073,7 +5107,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 185688}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 40d423a6be68c17458a847c1bf328e80, type: 3}
   m_Name: 
@@ -5126,8 +5160,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -.000770971179, y: .0013229847, z: 1.12056732e-05}
-    m_Extent: {x: .0109024849, y: .0113814427, z: 2.18122387e-09}
+    m_Center: {x: -.000771000981, y: .0013229847, z: 1.09672546e-05}
+    m_Extent: {x: .0109024849, y: .0113812666, z: 2.18120522e-09}
   m_DirtyAABB: 0
 --- !u!137 &13787910
 SkinnedMeshRenderer:
@@ -7673,7 +7707,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: type
-      value: 8
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: race
@@ -7702,6 +7736,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: Range
       value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: _distanceToTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

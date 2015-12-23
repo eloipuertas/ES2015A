@@ -118,7 +118,10 @@ public class GameSetupScript : MonoBehaviour
             {
                 Destroy(menuMusic);
             }
-            Application.LoadLevel(3);
+            if (info.getGameMode() == GameInformation.GameMode.SKIRMISH)
+                Application.LoadLevel("ES2015A");
+            else
+                Instantiate(Resources.Load("welcomeStory")).name = "Welcome-Screen";
         }
         else
         {
@@ -133,6 +136,7 @@ public class GameSetupScript : MonoBehaviour
 
     public void Cancel()
     {
+        Destroy(info.gameObject);
         Application.LoadLevel(0);
     }
 }

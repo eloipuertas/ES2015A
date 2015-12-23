@@ -38,6 +38,10 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
     public static AIController ia { get { return (AIController)_ia; } }
 
     protected int playerId = 0;
+    /// <summary>
+    /// Sets the player ID. Make sure to use a number greater than zero.
+    /// </summary>
+    /// <value>The player I.</value>
     public int PlayerID { set { playerId = value; } }
 
     protected MissionStatus missionStatus;
@@ -108,16 +112,23 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
             position.y = terrain.SampleHeight(position);
             created = _buildings.createBuilding(position, Quaternion.Euler(0,0,0),
                                         building.type.building,
-                                        _selfRace, 1.0f);
+                                        _selfRace, false, 1.0f);
 
-            IGameEntity entity = created.GetComponent<IGameEntity>();
-            if (building.hasStatus)
+            if (created)
             {
-                entity.DefaultStatus = building.status;
-                entity.setStatus(building.status);
-            }
+                IGameEntity entity = created.GetComponent<IGameEntity>();
+                if (building.hasStatus)
+                {
+                    entity.DefaultStatus = building.status;
+                    entity.setStatus(building.status);
+                }
 
-            AddBuilding(entity);
+                AddBuilding(entity);
+            }
+            else
+            {
+                Debug.LogWarning("Could not create Building: " + building + "\nPosition: " + position);
+            }
         }
     }
 

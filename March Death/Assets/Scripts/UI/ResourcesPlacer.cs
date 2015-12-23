@@ -197,7 +197,7 @@ public class ResourcesPlacer
             return;
         }
 
-        EntityAbilitiesController.ControlButtonsInteractability();
+        EntityAbilitiesController.get.ControlButtonsInteractability();
 
         for (int i = 0; i < txt_names.Length; i++)
         {

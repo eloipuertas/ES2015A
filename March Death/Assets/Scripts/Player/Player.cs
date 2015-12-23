@@ -92,35 +92,67 @@ public class Player : BasePlayer
             {
                 if (missionStatus.hasWon(playerId))
                 {
-                    switch (_selfRace)
+                    if (_info.getGameMode() == GameInformation.GameMode.SKIRMISH)
                     {
-                        case Storage.Races.MEN:
-                            gameOverDialog = (GameObject) Resources.Load("GameEndWinHuman");
-                            break;
-                        case Storage.Races.ELVES:
-                            gameOverDialog = (GameObject) Resources.Load("GameEndWinElf");
-                            break;
+                        switch (_selfRace)
+                        {
+                            case Storage.Races.MEN:
+                                gameOverDialog = (GameObject) Resources.Load("GameEndWinHuman");
+                                break;
+                            case Storage.Races.ELVES:
+                                gameOverDialog = (GameObject) Resources.Load("GameEndWinElf");
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        gameOverDialog = GetCampaignVictoryDialog();
                     }
                 }
                 else
                 {
-                    switch (_selfRace)
+                    if (_info.getGameMode() == GameInformation.GameMode.SKIRMISH)
                     {
-                        case Storage.Races.MEN:
-                            gameOverDialog = (GameObject) Resources.Load("GameOver-Human");
-                            break;
-                        case Storage.Races.ELVES:
-                            gameOverDialog = (GameObject) Resources.Load("GameOver-Elf");
-                            break;
+                        switch (_selfRace)
+                        {
+                            case Storage.Races.MEN:
+                                gameOverDialog = (GameObject) Resources.Load("GameOver-Human");
+                                break;
+                            case Storage.Races.ELVES:
+                                gameOverDialog = (GameObject) Resources.Load("GameOver-Elf");
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        gameOverDialog = (GameObject) Resources.Load("mission_failure");
                     }
                 }
                 gameOverDialog = Instantiate(gameOverDialog);
+                gameOverDialog.name = MissionScreen.SCREEN_NAME;
                 gameOverDialog.SetActive(false);
                 isGameOverScreenDisplayed = true;
             }
             ShowGameOverDialog();
             _currently = status.TERMINATED;
         }
+    }
+
+    private GameObject GetCampaignVictoryDialog()
+    {
+        GameObject obj = null;
+        switch (Application.loadedLevel)
+        {
+            case 3:         // First Story Scene
+            case 4:         // Second Story Scene
+            case 5:         // Third Story Scene
+                obj = (GameObject) Resources.Load("mission_complete");
+                break;
+            case 6:         // Fourth Story Scene
+                obj = (GameObject) Resources.Load ("victory_campaign");
+                break;
+        }
+        return obj;
     }
 
     private void ShowGameOverDialog()
@@ -156,8 +188,10 @@ public class Player : BasePlayer
     {
         _activeEntities.Add(newEntity);
         registerEntityEvents(newEntity);
+
         if (newEntity.info.isBuilding)
             events.DisplayBuildingUnderConstruction((Storage.BuildingInfo) newEntity.info);
+
         Debug.Log(_activeEntities.Count + " entities");
     }
 
