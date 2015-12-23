@@ -173,7 +173,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         else
         {
             Vector3 direction = (colliderPoint - point).normalized;
-            Vector3 size = (transform.rotation * _obstacle.Size) - COLLIDER_CORRECTION_FACTOR;
+            Vector3 size = _obstacle.Size;
             Vector3 factor = Vector3.Scale(direction, size - _collider.bounds.size);
 
             return colliderPoint - factor;
