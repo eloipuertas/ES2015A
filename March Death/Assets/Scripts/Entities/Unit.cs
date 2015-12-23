@@ -2,6 +2,8 @@
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
+
 using Utils;
 using Storage;
 using Pathfinding;
@@ -209,7 +211,7 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     protected override void onReceiveDamage()
 	{
-		base.onReceiveDamage ();
+		base.onReceiveDamage();
         fire(Actions.DAMAGED);
     }
 
@@ -218,6 +220,8 @@ public class Unit : GameEntity<Unit.Actions>
     /// </summary>
     protected override void onFatalWounds()
     {
+        setStatus(EntityStatus.DEAD);
+
         fire(Actions.EXTERMINATED, (IGameEntity)this);
         
         ResourcesEvents.get.unregisterUnitToEvents(this);
@@ -226,6 +230,14 @@ public class Unit : GameEntity<Unit.Actions>
         _target = null;
 
         fire(Actions.DIED);
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+
+        Assert.IsTrue(_target == null);
+        Assert.IsTrue(status == EntityStatus.DEAD);
     }
 
     /// <summary>
@@ -693,7 +705,8 @@ public class Unit : GameEntity<Unit.Actions>
                         } else {
                             while (Time.time - _lastAttack >= (1f / info.unitAttributes.attackRate)) {
                                 // Target might be null if inside the while the target unit is killed
-                                if (_target != null) {
+                                if (_target != null)
+                                {
                                     _target.receiveAttack(this, canDoRangedAttack());
                                 }
 

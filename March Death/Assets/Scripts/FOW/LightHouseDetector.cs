@@ -82,11 +82,7 @@ class LightHouseDetector : MonoBehaviour
     public void OnUnitDied(object obj)
     {
         IGameEntity entity = ((GameObject)obj).GetComponent<IGameEntity>();
-        if (IsTarget(entity) && _targets.Contains(entity))
-        {
-            RemoveTarget(entity);
-        }
-
+        RemoveTarget(entity);
     }
 
 
@@ -119,7 +115,7 @@ class LightHouseDetector : MonoBehaviour
 
         if (_currentTarget == entity.getGameObject())
         {
-            if (_targets.Any())
+            if (_targets.Count > 0)
             {
                 _currentTarget = _targets[0].getGameObject();
                 _revealer.FocusTarget(_currentTarget.GetComponent<IGameEntity>());
@@ -140,8 +136,7 @@ class LightHouseDetector : MonoBehaviour
     /// <param name="entity"></param>
     public void RegisterEvents(IGameEntity entity)
     {
-        Unit unit = (Unit)entity;
-        unit.register(Unit.Actions.DIED, OnUnitDied);
+        entity.registerFatalWounds(OnUnitDied);
     }
 
     /// <summary>
@@ -150,21 +145,15 @@ class LightHouseDetector : MonoBehaviour
     /// <param name="entity"></param>
     public void UnregisterEvents(IGameEntity entity)
     {
-        Unit unit = (Unit)entity;
-        unit.unregister(Unit.Actions.DIED, OnUnitDied);
+        entity.unregisterFatalWounds(OnUnitDied);
     }
 
     void OnDestroy()
     {
-        if (_targets.Any())
+        foreach (IGameEntity entity in _targets)
         {
-            foreach (IGameEntity entity in _targets)
-            {
-                Unit unit = (Unit)entity;
-                unit.unregister(Unit.Actions.DIED, OnUnitDied);
-            }
+            UnregisterEvents(entity);
         }
-
     }
 
     #region INFO
