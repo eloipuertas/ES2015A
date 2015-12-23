@@ -117,7 +117,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         Ability ability = (Ability)obj;
         int addOrSubs = ability.isActive ? 1 : -1;
 
-        if (info.isUnit)
+        if (info.isUnit || info.isPseudoUnit)
         {
             ((UnitAbility)_accumulatedModifier).weaponAbilityModifier =
                  addOrSubs * ability.info<UnitAbility>().weaponAbilityModifier;
@@ -208,7 +208,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     /// </summary>
     protected void setupAbilities()
     {
-        if (info.isUnit)
+        if (info.isUnit || info.isPseudoUnit)
         {
             _accumulatedModifier = new UnitAbility();
         }

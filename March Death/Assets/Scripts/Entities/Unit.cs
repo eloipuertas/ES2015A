@@ -326,23 +326,24 @@ public class Unit : GameEntity<Unit.Actions>
     /// <returns>Returns true if target is in range, false otherwise</returns>
     public bool attackTarget<A>(GameEntity<A> entity, bool selfDefense) where A : struct, IConvertible
     {
+        if (entity.info.isPseudoUnit)
+        {
+            return attackTarget(entity.transform.GetComponentInParent<Barrack>(), selfDefense);
+        }
+
         // Note: Cast is redundant but avoids warning
         if (_target != (IGameEntity)entity)
         {
             // Register for DEAD/DESTROYED and HIDDEN
             _auto += entity.registerFatalWounds(onTargetDied);
-            if (entity.GetComponent<FOWEntity>() != null)
-            {
-                _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
-            }
-            
+            _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
 
             // if target has changed, hide old target health
             Selectable selectable = null;
             if (_target != null)
             {
             	selectable = _target.getGameObject().GetComponent<Selectable>();
-                if (selectable!=null) selectable.NotAttackedEntity();
+            	selectable.NotAttackedEntity();
             }
 
             _target = entity;
@@ -351,7 +352,7 @@ public class Unit : GameEntity<Unit.Actions>
 
             // Show target health
             selectable = _target.getGameObject().GetComponent<Selectable>();
-            if (selectable != null) selectable.AttackedEntity();
+            selectable.AttackedEntity();
 
             // Update distance for immediate usage (ie. canDoRangedAttack)
             updateDistanceToTarget();
