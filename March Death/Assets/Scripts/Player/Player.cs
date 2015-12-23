@@ -129,6 +129,7 @@ public class Player : BasePlayer
                     }
                 }
                 gameOverDialog = Instantiate(gameOverDialog);
+                gameOverDialog.name = MissionScreen.SCREEN_NAME;
                 gameOverDialog.SetActive(false);
                 isGameOverScreenDisplayed = true;
             }

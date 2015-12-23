@@ -327,25 +327,40 @@ public class GameInformation : MonoBehaviour
         return game;
     }
 
+    /// <summary>
+    /// Sets the battle with predefined parameters for the mission, player
+    /// settings, and resources.
+    /// </summary>
     private void hardcodedBattle()
     {
         game = new Battle();
+        // Sets the mission
         Battle.MissionDefinition.TargetType t = new Battle.MissionDefinition.TargetType();
         t.unit = UnitTypes.HERO;
         game.AddMission(Battle.MissionType.DESTROY, 1, EntityType.UNIT, t, 0, true, "");
+        // Initializes the human civilization
         Battle.PlayerInformation player = new Battle.PlayerInformation(Races.MEN);
-        player.AddBuilding(BuildingTypes.STRONGHOLD, 777, 779, EntityStatus.IDLE);
-        player.AddUnit(UnitTypes.HERO, 825.6648f, 806.5628f);
+        player.AddBuilding(BuildingTypes.STRONGHOLD, 752, 880, EntityStatus.IDLE);
+        player.AddUnit(UnitTypes.HERO, 764.9564f, 823.0175f);
         player.SetInitialResources(2000, 2000, 2000, 2000);
         game.AddPlayerInformation(player);
+        // Initializes the elven civilization
         player = new Battle.PlayerInformation(Races.ELVES);
         player.AddUnit(UnitTypes.HERO, 331.35f, 575.81f);
         player.AddBuilding(BuildingTypes.STRONGHOLD, 283.7f, 562.5f, EntityStatus.IDLE);
         player.SetInitialResources(2000, 2000, 2000, 2000);
         game.AddPlayerInformation(player);
+
         game.SetWorldResources(5000, 5000, 5000);
     }
 
+    /// <summary>
+    /// Initializes a player for a battle.
+    /// </summary>
+    /// <returns>The player.</returns>
+    /// <param name="race">The player's race.</param>
+    /// <param name="strongholdGameObject">Name of the game object placed where
+    /// the player's stronghold should be.</param>
     private Battle.PlayerInformation initializePlayer(Storage.Races race, string strongholdGameObject)
     {
         GameObject stronghold;
@@ -357,6 +372,9 @@ public class GameInformation : MonoBehaviour
         return player;
     }
 
+    /// <summary>
+    /// Sets the story battle: mission and world resources. Players must be set separately.
+    /// </summary>
     private void SetStoryBattle()
     {
         game = new Battle();
@@ -366,6 +384,9 @@ public class GameInformation : MonoBehaviour
         game.AddMission(Battle.MissionType.DESTROY, 1, EntityType.BUILDING, t, 0, true, "");
     }
 
+    /// <summary>
+    /// Sets the story players.
+    /// </summary>
     public void SetStoryPlayers()
     {
         setGameMode(GameMode.CAMPAIGN);
