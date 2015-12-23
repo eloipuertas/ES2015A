@@ -180,10 +180,6 @@ public class MiniMapController : MonoBehaviour
         v.y = Screen.height - v.y;
         r.center = v;
 
-        Debug.Log(corners_minimap[0]);
-        Debug.Log(corners_minimap[1]);
-        Debug.Log(" ");
-
         return r;
     }
 
