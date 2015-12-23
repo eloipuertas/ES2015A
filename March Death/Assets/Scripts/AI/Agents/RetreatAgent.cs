@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Pathfinding;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.AI.Agents
@@ -20,18 +21,12 @@ namespace Assets.Scripts.AI.Agents
 
         Rect enemySquadBoundingBox, ownSquadBoundingBox;
         Vector3 safeArea;
-        float minDistanceBetweenHeroAndNearestEnemy;
-
-
-        bool isHeroInDanger;
 
         public RetreatAgent(AIController ai, AttackAgent aA, AssistAgent assist, string name) : base(ai, name)
         {
             attackAgent = aA;
             enemySquadBoundingBox = new Rect();
             ownSquadBoundingBox = new Rect();
-            isHeroInDanger = false;
-            minDistanceBetweenHeroAndNearestEnemy = 0f;
 
             assistAgent = assist;
 
@@ -47,6 +42,25 @@ namespace Assets.Scripts.AI.Agents
 
             // Intentar Veure on hauria d'anar una unitat per estar protegida
             recalcSafePoint();
+            if (squad.UserData == this && squad.NotMoved)//If this was the last agent to take control and we haven't moved we probably did something wrong
+            {
+                Vector3 resPoint= Vector3.zero;
+                Vector3 squadCenter = new Vector3(ownSquadBoundingBox.center.x, safeArea.y, ownSquadBoundingBox.y);
+                Vector3 newPoint = Quaternion.Euler(0, 90, 0) * (safeArea - squadCenter) + squadCenter;
+                if (DetourCrowd.Instance.RandomValidPointInCircle(newPoint, 20,ref resPoint))
+                {
+                    safeArea = resPoint;
+                }
+                else
+                {
+                    //OH NO! CONCAVE GEOGRAPHY, MY ONLY WEAKNESS.
+                    //There is no safe point ahead, so let's just pray to the dice gods.
+                    if (DetourCrowd.Instance.RandomValidPointInCircle(squadCenter, 20, ref resPoint))
+                    {
+                        safeArea = resPoint;
+                    }
+                }
+            }
             foreach (Unit u in squad.Units)
             {
                 if (u.status != EntityStatus.DEAD)
@@ -65,11 +79,6 @@ namespace Assets.Scripts.AI.Agents
 
         public override int getConfidence(Squad squad)
         {
-            if (ai.EnemyUnits.Count == 0)
-                return 0;
-
-            minDistanceBetweenHeroAndNearestEnemy = 0;
-
             //Get the squad bounding box
             ownSquadBoundingBox = squad.BoundingBox.Bounds;
             int confidence = 0;
