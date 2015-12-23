@@ -101,6 +101,13 @@ public sealed class Squad : BareObserver<Squad.Actions>
             return _maxAttackRange;
         }
     }
+    public bool NotMoved
+    {
+        get
+        {
+            return ((BoundingBox)_data[DataType.BOUNDING_BOX]).notMoved;
+        }
+    }
     #endregion
 
     public Squad(Storage.Races race, bool smellEnemies = true)
@@ -370,9 +377,10 @@ public class BoundingBox : SquadData<BoundingBox.BoundingBoxHolder>
 
     private BoundingBoxHolder _boundingBox = new BoundingBoxHolder();
     public override BoundingBoxHolder Value { get { return _boundingBox; } }
-
+    public bool notMoved { get; set; }
     public BoundingBox(Squad squad) : base(squad)
     {
+        notMoved = true;
     }
 
     public static Rect CalculateOf(List<Unit> units)
@@ -400,6 +408,7 @@ public class BoundingBox : SquadData<BoundingBox.BoundingBoxHolder>
         if (_needsUpdate)
         {
             Rect boundingBox = CalculateOf(units);
+            notMoved = (Vector2.Distance(boundingBox.center, _boundingBox.Bounds.center)<2);
             _boundingBox.Bounds = boundingBox;
             _boundingBox.MaxLongitude = boundingBox.width > boundingBox.height ? boundingBox.height : boundingBox.width;
             _boundingBox.MaxLongitude = _boundingBox.MaxLongitude < 1f ? 1f : _boundingBox.MaxLongitude;
