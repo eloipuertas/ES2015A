@@ -110,14 +110,21 @@ public abstract class BasePlayer : Utils.SingletonMono<BasePlayer> {
                                         building.type.building,
                                         _selfRace, false, 1.0f);
 
-            IGameEntity entity = created.GetComponent<IGameEntity>();
-            if (building.hasStatus)
+            if (created)
             {
-                entity.DefaultStatus = building.status;
-                entity.setStatus(building.status);
-            }
+                IGameEntity entity = created.GetComponent<IGameEntity>();
+                if (building.hasStatus)
+                {
+                    entity.DefaultStatus = building.status;
+                    entity.setStatus(building.status);
+                }
 
-            AddBuilding(entity);
+                AddBuilding(entity);
+            }
+            else
+            {
+                Debug.LogWarning("Could not create Building: " + building + "\nPosition: " + position);
+            }
         }
     }
 

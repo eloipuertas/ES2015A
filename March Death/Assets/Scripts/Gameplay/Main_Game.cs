@@ -114,11 +114,18 @@ public class Main_Game : MonoBehaviour
         loadPlayers();
     }
 
-    public void ClearGame()
+    public void ClearGame(bool destroyGameInformation = true)
     {
-        GameObject obj;
-        obj = GameObject.Find("GameInformationObject").gameObject;
-        Destroy(obj);
+        GameObject gameInformationObject = GameObject.Find("GameInformationObject");
+        if (destroyGameInformation)
+        {
+            Destroy(gameInformationObject);
+        }
+        else
+        {
+            //GameInformation info = gameInformationObject.GetComponent<GameInformation>();
+            //info.cle
+        }
 
         EntityAbilitiesController.get.Clear();
 

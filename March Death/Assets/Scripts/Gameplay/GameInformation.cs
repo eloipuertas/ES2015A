@@ -368,7 +368,7 @@ public class GameInformation : MonoBehaviour
 
     public void SetStoryPlayers()
     {
-        if (game == null) setGameMode(GameMode.CAMPAIGN);
+        setGameMode(GameMode.CAMPAIGN);
         Races enemyRace = playerRace == Races.ELVES ? Races.MEN : Races.ELVES;
         game.AddPlayerInformation(initializePlayer(playerRace, "Cube_Player_Stronghold"));
         game.AddPlayerInformation(initializePlayer(enemyRace, "Cube_Enemy_Stronghold"));

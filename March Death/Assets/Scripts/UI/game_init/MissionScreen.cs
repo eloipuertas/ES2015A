@@ -19,6 +19,12 @@ public class MissionScreen : MonoBehaviour
 
     public void LoadNextLevel()
     {
+        GameObject main = GameObject.FindWithTag("GameController");
+        if (main)
+        {
+            main.GetComponent<Main_Game>().ClearGame(false);
+        }
+
         Application.LoadLevel(Application.loadedLevel + 1);
     }
 
