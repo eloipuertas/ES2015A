@@ -5,13 +5,13 @@ public class MissionStatus
 {
     private Dictionary<Storage.BuildingTypes, uint[]> buildings;
     private Dictionary<Storage.UnitTypes, uint[]> units;
-    private Dictionary<WorldResources.Type, uint[]> resources;
+    //private Dictionary<WorldResources.Type, uint[]> resources;
 
     private int owner;
 
     private MissionController controller;
 
-    private static readonly int ACCUMULATE = 0;
+    //private static readonly int ACCUMULATE = 0;
 
     public MissionStatus(int owner)
     {
@@ -63,12 +63,14 @@ public class MissionStatus
 
     public void OnResourceAmountChanged(WorldResources.Type type, uint newAmmount) {}
 
+    /*
     public void OnResourceAdded(WorldResources.Type type, uint ammount)
     {
         uint[] missionTargets;
         if (resources.TryGetValue(type, out missionTargets))
         {
             // Logic for the resource finding (accumulation) mission
+            // The idea is to balance the resource amount to be zero
             if (missionTargets[0] != 0)
             {
                 if (missionTargets[0] < ammount)
@@ -97,13 +99,14 @@ public class MissionStatus
             // TODO Logic for resource keeping
         }
     }
+    */
 
     public void OnBuildingCreated(Storage.BuildingTypes type)
     {
         uint[] missionTargets;
         if (buildings.TryGetValue(type, out missionTargets))
         {
-            if (missionTargets[1] > 0)
+            if (missionTargets[1] > 0)   // There are targets in the "to be created" slot
             {
                 missionTargets[1]--;
                 if (missionTargets[1] == 0)
@@ -119,7 +122,7 @@ public class MissionStatus
         uint[] missionTargets;
         if (buildings.TryGetValue(type, out missionTargets))
         {
-            if (missionTargets[0] > 0)
+            if (missionTargets[0] > 0)   // There are targets in the "to be destroyed" slot
             {
                 missionTargets[0]--;
                 if (missionTargets[0] == 0)
@@ -137,7 +140,7 @@ public class MissionStatus
         uint[] missionTargets;
         if (units.TryGetValue(type, out missionTargets))
         {
-            if (missionTargets[1] > 0)
+            if (missionTargets[1] > 0)   // There are targets in the "to be created" slot
             {
                 missionTargets[1]--;
                 if (missionTargets[1] == 0)
@@ -153,7 +156,7 @@ public class MissionStatus
         uint[] missionTargets;
         if (units.TryGetValue(type, out missionTargets))
         {
-            if (missionTargets[0] > 0)
+            if (missionTargets[0] > 0)   // There are targets in the "to be destroyed" slot
             {
                 missionTargets[0]--;
                 if (missionTargets[0] == 0)
