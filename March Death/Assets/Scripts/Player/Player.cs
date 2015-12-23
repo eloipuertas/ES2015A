@@ -187,8 +187,10 @@ public class Player : BasePlayer
     {
         _activeEntities.Add(newEntity);
         registerEntityEvents(newEntity);
+
         if (newEntity.info.isBuilding)
             events.DisplayBuildingUnderConstruction((Storage.BuildingInfo) newEntity.info);
+
         Debug.Log(_activeEntities.Count + " entities");
     }
 

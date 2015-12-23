@@ -185,10 +185,9 @@ public class Unit : GameEntity<Unit.Actions>
     /// <param name="gob"></param>
     private void onTargetDied(System.Object obj)
     {
-        setStatus(EntityStatus.IDLE);
-        // TODO: After merge, I had a conflich in this line and I hesitated what to do
         fire(Actions.TARGET_TERMINATED, obj);
 
+        setStatus(EntityStatus.IDLE);
         _target = null;
     }
 

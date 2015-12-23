@@ -35,7 +35,9 @@ public partial class UserInput
             RaycastHit hit;
             bool hasHit;
             position = FindHit(out hasHit, Constants.Layers.TERRAIN_MASK).point;
-            Storage.Info.get.createUnit(BasePlayer.player.race, Storage.UnitTypes.SPECIALONE, position, Quaternion.Euler(0f, 0f, 0f), 0);
+            GameObject gameObject = Storage.Info.get.createUnit(BasePlayer.player.race, Storage.UnitTypes.SPECIALONE, position, Quaternion.Euler(0f, 0f, 0f), 0);
+
+            BasePlayer.player.addEntity(gameObject.GetComponent<IGameEntity>());
             Debug.Log("New SpecialOne Unit!");
             /*
 
