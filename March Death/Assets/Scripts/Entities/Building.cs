@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Reflection;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
+
 using Storage;
 using Utils;
-using System.Collections;
 
 
 /// <summary>
@@ -84,6 +86,7 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
     /// </summary>
     protected override void onFatalWounds()
     {
+        setStatus(EntityStatus.DESTROYED);
         fire(DESTROYED);
     }
 
@@ -111,8 +114,11 @@ public abstract class Building<T> : GameEntity<T>, IBuilding where T : struct, I
 		}
 
         ResourcesEvents.get.unregisterBuildingToEvents(this);
+
         base.OnDestroy();
-	}
+        
+        Assert.IsTrue(status == EntityStatus.DEAD);
+    }
 
 
     /// <summary>

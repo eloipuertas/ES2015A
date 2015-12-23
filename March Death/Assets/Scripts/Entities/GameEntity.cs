@@ -8,6 +8,7 @@ using Storage;
 using Utils;
 
 using UnityEngine;
+using UnityEngine.Assertions;
 
 
 public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IConvertible
@@ -117,7 +118,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         Ability ability = (Ability)obj;
         int addOrSubs = ability.isActive ? 1 : -1;
 
-        if (info.isUnit)
+        if (info.isUnit || info.isPseudoUnit)
         {
             ((UnitAbility)_accumulatedModifier).weaponAbilityModifier =
                  addOrSubs * ability.info<UnitAbility>().weaponAbilityModifier;
@@ -208,7 +209,7 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
     /// </summary>
     protected void setupAbilities()
     {
-        if (info.isUnit)
+        if (info.isUnit || info.isPseudoUnit)
         {
             _accumulatedModifier = new UnitAbility();
         }
@@ -293,6 +294,9 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
 
     public void Destroy(bool immediately = false)
     {
+        // Check we are dead before calling Destroy
+        Assert.IsTrue(status == EntityStatus.DEAD || status == EntityStatus.DESTROYED);
+
         // TODO: Should this be automatically handled with events?
         FOWManager.Instance.removeEntity(this.GetComponent<FOWEntity>());
 
@@ -465,9 +469,9 @@ public abstract class GameEntity<T> : Actor<T>, IGameEntity where T : struct, IC
         // Check if we are dead
         if (_woundsReceived == info.attributes.wounds)
         {
-            setStatus(info.isUnit ? EntityStatus.DEAD : EntityStatus.DESTROYED);
             onFatalWounds();
             Destroy();
+            return;
         }
 
         // If we are a unit and doing nothing, attack back
