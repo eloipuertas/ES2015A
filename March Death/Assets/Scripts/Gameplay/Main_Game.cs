@@ -121,6 +121,10 @@ public class Main_Game : MonoBehaviour
         Destroy(obj);
 
         EntityAbilitiesController.get.Clear();
+
+        Utils.Subscriber<FOWEntity.Actions, FOWEntity>.get.Clear();
+        Utils.Subscriber<EntityMarker.Actions, EntityMarker>.get.Clear();
+        Utils.Subscriber<Selectable.Actions, Selectable>.get.Clear();
     }
 
     void Update()
