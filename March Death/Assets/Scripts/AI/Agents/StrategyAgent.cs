@@ -32,11 +32,18 @@ namespace Assets.Scripts.AI.Agents
         {
             rnd = new System.Random();
             //Until we have a better way to mix it we will just keep it random
-            timings = new Stack<int>(); 
-            timings.Push(rnd.Next(1300, 1700));
-            timings.Push(rnd.Next(400, 600));
-            if (rnd.Next(0, 9) < 3) //add a rush
-                timings.Push(rnd.Next(60,100));
+            timings = new Stack<int>();
+            if (!ai.StoryMode)
+            {
+                timings.Push(rnd.Next(1300, 1700));
+                timings.Push(rnd.Next(400, 600));
+                if (rnd.Next(0, 9) < 3) //add a rush
+                    timings.Push(rnd.Next(60, 100));
+            }
+            else
+            {
+                timings.Push(rnd.Next(10000, 13000));
+            }
             patrolPoints = ai.Macro.architect.baseCriticPoints;
             attacking = false;
             FIND_PLAYER_RATE = FIND_PLAYER_RATE - 60 * ai.DifficultyLvl;
@@ -49,7 +56,7 @@ namespace Assets.Scripts.AI.Agents
             {
                 if(target != null && target.status != EntityStatus.DESTROYED)
                 {
-                        squad.AttackTo(target);
+                    squad.AttackTo(target);
                 }
                 else
                 {
