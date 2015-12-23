@@ -7,8 +7,24 @@ public class MissionScreen : MonoBehaviour
 
     void Start()
     {
+        GameInformation info;
         Time.timeScale = 0;
         // TODO Find "estandarte"; if exists, then update appropriately
+        info = GameObject.Find("GameInformationObject").GetComponent<GameInformation>();
+        if (info.getGameMode() == GameInformation.GameMode.CAMPAIGN)
+        {
+            switch (info.GetPlayerRace())
+            {
+                case Storage.Races.ELVES:
+                    GameObject.Find(SCREEN_NAME + "/estandarte2_Human").SetActive(false);
+                    GameObject.Find(SCREEN_NAME + "/estandarte1_Human").SetActive(false);
+                    break;
+                case Storage.Races.MEN:
+                    GameObject.Find(SCREEN_NAME + "/estandarte2_Elf").SetActive(false);
+                    GameObject.Find(SCREEN_NAME + "/estandarte1_Elf").SetActive(false);
+                    break;
+            }
+        }
     }
 
     public void Close()
