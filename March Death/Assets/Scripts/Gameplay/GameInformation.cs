@@ -340,7 +340,7 @@ public class GameInformation : MonoBehaviour
         game.AddMission(Battle.MissionType.DESTROY, 1, EntityType.UNIT, t, 0, true, "");
         // Initializes the human civilization
         Battle.PlayerInformation player = new Battle.PlayerInformation(Races.MEN);
-        player.AddBuilding(BuildingTypes.STRONGHOLD, 782, 880, EntityStatus.IDLE);
+        player.AddBuilding(BuildingTypes.STRONGHOLD, 752, 880, EntityStatus.IDLE);
         player.AddUnit(UnitTypes.HERO, 764.9564f, 823.0175f);
         player.SetInitialResources(2000, 2000, 2000, 2000);
         game.AddPlayerInformation(player);
