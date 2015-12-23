@@ -43,11 +43,15 @@ class LightHouseRevealer : MonoBehaviour
         _light.SetActive(false);
 
         transform.parent.GetComponent<Barrack>().register(Barrack.Actions.BUILDING_FINISHED, OnBuildingFinished);
+        transform.parent.GetComponent<Barrack>().register(Barrack.Actions.DESTROYED, OnBuildingDestroyed);
         _target = null;
 
     }
 
-
+    public void OnBuildingDestroyed(System.Object obj)
+    {
+        _attacker.stopAttack();
+    }
 
     public virtual void Update()
     {

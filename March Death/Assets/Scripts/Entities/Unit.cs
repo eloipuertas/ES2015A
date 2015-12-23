@@ -338,26 +338,34 @@ public class Unit : GameEntity<Unit.Actions>
     /// <returns>Returns true if target is in range, false otherwise</returns>
     public bool attackTarget<A>(GameEntity<A> entity, bool selfDefense) where A : struct, IConvertible
     {
+        // HACK: Ideally, we should not have to consider an special case for WatchTower / LightHouse Revealer
         if (entity.info.isPseudoUnit)
         {
-            return attackTarget(entity.transform.GetComponentInParent<Barrack>(), selfDefense);
+            Barrack barrack = entity.transform.GetComponentInParent<Barrack>();
+            if (barrack.status != EntityStatus.DESTROYED)
+            {
+                return attackTarget(barrack, selfDefense);
+            }
+
+            return false;
         }
 
         // Note: Cast is redundant but avoids warning
         if (_target != (IGameEntity)entity)
         {
+            // Stop attacking current target
+            Selectable selectable = null;
+            if (status == EntityStatus.ATTACKING)
+            {
+                selectable = _target.getGameObject().GetComponent<Selectable>();
+                selectable.NotAttackedEntity();
+                stopAttack();
+            }
+
             // Register for DEAD/DESTROYED and HIDDEN
             _auto += entity.registerFatalWounds(onTargetDied);
             _auto += entity.GetComponent<FOWEntity>().register(FOWEntity.Actions.HIDDEN, onTargetHidden);
-
-            // if target has changed, hide old target health
-            Selectable selectable = null;
-            if (_target != null)
-            {
-            	selectable = _target.getGameObject().GetComponent<Selectable>();
-            	selectable.NotAttackedEntity();
-            }
-
+            
             _target = entity;
             _selfDefense = selfDefense;
             _lastAttack = Time.time - (1f / info.unitAttributes.attackRate);
